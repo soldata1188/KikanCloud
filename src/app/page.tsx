@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { Shield, ArrowRight, AlertCircle, Clock, CheckCircle2, CalendarCheck, Calendar, Users, Building2, AlertTriangle, Plus, SlidersHorizontal, Mic } from 'lucide-react'
 import { Sidebar } from '@/components/Sidebar'
+import { DemoManager } from '@/components/DemoManager'
 
 export const dynamic = 'force-dynamic';
 
@@ -53,6 +54,7 @@ export default async function Dashboard() {
         <header className="flex justify-between items-center px-4 py-3 md:px-6 md:py-4 sticky top-0 bg-[#f0f4f9] z-10">
           <h1 className="text-[22px] font-normal text-[#444746] tracking-tight">Kikan AI</h1>
           <div className="flex items-center gap-2">
+            <DemoManager />
             <span className="hidden sm:flex px-3 py-1 bg-white rounded-full text-[11px] font-semibold text-[#444746] tracking-wider border border-gray-200">ULTRA</span>
             <button className="flex items-center gap-2 pl-4 pr-1.5 py-1.5 bg-white rounded-full text-sm font-medium text-[#444746] hover:bg-gray-50 transition border border-gray-200 shadow-sm cursor-pointer">
               仕事 <div className="w-8 h-8 rounded-full bg-[#d81b60] text-white flex items-center justify-center text-xs font-bold">{displayName.charAt(0)}</div>

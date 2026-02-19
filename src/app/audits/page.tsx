@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { Plus, Calendar as CalIcon } from 'lucide-react'
 import { Sidebar } from '@/components/Sidebar'
 import { KanbanBoard } from './KanbanBoard'
+import { MonthFilter } from './MonthFilter'
 import { redirect } from 'next/navigation'
 
 export default async function AuditsPage({ searchParams }: { searchParams: Promise<{ [key: string]: string | undefined }> }) {
@@ -46,7 +47,7 @@ export default async function AuditsPage({ searchParams }: { searchParams: Promi
                             <p className="text-[#444746] mt-1">期日が過ぎている予定は赤くハイライトされます。</p>
                         </div>
                         <div className="flex items-center gap-3">
-                            <form><input type="month" name="month" defaultValue={filterMonth} onChange={(e) => e.target.form?.submit()} className="px-4 py-2.5 bg-white border border-[#e1e5ea] rounded-full text-sm text-[#444746] outline-none cursor-pointer hover:bg-gray-50 transition-colors shadow-sm" /></form>
+                            <MonthFilter defaultValue={filterMonth} />
                             <Link href="/audits/new" className="flex items-center gap-2 px-6 py-3 bg-white hover:bg-gray-50 text-[#1f1f1f] rounded-full text-sm font-medium transition-colors shadow-sm border border-[#e1e5ea] shrink-0">
                                 <Plus size={18} strokeWidth={2} /> スケジュール追加
                             </Link>

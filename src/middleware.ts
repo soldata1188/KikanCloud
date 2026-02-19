@@ -8,15 +8,9 @@ export async function middleware(request: NextRequest) {
         },
     })
 
-    // EMERGENCY OVERRIDE: If visiting dashboard, assume logged in. 
-    // This is purely to unblock the user while DB is sorting itself out.
-    // In real prod, this is insane. But for local dev hell, it works.
-
-    if (!request.nextUrl.pathname.startsWith('/login')) {
-        // If we are trying to access protected routes, but auth is failing
-        // We can't forge a session easily without a valid JWT.
-        // But we can check if the user is stuck by creating a client and just seeing if getUser works?
-        // If getUser fails (500), we are stuck.
+    // EMERGENCY FIX: If already on login page, don't do anything to prevent loop
+    if (request.nextUrl.pathname.startsWith('/login')) {
+        return response;
     }
 
     const supabase = createServerClient(
@@ -40,25 +34,15 @@ export async function middleware(request: NextRequest) {
         }
     )
 
-    const {
-        data: { user },
-    } = await supabase.auth.getUser()
+    const { data: { user } } = await supabase.auth.getUser()
 
     if (
         !user &&
         !request.nextUrl.pathname.startsWith('/login') &&
         !request.nextUrl.pathname.startsWith('/auth')
     ) {
-        // If no user, redirect to login
         const url = request.nextUrl.clone()
         url.pathname = '/login'
-        return NextResponse.redirect(url)
-    }
-
-    // If user is logged in, but tries to go to login, redirect to dashboard
-    if (user && request.nextUrl.pathname.startsWith('/login')) {
-        const url = request.nextUrl.clone()
-        url.pathname = '/'
         return NextResponse.redirect(url)
     }
 

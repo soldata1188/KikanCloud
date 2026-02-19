@@ -1,9 +1,10 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { deleteCompany } from './actions'
-import { Plus, Search, Edit2, Users, Building2, MapPin, Contact } from 'lucide-react'
+import { Plus, Users, Search, Edit2, Trash2, Building2, MapPin, Contact } from 'lucide-react'
 import { Sidebar } from '@/components/Sidebar'
 import { CompanyDeleteButton } from '@/components/SubmitButtons'
+import { ImportModal } from './ImportModal'
 import { redirect } from 'next/navigation'
 
 export default async function CompaniesList() {
@@ -35,11 +36,13 @@ export default async function CompaniesList() {
                 <div className="flex-1 flex flex-col px-4 pb-12 w-full max-w-[1200px] mx-auto mt-4 md:mt-8">
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pl-2">
                         <h2 className="text-[32px] md:text-[40px] font-medium tracking-tight text-[#1f1f1f]">受入企業 管理</h2>
-                        <Link href="/companies/new" className="flex items-center gap-2 px-6 py-3 bg-white hover:bg-gray-50 text-[#1f1f1f] rounded-full text-sm font-medium transition-colors shadow-sm border border-[#e1e5ea]">
-                            <Plus size={18} strokeWidth={2} /> 新規登録
-                        </Link>
+                        <div className="flex items-center gap-3 overflow-x-auto pb-2 md:pb-0">
+                            <ImportModal />
+                            <Link href="/companies/new" className="flex items-center gap-2 px-6 py-3 bg-white hover:bg-gray-50 text-[#1f1f1f] rounded-full text-sm font-medium transition-colors shadow-sm border border-[#e1e5ea] shrink-0">
+                                <Plus size={18} strokeWidth={2} /> 新規登録
+                            </Link>
+                        </div>
                     </div>
-
                     <div className="bg-white rounded-[32px] p-2 shadow-[0_4px_16px_rgba(0,0,0,0.04)] border border-[#e1e5ea] mb-8 max-w-[800px]">
                         <div className="min-h-[48px] px-4 py-2 flex items-center gap-3">
                             <Search size={20} className="text-[#444746]" strokeWidth={1.5} />

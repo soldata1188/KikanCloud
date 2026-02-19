@@ -111,7 +111,7 @@ export default async function Dashboard() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
 
             {/* WIDGET 1: CẢNH BÁO HẾT HẠN (ĐỎ) */}
-            <div className="bg-white rounded-[32px] p-6 shadow-sm border border-red-100 flex flex-col relative overflow-hidden">
+            <div className="bg-white rounded-[32px] p-6 shadow-sm border border-[#e1e5ea] flex flex-col relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-400 to-red-600"></div>
               <h3 className="text-lg font-medium text-[#1f1f1f] mb-4 flex items-center gap-2 mt-2">
                 <AlertCircle className="text-red-500" size={20} /> 期限が迫っている手続き
@@ -148,7 +148,7 @@ export default async function Dashboard() {
             </div>
 
             {/* WIDGET 2: CÔNG VIỆC KANSA (CAM) */}
-            <div className="bg-white rounded-[32px] p-6 shadow-sm border border-orange-100 flex flex-col relative overflow-hidden">
+            <div className="bg-white rounded-[32px] p-6 shadow-sm border border-[#e1e5ea] flex flex-col relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orange-300 to-orange-500"></div>
               <h3 className="text-lg font-medium text-[#1f1f1f] mb-4 flex items-center gap-2 mt-2">
                 <CalendarCheck className="text-orange-500" size={20} /> 今月の監査・訪問タスク

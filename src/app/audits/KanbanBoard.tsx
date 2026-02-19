@@ -38,7 +38,7 @@ export function KanbanBoard({ audits }: { audits: any[] }) {
                             const typeInfo = getTypeStyle(audit.audit_type);
 
                             return (
-                                <div key={audit.id} className={`bg-white p-5 rounded-[24px] shadow-sm border ${isOverdue ? 'border-red-400 shadow-[0_0_12px_rgba(234,67,53,0.15)]' : 'border-[#e1e5ea]'} hover:shadow-md transition-all group relative`}>
+                                <div key={audit.id} className={`bg-white p-5 rounded-[24px] shadow-sm border border-[#e1e5ea] hover:shadow-md transition-all group relative`}>
                                     <div className="flex justify-between items-start mb-3">
                                         <span className={`text-[10px] px-2 py-1 rounded-full font-medium ${typeInfo.style}`}>{typeInfo.label}</span>
                                         <div className="flex items-center gap-2">

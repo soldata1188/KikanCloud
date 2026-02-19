@@ -37,3 +37,12 @@ export function CompanyDeleteButton() {
         </button>
     )
 }
+
+export function AuditDeleteButton() {
+    const { pending } = useFormStatus()
+    return (
+        <button type="submit" disabled={pending} className={`p-2 rounded-full transition-colors ${pending ? 'text-gray-300' : 'text-[#444746] hover:text-red-600 hover:bg-red-50'}`} title="削除" onClick={(e) => { if (!confirm('このスケジュールを削除してもよろしいですか？')) e.preventDefault() }}>
+            <Trash2 size={20} strokeWidth={1.5} />
+        </button>
+    )
+}

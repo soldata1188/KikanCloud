@@ -47,11 +47,11 @@ export default async function NewWorkerPage() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label className="block text-sm font-medium text-[#444746] mb-2">氏名（ローマ字） <span className="text-red-500 ml-1">*</span></label>
-                                    <input name="full_name_romaji" type="text" required placeholder="NGUYEN VAN A" className="w-full bg-[#f0f4f9] hover:bg-[#e1e5ea]/50 focus:bg-white border border-transparent focus:border-[#4285F4] rounded-2xl px-4 py-3.5 outline-none transition-all uppercase text-[#1f1f1f]" />
+                                    <input name="full_name_romaji" type="text" required placeholder="例：NGUYEN VAN A" className="w-full bg-[#f0f4f9] hover:bg-[#e1e5ea]/50 focus:bg-white border border-transparent focus:border-[#4285F4] rounded-2xl px-4 py-3.5 outline-none transition-all uppercase text-[#1f1f1f]" />
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-[#444746] mb-2">氏名（カナ） <span className="text-red-500 ml-1">*</span></label>
-                                    <input name="full_name_kana" type="text" required placeholder="グエン ヴァン ア" className="w-full bg-[#f0f4f9] hover:bg-[#e1e5ea]/50 focus:bg-white border border-transparent focus:border-[#4285F4] rounded-2xl px-4 py-3.5 outline-none transition-all text-[#1f1f1f]" />
+                                    <input name="full_name_kana" type="text" required placeholder="例：グエン ヴァン ア" className="w-full bg-[#f0f4f9] hover:bg-[#e1e5ea]/50 focus:bg-white border border-transparent focus:border-[#4285F4] rounded-2xl px-4 py-3.5 outline-none transition-all text-[#1f1f1f]" />
                                 </div>
                             </div>
 
@@ -62,26 +62,26 @@ export default async function NewWorkerPage() {
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-[#444746] mb-2">在留カード番号</label>
-                                    <input name="zairyu_no" type="text" placeholder="AB12345678CD" maxLength={12} className="w-full bg-[#f0f4f9] hover:bg-[#e1e5ea]/50 focus:bg-white border border-transparent focus:border-[#4285F4] rounded-2xl px-4 py-3.5 outline-none transition-all uppercase text-[#1f1f1f]" />
+                                    <input name="zairyu_no" type="text" placeholder="例：AB12345678CD" maxLength={12} className="w-full bg-[#f0f4f9] hover:bg-[#e1e5ea]/50 focus:bg-white border border-transparent focus:border-[#4285F4] rounded-2xl px-4 py-3.5 outline-none transition-all uppercase text-[#1f1f1f]" />
                                 </div>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2 border-t border-[#f0f4f9]">
                                 <div>
                                     <label className="block text-sm font-medium text-[#444746] mb-2">制度区分 <span className="text-red-500 ml-1">*</span></label>
-                                    <select name="system_type" required className="w-full bg-[#f0f4f9] hover:bg-[#e1e5ea]/50 focus:bg-white border border-transparent focus:border-[#4285F4] rounded-2xl px-4 py-3.5 outline-none transition-all appearance-none cursor-pointer text-[#1f1f1f]">
-                                        <option value="ikusei_shuro">育成就労 (Ikusei Shuro)</option>
-                                        <option value="tokuteigino">特定技能 (Tokuteigino)</option>
-                                        <option value="ginou_jisshu">技能実習 (Ginou Jisshu)</option>
+                                    <select name="system_type" required defaultValue="ikusei_shuro" className="w-full bg-[#f0f4f9] hover:bg-[#e1e5ea]/50 focus:bg-white border border-transparent focus:border-[#4285F4] rounded-2xl px-4 py-3.5 outline-none transition-all appearance-none cursor-pointer text-[#1f1f1f]">
+                                        <option value="ikusei_shuro">育成就労</option>
+                                        <option value="tokuteigino">特定技能</option>
+                                        <option value="ginou_jisshu">技能実習</option>
                                     </select>
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-[#444746] mb-2">ステータス <span className="text-red-500 ml-1">*</span></label>
-                                    <select name="status" required className="w-full bg-[#f0f4f9] hover:bg-[#e1e5ea]/50 focus:bg-white border border-transparent focus:border-[#4285F4] rounded-2xl px-4 py-3.5 outline-none transition-all appearance-none cursor-pointer text-[#1f1f1f]">
-                                        <option value="waiting">待機中 (Chờ bay)</option>
-                                        <option value="working" selected>就業中 (Đang làm)</option>
-                                        <option value="missing">失踪 (Bỏ trốn)</option>
-                                        <option value="returned">帰国 (Về nước)</option>
+                                    <select name="status" required defaultValue="working" className="w-full bg-[#f0f4f9] hover:bg-[#e1e5ea]/50 focus:bg-white border border-transparent focus:border-[#4285F4] rounded-2xl px-4 py-3.5 outline-none transition-all appearance-none cursor-pointer text-[#1f1f1f]">
+                                        <option value="waiting">入国待ち</option>
+                                        <option value="working">就業中</option>
+                                        <option value="missing">失踪</option>
+                                        <option value="returned">帰国</option>
                                     </select>
                                 </div>
                             </div>
@@ -89,8 +89,8 @@ export default async function NewWorkerPage() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label className="block text-sm font-medium text-[#444746] mb-2">配属先企業</label>
-                                    <select name="company_id" className="w-full bg-[#f0f4f9] hover:bg-[#e1e5ea]/50 focus:bg-white border border-transparent focus:border-[#4285F4] rounded-2xl px-4 py-3.5 outline-none transition-all appearance-none cursor-pointer text-[#1f1f1f]">
-                                        <option value="">未配属 (Chưa quyết định)</option>
+                                    <select name="company_id" defaultValue="" className="w-full bg-[#f0f4f9] hover:bg-[#e1e5ea]/50 focus:bg-white border border-transparent focus:border-[#4285F4] rounded-2xl px-4 py-3.5 outline-none transition-all appearance-none cursor-pointer text-[#1f1f1f]">
+                                        <option value="">未配属</option>
                                         {companies?.map(c => <option key={c.id} value={c.id}>{c.name_jp}</option>)}
                                     </select>
                                 </div>

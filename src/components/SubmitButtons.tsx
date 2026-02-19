@@ -5,7 +5,7 @@ import { Trash2, Sparkles } from 'lucide-react'
 export function DeleteButton() {
     const { pending } = useFormStatus()
     return (
-        <button type="submit" disabled={pending} className={`p-2 rounded-full transition-colors ${pending ? 'text-gray-300' : 'text-[#444746] hover:text-red-600 hover:bg-red-50'}`} title="削除" onClick={(e) => { if (!confirm('この外国人のデータを削除しますか？\n(※システム上は非表示になりますが、監査用にデータは保持されます)')) e.preventDefault() }}>
+        <button type="submit" disabled={pending} className={`p-2 rounded-full transition-colors ${pending ? 'text-gray-300' : 'text-[#444746] hover:text-red-600 hover:bg-red-50'}`} title="削除" onClick={(e) => { if (!confirm('この外国人材のデータを削除してもよろしいですか？\n※システム上は非表示となりますが、監査データとして保持されます。')) e.preventDefault() }}>
             <Trash2 size={20} strokeWidth={1.5} />
         </button>
     )

@@ -1,8 +1,10 @@
+```
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { deleteWorker } from './actions'
-import { Plus, Search, Edit2 } from 'lucide-react'
+import { Plus, Users, Search, Edit2, Wallet, Briefcase, Clock, Tag } from 'lucide-react'
 import { Sidebar } from '@/components/Sidebar'
+import { ImportModal } from './ImportModal'
 import { DeleteButton } from '@/components/SubmitButtons'
 import { redirect } from 'next/navigation'
 
@@ -33,11 +35,14 @@ export default async function WorkersList() {
                 </header>
 
                 <div className="flex-1 flex flex-col px-4 pb-12 w-full max-w-[1000px] mx-auto mt-4 md:mt-8">
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pl-2">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pl-2">
                         <h2 className="text-[32px] md:text-[40px] font-medium tracking-tight text-[#1f1f1f]">外国人材 管理</h2>
-                        <Link href="/workers/new" className="flex items-center gap-2 px-6 py-3 bg-white hover:bg-gray-50 text-[#1f1f1f] rounded-full text-sm font-medium transition-colors shadow-sm border border-[#e1e5ea]">
-                            <Plus size={18} strokeWidth={2} /> 新規登録
-                        </Link>
+                        <div className="flex items-center gap-3 overflow-x-auto pb-2 md:pb-0">
+                            <ImportModal />
+                            <Link href="/workers/new" className="flex items-center gap-2 px-6 py-3 bg-white hover:bg-gray-50 text-[#1f1f1f] rounded-full text-sm font-medium transition-colors shadow-sm border border-[#e1e5ea] shrink-0">
+                                <Plus size={18} strokeWidth={2} /> 新規登録
+                            </Link>
+                        </div>
                     </div>
 
                     <div className="bg-white rounded-[32px] p-2 shadow-[0_4px_16px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)] transition-shadow duration-300 mb-8 border border-[#e1e5ea]">
@@ -69,16 +74,16 @@ export default async function WorkersList() {
                                                         {w.avatar_url ? <img src={w.avatar_url} alt="Avatar" className="w-full h-full object-cover" /> : <span className="text-[#444746] font-medium text-sm">{w.full_name_romaji.charAt(0)}</span>}
                                                     </div>
                                                     <div>
-                                                        <Link href={`/workers/${w.id}/edit`} className="block group-hover:text-[#4285F4] transition-colors" title="クリックして編集">
+                                                        <Link href={`/ workers / ${ w.id }/edit`} className = "block group-hover:text-[#4285F4] transition-colors" title = "クリックして編集" >
                                                             <div className="font-medium text-[#1f1f1f] group-hover:text-[#4285F4] flex items-center gap-2">
                                                                 {w.full_name_romaji}
                                                                 {w.nationality && <span className="text-[10px] px-1.5 py-0.5 bg-gray-100 text-gray-500 rounded border border-gray-200">{w.nationality}</span>}
                                                             </div>
                                                             <div className="text-xs text-gray-400 mt-0.5">{w.full_name_kana} {w.entry_batch && `・ ${w.entry_batch}`}</div>
-                                                        </Link>
-                                                    </div>
-                                                </div>
-                                            </td>
+                                                        </Link >
+                                                    </div >
+                                                </div >
+                                            </td >
                                             <td className="px-6 py-4 hidden md:table-cell font-mono text-xs uppercase tracking-wider">{w.zairyu_no || 'ー'}</td>
                                             <td className="px-6 py-4">
                                                 <span className={`px-2.5 py-1 rounded-full text-[11px] font-medium ${w.system_type === 'ikusei_shuro' ? 'bg-[#c4eed0] text-[#0d652d]' : w.system_type === 'tokuteigino' ? 'bg-[#c2e7ff] text-[#001d35]' : 'bg-[#fce8e6] text-[#b31412]'}`}>
@@ -102,14 +107,14 @@ export default async function WorkersList() {
                                                     </form>
                                                 </div>
                                             </td>
-                                        </tr>
+                                        </tr >
                                     ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </main>
-        </div>
+                                </tbody >
+                            </table >
+                        </div >
+                    </div >
+                </div >
+            </main >
+        </div >
     )
 }

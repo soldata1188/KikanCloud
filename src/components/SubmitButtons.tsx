@@ -1,0 +1,21 @@
+'use client'
+import { useFormStatus } from 'react-dom'
+import { Trash2, Sparkles } from 'lucide-react'
+
+export function DeleteButton() {
+    const { pending } = useFormStatus()
+    return (
+        <button type="submit" disabled={pending} className={`p-2 rounded-full transition-colors ${pending ? 'text-gray-300' : 'text-[#444746] hover:text-red-600 hover:bg-red-50'}`} title="削除" onClick={(e) => { if (!confirm('この外国人のデータを削除しますか？\n(※システム上は非表示になりますが、監査用にデータは保持されます)')) e.preventDefault() }}>
+            <Trash2 size={20} strokeWidth={1.5} />
+        </button>
+    )
+}
+
+export function SaveButton() {
+    const { pending } = useFormStatus()
+    return (
+        <button type="submit" disabled={pending} className="inline-flex items-center gap-2 px-8 py-3 bg-white border border-[#e1e5ea] text-[#1f1f1f] hover:bg-gray-50 font-medium rounded-full transition-colors shadow-sm disabled:opacity-50">
+            <Sparkles size={18} className="text-[#4285F4]" /> {pending ? '保存中...' : '登録する'}
+        </button>
+    )
+}

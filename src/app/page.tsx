@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { logout } from './login/actions'
-import { Menu, SquarePen, Settings, Shield, Plus, SlidersHorizontal, Mic } from 'lucide-react'
+import { Sidebar } from '@/components/Sidebar'
+import { Shield, Plus, SlidersHorizontal, Mic } from 'lucide-react'
 
 export default async function Dashboard() {
   const supabase = await createClient()
@@ -22,22 +22,7 @@ export default async function Dashboard() {
   return (
     <div className="flex h-screen bg-[#f0f4f9] font-sans text-[#1f1f1f] overflow-hidden selection:bg-blue-100">
 
-      {/* 1. ULTRA-MINIMAL SIDEBAR (GEMINI STYLE) */}
-      <aside className="w-[68px] flex flex-col items-center py-4 shrink-0">
-        <button className="w-12 h-12 flex items-center justify-center rounded-full hover:bg-black/5 transition-colors text-[#444746] mb-2">
-          <Menu size={24} strokeWidth={1.5} />
-        </button>
-        <button className="w-12 h-12 flex items-center justify-center rounded-full hover:bg-black/5 transition-colors text-[#444746]">
-          <SquarePen size={20} strokeWidth={1.5} />
-        </button>
-        <div className="mt-auto flex flex-col gap-4">
-          <form action={logout}>
-            <button type="submit" className="w-12 h-12 flex items-center justify-center rounded-full hover:bg-black/5 transition-colors text-[#444746]" title="設定/ログアウト">
-              <Settings size={22} strokeWidth={1.5} />
-            </button>
-          </form>
-        </div>
-      </aside>
+      <Sidebar active="dashboard" />
 
       {/* 2. MAIN CONTENT AREA */}
       <main className="flex-1 flex flex-col relative overflow-y-auto no-scrollbar">

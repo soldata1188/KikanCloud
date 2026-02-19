@@ -4,7 +4,6 @@ import { logout } from './login/actions'
 import { Menu, SquarePen, Settings, Shield, Plus, SlidersHorizontal, Mic } from 'lucide-react'
 
 export default async function Dashboard() {
-  // --- BACKEND LOGIC (GIỮ NGUYÊN) ---
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')

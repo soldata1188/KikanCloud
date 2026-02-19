@@ -28,3 +28,12 @@ export function UpdateButton() {
         </button>
     )
 }
+
+export function CompanyDeleteButton() {
+    const { pending } = useFormStatus()
+    return (
+        <button type="submit" disabled={pending} className={`p-2 rounded-full transition-colors ${pending ? 'text-gray-300' : 'text-[#444746] hover:text-red-600 hover:bg-red-50'}`} title="削除" onClick={(e) => { if (!confirm('この受入企業を削除してもよろしいですか？\n※所属している外国人材のデータは削除されません。')) e.preventDefault() }}>
+            <Trash2 size={20} strokeWidth={1.5} />
+        </button>
+    )
+}

@@ -134,7 +134,7 @@ export default async function Dashboard() {
                         <span className="font-medium text-[#1f1f1f] group-hover:text-[#4285F4] transition-colors line-clamp-1 pr-2">{w.full_name_romaji}</span>
                         <span className="text-[10px] px-2 py-0.5 rounded-full bg-red-100 text-red-700 font-bold whitespace-nowrap">{reason}</span>
                       </div>
-                      <p className="text-xs text-[#444746] flex items-center gap-1.5"><Clock size={12} className="text-red-400" /> 期限: {dateStr?.replace(/-/g, '/')} <span className="text-gray-300">|</span> {w.companies?.name_jp || '未配属'}</p>
+                      <p className="text-xs text-[#444746] flex items-center gap-1.5"><Clock size={12} className="text-red-400" /> 期限: {dateStr?.replace(/-/g, '/')} <span className="text-gray-300">|</span> {(w.companies as any)?.name_jp || '未配属'}</p>
                     </Link>
                   )
                 }) : (
@@ -159,7 +159,7 @@ export default async function Dashboard() {
                   return (
                     <Link href={`/audits`} key={a.id} className={`block p-4 rounded-[20px] border ${isOverdue ? 'border-orange-200 bg-orange-50/50 hover:bg-orange-50' : 'border-gray-100 hover:bg-gray-50'} transition-colors group`}>
                       <div className="flex justify-between items-start mb-1">
-                        <span className="font-medium text-[#1f1f1f] group-hover:text-[#4285F4] transition-colors line-clamp-1">{a.companies?.name_jp}</span>
+                        <span className="font-medium text-[#1f1f1f] group-hover:text-[#4285F4] transition-colors line-clamp-1">{(a.companies as any)?.name_jp}</span>
                         {isOverdue && <span className="text-[10px] px-2 py-0.5 rounded-full bg-orange-100 text-orange-700 font-bold shrink-0 animate-pulse">遅延</span>}
                       </div>
                       <p className="text-xs text-[#444746] flex items-center gap-1.5">

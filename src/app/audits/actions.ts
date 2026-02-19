@@ -59,3 +59,27 @@ export async function deleteAudit(formData: FormData) {
     await supabase.from('audits').update({ is_deleted: true }).eq('id', id)
     revalidatePath('/audits')
 }
+
+export async function quickToggleAuditStatus(auditId: string) {
+    const supabase = await createClient()
+    const { data: audit } = await supabase.from('audits').select('status').eq('id', auditId).single()
+    if (!audit) return
+
+    let newStatus = 'planned'
+    let actualDate = null
+
+    if (audit.status === 'planned' || audit.status === 'in_progress') {
+        newStatus = 'completed' // Chuyển thẳng sang Hoàn thành
+        const d = new Date()
+        actualDate = new Date(d.getTime() + (9 * 60 * 60 * 1000)).toISOString().split('T')[0] // Giờ JST
+    } else {
+        return // Nếu đã completed thì không làm gì cả
+    }
+
+    const updateData: any = { status: newStatus }
+    if (actualDate) updateData.actual_date = actualDate
+
+    await supabase.from('audits').update(updateData).eq('id', auditId)
+    revalidatePath('/audits')
+    revalidatePath('/')
+}

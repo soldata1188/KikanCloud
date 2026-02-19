@@ -101,3 +101,87 @@ export async function deleteWorker(formData: FormData) {
     revalidatePath('/workers')
     revalidatePath('/')
 }
+
+export async function importWorkers(workersData: any[]) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('Unauthorized')
+    const { data: userData } = await supabase.from('users').select('tenant_id').eq('id', user.id).single()
+
+    // 1. Fetch toàn bộ Xí nghiệp để Auto-Map ID từ Tên
+    const { data: companies } = await supabase.from('companies').select('id, name_jp').eq('is_deleted', false)
+
+    // Các hàm Helper để xử lý Data
+    const parseDate = (dateStr: string) => {
+        if (!dateStr || String(dateStr).trim() === '') return null;
+        const cleanStr = String(dateStr).replace(/\//g, '-');
+        const d = new Date(cleanStr);
+        return isNaN(d.getTime()) ? null : d.toISOString().split('T')[0];
+    }
+
+    const mapSystemType = (text: string) => {
+        const t = String(text || '');
+        if (t.includes('育成就労')) return 'ikusei_shuro'
+        if (t.includes('特定技能')) return 'tokuteigino'
+        return 'ginou_jisshu'
+    }
+
+    const mapStatus = (text: string) => {
+        const t = String(text || '');
+        if (t.includes('待機') || t.includes('入国待')) return 'waiting'
+        if (t.includes('失踪')) return 'missing'
+        if (t.includes('帰国')) return 'returned'
+        return 'working' // Default là Đang làm việc
+    }
+
+    const mapNationality = (text: string) => {
+        const t = String(text || '');
+        if (t.includes('インドネシア')) return 'IDN'
+        if (t.includes('フィリピン')) return 'PHL'
+        if (t.includes('ミャンマー')) return 'MMR'
+        if (t.includes('中国')) return 'CHN'
+        return 'VNM'
+    }
+
+    // 2. Chuẩn hóa và Ép kiểu dữ liệu
+    const payload = workersData.map(w => {
+        // Tìm Company ID nếu người dùng gõ Tên Xí nghiệp vào Excel
+        let cId = null;
+        if (w.company_name) {
+            const found = companies?.find(c => c.name_jp === String(w.company_name).trim())
+            if (found) cId = found.id
+        }
+
+        return {
+            tenant_id: userData?.tenant_id,
+            full_name_romaji: w.full_name_romaji ? String(w.full_name_romaji).toUpperCase().trim() : 'UNKNOWN',
+            full_name_kana: w.full_name_kana ? String(w.full_name_kana).trim() : '-',
+            dob: parseDate(w.dob) || '2000-01-01', // Bắt buộc có ngày sinh
+            company_id: cId,
+            system_type: mapSystemType(w.system_type),
+            status: mapStatus(w.status),
+            zairyu_no: w.zairyu_no ? String(w.zairyu_no).toUpperCase().trim() : null,
+            entry_date: parseDate(w.entry_date),
+            passport_exp: parseDate(w.passport_exp),
+            cert_start_date: parseDate(w.cert_start_date),
+            cert_end_date: parseDate(w.cert_end_date),
+            insurance_exp: parseDate(w.insurance_exp),
+            entry_batch: w.entry_batch ? String(w.entry_batch).trim() : null,
+            nationality: mapNationality(w.nationality),
+            sending_org: w.sending_org ? String(w.sending_org).trim() : null,
+            address: w.address ? String(w.address).trim() : null,
+        }
+    })
+
+    // 3. Insert Bulk (Bắn nguyên mảng lên DB 1 lần)
+    const { error } = await supabase.from('workers').insert(payload)
+    if (error) {
+        console.error('Worker Import Error:', error)
+        throw new Error('インポートに失敗しました。日付の形式（YYYY/MM/DD）等を確認してください。')
+    }
+
+    revalidatePath('/workers')
+    revalidatePath('/companies')
+    revalidatePath('/')
+    return { success: true, count: payload.length }
+}

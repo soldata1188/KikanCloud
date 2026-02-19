@@ -15,7 +15,7 @@ export default async function WorkersList() {
     const displayName = userProfile?.full_name?.split(' ').pop() || '管理者'
 
     const { data: workers } = await supabase.from('workers')
-        .select('id, full_name_romaji, full_name_kana, system_type, status, entry_date, zairyu_no, companies(name_jp)')
+        .select('id, full_name_romaji, full_name_kana, system_type, status, entry_date, zairyu_no, avatar_url, nationality, entry_batch, companies(name_jp)')
         .eq('is_deleted', false).order('created_at', { ascending: false })
 
     return (
@@ -64,10 +64,20 @@ export default async function WorkersList() {
                                     {workers?.map((w) => (
                                         <tr key={w.id} className="hover:bg-white transition-colors group">
                                             <td className="px-6 py-4">
-                                                <Link href={`/workers/${w.id}/edit`} className="block group-hover:text-[#4285F4] transition-colors" title="クリックして編集">
-                                                    <div className="font-medium text-[#1f1f1f] group-hover:text-[#4285F4]">{w.full_name_romaji}</div>
-                                                    <div className="text-xs text-gray-400 mt-0.5">{w.full_name_kana}</div>
-                                                </Link>
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-10 h-10 rounded-full bg-[#f0f4f9] border border-[#e1e5ea] overflow-hidden flex items-center justify-center shrink-0">
+                                                        {w.avatar_url ? <img src={w.avatar_url} alt="Avatar" className="w-full h-full object-cover" /> : <span className="text-[#444746] font-medium text-sm">{w.full_name_romaji.charAt(0)}</span>}
+                                                    </div>
+                                                    <div>
+                                                        <Link href={`/workers/${w.id}/edit`} className="block group-hover:text-[#4285F4] transition-colors" title="クリックして編集">
+                                                            <div className="font-medium text-[#1f1f1f] group-hover:text-[#4285F4] flex items-center gap-2">
+                                                                {w.full_name_romaji}
+                                                                {w.nationality && <span className="text-[10px] px-1.5 py-0.5 bg-gray-100 text-gray-500 rounded border border-gray-200">{w.nationality}</span>}
+                                                            </div>
+                                                            <div className="text-xs text-gray-400 mt-0.5">{w.full_name_kana} {w.entry_batch && `・ ${w.entry_batch}`}</div>
+                                                        </Link>
+                                                    </div>
+                                                </div>
                                             </td>
                                             <td className="px-6 py-4 hidden md:table-cell font-mono text-xs uppercase tracking-wider">{w.zairyu_no || 'ー'}</td>
                                             <td className="px-6 py-4">

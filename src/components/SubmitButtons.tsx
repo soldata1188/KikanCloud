@@ -19,3 +19,12 @@ export function SaveButton() {
         </button>
     )
 }
+
+export function UpdateButton() {
+    const { pending } = useFormStatus()
+    return (
+        <button type="submit" disabled={pending} className="inline-flex items-center gap-2 px-8 py-3 bg-white border border-[#e1e5ea] text-[#1f1f1f] hover:bg-gray-50 font-medium rounded-full transition-colors shadow-sm disabled:opacity-50">
+            <Sparkles size={18} className="text-[#4285F4]" /> {pending ? '更新中...' : '更新する'}
+        </button>
+    )
+}

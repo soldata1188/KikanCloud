@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { deleteWorker } from './actions'
-import { Plus, Search } from 'lucide-react'
+import { Plus, Search, Edit2 } from 'lucide-react'
 import { Sidebar } from '@/components/Sidebar'
 import { DeleteButton } from '@/components/SubmitButtons'
 import { redirect } from 'next/navigation'
@@ -43,7 +43,7 @@ export default async function WorkersList() {
                     <div className="bg-white rounded-[32px] p-2 shadow-[0_4px_16px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)] transition-shadow duration-300 mb-8 border border-[#e1e5ea]">
                         <div className="min-h-[48px] px-4 py-2 flex items-center gap-3">
                             <Search size={20} className="text-[#444746]" strokeWidth={1.5} />
-                            <input type="text" placeholder="氏名、在留カード番号で検索..." className="w-full bg-transparent outline-none text-[16px] text-[#1f1f1f] placeholder:text-[#444746]/70" />
+                            <input type="text" placeholder="例：NGUYEN VAN A、または在留カード番号を入力..." className="w-full bg-transparent outline-none text-[16px] text-[#1f1f1f] placeholder:text-[#444746]/70" />
                         </div>
                     </div>
 
@@ -64,8 +64,10 @@ export default async function WorkersList() {
                                     {workers?.map((w) => (
                                         <tr key={w.id} className="hover:bg-white transition-colors group">
                                             <td className="px-6 py-4">
-                                                <div className="font-medium text-[#1f1f1f]">{w.full_name_romaji}</div>
-                                                <div className="text-xs text-gray-400 mt-0.5">{w.full_name_kana}</div>
+                                                <Link href={`/workers/${w.id}/edit`} className="block group-hover:text-[#4285F4] transition-colors" title="クリックして編集">
+                                                    <div className="font-medium text-[#1f1f1f] group-hover:text-[#4285F4]">{w.full_name_romaji}</div>
+                                                    <div className="text-xs text-gray-400 mt-0.5">{w.full_name_kana}</div>
+                                                </Link>
                                             </td>
                                             <td className="px-6 py-4 hidden md:table-cell font-mono text-xs uppercase tracking-wider">{w.zairyu_no || 'ー'}</td>
                                             <td className="px-6 py-4">
@@ -74,16 +76,21 @@ export default async function WorkersList() {
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4">
-                                                <span className={`text-xs flex items-center gap-1.5 ${w.status === 'working' ? 'text-green-600' : w.status === 'missing' ? 'text-red-500' : 'text-orange-500'}`}>
-                                                    <span className={`w-1.5 h-1.5 rounded-full ${w.status === 'working' ? 'bg-green-500' : w.status === 'missing' ? 'bg-red-500' : 'bg-orange-500'}`}></span>
-                                                    {w.status === 'working' ? '就業中' : w.status === 'missing' ? '失踪' : w.status === 'returned' ? '帰国' : '待機中'}
+                                                <span className={`text-xs flex items-center gap-1.5 ${w.status === 'working' ? 'text-green-600' : w.status === 'missing' ? 'text-red-500' : w.status === 'returned' ? 'text-gray-500' : 'text-orange-500'}`}>
+                                                    <span className={`w-1.5 h-1.5 rounded-full ${w.status === 'working' ? 'bg-green-500' : w.status === 'missing' ? 'bg-red-500' : w.status === 'returned' ? 'bg-gray-400' : 'bg-orange-500'}`}></span>
+                                                    {w.status === 'working' ? '就業中' : w.status === 'missing' ? '失踪' : w.status === 'returned' ? '帰国' : '入国待ち'}
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4 text-right">
-                                                <form action={deleteWorker} className="inline-block opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <input type="hidden" name="id" value={w.id} />
-                                                    <DeleteButton />
-                                                </form>
+                                                <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <Link href={`/workers/${w.id}/edit`} className="p-2 rounded-full text-[#444746] hover:text-[#4285F4] hover:bg-blue-50 transition-colors" title="編集">
+                                                        <Edit2 size={18} strokeWidth={1.5} />
+                                                    </Link>
+                                                    <form action={deleteWorker} className="inline-block">
+                                                        <input type="hidden" name="id" value={w.id} />
+                                                        <DeleteButton />
+                                                    </form>
+                                                </div>
                                             </td>
                                         </tr>
                                     ))}

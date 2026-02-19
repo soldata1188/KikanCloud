@@ -39,3 +39,30 @@ export async function deleteWorker(formData: FormData) {
     revalidatePath('/workers')
     revalidatePath('/')
 }
+
+export async function updateWorker(formData: FormData) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('Unauthorized')
+
+    const id = formData.get('id') as string
+    const companyId = formData.get('company_id') as string
+
+    const updatedData = {
+        full_name_romaji: (formData.get('full_name_romaji') as string).toUpperCase(),
+        full_name_kana: formData.get('full_name_kana') as string,
+        dob: formData.get('dob') as string,
+        company_id: companyId ? companyId : null,
+        system_type: formData.get('system_type') as string,
+        status: formData.get('status') as string,
+        entry_date: formData.get('entry_date') as string || null,
+        zairyu_no: formData.get('zairyu_no') as string || null,
+    }
+
+    const { error } = await supabase.from('workers').update(updatedData).eq('id', id)
+    if (error) console.error('Update error:', error)
+
+    revalidatePath('/workers')
+    revalidatePath('/')
+    redirect('/workers')
+}

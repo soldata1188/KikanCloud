@@ -63,6 +63,20 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
                             ログイン
                         </button>
                     </div>
+
+                    <div className="mt-8 p-4 bg-[#f0f4f9] rounded-2xl border border-[#e1e5ea] text-sm text-center">
+                        <p className="text-[#4285F4] mb-3 text-xs font-bold tracking-wider">✨ 体験用 デモアカウント</p>
+                        <div className="flex flex-col gap-1.5 items-center justify-center">
+                            <div className="bg-white px-3 py-1.5 rounded-lg border border-gray-200 shadow-sm flex items-center justify-between w-[220px]">
+                                <span className="text-gray-400 text-xs font-bold">Email</span>
+                                <span className="text-[#1f1f1f] font-mono font-medium">demo@kikancloud.com</span>
+                            </div>
+                            <div className="bg-white px-3 py-1.5 rounded-lg border border-gray-200 shadow-sm flex items-center justify-between w-[220px]">
+                                <span className="text-gray-400 text-xs font-bold">Pass</span>
+                                <span className="text-[#1f1f1f] font-mono font-medium">demo123</span>
+                            </div>
+                        </div>
+                    </div>
                 </form>
 
                 <div className="mt-8 text-center">

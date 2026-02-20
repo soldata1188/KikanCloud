@@ -12,7 +12,7 @@ export function DemoManager() {
         if (!confirm('テスト用のDEMOデータ（企業5社・人材5名・監査3件）を生成しますか？\n※既存のデータは一切消えません。安全にテストできます。')) return
         startTransition(async () => {
             await injectDemoData()
-            alert('DEMOデータの生成が完了しました！ダッシュボードのアラートやマトリックスを確認してください。')
+            alert('✅ フルデータセットのデモ生成が完了しました！\nダッシュボードのアラートやマトリックスが充実しました。')
             router.refresh()
         })
     }

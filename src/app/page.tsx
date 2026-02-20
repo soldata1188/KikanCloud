@@ -113,7 +113,7 @@ export default async function Dashboard() {
 
             {/* WIDGET 1: CẢNH BÁO HẾT HẠN (ĐỎ) */}
             <div className="bg-white/80 rounded-[32px] shadow-sm border border-[#e1e5ea] overflow-hidden p-2 relative flex flex-col">
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-400 to-red-600"></div>
+
 
               <div className="px-5 py-3.5 flex items-center justify-between border-b border-gray-200/50 bg-white">
                 <h3 className="text-base font-bold text-[#1f1f1f] flex items-center gap-2">
@@ -182,7 +182,7 @@ export default async function Dashboard() {
 
             {/* WIDGET 2: CÔNG VIỆC KANSA (CAM) */}
             <div className="bg-white/80 rounded-[32px] shadow-sm border border-[#e1e5ea] overflow-hidden p-2 relative flex flex-col">
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orange-300 to-orange-500"></div>
+
 
               <div className="px-5 py-3.5 flex items-center justify-between border-b border-gray-200/50 bg-white">
                 <h3 className="text-base font-bold text-[#1f1f1f] flex items-center gap-2">

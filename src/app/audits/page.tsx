@@ -29,6 +29,15 @@ export default async function AuditsPage({ searchParams }: { searchParams: Promi
         .gte('scheduled_date', startOfMonth)
         .lte('scheduled_date', endOfMonth)
 
+    const companyIds = companies?.map(c => c.id) || [];
+    const { data: pastAuditsData } = await supabase.from('audits')
+        .select('id, audit_type, company_id, actual_date, status')
+        .eq('is_deleted', false)
+        .eq('status', 'completed')
+        .in('company_id', companyIds)
+        .lt('scheduled_date', startOfMonth)
+        .order('actual_date', { ascending: false })
+
     // TÍNH ĐIỂM ƯU TIÊN (Priority Score)
     // 1: Trễ hạn (Red) | 2: Chưa lên lịch (Orange) | 4: Tương lai an toàn (Blue) | 5: Xong (Green)
     const todayStr = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Tokyo' });
@@ -63,7 +72,10 @@ export default async function AuditsPage({ searchParams }: { searchParams: Promi
             statusLabel = { text: '提出済', bg: 'bg-gray-100 text-gray-500', border: 'border-l-gray-300' };
         }
 
-        return { company, currentAudit, priority, statusLabel, workerCounts };
+        const pastAudits = pastAuditsData?.filter(a => a.company_id === company.id) || [];
+        const lastTwoAudits = pastAudits.slice(0, 2);
+
+        return { company, currentAudit, priority, statusLabel, workerCounts, lastTwoAudits };
     }) || [];
 
     matrixData.sort((a, b) => {
@@ -143,13 +155,36 @@ export default async function AuditsPage({ searchParams }: { searchParams: Promi
                                             </td>
 
                                             {/* 3. Ngày */}
-                                            <td className="px-6 py-5">
-                                                {row.currentAudit ? (
-                                                    <div className="flex flex-col gap-1.5">
-                                                        <div className="flex items-center gap-2"><Calendar size={14} className="text-gray-400" /> <span className="text-[#1f1f1f] font-medium">{row.currentAudit.scheduled_date.replace(/-/g, '/')}</span> <span className="text-[10px] px-1.5 py-0.5 bg-gray-100 text-gray-500 rounded border border-gray-200">予定</span></div>
-                                                        {row.currentAudit.actual_date && <div className="text-xs text-green-700 font-medium inline-flex items-center gap-2"><CheckCircle2 size={14} className="text-green-500" /> <span>{row.currentAudit.actual_date.replace(/-/g, '/')}</span> <span className="text-[10px] px-1.5 py-0.5 bg-green-50 text-green-700 rounded border border-green-200">完了</span></div>}
-                                                    </div>
-                                                ) : <span className="text-gray-300 font-medium">-</span>}
+                                            <td className="px-6 py-5 align-top">
+                                                <div className="flex flex-col gap-3">
+                                                    {/* Current Month */}
+                                                    {row.currentAudit ? (
+                                                        <div className="flex flex-col gap-1.5">
+                                                            <div className="flex items-center gap-2"><Calendar size={14} className="text-gray-400" /> <span className="text-[#1f1f1f] font-medium">{row.currentAudit.scheduled_date.replace(/-/g, '/')}</span> <span className="text-[10px] px-1.5 py-0.5 bg-gray-100 text-gray-500 rounded border border-gray-200">予定</span></div>
+                                                            {row.currentAudit.actual_date && <div className="text-xs text-green-700 font-medium inline-flex items-center gap-2"><CheckCircle2 size={14} className="text-green-500" /> <span>{row.currentAudit.actual_date.replace(/-/g, '/')}</span> <span className="text-[10px] px-1.5 py-0.5 bg-green-50 text-green-700 rounded border border-green-200">完了</span></div>}
+                                                        </div>
+                                                    ) : <div className="h-[42px] flex items-center"><span className="text-gray-300 font-medium">-</span></div>}
+
+                                                    {/* History */}
+                                                    {row.lastTwoAudits.length > 0 && (
+                                                        <div className="border-t border-gray-100 pt-2 mt-1">
+                                                            <div className="text-[10px] font-semibold text-gray-400 mb-1.5 tracking-wider">過去2回の履歴</div>
+                                                            <div className="flex flex-col gap-1.5">
+                                                                {row.lastTwoAudits.map((pa: any) => (
+                                                                    <div key={pa.id} className="text-[11px] text-gray-500 flex items-center justify-between opacity-80 hover:opacity-100 transition-opacity">
+                                                                        <div className="flex items-center gap-1.5">
+                                                                            <span className="w-1.5 h-1.5 rounded-full bg-gray-300"></span>
+                                                                            <span className="font-mono tracking-tight">{pa.actual_date?.replace(/-/g, '/')}</span>
+                                                                        </div>
+                                                                        <span className="px-1.5 py-0.5 bg-gray-50 border border-gray-100 rounded text-[9px] text-gray-500">
+                                                                            {pa.audit_type === 'kansa' ? '監査' : pa.audit_type === 'homon' ? '訪問' : '臨時'}
+                                                                        </span>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
                                             </td>
 
                                             {/* 4. PIC */}

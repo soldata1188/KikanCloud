@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
-import { Plus, Calendar, AlertCircle, CheckCircle2, CalendarCheck, Building2, User } from 'lucide-react'
+import { Plus, Calendar, AlertCircle, CheckCircle2, CalendarCheck, Building2, User, Edit2 } from 'lucide-react'
 import { Sidebar } from '@/components/Sidebar'
 import { MonthFilter } from './MonthFilter'
 import { SmartActionCell } from './SmartActionCell'
@@ -176,9 +176,14 @@ export default async function AuditsPage({ searchParams }: { searchParams: Promi
                                                                             <span className="w-1.5 h-1.5 rounded-full bg-gray-300"></span>
                                                                             <span className="font-mono tracking-tight">{pa.actual_date?.replace(/-/g, '/')}</span>
                                                                         </div>
-                                                                        <span className="px-1.5 py-0.5 bg-gray-50 border border-gray-100 rounded text-[9px] text-gray-500">
-                                                                            {pa.audit_type === 'kansa' ? '監査' : pa.audit_type === 'homon' ? '訪問' : '臨時'}
-                                                                        </span>
+                                                                        <div className="flex items-center gap-1.5">
+                                                                            <span className="px-1.5 py-0.5 bg-gray-50 border border-gray-100 rounded text-[9px] text-gray-500">
+                                                                                {pa.audit_type === 'kansa' ? '監査' : pa.audit_type === 'homon' ? '訪問' : '臨時'}
+                                                                            </span>
+                                                                            <Link href={`/audits/${pa.id}/edit`} className="text-gray-400 hover:text-[#4285F4] transition-colors p-0.5 rounded hover:bg-blue-50" title="編集">
+                                                                                <Edit2 size={12} strokeWidth={2} />
+                                                                            </Link>
+                                                                        </div>
                                                                     </div>
                                                                 ))}
                                                             </div>

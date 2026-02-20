@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import { PrintButton } from './PrintButton'
 
 export default async function AuditPrintPage({ searchParams }: { searchParams: Promise<{ [key: string]: string | undefined }> }) {
     const sp = await searchParams;
@@ -48,12 +49,9 @@ export default async function AuditPrintPage({ searchParams }: { searchParams: P
         return { company, currentAudit, workerCounts, lastTwoAudits };
     }) || [];
 
-    // Tự động kích hoạt hộp thoại in khi trang đã tải xong
-    const printScript = `window.onload = function() { window.print(); }`;
-
     return (
         <div className="bg-white min-h-screen text-black p-4 max-w-[800px] mx-auto font-sans">
-            <script dangerouslySetInnerHTML={{ __html: printScript }} />
+            <PrintButton />
 
             <div className="text-center mb-6 relative">
                 <h1 className="text-xl font-bold border-b border-black inline-block pb-1">

@@ -4,6 +4,7 @@ import { Plus, Calendar, AlertCircle, CheckCircle2, CalendarCheck } from 'lucide
 import { Sidebar } from '@/components/Sidebar'
 import { MonthFilter } from './MonthFilter'
 import { SmartActionCell } from './SmartActionCell'
+import { ExportExcelButton } from './ExportExcelButton'
 import { redirect } from 'next/navigation'
 
 export default async function AuditsPage({ searchParams }: { searchParams: Promise<{ [key: string]: string | undefined }> }) {
@@ -81,10 +82,13 @@ export default async function AuditsPage({ searchParams }: { searchParams: Promi
                             <h2 className="text-[32px] md:text-[40px] font-medium tracking-tight text-[#1f1f1f]">監査・定期訪問</h2>
                             <p className="text-[#444746] mt-1">期日が過ぎている予定は赤くハイライトされます。</p>
                         </div>
-                        <div className="flex items-center gap-3">
-                            <MonthFilter defaultValue={filterMonth} />
-                            <Link href="/audits/new" className="flex items-center gap-2 px-6 py-3 bg-white hover:bg-gray-50 text-[#1f1f1f] rounded-full text-sm font-medium transition-colors shadow-sm border border-[#e1e5ea] shrink-0">
-                                <Plus size={18} strokeWidth={2} /> スケジュール追加
+                        <div className="flex items-center gap-3 shrink-0 overflow-x-auto pb-2 md:pb-0">
+                            <form><input type="month" name="month" defaultValue={filterMonth} onChange={(e) => e.target.form?.submit()} className="px-5 py-2.5 bg-white border border-[#e1e5ea] rounded-full text-sm font-medium text-[#444746] outline-none cursor-pointer hover:bg-gray-50 transition-colors shadow-sm" /></form>
+
+                            <ExportExcelButton data={matrixData} month={filterMonth} />
+
+                            <Link href="/audits/new" className="flex items-center gap-2 px-6 py-2.5 bg-[#4285F4] text-white rounded-full text-sm font-medium hover:bg-[#3367d6] transition-colors shadow-sm border border-transparent shrink-0">
+                                <Plus size={18} strokeWidth={2} /> 予定登録
                             </Link>
                         </div>
                     </div>

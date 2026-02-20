@@ -112,9 +112,9 @@ export default async function AuditsPage({ searchParams }: { searchParams: Promi
                                         <th className="px-6 py-4 font-medium text-right w-[160px]">アクション</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-gray-100/50">
+                                <tbody className="divide-y divide-[#e1e5ea]">
                                     {matrixData.map((row) => (
-                                        <tr key={row.company.id} className="hover:bg-white transition-colors group">
+                                        <tr key={row.company.id} className="hover:bg-gray-50/50 transition-colors group">
                                             {/* 1. Tên Xí Nghiệp */}
                                             <td className="px-6 py-5">
                                                 <div className="flex gap-3">

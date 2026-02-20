@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { updateWorker } from '@/app/workers/actions'
-import { ArrowLeft, Sparkles } from 'lucide-react'
+import { ArrowLeft, Sparkles, FolderOpen } from 'lucide-react'
 import { Sidebar } from '@/components/Sidebar'
 import { UpdateButton } from '@/components/SubmitButtons'
 import { UserMenu } from '@/components/UserMenu'
@@ -34,11 +34,17 @@ export default async function EditWorkerPage({ params }: { params: Promise<{ id:
                 </header>
 
                 <div className="flex-1 flex flex-col px-4 pb-12 w-full max-w-[800px] mx-auto mt-4 md:mt-8">
-                    <div className="flex items-center gap-4 mb-8 pl-2">
-                        <Link href="/workers" className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 transition-colors text-[#444746]">
-                            <ArrowLeft size={24} strokeWidth={1.5} />
-                        </Link>
-                        <h2 className="text-[32px] md:text-[40px] font-medium tracking-tight text-[#1f1f1f]">情報編集</h2>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pl-2">
+                        <div className="flex items-center gap-4">
+                            <Link href="/workers" className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 transition-colors text-[#444746]"><ArrowLeft size={24} strokeWidth={1.5} /></Link>
+                            <h2 className="text-[32px] md:text-[40px] font-medium tracking-tight text-[#1f1f1f]">人材情報の編集</h2>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <Link href={`/workers/${worker.id}/documents`} className="flex items-center gap-2 px-5 py-2.5 bg-blue-50 text-[#4285F4] hover:bg-blue-100 rounded-full text-sm font-bold transition-colors border border-blue-100 shadow-sm">
+                                <FolderOpen size={16} strokeWidth={2} /> 関連書類・ファイル管理
+                            </Link>
+                            <span className="text-xs text-gray-500 bg-gray-100 px-3 py-2 rounded-full font-medium border border-gray-200">編集中</span>
+                        </div>
                     </div>
 
                     <form action={updateWorker} className="space-y-6">

@@ -42,59 +42,102 @@ export default async function CompaniesList() {
                             </Link>
                         </div>
                     </div>
-                    <div className="bg-white rounded-[32px] p-2 shadow-[0_4px_16px_rgba(0,0,0,0.04)] border border-[#e1e5ea] mb-8 max-w-[800px]">
-                        <div className="min-h-[48px] px-4 py-2 flex items-center gap-3">
+                    <div className="bg-white rounded-[32px] p-2 shadow-[0_4px_16px_rgba(0,0,0,0.04)] border border-[#e1e5ea] mb-6">
+                        <div className="min-h-[48px] px-4 py-2 flex items-center gap-3 bg-[#f0f4f9] rounded-2xl border border-transparent focus-within:bg-white focus-within:border-[#4285F4] transition-colors">
                             <Search size={20} className="text-[#444746]" strokeWidth={1.5} />
                             <input type="text" placeholder="例：トヨタ自動車、または法人番号を入力..." className="w-full bg-transparent outline-none text-[16px] text-[#1f1f1f] placeholder:text-[#444746]/70" />
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {companies?.length === 0 && <div className="col-span-full py-12 text-center text-[#444746]/70 bg-white/50 rounded-[32px] border border-[#e1e5ea] border-dashed">データがありません。</div>}
+                    <div className="bg-white/80 rounded-[32px] shadow-sm border border-[#e1e5ea] overflow-hidden p-2">
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left text-sm text-[#444746]">
+                                <thead className="bg-transparent text-[12px] font-semibold text-[#444746]/60 border-b border-gray-200/50 uppercase tracking-widest whitespace-nowrap">
+                                    <tr>
+                                        <th className="px-6 py-4 font-medium">企業名 / 法人番号</th>
+                                        <th className="px-6 py-4 font-medium">所在地 / 代表者</th>
+                                        <th className="px-6 py-4 font-medium">担当者 / 受入人数</th>
+                                        <th className="px-6 py-4 font-medium text-right w-[120px]">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-[#e1e5ea]">
+                                    {companies?.length === 0 && (
+                                        <tr>
+                                            <td colSpan={4} className="px-6 py-16 text-center text-[#444746]/60 font-medium">
+                                                <div className="flex flex-col items-center gap-3">
+                                                    <Search size={32} className="text-gray-300" />
+                                                    受入企業が見つかりません。
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    )}
+                                    {companies?.map((c) => {
+                                        const activeWorkers = c.workers?.filter((w: any) => w.status === 'working' && w.is_deleted === false).length || 0;
+                                        return (
+                                            <tr key={c.id} className="hover:bg-gray-50/50 transition-colors group">
+                                                <td className="px-6 py-5">
+                                                    <div className="flex gap-3">
+                                                        <div className="w-10 h-10 rounded-full bg-[#f0f4f9] border border-[#e1e5ea] flex items-center justify-center shrink-0 text-[#444746] mt-0.5">
+                                                            <Building2 size={18} strokeWidth={1.5} />
+                                                        </div>
+                                                        <div>
+                                                            <Link href={`/companies/${c.id}/edit`} className="font-semibold text-[#1f1f1f] text-[15px] group-hover:text-[#4285F4] transition-colors block mb-1.5 leading-tight">{c.name_jp}</Link>
+                                                            <div className="flex items-center gap-1.5 flex-wrap">
+                                                                {c.name_romaji && <span className="text-[11px] text-gray-500 font-medium uppercase tracking-wider">{c.name_romaji}</span>}
+                                                                {c.name_romaji && <span className="text-gray-300 ml-1 mr-0.5">|</span>}
+                                                                <span className="text-[11px] text-gray-500 font-mono">法人番号: {c.corporate_number || 'ー'}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
 
-                        {companies?.map((c) => {
-                            const activeWorkers = c.workers?.filter((w: any) => w.status === 'working' && w.is_deleted === false).length || 0;
-                            return (
-                                <div key={c.id} className="bg-white rounded-[32px] p-6 shadow-sm border border-[#e1e5ea] hover:shadow-md transition-all group relative flex flex-col">
-                                    <div className="flex justify-between items-start mb-4">
-                                        <div className="w-12 h-12 rounded-2xl bg-[#f0f4f9] text-[#4285F4] flex items-center justify-center shrink-0 border border-[#e1e5ea]">
-                                            <Building2 size={24} strokeWidth={1.5} />
-                                        </div>
-                                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <Link href={`/companies/${c.id}/edit`} className="p-2 rounded-full text-[#444746] hover:text-[#4285F4] hover:bg-blue-50 transition-colors" title="編集"><Edit2 size={18} strokeWidth={1.5} /></Link>
-                                            <form action={deleteCompany}><input type="hidden" name="id" value={c.id} /><CompanyDeleteButton /></form>
-                                        </div>
-                                    </div>
+                                                {/* Address & Rep */}
+                                                <td className="px-6 py-5">
+                                                    <div className="flex flex-col gap-2">
+                                                        <div className="flex items-start gap-2 text-[13px] text-[#1f1f1f]">
+                                                            <MapPin size={15} className="mt-0.5 text-[#4285F4] shrink-0" strokeWidth={1.5} />
+                                                            <span className="line-clamp-2 leading-relaxed max-w-[200px]">{c.address || '住所未登録'}</span>
+                                                        </div>
+                                                        <div className="flex items-center gap-2 text-[13px] text-[#1f1f1f]">
+                                                            <Users size={15} className="text-[#34A853] shrink-0" strokeWidth={1.5} />
+                                                            <span className="truncate">代表: {c.representative || '未設定'}</span>
+                                                        </div>
+                                                    </div>
+                                                </td>
 
-                                    <h3 className="text-xl font-medium text-[#1f1f1f] mb-1 leading-tight group-hover:text-[#4285F4] transition-colors">
-                                        <Link href={`/companies/${c.id}/edit`}>{c.name_jp}</Link>
-                                    </h3>
-                                    {c.name_romaji ? <p className="text-xs text-gray-400 mb-4 uppercase tracking-wider">{c.name_romaji}</p> : <p className="text-xs text-transparent mb-4">_</p>}
+                                                {/* PIC & Count */}
+                                                <td className="px-6 py-5">
+                                                    <div className="flex flex-col gap-2">
+                                                        <div className="flex items-center gap-2 text-[13px] text-[#1f1f1f]">
+                                                            <Contact size={15} className="text-[#EA4335] shrink-0" strokeWidth={1.5} />
+                                                            <span className="truncate">担当: {c.pic_name || '未設定'}</span>
+                                                        </div>
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[#f0f4f9] rounded-md text-[11px] font-bold border border-gray-200 text-[#444746]">
+                                                                <Users size={12} strokeWidth={2} className="text-[#4285F4]" /> 在籍: {activeWorkers}名
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </td>
 
-                                    <div className="space-y-3 flex-1">
-                                        <div className="flex items-start gap-2.5 text-sm text-[#444746]">
-                                            <MapPin size={16} className="mt-0.5 text-[#4285F4] shrink-0" strokeWidth={1.5} />
-                                            <span className="line-clamp-2 leading-relaxed">{c.address || '住所未登録'}</span>
-                                        </div>
-                                        <div className="flex items-center gap-2.5 text-sm text-[#444746]">
-                                            <Users size={16} className="text-[#34A853] shrink-0" strokeWidth={1.5} />
-                                            <span className="truncate">代表: {c.representative || '未設定'}</span>
-                                        </div>
-                                        <div className="flex items-center gap-2.5 text-sm text-[#444746]">
-                                            <Contact size={16} className="text-[#EA4335] shrink-0" strokeWidth={1.5} />
-                                            <span className="truncate">担当: {c.pic_name || '未設定'}</span>
-                                        </div>
-                                    </div>
-
-                                    <div className="mt-6 pt-4 border-t border-gray-100 flex items-center justify-between">
-                                        <span className="text-xs font-mono text-gray-500">法人番号: {c.corporate_number || 'ー'}</span>
-                                        <div className="flex items-center gap-1.5 px-3 py-1 bg-[#f0f4f9] rounded-full text-sm font-medium text-[#444746]">
-                                            <Users size={14} className="text-[#4285F4]" strokeWidth={2} /> {activeWorkers}名
-                                        </div>
-                                    </div>
-                                </div>
-                            )
-                        })}
+                                                {/* Actions */}
+                                                <td className="px-6 py-5 text-right">
+                                                    <div className="flex items-center justify-end gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+                                                        <Link href={`/companies/${c.id}/edit`} className="p-2 rounded-full text-[#444746] hover:text-[#4285F4] hover:bg-blue-50 transition-colors" title="編集">
+                                                            <Edit2 size={18} strokeWidth={1.5} />
+                                                        </Link>
+                                                        <form action={deleteCompany} className="inline-block">
+                                                            <input type="hidden" name="id" value={c.id} />
+                                                            <CompanyDeleteButton />
+                                                        </form>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        )
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </main>

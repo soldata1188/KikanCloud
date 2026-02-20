@@ -4,6 +4,7 @@ import { updateWorker } from '@/app/workers/actions'
 import { ArrowLeft, Sparkles } from 'lucide-react'
 import { Sidebar } from '@/components/Sidebar'
 import { UpdateButton } from '@/components/SubmitButtons'
+import { UserMenu } from '@/components/UserMenu'
 import { redirect, notFound } from 'next/navigation'
 
 export default async function EditWorkerPage({ params }: { params: Promise<{ id: string }> }) {
@@ -12,7 +13,7 @@ export default async function EditWorkerPage({ params }: { params: Promise<{ id:
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) redirect('/login')
 
-    const { data: userProfile } = await supabase.from('users').select('full_name').eq('id', user.id).single()
+    const { data: userProfile } = await supabase.from('users').select('full_name, role').eq('id', user.id).single()
     const displayName = userProfile?.full_name?.split(' ').pop() || '管理者'
 
     const { data: worker } = await supabase.from('workers').select('*').eq('id', id).eq('is_deleted', false).single()
@@ -28,9 +29,7 @@ export default async function EditWorkerPage({ params }: { params: Promise<{ id:
                     <h1 className="text-[22px] font-normal text-[#444746] tracking-tight">Kikan AI</h1>
                     <div className="flex items-center gap-2">
                         <span className="hidden sm:flex px-3 py-1 bg-white rounded-full text-[11px] font-semibold text-[#444746] tracking-wider border border-gray-200">ULTRA</span>
-                        <button className="flex items-center gap-2 pl-4 pr-1.5 py-1.5 bg-white rounded-full text-sm font-medium text-[#444746] hover:bg-gray-50 transition border border-gray-200 shadow-sm cursor-pointer">
-                            仕事 <div className="w-8 h-8 rounded-full bg-[#d81b60] text-white flex items-center justify-center text-xs font-bold">{displayName.charAt(0)}</div>
-                        </button>
+                        <UserMenu displayName={displayName} email={user.email || ''} role={userProfile?.role} />
                     </div>
                 </header>
 

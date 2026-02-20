@@ -165,8 +165,8 @@ export function WorkersClient({ workers }: { workers: any[] }) {
                                 </tr>
                             )}
                             {filteredWorkers.map((w) => {
-                                const expSoon = isExpiringSoon(w.residence_card_exp_date)
-                                const expPass = isExpired(w.residence_card_exp_date)
+                                const expSoon = isExpiringSoon(w.cert_end_date)
+                                const expPass = isExpired(w.cert_end_date)
 
                                 return (
                                     <tr key={w.id} className="hover:bg-white transition-colors group">
@@ -233,7 +233,7 @@ export function WorkersClient({ workers }: { workers: any[] }) {
                                                     {expPass || expSoon ? <AlertCircle size={13} strokeWidth={2.5} /> : <Calendar size={13} className="text-gray-400" />}
                                                     <span className={`w-10 text-[11px] ${expPass || expSoon ? 'text-current' : 'text-gray-400'}`}>在留:</span>
                                                     <span className={`font-medium ${expPass || expSoon ? 'text-current' : 'text-[#1f1f1f]'}`}>
-                                                        {w.residence_card_exp_date ? w.residence_card_exp_date.replace(/-/g, '/') : '未定'}
+                                                        {w.cert_end_date ? w.cert_end_date.replace(/-/g, '/') : '未定'}
                                                     </span>
                                                 </div>
                                             </div>

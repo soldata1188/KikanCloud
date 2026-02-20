@@ -16,7 +16,7 @@ export default async function WorkersList() {
     const displayName = userProfile?.full_name?.split(' ').pop() || '管理者'
 
     const { data: workers } = await supabase.from('workers')
-        .select('id, full_name_romaji, full_name_kana, system_type, status, entry_date, residence_card_exp_date, zairyu_no, avatar_url, nationality, entry_batch, companies(name_jp)')
+        .select('id, full_name_romaji, full_name_kana, system_type, status, entry_date, cert_end_date, zairyu_no, avatar_url, nationality, entry_batch, companies(name_jp)')
         .eq('is_deleted', false).order('created_at', { ascending: false })
 
     return (

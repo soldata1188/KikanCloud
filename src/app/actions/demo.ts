@@ -25,6 +25,10 @@ export async function injectDemoData() {
     const { data: userData } = await supabase.from('users').select('tenant_id').eq('id', user.id).single()
     const tenant_id = userData?.tenant_id
 
+    if (!tenant_id) {
+        throw new Error('【エラー】現在ログイン中のアカウントには、事業所（テナント）が紐付いていません。管理者プロフィールが public.users テーブルに存在するか確認してください。')
+    }
+
     // 1. Dọn dẹp Demo cũ trước khi tạo mới để tránh rác
     await clearDemoData()
 
@@ -43,8 +47,11 @@ export async function injectDemoData() {
         { tenant_id, name_jp: 'パナソニック (DEMO)', address: '大阪府門真市', corporate_number: '4444444444444' },
         { tenant_id, name_jp: '任天堂 (DEMO)', address: '京都府京都市', corporate_number: '5555555555555' }
     ]
-    const { data: insertedCompanies } = await supabase.from('companies').insert(companies).select()
-    if (!insertedCompanies) throw new Error('Failed to insert companies')
+    const { data: insertedCompanies, error: insertError } = await supabase.from('companies').insert(companies).select()
+    if (insertError) {
+        require('fs').writeFileSync('insert_error.txt', JSON.stringify(insertError, null, 2))
+    }
+    if (!insertedCompanies) throw new Error('Failed to insert companies: ' + (insertError?.message || 'unknown error'))
 
     // 3. Tạo 5 Người lao động DEMO (Đa dạng trạng thái rủi ro)
     const workers = [

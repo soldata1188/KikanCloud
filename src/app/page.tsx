@@ -53,7 +53,7 @@ export default async function Dashboard() {
       <Sidebar active="dashboard" />
       <main className="flex-1 flex flex-col relative overflow-y-auto no-scrollbar">
         <header className="flex justify-between items-center px-4 py-3 md:px-6 md:py-4 sticky top-0 bg-[#f0f4f9] z-10">
-          <h1 className="text-[22px] font-normal text-[#444746] tracking-tight">Kikan AI</h1>
+          <h1 className="text-[22px] font-normal text-[#444746] tracking-tight">KikanCloud</h1>
           <div className="flex items-center gap-2">
             <DemoManager />
             <span className="hidden sm:flex px-3 py-1 bg-white rounded-full text-[11px] font-semibold text-[#444746] tracking-wider border border-gray-200">ULTRA</span>
@@ -78,7 +78,7 @@ export default async function Dashboard() {
           <div className="bg-white rounded-[32px] p-2 shadow-[0_4px_16px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)] transition-shadow duration-300 border border-[#e1e5ea] mb-8">
             <div className="min-h-[64px] px-4 pt-3 pb-2 flex items-start gap-3">
               <Shield size={20} className="text-[#4285F4] mt-1 shrink-0" strokeWidth={1.5} />
-              <textarea placeholder="Kikan AI に作業を依頼する (例: 期限が近い実習生のリストを出して)" className="w-full bg-transparent outline-none text-[16px] text-[#1f1f1f] placeholder:text-[#444746]/70 resize-none h-12 pt-0.5"></textarea>
+              <textarea placeholder="KikanCloud のAIに作業を依頼する (例: 期限が近い実習生のリストを出して)" className="w-full bg-transparent outline-none text-[16px] text-[#1f1f1f] placeholder:text-[#444746]/70 resize-none h-12 pt-0.5"></textarea>
             </div>
             <div className="flex justify-between items-center px-2 pb-1">
               <div className="flex items-center gap-1 text-[#444746]">

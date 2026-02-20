@@ -5,8 +5,8 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "監理支援システム | Kikan SaaS",
-  description: "外国人材・受入企業の管理プラットフォーム",
+  title: "KikanCloud | 外国人材・受入企業管理クラウド",
+  description: "監理団体・登録支援機関向けの次世代クラウド管理システム",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

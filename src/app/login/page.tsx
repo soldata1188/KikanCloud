@@ -18,7 +18,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
                             </linearGradient>
                         </defs>
                     </svg>
-                    <h1 className="text-[28px] font-medium text-[#444746] tracking-tight">Kikan AI</h1>
+                    <h1 className="text-[28px] font-medium text-[#444746] tracking-tight">KikanCloud</h1>
                 </div>
                 <p className="text-[#444746] text-sm">監理団体・登録支援機関向けプラットフォーム</p>
             </div>

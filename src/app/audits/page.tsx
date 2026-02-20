@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
-import { Plus, Calendar, AlertCircle, CheckCircle2, CalendarCheck, Building2, User, Edit2 } from 'lucide-react'
+import { Plus, Calendar, AlertCircle, CheckCircle2, CalendarCheck, Building2, User, Edit2, Printer } from 'lucide-react'
 import { Sidebar } from '@/components/Sidebar'
 import { MonthFilter } from './MonthFilter'
 import { SmartActionCell } from './SmartActionCell'
@@ -108,6 +108,10 @@ export default async function AuditsPage({ searchParams }: { searchParams: Promi
                             <MonthFilter defaultValue={filterMonth} />
 
                             <ExportExcelButton data={matrixData} month={filterMonth} />
+
+                            <Link href={`/audits/print?month=${filterMonth}`} target="_blank" className="flex items-center gap-2 px-6 py-2.5 bg-white border border-[#e1e5ea] hover:bg-red-50 hover:text-red-700 hover:border-red-200 text-[#444746] rounded-full text-sm font-bold transition-colors shadow-sm shrink-0" title="PDF形式で印刷・保存します">
+                                <Printer size={18} strokeWidth={2.5} /> PDF出力
+                            </Link>
 
                             <Link href="/audits/new" className="flex items-center gap-2 px-6 py-2.5 bg-[#4285F4] text-white rounded-full text-sm font-medium hover:bg-[#3367d6] transition-colors shadow-sm border border-transparent shrink-0">
                                 <Plus size={18} strokeWidth={2} /> 予定登録

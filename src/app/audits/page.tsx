@@ -102,7 +102,7 @@ export default async function AuditsPage({ searchParams }: { searchParams: Promi
 
                     <div className="bg-white rounded-[32px] overflow-hidden shadow-sm border border-[#e1e5ea]">
                         <table className="w-full text-left text-sm text-[#444746]">
-                            <thead className="bg-[#f0f4f9] border-b border-[#e1e5ea] text-xs uppercase text-[#444746] font-medium tracking-wider">
+                            <thead className="bg-[#4285F4] text-xs uppercase text-white font-medium tracking-wider">
                                 <tr>
                                     <th className="px-6 py-4 rounded-tl-[32px]">受入企業</th>
                                     <th className="px-6 py-4">ステータス</th>

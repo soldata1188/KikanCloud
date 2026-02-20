@@ -17,6 +17,7 @@ function DeleteButton() {
 
 export function WorkersClient({ workers }: { workers: any[] }) {
     const [searchTerm, setSearchTerm] = useState('')
+    const [statusFilter, setStatusFilter] = useState('all')
     const [companyFilter, setCompanyFilter] = useState('all')
     const [systemTypeFilter, setSystemTypeFilter] = useState('all')
     const [batchFilter, setBatchFilter] = useState('all')
@@ -40,13 +41,14 @@ export function WorkersClient({ workers }: { workers: any[] }) {
                 w.full_name_kana?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 w.zairyu_no?.toLowerCase().includes(searchTerm.toLowerCase())
 
+            const matchStatus = statusFilter === 'all' || w.status === statusFilter
             const matchCompany = companyFilter === 'all' || w.companies?.name_jp === companyFilter
             const matchSystemType = systemTypeFilter === 'all' || w.system_type === systemTypeFilter
             const matchBatch = batchFilter === 'all' || w.entry_batch === batchFilter
 
-            return matchSearch && matchCompany && matchSystemType && matchBatch
+            return matchSearch && matchStatus && matchCompany && matchSystemType && matchBatch
         })
-    }, [workers, searchTerm, companyFilter, systemTypeFilter, batchFilter])
+    }, [workers, searchTerm, statusFilter, companyFilter, systemTypeFilter, batchFilter])
 
     const isExpiringSoon = (dateStr: string) => {
         if (!dateStr) return false
@@ -82,6 +84,18 @@ export function WorkersClient({ workers }: { workers: any[] }) {
                     </div>
 
                     <select
+                        value={statusFilter}
+                        onChange={(e) => setStatusFilter(e.target.value)}
+                        className="bg-white border border-[#e1e5ea] text-[#1f1f1f] text-sm rounded-full px-4 py-2 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#4285F4]/20 transition-all font-medium appearance-none min-w-[140px] cursor-pointer"
+                    >
+                        <option value="all">すべてのステータス</option>
+                        <option value="working">就業中</option>
+                        <option value="waiting_entry">入国待ち</option>
+                        <option value="missing">失踪</option>
+                        <option value="returned">帰国</option>
+                    </select>
+
+                    <select
                         value={companyFilter}
                         onChange={(e) => setCompanyFilter(e.target.value)}
                         className="bg-white border border-[#e1e5ea] text-[#1f1f1f] text-sm rounded-full px-4 py-2 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#4285F4]/20 transition-all font-medium appearance-none min-w-[160px] cursor-pointer"
@@ -110,10 +124,11 @@ export function WorkersClient({ workers }: { workers: any[] }) {
                         {uniqueBatches.map(b => <option key={b} value={b}>{b}</option>)}
                     </select>
 
-                    {(searchTerm || companyFilter !== 'all' || systemTypeFilter !== 'all' || batchFilter !== 'all') && (
+                    {(searchTerm || statusFilter !== 'all' || companyFilter !== 'all' || systemTypeFilter !== 'all' || batchFilter !== 'all') && (
                         <button
                             onClick={() => {
                                 setSearchTerm('')
+                                setStatusFilter('all')
                                 setCompanyFilter('all')
                                 setSystemTypeFilter('all')
                                 setBatchFilter('all')

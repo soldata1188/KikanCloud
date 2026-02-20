@@ -46,3 +46,10 @@ export function AuditDeleteButton() {
         </button>
     )
 }
+
+export function AuditEditDeleteButton({ deleteAction }: { deleteAction: any }) {
+    const { pending } = useFormStatus()
+    return (
+        <button formAction={deleteAction} disabled={pending} className="px-6 py-3 text-red-600 bg-red-50 font-medium hover:bg-red-100 rounded-full transition-colors shadow-sm disabled:opacity-50" onClick={(e) => { if (!confirm('このスケジュールを削除してもよろしいですか？')) e.preventDefault() }}>削除</button>
+    )
+}

@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { updateAudit, deleteAudit } from '@/app/audits/actions'
 import { ArrowLeft, CalendarCheck } from 'lucide-react'
 import { Sidebar } from '@/components/Sidebar'
-import { UpdateButton, AuditDeleteButton } from '@/components/SubmitButtons'
+import { UpdateButton, AuditEditDeleteButton } from '@/components/SubmitButtons'
 import { redirect, notFound } from 'next/navigation'
 
 export default async function EditAuditPage({ params }: { params: Promise<{ id: string }> }) {
@@ -40,7 +40,7 @@ export default async function EditAuditPage({ params }: { params: Promise<{ id: 
                             </div>
                         </div>
                         <div className="pt-4 pb-8 flex justify-between items-center sticky bottom-4">
-                            <button formAction={deleteAudit} className="px-6 py-3 text-red-600 bg-red-50 font-medium hover:bg-red-100 rounded-full transition-colors shadow-sm" onClick={(e) => { if (!confirm('このスケジュールを削除してもよろしいですか？')) e.preventDefault() }}>削除</button>
+                            <AuditEditDeleteButton deleteAction={deleteAudit} />
                             <div className="flex gap-3"><Link href="/audits" className="px-6 py-3 text-[#444746] bg-white border border-[#e1e5ea] font-medium hover:bg-gray-50 rounded-full transition-colors shadow-sm">キャンセル</Link><UpdateButton /></div>
                         </div>
                     </form>

@@ -53,3 +53,12 @@ export function AuditEditDeleteButton({ deleteAction }: { deleteAction: any }) {
         <button formAction={deleteAction} disabled={pending} className="px-6 py-3 text-red-600 bg-red-50 font-medium hover:bg-red-100 rounded-full transition-colors shadow-sm disabled:opacity-50" onClick={(e) => { if (!confirm('このスケジュールを削除してもよろしいですか？')) e.preventDefault() }}>削除</button>
     )
 }
+
+export function ProcedureDeleteButton() {
+    const { pending } = useFormStatus()
+    return (
+        <button type="submit" disabled={pending} className={`p-2 rounded-full transition-colors ${pending ? 'text-gray-300' : 'text-[#444746] hover:text-red-600 hover:bg-red-50'}`} title="削除" onClick={(e) => { if (!confirm('この手続記録を削除してもよろしいですか？')) e.preventDefault() }}>
+            <Trash2 size={20} strokeWidth={1.5} />
+        </button>
+    )
+}

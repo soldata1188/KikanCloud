@@ -56,7 +56,7 @@ export function WorkersClient({ workers, userRole }: { workers: any[], userRole?
     return (
         <div className="flex-1 flex flex-col w-full max-w-[1200px] mx-auto mt-4 md:mt-8">
             <div className="bg-white rounded-[32px] p-4 shadow-[0_4px_16px_rgba(0,0,0,0.04)] border border-[#e1e5ea] mb-6 space-y-4">
-                <div className="min-h-[48px] px-4 py-2 flex items-center gap-3 bg-[#f0f4f9] rounded-2xl border border-transparent focus-within:bg-white focus-within:border-[#4285F4] transition-colors">
+                <div className="min-h-[48px] px-4 py-2 flex items-center gap-3 bg-[#f0f4f9] rounded-[32px] border border-transparent focus-within:bg-white focus-within:border-[#4285F4] transition-colors">
                     <Search size={20} className="text-[#444746]" strokeWidth={1.5} />
                     <input
                         type="text"
@@ -75,7 +75,7 @@ export function WorkersClient({ workers, userRole }: { workers: any[], userRole?
                     <select
                         value={statusFilter}
                         onChange={(e) => setStatusFilter(e.target.value)}
-                        className="bg-white border border-[#e1e5ea] text-[#1f1f1f] text-sm rounded-full px-4 py-2 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#4285F4]/20 transition-all font-medium appearance-none min-w-[140px] cursor-pointer"
+                        className="bg-white border border-[#e1e5ea] text-[#1f1f1f] text-sm rounded-[32px] px-4 py-2 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#4285F4]/20 transition-all font-medium appearance-none min-w-[140px] cursor-pointer"
                     >
                         <option value="all">すべてのステータス</option>
                         <option value="working">就業中</option>
@@ -87,7 +87,7 @@ export function WorkersClient({ workers, userRole }: { workers: any[], userRole?
                     <select
                         value={companyFilter}
                         onChange={(e) => setCompanyFilter(e.target.value)}
-                        className="bg-white border border-[#e1e5ea] text-[#1f1f1f] text-sm rounded-full px-4 py-2 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#4285F4]/20 transition-all font-medium appearance-none min-w-[160px] cursor-pointer"
+                        className="bg-white border border-[#e1e5ea] text-[#1f1f1f] text-sm rounded-[32px] px-4 py-2 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#4285F4]/20 transition-all font-medium appearance-none min-w-[160px] cursor-pointer"
                     >
                         <option value="all">すべての受入企業</option>
                         {uniqueCompanies.map(c => <option key={c} value={c}>{c}</option>)}
@@ -96,7 +96,7 @@ export function WorkersClient({ workers, userRole }: { workers: any[], userRole?
                     <select
                         value={systemTypeFilter}
                         onChange={(e) => setSystemTypeFilter(e.target.value)}
-                        className="bg-white border border-[#e1e5ea] text-[#1f1f1f] text-sm rounded-full px-4 py-2 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#4285F4]/20 transition-all font-medium appearance-none min-w-[140px] cursor-pointer"
+                        className="bg-white border border-[#e1e5ea] text-[#1f1f1f] text-sm rounded-[32px] px-4 py-2 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#4285F4]/20 transition-all font-medium appearance-none min-w-[140px] cursor-pointer"
                     >
                         <option value="all">すべての制度</option>
                         <option value="ikusei_shuro">育成就労</option>
@@ -107,7 +107,7 @@ export function WorkersClient({ workers, userRole }: { workers: any[], userRole?
                     <select
                         value={batchFilter}
                         onChange={(e) => setBatchFilter(e.target.value)}
-                        className="bg-white border border-[#e1e5ea] text-[#1f1f1f] text-sm rounded-full px-4 py-2 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#4285F4]/20 transition-all font-medium appearance-none min-w-[140px] cursor-pointer"
+                        className="bg-white border border-[#e1e5ea] text-[#1f1f1f] text-sm rounded-[32px] px-4 py-2 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#4285F4]/20 transition-all font-medium appearance-none min-w-[140px] cursor-pointer"
                     >
                         <option value="all">すべての入国期生</option>
                         {uniqueBatches.map(b => <option key={b} value={b}>{b}</option>)}
@@ -122,7 +122,7 @@ export function WorkersClient({ workers, userRole }: { workers: any[], userRole?
                                 setSystemTypeFilter('all')
                                 setBatchFilter('all')
                             }}
-                            className="ml-auto flex items-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-gray-700 hover:bg-gray-100 px-3 py-1.5 rounded-full transition-colors"
+                            className="ml-auto flex items-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-gray-700 hover:bg-gray-100 px-3 py-1.5 rounded-[32px] transition-colors"
                         >
                             <RefreshCw size={12} /> リセット
                         </button>
@@ -135,17 +135,17 @@ export function WorkersClient({ workers, userRole }: { workers: any[], userRole?
                     <table className="w-full text-left text-sm text-[#444746]">
                         <thead className="bg-transparent text-[12px] font-semibold text-[#444746]/60 border-b border-gray-200/50 uppercase tracking-widest whitespace-nowrap">
                             <tr>
-                                <th className="px-6 py-4 font-medium">氏名 / 基本情報</th>
-                                <th className="px-6 py-4 font-medium">受入企業 / 期生</th>
-                                <th className="px-6 py-4 font-medium">制度区分 / ステータス</th>
-                                <th className="px-6 py-4 font-medium">入国日 / 在留期限</th>
-                                <th className="px-6 py-4 font-medium text-right w-[120px]">操作</th>
+                                <th className="px-4 py-2 font-medium">氏名 / 基本情報</th>
+                                <th className="px-4 py-2 font-medium">受入企業 / 期生</th>
+                                <th className="px-4 py-2 font-medium">制度区分 / ステータス</th>
+                                <th className="px-4 py-2 font-medium">入国日 / 在留期限</th>
+                                <th className="px-4 py-2 font-medium text-right w-[120px]">操作</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100/50">
                             {filteredWorkers.length === 0 && (
                                 <tr>
-                                    <td colSpan={5} className="px-6 py-16 text-center text-[#444746]/60 font-medium">
+                                    <td colSpan={5} className="px-4 py-8 text-center text-[#444746]/60 font-medium">
                                         <div className="flex flex-col items-center gap-3">
                                             <Search size={32} className="text-gray-300" />
                                             条件に一致する人材が見つかりません。
@@ -160,9 +160,9 @@ export function WorkersClient({ workers, userRole }: { workers: any[], userRole?
                                 return (
                                     <tr key={w.id} className="hover:bg-white transition-colors group">
                                         {/* 1. Name & Info */}
-                                        <td className="px-6 py-4">
+                                        <td className="px-4 py-2">
                                             <div className="flex items-center gap-3.5">
-                                                <div className="w-11 h-11 rounded-full bg-[#f0f4f9] border border-[#e1e5ea] overflow-hidden flex items-center justify-center shrink-0 shadow-sm">
+                                                <div className="w-11 h-11 rounded-[32px] bg-[#f0f4f9] border border-[#e1e5ea] overflow-hidden flex items-center justify-center shrink-0 shadow-sm">
                                                     {w.avatar_url ? <img src={w.avatar_url} alt="Avatar" className="w-full h-full object-cover" /> : <span className="text-[#444746] font-medium text-sm">{w.full_name_romaji.charAt(0)}</span>}
                                                 </div>
                                                 <div>
@@ -182,7 +182,7 @@ export function WorkersClient({ workers, userRole }: { workers: any[], userRole?
                                         </td>
 
                                         {/* 2. Company & Batch */}
-                                        <td className="px-6 py-4">
+                                        <td className="px-4 py-2">
                                             <div className="flex flex-col gap-1.5">
                                                 <div className="font-medium text-[#1f1f1f] flex items-center gap-1.5">
                                                     <Building2 size={14} className="text-[#4285F4]" />
@@ -197,21 +197,21 @@ export function WorkersClient({ workers, userRole }: { workers: any[], userRole?
                                         </td>
 
                                         {/* 3. System & Status */}
-                                        <td className="px-6 py-4">
+                                        <td className="px-4 py-2">
                                             <div className="flex flex-col items-start gap-2">
-                                                <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold border ${w.system_type === 'ikusei_shuro' ? 'bg-emerald-50 text-emerald-700 border-emerald-100/50' : w.system_type === 'tokuteigino' ? 'bg-blue-50 text-blue-700 border-blue-100/50' : 'bg-red-50 text-red-700 border-red-100/50'}`}>
+                                                <span className={`px-2.5 py-1 rounded-[32px] text-[11px] font-bold border ${w.system_type === 'ikusei_shuro' ? 'bg-emerald-50 text-emerald-700 border-emerald-100/50' : w.system_type === 'tokuteigino' ? 'bg-blue-50 text-blue-700 border-blue-100/50' : 'bg-red-50 text-red-700 border-red-100/50'}`}>
                                                     {w.system_type === 'ikusei_shuro' ? '育成就労' : w.system_type === 'tokuteigino' ? '特定技能' : '技能実習'}
                                                 </span>
 
                                                 <div className={`text-[12px] font-medium flex items-center gap-1.5 ${w.status === 'working' ? 'text-green-600' : w.status === 'missing' ? 'text-red-500' : w.status === 'returned' ? 'text-gray-500' : 'text-orange-500'}`}>
-                                                    <span className={`w-1.5 h-1.5 rounded-full shadow-sm ${w.status === 'working' ? 'bg-green-500' : w.status === 'missing' ? 'bg-red-500' : w.status === 'returned' ? 'bg-gray-400' : 'bg-orange-500'}`}></span>
+                                                    <span className={`w-1.5 h-1.5 rounded-[32px] shadow-sm ${w.status === 'working' ? 'bg-green-500' : w.status === 'missing' ? 'bg-red-500' : w.status === 'returned' ? 'bg-gray-400' : 'bg-orange-500'}`}></span>
                                                     {w.status === 'working' ? '就業中' : w.status === 'missing' ? '失踪' : w.status === 'returned' ? '帰国' : '入国待ち'}
                                                 </div>
                                             </div>
                                         </td>
 
                                         {/* 4. Dates */}
-                                        <td className="px-6 py-4">
+                                        <td className="px-4 py-2">
                                             <div className="flex flex-col gap-1.5 text-[13px]">
                                                 <div className="flex items-center gap-1.5 text-gray-500">
                                                     <Calendar size={13} className="text-gray-400" />
@@ -229,12 +229,12 @@ export function WorkersClient({ workers, userRole }: { workers: any[], userRole?
                                         </td>
 
                                         {/* 5. Actions */}
-                                        <td className="px-6 py-4 text-right">
+                                        <td className="px-4 py-2 text-right">
                                             <div className="flex items-center justify-end gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
-                                                <Link href={`/workers/${w.id}`} className="px-3 py-1.5 flex items-center gap-1.5 rounded-full text-xs font-medium text-[#444746] hover:text-white hover:bg-[#4285F4] transition-colors border border-transparent hover:border-[#4285F4]" title="詳細">
+                                                <Link href={`/workers/${w.id}`} className="px-3 py-1.5 flex items-center gap-1.5 rounded-[32px] text-xs font-medium text-[#444746] hover:text-white hover:bg-[#4285F4] transition-colors border border-transparent hover:border-[#4285F4]" title="詳細">
                                                     <FileSearch size={14} strokeWidth={2} /> 詳細
                                                 </Link>
-                                                <Link href={`/workers/${w.id}/edit`} className="px-3 py-1.5 flex items-center gap-1.5 rounded-full text-xs font-medium text-[#444746] hover:text-[#4285F4] hover:bg-blue-50 transition-colors border border-transparent" title="編集">
+                                                <Link href={`/workers/${w.id}/edit`} className="px-3 py-1.5 flex items-center gap-1.5 rounded-[32px] text-xs font-medium text-[#444746] hover:text-[#4285F4] hover:bg-blue-50 transition-colors border border-transparent" title="編集">
                                                     <Edit2 size={14} strokeWidth={2} /> 編集
                                                 </Link>
                                             </div>

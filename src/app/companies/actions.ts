@@ -17,9 +17,13 @@ export async function createCompany(formData: FormData) {
         postal_code: formData.get('postal_code') as string || null,
         address: formData.get('address') as string || null,
         phone: formData.get('phone') as string || null,
+        industry: formData.get('industry') as string || null,
         representative: formData.get('representative') as string || null,
+        manager_name: formData.get('manager_name') as string || null,
         pic_name: formData.get('pic_name') as string || null,
         guidance_manager: formData.get('guidance_manager') as string || null,
+        life_advisor: formData.get('life_advisor') as string || null,
+        tech_advisor: formData.get('tech_advisor') as string || null,
     }
 
     await supabase.from('companies').insert(newCompany)
@@ -40,9 +44,13 @@ export async function updateCompany(formData: FormData) {
         postal_code: formData.get('postal_code') as string || null,
         address: formData.get('address') as string || null,
         phone: formData.get('phone') as string || null,
+        industry: formData.get('industry') as string || null,
         representative: formData.get('representative') as string || null,
+        manager_name: formData.get('manager_name') as string || null,
         pic_name: formData.get('pic_name') as string || null,
         guidance_manager: formData.get('guidance_manager') as string || null,
+        life_advisor: formData.get('life_advisor') as string || null,
+        tech_advisor: formData.get('tech_advisor') as string || null,
     }
 
     await supabase.from('companies').update(updatedData).eq('id', id)
@@ -81,9 +89,13 @@ export async function importCompanies(companiesData: any[]) {
         postal_code: c.postal_code || null,
         address: c.address || null,
         phone: c.phone || null,
+        industry: c.industry || null,
         representative: c.representative || null,
+        manager_name: c.manager_name || null,
         pic_name: c.pic_name || null,
         guidance_manager: c.guidance_manager || null,
+        life_advisor: c.life_advisor || null,
+        tech_advisor: c.tech_advisor || null,
     }))
 
     const { error } = await supabase.from('companies').insert(payload)

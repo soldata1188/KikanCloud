@@ -42,7 +42,7 @@ export default async function WorkerDocumentsPage({ params }: { params: Promise<
 
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pl-2">
                         <div className="flex items-center gap-4">
-                            <Link href={`/workers/${id}/edit`} className="w-10 h-10 flex items-center justify-center rounded-full bg-white shadow-sm border border-gray-200 hover:bg-gray-50 transition-colors text-[#444746]"><ArrowLeft size={20} strokeWidth={2} /></Link>
+                            <Link href={`/workers/${id}/edit`} className="w-10 h-10 flex items-center justify-center rounded-[32px] bg-white shadow-sm border border-gray-200 hover:bg-gray-50 transition-colors text-[#444746]"><ArrowLeft size={20} strokeWidth={2} /></Link>
                             <div>
                                 <h2 className="text-[28px] md:text-[32px] font-bold tracking-tight text-[#1f1f1f] flex items-center gap-3">
                                     <FolderOpen className="text-[#4285F4]" size={32} /> 関連書類・ファイル管理
@@ -56,7 +56,7 @@ export default async function WorkerDocumentsPage({ params }: { params: Promise<
                         </div>
                     </div>
 
-                    <div className="bg-blue-50/50 p-4 rounded-2xl border border-blue-100 mb-6 flex items-start gap-3">
+                    <div className="bg-blue-50/50 p-4 rounded-[32px] border border-blue-100 mb-6 flex items-start gap-3">
                         <ShieldCheck className="text-[#4285F4] shrink-0 mt-0.5" size={20} />
                         <div className="text-sm text-[#444746] space-y-1">
                             <p className="font-bold text-[#1f1f1f]">セキュアなファイル保管庫 (Secure Vault)</p>

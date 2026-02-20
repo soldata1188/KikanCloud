@@ -56,7 +56,7 @@ export default async function Dashboard() {
           <h1 className="text-[22px] font-normal text-[#444746] tracking-tight">KikanCloud</h1>
           <div className="flex items-center gap-2">
             {userProfile?.role === 'admin' && <DemoManager />}
-            <span className="hidden sm:flex px-3 py-1 bg-white rounded-full text-[11px] font-semibold text-[#444746] tracking-wider border border-gray-200">ULTRA</span>
+            <span className="hidden sm:flex px-3 py-1 bg-white rounded-[32px] text-[11px] font-semibold text-[#444746] tracking-wider border border-gray-200">ULTRA</span>
             <UserMenu displayName={displayName} email={user.email || ''} role={userProfile?.role} />
           </div>
         </header>
@@ -82,28 +82,28 @@ export default async function Dashboard() {
             </div>
             <div className="flex justify-between items-center px-2 pb-1">
               <div className="flex items-center gap-1 text-[#444746]">
-                <button className="p-2.5 hover:bg-[#f0f4f9] rounded-full transition-colors"><Plus size={20} strokeWidth={1.5} /></button>
-                <button className="flex items-center gap-2 px-3 py-2 hover:bg-[#f0f4f9] rounded-full transition-colors text-sm font-medium"><SlidersHorizontal size={18} strokeWidth={1.5} /> ツール</button>
+                <button className="p-2.5 hover:bg-[#f0f4f9] rounded-[32px] transition-colors"><Plus size={20} strokeWidth={1.5} /></button>
+                <button className="flex items-center gap-2 px-3 py-2 hover:bg-[#f0f4f9] rounded-[32px] transition-colors text-sm font-medium"><SlidersHorizontal size={18} strokeWidth={1.5} /> ツール</button>
               </div>
               <div className="flex items-center gap-2">
-                <button className="flex items-center gap-1 px-3 py-2 hover:bg-[#f0f4f9] rounded-full transition-colors text-sm font-medium text-[#444746]">Pro <svg width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg></button>
-                <button className="w-10 h-10 flex items-center justify-center rounded-full bg-[#f0f4f9] hover:bg-[#e1e5ea] transition-colors text-[#444746]"><Mic size={20} strokeWidth={1.5} /></button>
+                <button className="flex items-center gap-1 px-3 py-2 hover:bg-[#f0f4f9] rounded-[32px] transition-colors text-sm font-medium text-[#444746]">Pro <svg width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg></button>
+                <button className="w-10 h-10 flex items-center justify-center rounded-[32px] bg-[#f0f4f9] hover:bg-[#e1e5ea] transition-colors text-[#444746]"><Mic size={20} strokeWidth={1.5} /></button>
               </div>
             </div>
           </div>
 
           {/* CÁC VIÊN THUỐC LỌC THÔNG MINH (ACTION CHIPS) */}
           <div className="flex flex-wrap gap-3 mb-10 pl-1">
-            <Link href="/workers" className={`bg-white hover:bg-gray-50 border ${urgentCount > 0 ? 'border-red-200 text-red-600 bg-red-50/50 shadow-red-100' : 'border-[#e1e5ea] text-[#444746]'} px-5 py-3.5 rounded-full text-sm font-medium transition-colors flex items-center gap-2 shadow-sm`}>
+            <Link href="/workers" className={`bg-white hover:bg-gray-50 border ${urgentCount > 0 ? 'border-red-200 text-red-600 bg-red-50/50 shadow-red-100' : 'border-[#e1e5ea] text-[#444746]'} px-5 py-3.5 rounded-[32px] text-sm font-medium transition-colors flex items-center gap-2 shadow-sm`}>
               {urgentCount > 0 ? <AlertCircle size={16} /> : '⚠️'} 期限警告 ({urgentCount})
             </Link>
-            <Link href="/audits" className={`bg-white hover:bg-gray-50 border ${overdueAuditsCount > 0 ? 'border-orange-200 text-orange-600 bg-orange-50/50 shadow-orange-100' : 'border-[#e1e5ea] text-[#444746]'} px-5 py-3.5 rounded-full text-sm font-medium transition-colors flex items-center gap-2 shadow-sm`}>
+            <Link href="/audits" className={`bg-white hover:bg-gray-50 border ${overdueAuditsCount > 0 ? 'border-orange-200 text-orange-600 bg-orange-50/50 shadow-orange-100' : 'border-[#e1e5ea] text-[#444746]'} px-5 py-3.5 rounded-[32px] text-sm font-medium transition-colors flex items-center gap-2 shadow-sm`}>
               {overdueAuditsCount > 0 ? <AlertTriangle size={16} /> : '🚨'} 監査遅延 ({overdueAuditsCount})
             </Link>
-            <Link href="/companies" className="bg-white hover:bg-gray-50 border border-[#e1e5ea] px-5 py-3.5 rounded-full text-sm text-[#444746] font-medium transition-colors flex items-center gap-2 shadow-sm">
+            <Link href="/companies" className="bg-white hover:bg-gray-50 border border-[#e1e5ea] px-5 py-3.5 rounded-[32px] text-sm text-[#444746] font-medium transition-colors flex items-center gap-2 shadow-sm">
               🏢 受入企業 ({companyCount || 0})
             </Link>
-            <Link href="/workers" className="bg-white hover:bg-gray-50 border border-[#e1e5ea] px-5 py-3.5 rounded-full text-sm text-[#444746] font-medium transition-colors flex items-center gap-2 shadow-sm">
+            <Link href="/workers" className="bg-white hover:bg-gray-50 border border-[#e1e5ea] px-5 py-3.5 rounded-[32px] text-sm text-[#444746] font-medium transition-colors flex items-center gap-2 shadow-sm">
               👥 就業中人材 ({workerCount || 0})
             </Link>
           </div>
@@ -125,9 +125,9 @@ export default async function Dashboard() {
                 <table className="w-full text-left text-sm text-[#444746]">
                   <thead className="bg-transparent text-[12px] font-semibold text-[#444746]/60 border-b border-gray-200/50 uppercase tracking-widest whitespace-nowrap">
                     <tr>
-                      <th className="px-6 py-4 font-medium">氏名 / 受入企業</th>
-                      <th className="px-6 py-4 font-medium">警告内容</th>
-                      <th className="px-6 py-4 font-medium text-right w-[160px]">期限日</th>
+                      <th className="px-4 py-2 font-medium">氏名 / 受入企業</th>
+                      <th className="px-4 py-2 font-medium">警告内容</th>
+                      <th className="px-4 py-2 font-medium text-right w-[160px]">期限日</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#e1e5ea]">
@@ -144,16 +144,16 @@ export default async function Dashboard() {
 
                       return (
                         <tr key={w.id} className="hover:bg-red-50/50 transition-colors group">
-                          <td className="px-6 py-4">
+                          <td className="px-4 py-2">
                             <Link href={`/workers/${w.id}/edit`} className="block">
                               <span className="font-semibold text-[#1f1f1f] group-hover:text-[#4285F4] transition-colors line-clamp-1 mb-1">{w.full_name_romaji}</span>
                               <span className="text-[12px] text-gray-500">{(w.companies as any)?.name_jp || '未配属'}</span>
                             </Link>
                           </td>
-                          <td className="px-6 py-4">
-                            <span className="text-[11px] px-2.5 py-1 rounded-full bg-red-50 text-red-600 font-bold border border-red-200 whitespace-nowrap flex items-center gap-1.5 w-max"><AlertCircle size={12} /> {reason}期限迫る</span>
+                          <td className="px-4 py-2">
+                            <span className="text-[11px] px-2.5 py-1 rounded-[32px] bg-red-50 text-red-600 font-bold border border-red-200 whitespace-nowrap flex items-center gap-1.5 w-max"><AlertCircle size={12} /> {reason}期限迫る</span>
                           </td>
-                          <td className="px-6 py-4 text-right">
+                          <td className="px-4 py-2 text-right">
                             <div className="font-medium text-[#1f1f1f] flex flex-col items-end gap-1">
                               <span className="flex items-center gap-1.5"><Clock size={14} className="text-red-400" /> {dateStr?.replace(/-/g, '/')}</span>
                             </div>
@@ -194,9 +194,9 @@ export default async function Dashboard() {
                 <table className="w-full text-left text-sm text-[#444746]">
                   <thead className="bg-transparent text-[12px] font-semibold text-[#444746]/60 border-b border-gray-200/50 uppercase tracking-widest whitespace-nowrap">
                     <tr>
-                      <th className="px-6 py-4 font-medium">受入企業 / 手続種別</th>
-                      <th className="px-6 py-4 font-medium">ステータス</th>
-                      <th className="px-6 py-4 font-medium text-right w-[160px]">予定日</th>
+                      <th className="px-4 py-2 font-medium">受入企業 / 手続種別</th>
+                      <th className="px-4 py-2 font-medium">ステータス</th>
+                      <th className="px-4 py-2 font-medium text-right w-[160px]">予定日</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#e1e5ea]">
@@ -204,7 +204,7 @@ export default async function Dashboard() {
                       const isOverdue = a.scheduled_date < todayStr;
                       return (
                         <tr key={a.id} className={`hover:bg-orange-50/30 transition-colors group ${isOverdue ? 'bg-orange-50/20' : ''}`}>
-                          <td className="px-6 py-4">
+                          <td className="px-4 py-2">
                             <Link href={`/audits`} className="block">
                               <span className="font-semibold text-[#1f1f1f] group-hover:text-[#4285F4] transition-colors line-clamp-1 mb-1">{(a.companies as any)?.name_jp}</span>
                               <span className="text-[12px] text-gray-500 flex items-center gap-1.5">
@@ -213,14 +213,14 @@ export default async function Dashboard() {
                               </span>
                             </Link>
                           </td>
-                          <td className="px-6 py-4">
+                          <td className="px-4 py-2">
                             {isOverdue ? (
-                              <span className="text-[11px] px-2.5 py-1 rounded-full bg-orange-50 text-orange-600 font-bold border border-orange-200 whitespace-nowrap flex items-center gap-1.5 w-max animate-pulse"><AlertTriangle size={12} /> 期限遅延</span>
+                              <span className="text-[11px] px-2.5 py-1 rounded-[32px] bg-orange-50 text-orange-600 font-bold border border-orange-200 whitespace-nowrap flex items-center gap-1.5 w-max animate-pulse"><AlertTriangle size={12} /> 期限遅延</span>
                             ) : (
-                              <span className="text-[11px] px-2.5 py-1 rounded-full bg-gray-50 text-gray-600 font-bold border border-gray-200 whitespace-nowrap flex items-center gap-1.5 w-max"><Calendar size={12} /> 今月タスク</span>
+                              <span className="text-[11px] px-2.5 py-1 rounded-[32px] bg-gray-50 text-gray-600 font-bold border border-gray-200 whitespace-nowrap flex items-center gap-1.5 w-max"><Calendar size={12} /> 今月タスク</span>
                             )}
                           </td>
-                          <td className="px-6 py-4 text-right">
+                          <td className="px-4 py-2 text-right">
                             <div className={`font-medium flex flex-col items-end gap-1 ${isOverdue ? 'text-orange-600' : 'text-[#1f1f1f]'}`}>
                               <span className="flex items-center gap-1.5"><CalendarCheck size={14} className={isOverdue ? "text-orange-400" : "text-gray-400"} /> {a.scheduled_date.replace(/-/g, '/')}</span>
                             </div>

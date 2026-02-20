@@ -27,12 +27,12 @@ export function DemoManager() {
     }
 
     return (
-        <div className="flex items-center gap-2 mr-4 bg-white px-2 py-1.5 rounded-full border border-gray-200 shadow-sm hidden sm:flex">
-            <button onClick={handleInject} disabled={isPending} className="flex items-center gap-1 px-3 py-1 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-full text-[11px] font-bold transition-colors disabled:opacity-50">
+        <div className="flex items-center gap-2 mr-4 bg-white px-2 py-1.5 rounded-[32px] border border-gray-200 shadow-sm hidden sm:flex">
+            <button onClick={handleInject} disabled={isPending} className="flex items-center gap-1 px-3 py-1 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-[32px] text-[11px] font-bold transition-colors disabled:opacity-50">
                 {isPending ? <Loader2 size={12} className="animate-spin" /> : <DatabaseZap size={12} strokeWidth={2} />} DEMO生成
             </button>
             <div className="w-px h-4 bg-gray-200"></div>
-            <button onClick={handleClear} disabled={isPending} className="flex items-center gap-1 px-3 py-1 bg-red-50 hover:bg-red-100 text-red-600 rounded-full text-[11px] font-bold transition-colors disabled:opacity-50">
+            <button onClick={handleClear} disabled={isPending} className="flex items-center gap-1 px-3 py-1 bg-red-50 hover:bg-red-100 text-red-600 rounded-[32px] text-[11px] font-bold transition-colors disabled:opacity-50">
                 {isPending ? <Loader2 size={12} className="animate-spin" /> : <Trash2 size={12} strokeWidth={2} />} リセット
             </button>
         </div>

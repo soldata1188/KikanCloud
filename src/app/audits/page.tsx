@@ -93,7 +93,7 @@ export default async function AuditsPage({ searchParams }: { searchParams: Promi
                 <header className="flex justify-between items-center px-4 py-3 md:px-6 md:py-4 sticky top-0 bg-[#f0f4f9] z-10">
                     <h1 className="text-[22px] font-normal text-[#444746] tracking-tight">KikanCloud</h1>
                     <div className="flex items-center gap-2">
-                        <span className="hidden sm:flex px-3 py-1 bg-white rounded-full text-[11px] font-semibold text-[#444746] tracking-wider border border-gray-200">ULTRA</span>
+                        <span className="hidden sm:flex px-3 py-1 bg-white rounded-[32px] text-[11px] font-semibold text-[#444746] tracking-wider border border-gray-200">ULTRA</span>
                         <UserMenu displayName={displayName} email={user.email || ''} role={userProfile?.role} />
                     </div>
                 </header>
@@ -109,11 +109,11 @@ export default async function AuditsPage({ searchParams }: { searchParams: Promi
 
                             {userProfile?.role === 'admin' && <ExportExcelButton data={matrixData} month={filterMonth} />}
 
-                            <Link href={`/audits/print?month=${filterMonth}`} target="_blank" className="flex items-center gap-2 px-6 py-2.5 bg-white border border-[#e1e5ea] hover:bg-red-50 hover:text-red-700 hover:border-red-200 text-[#444746] rounded-full text-sm font-bold transition-colors shadow-sm shrink-0" title="PDF形式で印刷・保存します">
+                            <Link href={`/audits/print?month=${filterMonth}`} target="_blank" className="flex items-center gap-2 px-6 py-2.5 bg-white border border-[#e1e5ea] hover:bg-red-50 hover:text-red-700 hover:border-red-200 text-[#444746] rounded-[32px] text-sm font-bold transition-colors shadow-sm shrink-0" title="PDF形式で印刷・保存します">
                                 <Printer size={18} strokeWidth={2.5} /> PDF出力
                             </Link>
 
-                            <Link href="/audits/new" className="flex items-center gap-2 px-6 py-2.5 bg-[#4285F4] text-white rounded-full text-sm font-medium hover:bg-[#3367d6] transition-colors shadow-sm border border-transparent shrink-0">
+                            <Link href="/audits/new" className="flex items-center gap-2 px-6 py-2.5 bg-[#4285F4] text-white rounded-[32px] text-sm font-medium hover:bg-[#3367d6] transition-colors shadow-sm border border-transparent shrink-0">
                                 <Plus size={18} strokeWidth={2} /> 予定登録
                             </Link>
                         </div>
@@ -124,20 +124,20 @@ export default async function AuditsPage({ searchParams }: { searchParams: Promi
                             <table className="w-full text-left text-sm text-[#444746]">
                                 <thead className="bg-transparent text-[12px] font-semibold text-[#444746]/60 border-b border-gray-200/50 uppercase tracking-widest">
                                     <tr>
-                                        <th className="px-6 py-4 font-medium">受入企業</th>
-                                        <th className="px-6 py-4 font-medium">ステータス</th>
-                                        <th className="px-6 py-4 font-medium">予定日 / 完了日</th>
-                                        <th className="px-6 py-4 font-medium">担当</th>
-                                        <th className="px-6 py-4 font-medium text-right w-[160px]">アクション</th>
+                                        <th className="px-4 py-2 font-medium">受入企業</th>
+                                        <th className="px-4 py-2 font-medium">ステータス</th>
+                                        <th className="px-4 py-2 font-medium">予定日 / 完了日</th>
+                                        <th className="px-4 py-2 font-medium">担当</th>
+                                        <th className="px-4 py-2 font-medium text-right w-[160px]">アクション</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-[#e1e5ea]">
                                     {matrixData.map((row) => (
                                         <tr key={row.company.id} className="hover:bg-gray-50/50 transition-colors group">
                                             {/* 1. Tên Xí Nghiệp */}
-                                            <td className="px-6 py-5">
+                                            <td className="px-4 py-2.5">
                                                 <div className="flex gap-3">
-                                                    <div className="w-10 h-10 rounded-full bg-[#f0f4f9] border border-[#e1e5ea] flex items-center justify-center shrink-0 text-[#444746] mt-0.5">
+                                                    <div className="w-10 h-10 rounded-[32px] bg-[#f0f4f9] border border-[#e1e5ea] flex items-center justify-center shrink-0 text-[#444746] mt-0.5">
                                                         <Building2 size={18} strokeWidth={1.5} />
                                                     </div>
                                                     <div>
@@ -145,24 +145,24 @@ export default async function AuditsPage({ searchParams }: { searchParams: Promi
                                                         <div className="flex items-center gap-1.5 flex-wrap">
                                                             <span className="text-[11px] text-gray-500 font-medium whitespace-nowrap">計 <span className="text-[#1f1f1f]">{row.workerCounts.total}</span>名</span>
                                                             {row.workerCounts.total > 0 && <span className="text-gray-300 ml-1 mr-0.5">|</span>}
-                                                            {row.workerCounts.ikusei > 0 && <span className="text-[10px] px-1.5 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-100/50 rounded flex items-center gap-1 whitespace-nowrap"><span className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>育成 {row.workerCounts.ikusei}</span>}
-                                                            {row.workerCounts.tokutei > 0 && <span className="text-[10px] px-1.5 py-0.5 bg-blue-50 text-blue-700 border border-blue-100/50 rounded flex items-center gap-1 whitespace-nowrap"><span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>特定 {row.workerCounts.tokutei}</span>}
-                                                            {row.workerCounts.ginou > 0 && <span className="text-[10px] px-1.5 py-0.5 bg-red-50 text-red-700 border border-red-100/50 rounded flex items-center gap-1 whitespace-nowrap"><span className="w-1.5 h-1.5 bg-red-500 rounded-full"></span>技能 {row.workerCounts.ginou}</span>}
+                                                            {row.workerCounts.ikusei > 0 && <span className="text-[10px] px-1.5 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-100/50 rounded flex items-center gap-1 whitespace-nowrap"><span className="w-1.5 h-1.5 bg-emerald-500 rounded-[32px]"></span>育成 {row.workerCounts.ikusei}</span>}
+                                                            {row.workerCounts.tokutei > 0 && <span className="text-[10px] px-1.5 py-0.5 bg-blue-50 text-blue-700 border border-blue-100/50 rounded flex items-center gap-1 whitespace-nowrap"><span className="w-1.5 h-1.5 bg-blue-500 rounded-[32px]"></span>特定 {row.workerCounts.tokutei}</span>}
+                                                            {row.workerCounts.ginou > 0 && <span className="text-[10px] px-1.5 py-0.5 bg-red-50 text-red-700 border border-red-100/50 rounded flex items-center gap-1 whitespace-nowrap"><span className="w-1.5 h-1.5 bg-red-500 rounded-[32px]"></span>技能 {row.workerCounts.ginou}</span>}
                                                         </div>
                                                     </div>
                                                 </div>
                                             </td>
 
                                             {/* 2. Trạng thái */}
-                                            <td className="px-6 py-5">
-                                                <span className={`px-3 py-1.5 rounded-full text-xs font-bold inline-flex items-center gap-1.5 ${row.statusLabel.bg}`}>
+                                            <td className="px-4 py-2.5">
+                                                <span className={`px-3 py-1.5 rounded-[32px] text-xs font-bold inline-flex items-center gap-1.5 ${row.statusLabel.bg}`}>
                                                     {row.priority === 1 || row.priority === 2 ? <AlertCircle size={14} /> : row.priority === 5 ? <CheckCircle2 size={14} /> : <CalendarCheck size={14} />}
                                                     {row.statusLabel.text}
                                                 </span>
                                             </td>
 
                                             {/* 3. Ngày */}
-                                            <td className="px-6 py-5 align-top">
+                                            <td className="px-4 py-2.5 align-top">
                                                 <div className="flex flex-col gap-3">
                                                     {/* Current Month */}
                                                     {row.currentAudit ? (
@@ -179,7 +179,7 @@ export default async function AuditsPage({ searchParams }: { searchParams: Promi
                                                                 row.lastTwoAudits.map((pa: any) => (
                                                                     <div key={pa.id} className="text-[11px] text-gray-500 flex items-center justify-between opacity-80 hover:opacity-100 transition-opacity">
                                                                         <div className="flex items-center gap-1.5">
-                                                                            <span className="w-1.5 h-1.5 rounded-full bg-gray-300"></span>
+                                                                            <span className="w-1.5 h-1.5 rounded-[32px] bg-gray-300"></span>
                                                                             <span className="font-mono tracking-tight">{pa.actual_date?.replace(/-/g, '/')}</span>
                                                                         </div>
                                                                         <div className="flex items-center gap-1.5">
@@ -201,10 +201,10 @@ export default async function AuditsPage({ searchParams }: { searchParams: Promi
                                             </td>
 
                                             {/* 4. PIC */}
-                                            <td className="px-6 py-5">
+                                            <td className="px-4 py-2.5">
                                                 {row.currentAudit?.pic_name ? (
                                                     <div className="flex items-center gap-2">
-                                                        <div className="w-6 h-6 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center text-xs font-bold shrink-0 shadow-sm border border-blue-100">
+                                                        <div className="w-6 h-6 rounded-[32px] bg-blue-50 text-blue-600 flex items-center justify-center text-xs font-bold shrink-0 shadow-sm border border-blue-100">
                                                             {row.currentAudit.pic_name.charAt(0)}
                                                         </div>
                                                         <span className="text-sm font-medium text-[#1f1f1f]">{row.currentAudit.pic_name}</span>
@@ -213,7 +213,7 @@ export default async function AuditsPage({ searchParams }: { searchParams: Promi
                                             </td>
 
                                             {/* 5. Action */}
-                                            <td className="px-6 py-5 text-right">
+                                            <td className="px-4 py-2.5 text-right">
                                                 <SmartActionCell
                                                     auditId={row.currentAudit?.id || null}
                                                     status={row.currentAudit?.status || null}

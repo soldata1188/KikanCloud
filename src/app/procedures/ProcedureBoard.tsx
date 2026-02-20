@@ -58,7 +58,7 @@ export function ProcedureBoard({ procedures }: { procedures: any[] }) {
                         className={`px-6 py-3 rounded-t-2xl font-bold flex items-center gap-2 transition-colors shrink-0 ${activeTab === t.id ? t.color : t.inactive}`}
                     >
                         {t.icon} {t.label}
-                        <span className={`text-[11px] px-2 py-0.5 rounded-full ${activeTab === t.id ? 'bg-black/10' : 'bg-gray-200'}`}>
+                        <span className={`text-[11px] px-2 py-0.5 rounded-[32px] ${activeTab === t.id ? 'bg-black/10' : 'bg-gray-200'}`}>
                             {procedures.filter(p => p.agency === t.id && p.status !== 'completed').length}件
                         </span>
                     </button>
@@ -75,7 +75,7 @@ export function ProcedureBoard({ procedures }: { procedures: any[] }) {
                         <div key={col.id} className="bg-white rounded-[24px] shadow-sm border border-[#e1e5ea] overflow-hidden">
                             <div className="px-5 py-3 border-b border-[#e1e5ea] bg-gray-50/50 flex items-center justify-between">
                                 <h3 className="font-bold text-[#1f1f1f] flex items-center gap-2">{col.icon} {col.title}</h3>
-                                <span className="bg-white text-[#444746] text-xs font-bold px-2.5 py-1 rounded-full border border-gray-200 shadow-sm">{items.length}件</span>
+                                <span className="bg-white text-[#444746] text-xs font-bold px-2.5 py-1 rounded-[32px] border border-gray-200 shadow-sm">{items.length}件</span>
                             </div>
                             <div className="flex flex-col">
                                 {items.map(proc => {
@@ -88,10 +88,10 @@ export function ProcedureBoard({ procedures }: { procedures: any[] }) {
                                         <div key={proc.id} className="py-4 px-2 hover:bg-gray-50/50 transition-colors flex flex-col md:flex-row md:items-center gap-4 group relative border-b border-[#e1e5ea]/80 last:border-0 mx-4">
                                             <div className="flex-1 min-w-0 flex flex-col gap-1.5">
                                                 <div className="flex items-center gap-2 flex-wrap">
-                                                    <span className={`text-[11px] px-2.5 py-0.5 rounded-full font-bold border ${getAgencyTagStyle(proc.agency)}`}>{proc.procedure_name}</span>
-                                                    {isIssue && <span className="flex items-center gap-1 text-[10px] text-red-600 font-bold bg-red-50 px-2 py-0.5 rounded-full border border-red-200"><AlertCircle size={10} /> 不備・要対応</span>}
-                                                    {isOverdue && !isIssue && <span className="flex items-center gap-1 text-[10px] text-red-600 font-bold bg-red-50 px-2 py-0.5 rounded-full border border-red-200"><Clock size={10} /> 期限超過</span>}
-                                                    {isUrgent && !isOverdue && !isIssue && <span className="flex items-center gap-1 text-[10px] text-orange-600 font-bold bg-orange-50 px-2 py-0.5 rounded-full border border-orange-200"><Clock size={10} /> 期限注意</span>}
+                                                    <span className={`text-[11px] px-2.5 py-0.5 rounded-[32px] font-bold border ${getAgencyTagStyle(proc.agency)}`}>{proc.procedure_name}</span>
+                                                    {isIssue && <span className="flex items-center gap-1 text-[10px] text-red-600 font-bold bg-red-50 px-2 py-0.5 rounded-[32px] border border-red-200"><AlertCircle size={10} /> 不備・要対応</span>}
+                                                    {isOverdue && !isIssue && <span className="flex items-center gap-1 text-[10px] text-red-600 font-bold bg-red-50 px-2 py-0.5 rounded-[32px] border border-red-200"><Clock size={10} /> 期限超過</span>}
+                                                    {isUrgent && !isOverdue && !isIssue && <span className="flex items-center gap-1 text-[10px] text-orange-600 font-bold bg-orange-50 px-2 py-0.5 rounded-[32px] border border-orange-200"><Clock size={10} /> 期限注意</span>}
                                                 </div>
 
                                                 <div className="flex items-baseline gap-2">
@@ -136,22 +136,22 @@ export function ProcedureBoard({ procedures }: { procedures: any[] }) {
                                             {/* Actions */}
                                             <div className="flex items-center justify-end gap-2 md:w-[220px] shrink-0">
                                                 {(proc.status === 'preparing' || proc.status === 'issue') && (
-                                                    <button onClick={() => handleToggle(proc.id)} disabled={isPending} className="px-5 py-2.5 text-[13px] font-bold text-white bg-[#4285F4] hover:bg-[#3367d6] rounded-full transition-colors flex items-center justify-center gap-1.5 shadow-sm disabled:opacity-50 w-full md:w-[140px]">
+                                                    <button onClick={() => handleToggle(proc.id)} disabled={isPending} className="px-5 py-2.5 text-[13px] font-bold text-white bg-[#4285F4] hover:bg-[#3367d6] rounded-[32px] transition-colors flex items-center justify-center gap-1.5 shadow-sm disabled:opacity-50 w-full md:w-[140px]">
                                                         {isPending ? <Clock size={16} className="animate-spin" /> : <Send size={16} />} 申請にする
                                                     </button>
                                                 )}
                                                 {proc.status === 'submitted' && (
-                                                    <button onClick={() => handleToggle(proc.id)} disabled={isPending} className="px-5 py-2.5 text-[13px] font-bold text-[#137333] bg-[#e6f4ea] hover:bg-[#ceead6] border border-green-200 rounded-full transition-colors flex items-center justify-center gap-1.5 shadow-sm disabled:opacity-50 w-full md:w-[140px]">
+                                                    <button onClick={() => handleToggle(proc.id)} disabled={isPending} className="px-5 py-2.5 text-[13px] font-bold text-[#137333] bg-[#e6f4ea] hover:bg-[#ceead6] border border-green-200 rounded-[32px] transition-colors flex items-center justify-center gap-1.5 shadow-sm disabled:opacity-50 w-full md:w-[140px]">
                                                         {isPending ? <Clock size={16} className="animate-spin" /> : <CheckCircle2 size={16} />} 許可・認定
                                                     </button>
                                                 )}
                                                 {proc.status === 'completed' && (
-                                                    <div className="px-5 py-2.5 text-[13px] font-bold text-gray-500 bg-gray-50 border border-gray-200 rounded-full flex items-center justify-center gap-1.5 w-full md:w-[140px]">
+                                                    <div className="px-5 py-2.5 text-[13px] font-bold text-gray-500 bg-gray-50 border border-gray-200 rounded-[32px] flex items-center justify-center gap-1.5 w-full md:w-[140px]">
                                                         <CheckCircle2 size={16} className="text-gray-400" /> 完了済
                                                     </div>
                                                 )}
 
-                                                <Link href={`/procedures/${proc.id}/edit`} className="w-10 h-10 flex items-center justify-center rounded-full text-[#444746] hover:text-[#4285F4] hover:bg-blue-50 transition-colors shrink-0" title="編集">
+                                                <Link href={`/procedures/${proc.id}/edit`} className="w-10 h-10 flex items-center justify-center rounded-[32px] text-[#444746] hover:text-[#4285F4] hover:bg-blue-50 transition-colors shrink-0" title="編集">
                                                     <Edit2 size={18} />
                                                 </Link>
                                             </div>

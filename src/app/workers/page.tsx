@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
-import { Plus } from 'lucide-react'
+import { Plus, ListPlus } from 'lucide-react'
 import { Sidebar } from '@/components/Sidebar'
 import { ImportModal } from './ImportModal'
 import { UserMenu } from '@/components/UserMenu'
@@ -26,7 +26,7 @@ export default async function WorkersList() {
                 <header className="flex justify-between items-center px-4 py-3 md:px-6 md:py-4 sticky top-0 bg-[#f0f4f9] z-10">
                     <h1 className="text-[22px] font-normal text-[#444746] tracking-tight">KikanCloud</h1>
                     <div className="flex items-center gap-2">
-                        <span className="hidden sm:flex px-3 py-1 bg-white rounded-full text-[11px] font-semibold text-[#444746] tracking-wider border border-gray-200">ULTRA</span>
+                        <span className="hidden sm:flex px-3 py-1 bg-white rounded-[32px] text-[11px] font-semibold text-[#444746] tracking-wider border border-gray-200">ULTRA</span>
                         <UserMenu displayName={displayName} email={user.email || ''} role={userProfile?.role} />
                     </div>
                 </header>
@@ -36,7 +36,10 @@ export default async function WorkersList() {
                         <h2 className="text-[32px] md:text-[40px] font-medium tracking-tight text-[#1f1f1f]">外国人材 管理</h2>
                         <div className="flex items-center gap-3 overflow-x-auto pb-2 md:pb-0">
                             {userProfile?.role === 'admin' && <ImportModal />}
-                            <Link href="/workers/new" className="flex items-center gap-2 px-6 py-3 bg-white hover:bg-gray-50 text-[#1f1f1f] rounded-full text-sm font-medium transition-colors shadow-sm border border-[#e1e5ea] shrink-0">
+                            <Link href="/workers/bulk-input" className="flex items-center gap-2 px-6 py-3 bg-white hover:bg-gray-50 text-[#1f1f1f] rounded-[32px] text-sm font-medium transition-colors shadow-sm border border-[#e1e5ea] shrink-0">
+                                <ListPlus size={18} strokeWidth={2} /> 一括入力
+                            </Link>
+                            <Link href="/workers/new" className="flex items-center gap-2 px-6 py-3 bg-white hover:bg-gray-50 text-[#1f1f1f] rounded-[32px] text-sm font-medium transition-colors shadow-sm border border-[#e1e5ea] shrink-0">
                                 <Plus size={18} strokeWidth={2} /> 新規登録
                             </Link>
                         </div>

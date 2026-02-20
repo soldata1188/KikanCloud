@@ -65,81 +65,106 @@ export function ProcedureBoard({ procedures }: { procedures: any[] }) {
                 ))}
             </div>
 
-            {/* KANBAN BOARD */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
-                {columns.map(col => (
-                    <div key={col.id} className={`${col.bg} rounded-[32px] p-4 min-h-[500px] border-t-4 ${col.border} shadow-sm border-x border-b border-[#e1e5ea] flex flex-col`}>
-                        <div className="flex items-center justify-between mb-4 px-2">
-                            <h3 className="font-medium text-[#1f1f1f] flex items-center gap-2">{col.icon} {col.title}</h3>
-                            <span className="bg-white text-[#444746] text-xs font-bold px-2 py-1 rounded-full border border-gray-200">
-                                {filteredProcs.filter(a => a.status === col.id || (col.id === 'preparing' && a.status === 'issue')).length}
-                            </span>
-                        </div>
+            {/* LIST BOARD */}
+            <div className="flex flex-col gap-8">
+                {columns.map(col => {
+                    const items = filteredProcs.filter(a => a.status === col.id || (col.id === 'preparing' && a.status === 'issue'));
+                    if (items.length === 0) return null;
 
-                        <div className="space-y-4 flex-1">
-                            {filteredProcs.filter(a => a.status === col.id || (col.id === 'preparing' && a.status === 'issue')).map(proc => {
-                                const today = new Date().toISOString().split('T')[0];
-                                const isUrgent = proc.target_date && proc.target_date < new Date(new Date().setDate(new Date().getDate() + 14)).toISOString().split('T')[0] && proc.status === 'preparing';
-                                const isOverdue = proc.target_date && proc.target_date < today && proc.status === 'preparing';
-                                const isIssue = proc.status === 'issue';
+                    return (
+                        <div key={col.id} className="bg-white rounded-[24px] shadow-sm border border-[#e1e5ea] overflow-hidden">
+                            <div className="px-5 py-3 border-b border-[#e1e5ea] bg-gray-50/50 flex items-center justify-between">
+                                <h3 className="font-bold text-[#1f1f1f] flex items-center gap-2">{col.icon} {col.title}</h3>
+                                <span className="bg-white text-[#444746] text-xs font-bold px-2.5 py-1 rounded-full border border-gray-200 shadow-sm">{items.length}件</span>
+                            </div>
+                            <div className="flex flex-col">
+                                {items.map(proc => {
+                                    const today = new Date().toISOString().split('T')[0];
+                                    const isUrgent = proc.target_date && proc.target_date < new Date(new Date().setDate(new Date().getDate() + 14)).toISOString().split('T')[0] && proc.status === 'preparing';
+                                    const isOverdue = proc.target_date && proc.target_date < today && proc.status === 'preparing';
+                                    const isIssue = proc.status === 'issue';
 
-                                return (
-                                    <div key={proc.id} className={`bg-white p-5 rounded-[24px] shadow-sm border ${isIssue ? 'border-red-400 bg-red-50/30' : isOverdue ? 'border-red-400 shadow-[0_0_12px_rgba(234,67,53,0.15)]' : isUrgent ? 'border-orange-300' : 'border-[#e1e5ea]'} hover:shadow-md transition-all group relative`}>
-                                        <div className="flex justify-between items-start mb-3">
-                                            <span className={`text-[10px] px-2.5 py-1 rounded-full font-bold border ${getAgencyTagStyle(proc.agency)}`}>{proc.procedure_name}</span>
-                                            <div className="flex items-center gap-1">
-                                                {isIssue && <span className="flex items-center gap-1 text-[10px] text-red-600 font-bold bg-red-50 px-2 py-1 rounded-full animate-pulse"><AlertCircle size={12} /> 不備・要対応</span>}
-                                                {isOverdue && !isIssue && <span className="flex items-center gap-1 text-[10px] text-red-600 font-bold bg-red-50 px-2 py-1 rounded-full animate-pulse"><Clock size={12} /> 期限超過</span>}
-                                                {isUrgent && !isOverdue && !isIssue && <span className="flex items-center gap-1 text-[10px] text-orange-600 font-bold bg-orange-50 px-2 py-1 rounded-full"><Clock size={12} /> 期限注意</span>}
-                                                <Link href={`/procedures/${proc.id}/edit`} className="opacity-0 group-hover:opacity-100 p-1.5 rounded-full text-[#444746] hover:text-[#4285F4] hover:bg-blue-50 transition-colors" title="編集"><Edit2 size={14} /></Link>
+                                    return (
+                                        <div key={proc.id} className="py-4 px-2 hover:bg-gray-50/50 transition-colors flex flex-col md:flex-row md:items-center gap-4 group relative border-b border-[#e1e5ea]/80 last:border-0 mx-4">
+                                            <div className="flex-1 min-w-0 flex flex-col gap-1.5">
+                                                <div className="flex items-center gap-2 flex-wrap">
+                                                    <span className={`text-[11px] px-2.5 py-0.5 rounded-full font-bold border ${getAgencyTagStyle(proc.agency)}`}>{proc.procedure_name}</span>
+                                                    {isIssue && <span className="flex items-center gap-1 text-[10px] text-red-600 font-bold bg-red-50 px-2 py-0.5 rounded-full border border-red-200"><AlertCircle size={10} /> 不備・要対応</span>}
+                                                    {isOverdue && !isIssue && <span className="flex items-center gap-1 text-[10px] text-red-600 font-bold bg-red-50 px-2 py-0.5 rounded-full border border-red-200"><Clock size={10} /> 期限超過</span>}
+                                                    {isUrgent && !isOverdue && !isIssue && <span className="flex items-center gap-1 text-[10px] text-orange-600 font-bold bg-orange-50 px-2 py-0.5 rounded-full border border-orange-200"><Clock size={10} /> 期限注意</span>}
+                                                </div>
+
+                                                <div className="flex items-baseline gap-2">
+                                                    {proc.workers ? (
+                                                        <Link href={`/workers/${proc.workers.id}/edit`} className="font-bold text-[#1f1f1f] text-[16px] hover:text-[#4285F4] transition-colors truncate flex items-center gap-1.5">
+                                                            <UserCircle2 size={16} className="text-[#4285F4]" /> {proc.workers.full_name_romaji}
+                                                        </Link>
+                                                    ) : (
+                                                        <span className="font-bold text-[#1f1f1f] text-[16px] truncate flex items-center gap-1.5">
+                                                            <Building2 size={16} className="text-[#34A853]" /> {proc.companies?.name_jp || '企業未定'}
+                                                        </span>
+                                                    )}
+                                                    {proc.workers && <span className="text-sm text-gray-500 truncate">({proc.companies?.name_jp || '未配属'})</span>}
+                                                </div>
+
+                                                <div className="text-xs text-gray-500 flex items-center gap-4">
+                                                    <span>担当: {proc.pic_name || '未定'}</span>
+                                                    {proc.notes && <span className="truncate max-w-[300px]" title={proc.notes}>メモ: {proc.notes}</span>}
+                                                </div>
+                                            </div>
+
+                                            {/* Dates */}
+                                            <div className="text-sm md:text-right shrink-0 w-32">
+                                                {proc.status === 'preparing' || proc.status === 'issue' ? (
+                                                    <div className={isOverdue ? 'text-red-600 font-bold' : isUrgent ? 'text-orange-600 font-bold' : 'text-[#444746]'}>
+                                                        <p className="text-[10px] text-gray-400 font-semibold mb-0.5">提出目標</p>
+                                                        {proc.target_date?.replace(/-/g, '/') || '未設定'}
+                                                    </div>
+                                                ) : proc.status === 'submitted' ? (
+                                                    <div className="text-[#4285F4] font-bold">
+                                                        <p className="text-[10px] text-[#4285F4]/70 font-semibold mb-0.5">申請日</p>
+                                                        {proc.submitted_date?.replace(/-/g, '/')}
+                                                    </div>
+                                                ) : (
+                                                    <div className="text-[#34A853] font-bold">
+                                                        <p className="text-[10px] text-[#34A853]/70 font-semibold mb-0.5">完了日</p>
+                                                        {proc.completed_date?.replace(/-/g, '/')}
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            {/* Actions */}
+                                            <div className="flex items-center justify-end gap-2 md:w-[220px] shrink-0">
+                                                {(proc.status === 'preparing' || proc.status === 'issue') && (
+                                                    <button onClick={() => handleToggle(proc.id)} disabled={isPending} className="px-5 py-2.5 text-[13px] font-bold text-white bg-[#4285F4] hover:bg-[#3367d6] rounded-full transition-colors flex items-center justify-center gap-1.5 shadow-sm disabled:opacity-50 w-full md:w-[140px]">
+                                                        {isPending ? <Clock size={16} className="animate-spin" /> : <Send size={16} />} 申請にする
+                                                    </button>
+                                                )}
+                                                {proc.status === 'submitted' && (
+                                                    <button onClick={() => handleToggle(proc.id)} disabled={isPending} className="px-5 py-2.5 text-[13px] font-bold text-[#137333] bg-[#e6f4ea] hover:bg-[#ceead6] border border-green-200 rounded-full transition-colors flex items-center justify-center gap-1.5 shadow-sm disabled:opacity-50 w-full md:w-[140px]">
+                                                        {isPending ? <Clock size={16} className="animate-spin" /> : <CheckCircle2 size={16} />} 許可・認定
+                                                    </button>
+                                                )}
+                                                {proc.status === 'completed' && (
+                                                    <div className="px-5 py-2.5 text-[13px] font-bold text-gray-500 bg-gray-50 border border-gray-200 rounded-full flex items-center justify-center gap-1.5 w-full md:w-[140px]">
+                                                        <CheckCircle2 size={16} className="text-gray-400" /> 完了済
+                                                    </div>
+                                                )}
+
+                                                <Link href={`/procedures/${proc.id}/edit`} className="w-10 h-10 flex items-center justify-center rounded-full text-[#444746] hover:text-[#4285F4] hover:bg-blue-50 transition-colors shrink-0" title="編集">
+                                                    <Edit2 size={18} />
+                                                </Link>
                                             </div>
                                         </div>
-
-                                        {proc.workers ? (
-                                            <h4 className="font-bold text-[#1f1f1f] text-[15px] mb-1 leading-tight hover:text-[#4285F4] transition-colors"><Link href={`/workers/${proc.workers.id}/edit`} className="flex items-start gap-2"><UserCircle2 size={16} className="text-[#4285F4] shrink-0 mt-0.5" />{proc.workers.full_name_romaji}</Link></h4>
-                                        ) : (
-                                            <h4 className="font-bold text-[#1f1f1f] text-[15px] mb-1 leading-tight"><span className="flex items-center gap-2"><Building2 size={16} className="text-[#34A853] shrink-0" />{proc.companies?.name_jp || '企業未定'}</span></h4>
-                                        )}
-                                        {proc.workers && <p className="text-[11px] text-gray-500 mb-3 truncate border-b border-gray-100 pb-2 ml-6">{proc.companies?.name_jp || '未配属'}</p>}
-
-                                        <div className="space-y-1.5 mb-4 text-xs text-[#444746]">
-                                            {proc.status === 'preparing' || proc.status === 'issue' ? (
-                                                <p className={isOverdue ? 'text-red-600 font-bold' : isUrgent ? 'text-orange-600 font-bold' : ''}>提出目標: {proc.target_date?.replace(/-/g, '/') || '未設定'}</p>
-                                            ) : proc.status === 'submitted' ? (
-                                                <p className="text-[#4285F4] font-medium">申請日: {proc.submitted_date?.replace(/-/g, '/')}</p>
-                                            ) : (
-                                                <p className="text-[#34A853] font-medium">完了日: {proc.completed_date?.replace(/-/g, '/')}</p>
-                                            )}
-                                            <p className="text-gray-400">担当: {proc.pic_name || '未定'}</p>
-                                        </div>
-
-                                        {/* 1-Click Actions */}
-                                        <div className="pt-3 border-t border-gray-100">
-                                            {(proc.status === 'preparing' || proc.status === 'issue') && (
-                                                <button onClick={() => handleToggle(proc.id)} disabled={isPending} className="w-full flex items-center justify-center gap-2 bg-[#f0f4f9] hover:bg-[#e1e5ea] text-[#4285F4] font-bold text-xs py-2.5 rounded-xl transition-colors disabled:opacity-50 shadow-sm border border-transparent hover:border-blue-200">
-                                                    {isPending ? <Clock size={14} className="animate-spin" /> : <Send size={14} />} 申請完了にする (本日付)
-                                                </button>
-                                            )}
-                                            {proc.status === 'submitted' && (
-                                                <button onClick={() => handleToggle(proc.id)} disabled={isPending} className="w-full flex items-center justify-center gap-2 bg-[#e6f4ea] hover:bg-[#ceead6] text-[#137333] font-bold text-xs py-2.5 rounded-xl transition-colors disabled:opacity-50 shadow-sm border border-transparent hover:border-green-200">
-                                                    {isPending ? <Clock size={14} className="animate-spin" /> : <CheckCircle2 size={14} />} 許可・認定が下りた
-                                                </button>
-                                            )}
-                                            {proc.status === 'completed' && (
-                                                <div className="w-full text-center text-xs text-gray-400 font-medium py-1.5 flex items-center justify-center gap-1">
-                                                    <CheckCircle2 size={14} /> 手続完了
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                )
-                            })}
-                            {filteredProcs.filter(a => a.status === col.id || (col.id === 'preparing' && a.status === 'issue')).length === 0 && (
-                                <div className="text-center py-8 text-sm text-[#444746]/50 border-2 border-dashed border-[#e1e5ea]/50 rounded-[24px]">タスクはありません</div>
-                            )}
+                                    )
+                                })}
+                            </div>
                         </div>
-                    </div>
-                ))}
+                    )
+                })}
+                {filteredProcs.length === 0 && (
+                    <div className="text-center py-12 text-sm text-[#444746]/50 border-2 border-dashed border-[#e1e5ea]/70 rounded-[24px]">タスクはありません</div>
+                )}
             </div>
         </div>
     )

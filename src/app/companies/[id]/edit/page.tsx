@@ -1,7 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { updateCompany } from '@/app/companies/actions'
-import { ArrowLeft, Sparkles, Building2 } from 'lucide-react'
+import { ArrowLeft, Sparkles, Building2, MessageCircle } from 'lucide-react'
+import { ChatBox } from '@/components/ChatBox'
 import { Sidebar } from '@/components/Sidebar'
 import { UpdateButton } from '@/components/SubmitButtons'
 import { redirect, notFound } from 'next/navigation'
@@ -14,6 +15,8 @@ export default async function EditCompanyPage({ params }: { params: Promise<{ id
 
     const { data: company } = await supabase.from('companies').select('*').eq('id', id).eq('is_deleted', false).single()
     if (!company) notFound()
+
+    const { data: messages } = await supabase.from('messages').select('*').eq('company_id', id).order('created_at', { ascending: true })
 
     return (
         <div className="flex h-screen bg-[#f0f4f9] font-sans text-[#1f1f1f] overflow-hidden selection:bg-blue-100">
@@ -62,6 +65,12 @@ export default async function EditCompanyPage({ params }: { params: Promise<{ id
                             <UpdateButton />
                         </div>
                     </form>
+
+                    {/* B2B CHAT BOX FOR UNION */}
+                    <div className="mt-12 mb-8 border-t border-gray-200 pt-12">
+                        <h3 className="text-xl font-bold text-[#1f1f1f] mb-4 flex items-center gap-2"><MessageCircle className="text-[#4285F4]" size={24} /> 企業連絡チャット (Client Portal)</h3>
+                        <ChatBox companyId={id} currentUserId={user.id} messages={messages || []} sourcePath={`/companies/${id}/edit`} isClient={false} />
+                    </div>
                 </div>
             </main>
         </div>

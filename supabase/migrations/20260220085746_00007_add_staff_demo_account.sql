@@ -14,8 +14,8 @@ BEGIN
     '', '', '', '', '', '', '', ''
   ) ON CONFLICT (id) DO UPDATE SET encrypted_password = crypt('staff123', gen_salt('bf'));
 
-  INSERT INTO auth.identities (id, user_id, identity_data, provider, last_sign_in_at, created_at, updated_at)
-  VALUES (gen_random_uuid(), staff_user_id, format('{"sub":"%s","email":"%s"}', staff_user_id::text, 'staff@kikancloud.com')::jsonb, 'email', now(), now(), now())
+  INSERT INTO auth.identities (id, user_id, provider_id, identity_data, provider, last_sign_in_at, created_at, updated_at)
+  VALUES (gen_random_uuid(), staff_user_id, 'staff@kikancloud.com', format('{"sub":"%s","email":"%s"}', staff_user_id::text, 'staff@kikancloud.com')::jsonb, 'email', now(), now(), now())
   ON CONFLICT DO NOTHING;
 
   INSERT INTO public.users (id, tenant_id, full_name, role)

@@ -21,7 +21,10 @@ export async function uploadWorkerDocument(workerId: string, formData: FormData)
     const filePath = `${userData?.tenant_id}/${workerId}/${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`
 
     const { error: uploadError } = await supabase.storage.from('worker_docs').upload(filePath, file)
-    if (uploadError) throw new Error('ファイルのアップロードに失敗しました。')
+    if (uploadError) {
+        console.error('Upload Error:', uploadError);
+        throw new Error(`ファイルのアップロードに失敗しました。${uploadError.message}`)
+    }
 
     // 2. Save metadata to DB
     const { error: dbError } = await supabase.from('worker_documents').insert({

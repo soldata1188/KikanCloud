@@ -25,15 +25,13 @@ export function ExportExcelButton({ data, month }: { data: any[], month: string 
 
                 return {
                     'No.': index + 1,
-                    '優先度 (Mức độ Rủi ro)': row.priority === 1 ? '1_超過 (緊急)' : row.priority === 2 ? '2_未作成' : row.priority === 4 ? '3_予定あり' : '4_完了済',
-                    '受入企業名 (Tên Xí nghiệp)': row.company.name_jp,
-                    '在籍人数 (Số lượng)': `${row.workerCounts.total}名${row.workerCounts.total > 0 ? ` (育成就労: ${row.workerCounts.ikusei}, 特定技能: ${row.workerCounts.tokutei}, 技能実習: ${row.workerCounts.ginou})` : ''}`,
-                    '今月の状況 (Tình trạng)': row.statusLabel.text,
-                    '訪問種別 (Loại)': typeLabel,
-                    '予定日 (Ngày dự kiến)': audit?.scheduled_date ? audit.scheduled_date.replace(/-/g, '/') : '未定',
-                    '実施日 (Ngày thực tế)': audit?.actual_date ? audit.actual_date.replace(/-/g, '/') : '-',
-                    '担当スタッフ (Người phụ trách)': audit?.pic_name || '-',
-                    '前回実績 (Lịch sử lần trước)': row.lastVisit ? `${row.lastVisit.actual_date.replace(/-/g, '/')} (${row.lastVisit.audit_type === 'kansa' ? '監査' : '訪問'})` : 'なし'
+                    '受入企業名': row.company.name_jp,
+                    '在籍人数': `${row.workerCounts.total}名${row.workerCounts.total > 0 ? ` (育成就労: ${row.workerCounts.ikusei}, 特定技能: ${row.workerCounts.tokutei}, 技能実習: ${row.workerCounts.ginou})` : ''}`,
+                    '訪問種別': typeLabel,
+                    '実施日': audit?.actual_date ? audit.actual_date.replace(/-/g, '/') : (audit?.scheduled_date ? audit.scheduled_date.replace(/-/g, '/') + ' (予定)' : '-'),
+                    '担当スタッフ': audit?.pic_name || '-',
+                    '前回実績': row.lastTwoAudits && row.lastTwoAudits.length > 0 ? `${row.lastTwoAudits[0].actual_date.replace(/-/g, '/')} (${row.lastTwoAudits[0].audit_type === 'kansa' ? '監査' : row.lastTwoAudits[0].audit_type === 'homon' ? '訪問' : '臨時'})` : 'なし',
+                    '特記事項・メモ': audit?.notes || '-'
                 }
             });
 
@@ -43,15 +41,13 @@ export function ExportExcelButton({ data, month }: { data: any[], month: string 
             // 3. Tùy chỉnh độ rộng các cột (Auto-width) cho đẹp mắt khi mở lên
             ws['!cols'] = [
                 { wch: 5 },   // No.
-                { wch: 22 },  // 優先度
                 { wch: 35 },  // 企業名
                 { wch: 50 },  // 在籍人数
-                { wch: 18 },  // 状況
                 { wch: 15 },  // 種別
-                { wch: 15 },  // 予定日
-                { wch: 15 },  // 実施日
+                { wch: 20 },  // 実施日
                 { wch: 22 },  // 担当スタッフ
                 { wch: 25 },  // 前回実績
+                { wch: 50 },  // メモ
             ];
 
             // 4. Khởi tạo Workbook và Gắn Sheet vào

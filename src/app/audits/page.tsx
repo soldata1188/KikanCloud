@@ -83,7 +83,7 @@ export default async function AuditsPage({ searchParams }: { searchParams: Promi
                             <p className="text-[#444746] mt-1">期日が過ぎている予定は赤くハイライトされます。</p>
                         </div>
                         <div className="flex items-center gap-3 shrink-0 overflow-x-auto pb-2 md:pb-0">
-                            <form><input type="month" name="month" defaultValue={filterMonth} onChange={(e) => e.target.form?.submit()} className="px-5 py-2.5 bg-white border border-[#e1e5ea] rounded-full text-sm font-medium text-[#444746] outline-none cursor-pointer hover:bg-gray-50 transition-colors shadow-sm" /></form>
+                            <MonthFilter defaultValue={filterMonth} />
 
                             <ExportExcelButton data={matrixData} month={filterMonth} />
 

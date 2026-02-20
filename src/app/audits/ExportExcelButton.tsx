@@ -30,7 +30,7 @@ export function ExportExcelButton({ data, month }: { data: any[], month: string 
                     '訪問種別': typeLabel,
                     '実施日': audit?.actual_date ? audit.actual_date.replace(/-/g, '/') : (audit?.scheduled_date ? audit.scheduled_date.replace(/-/g, '/') + ' (予定)' : '-'),
                     '担当スタッフ': audit?.pic_name || '-',
-                    '前回実績': row.lastTwoAudits && row.lastTwoAudits.length > 0 ? `${row.lastTwoAudits[0].actual_date.replace(/-/g, '/')} (${row.lastTwoAudits[0].audit_type === 'kansa' ? '監査' : row.lastTwoAudits[0].audit_type === 'homon' ? '訪問' : '臨時'})` : 'なし',
+                    '前回実績': row.lastTwoAudits && row.lastTwoAudits.length > 0 && row.lastTwoAudits[0].actual_date ? `${row.lastTwoAudits[0].actual_date.replace(/-/g, '/')} (${row.lastTwoAudits[0].audit_type === 'kansa' ? '監査' : row.lastTwoAudits[0].audit_type === 'homon' ? '訪問' : '臨時'})` : 'なし',
                     '特記事項・メモ': audit?.notes || '-'
                 }
             });

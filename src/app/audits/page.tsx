@@ -73,7 +73,10 @@ export default async function AuditsPage({ searchParams }: { searchParams: Promi
         }
 
         const pastAudits = pastAuditsData?.filter(a => a.company_id === company.id) || [];
-        const lastTwoAudits = pastAudits.slice(0, 2);
+        const historyList = currentAudit?.status === 'completed' && currentAudit?.actual_date
+            ? [currentAudit, ...pastAudits]
+            : pastAudits;
+        const lastTwoAudits = historyList.slice(0, 2);
 
         return { company, currentAudit, priority, statusLabel, workerCounts, lastTwoAudits };
     }) || [];
@@ -161,7 +164,6 @@ export default async function AuditsPage({ searchParams }: { searchParams: Promi
                                                     {row.currentAudit ? (
                                                         <div className="flex flex-col gap-1.5">
                                                             <div className="flex items-center gap-2"><Calendar size={14} className="text-gray-400" /> <span className="text-[#1f1f1f] font-medium">{row.currentAudit.scheduled_date.replace(/-/g, '/')}</span> <span className="text-[10px] px-1.5 py-0.5 bg-gray-100 text-gray-500 rounded border border-gray-200">予定</span></div>
-                                                            {row.currentAudit.actual_date && <div className="text-xs text-green-700 font-medium inline-flex items-center gap-2"><CheckCircle2 size={14} className="text-green-500" /> <span>{row.currentAudit.actual_date.replace(/-/g, '/')}</span> <span className="text-[10px] px-1.5 py-0.5 bg-green-50 text-green-700 rounded border border-green-200">完了</span></div>}
                                                         </div>
                                                     ) : <div className="h-[42px] flex items-center"><span className="text-gray-300 font-medium">-</span></div>}
 

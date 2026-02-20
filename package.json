@@ -9,7 +9,8 @@
     "lint": "eslint",
     "db:start": "supabase start",
     "db:stop": "supabase stop",
-    "db:status": "supabase status"
+    "db:status": "supabase status",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@radix-ui/react-label": "^2.1.8",
@@ -31,6 +32,7 @@
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20.19.33",
     "@types/papaparse": "^5.5.2",

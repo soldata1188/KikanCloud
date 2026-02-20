@@ -55,7 +55,7 @@ export default async function Dashboard() {
         <header className="flex justify-between items-center px-4 py-3 md:px-6 md:py-4 sticky top-0 bg-[#f0f4f9] z-10">
           <h1 className="text-[22px] font-normal text-[#444746] tracking-tight">KikanCloud</h1>
           <div className="flex items-center gap-2">
-            <DemoManager />
+            {userProfile?.role === 'admin' && <DemoManager />}
             <span className="hidden sm:flex px-3 py-1 bg-white rounded-full text-[11px] font-semibold text-[#444746] tracking-wider border border-gray-200">ULTRA</span>
             <UserMenu displayName={displayName} email={user.email || ''} role={userProfile?.role} />
           </div>

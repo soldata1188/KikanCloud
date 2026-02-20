@@ -35,14 +35,14 @@ export default async function WorkersList() {
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pl-2">
                         <h2 className="text-[32px] md:text-[40px] font-medium tracking-tight text-[#1f1f1f]">外国人材 管理</h2>
                         <div className="flex items-center gap-3 overflow-x-auto pb-2 md:pb-0">
-                            <ImportModal />
+                            {userProfile?.role === 'admin' && <ImportModal />}
                             <Link href="/workers/new" className="flex items-center gap-2 px-6 py-3 bg-white hover:bg-gray-50 text-[#1f1f1f] rounded-full text-sm font-medium transition-colors shadow-sm border border-[#e1e5ea] shrink-0">
                                 <Plus size={18} strokeWidth={2} /> 新規登録
                             </Link>
                         </div>
                     </div>
 
-                    <WorkersClient workers={workers || []} />
+                    <WorkersClient workers={workers || []} userRole={userProfile?.role} />
                 </div>
             </main>
         </div>

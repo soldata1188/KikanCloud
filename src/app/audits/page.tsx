@@ -107,7 +107,7 @@ export default async function AuditsPage({ searchParams }: { searchParams: Promi
                         <div className="flex items-center gap-3 shrink-0 overflow-x-auto pb-2 md:pb-0">
                             <MonthFilter defaultValue={filterMonth} />
 
-                            <ExportExcelButton data={matrixData} month={filterMonth} />
+                            {userProfile?.role === 'admin' && <ExportExcelButton data={matrixData} month={filterMonth} />}
 
                             <Link href={`/audits/print?month=${filterMonth}`} target="_blank" className="flex items-center gap-2 px-6 py-2.5 bg-white border border-[#e1e5ea] hover:bg-red-50 hover:text-red-700 hover:border-red-200 text-[#444746] rounded-full text-sm font-bold transition-colors shadow-sm shrink-0" title="PDF形式で印刷・保存します">
                                 <Printer size={18} strokeWidth={2.5} /> PDF出力

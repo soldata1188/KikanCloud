@@ -64,16 +64,21 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
                         </button>
                     </div>
 
-                    <div className="mt-8 p-4 bg-[#f0f4f9] rounded-2xl border border-[#e1e5ea] text-sm text-center">
-                        <p className="text-[#4285F4] mb-3 text-xs font-bold tracking-wider">✨ 体験用 デモアカウント</p>
-                        <div className="flex flex-col gap-1.5 items-center justify-center">
-                            <div className="bg-white px-3 py-1.5 rounded-lg border border-gray-200 shadow-sm flex items-center justify-between w-[220px]">
-                                <span className="text-gray-400 text-xs font-bold">Email</span>
-                                <span className="text-[#1f1f1f] font-mono font-medium">demo@kikancloud.com</span>
+                    <div className="mt-8 flex flex-col gap-3">
+                        <div className="p-4 bg-blue-50/50 rounded-2xl border border-blue-100 text-sm">
+                            <p className="text-[#4285F4] mb-2 text-[13px] font-bold tracking-wider text-center flex items-center justify-center gap-1.5">👑 管理者 (Admin) アカウント</p>
+                            <p className="text-center text-[11px] text-gray-500 mb-2">全権限あり（削除・Excel出力・一括登録可能）</p>
+                            <div className="flex flex-col gap-1.5 items-center">
+                                <div className="bg-white px-3 py-1.5 rounded-lg border border-blue-200 flex justify-between w-[240px] shadow-sm"><span className="text-gray-400 text-xs font-bold w-10">Email</span><span className="text-[#1f1f1f] font-mono font-medium text-[13px]">demo@kikancloud.com</span></div>
+                                <div className="bg-white px-3 py-1.5 rounded-lg border border-blue-200 flex justify-between w-[240px] shadow-sm"><span className="text-gray-400 text-xs font-bold w-10">Pass</span><span className="text-[#1f1f1f] font-mono font-medium text-[13px]">demo123</span></div>
                             </div>
-                            <div className="bg-white px-3 py-1.5 rounded-lg border border-gray-200 shadow-sm flex items-center justify-between w-[220px]">
-                                <span className="text-gray-400 text-xs font-bold">Pass</span>
-                                <span className="text-[#1f1f1f] font-mono font-medium">demo123</span>
+                        </div>
+                        <div className="p-4 bg-gray-50 rounded-2xl border border-gray-200 text-sm">
+                            <p className="text-gray-600 mb-2 text-[13px] font-bold tracking-wider text-center flex items-center justify-center gap-1.5">👤 一般スタッフ (Staff) アカウント</p>
+                            <p className="text-center text-[11px] text-gray-500 mb-2">閲覧・進捗更新のみ（削除・出力等は不可）</p>
+                            <div className="flex flex-col gap-1.5 items-center">
+                                <div className="bg-white px-3 py-1.5 rounded-lg border border-gray-200 flex justify-between w-[240px] shadow-sm"><span className="text-gray-400 text-xs font-bold w-10">Email</span><span className="text-[#1f1f1f] font-mono font-medium text-[13px]">staff@kikancloud.com</span></div>
+                                <div className="bg-white px-3 py-1.5 rounded-lg border border-gray-200 flex justify-between w-[240px] shadow-sm"><span className="text-gray-400 text-xs font-bold w-10">Pass</span><span className="text-[#1f1f1f] font-mono font-medium text-[13px]">staff123</span></div>
                             </div>
                         </div>
                     </div>

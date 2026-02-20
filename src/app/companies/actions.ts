@@ -54,6 +54,10 @@ export async function updateCompany(formData: FormData) {
 
 export async function deleteCompany(formData: FormData) {
     const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('Unauthorized')
+    const { data: userData } = await supabase.from('users').select('role').eq('id', user.id).single()
+    if (userData?.role !== 'admin') throw new Error('管理者権限が必要です。(Admin only)')
     const id = formData.get('id') as string
     await supabase.from('companies').update({ is_deleted: true }).eq('id', id)
     revalidatePath('/companies')
@@ -65,7 +69,8 @@ export async function importCompanies(companiesData: any[]) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error('Unauthorized')
-    const { data: userData } = await supabase.from('users').select('tenant_id').eq('id', user.id).single()
+    const { data: userData } = await supabase.from('users').select('tenant_id, role').eq('id', user.id).single()
+    if (userData?.role !== 'admin') throw new Error('管理者権限が必要です。(Admin only)')
 
     // Chuẩn hóa dữ liệu trước khi insert
     const payload = companiesData.map(c => ({

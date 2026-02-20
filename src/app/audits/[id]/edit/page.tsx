@@ -12,6 +12,8 @@ export default async function EditAuditPage({ params }: { params: Promise<{ id: 
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) redirect('/login')
 
+    const { data: userProfile } = await supabase.from('users').select('role').eq('id', user.id).single()
+
     const { data: audit } = await supabase.from('audits').select('*').eq('id', id).eq('is_deleted', false).single()
     if (!audit) notFound()
 
@@ -40,7 +42,7 @@ export default async function EditAuditPage({ params }: { params: Promise<{ id: 
                             </div>
                         </div>
                         <div className="pt-4 pb-8 flex justify-between items-center sticky bottom-4">
-                            <AuditEditDeleteButton deleteAction={deleteAudit} />
+                            {userProfile?.role === 'admin' ? <AuditEditDeleteButton deleteAction={deleteAudit} /> : <div></div>}
                             <div className="flex gap-3"><Link href="/audits" className="px-6 py-3 text-[#444746] bg-white border border-[#e1e5ea] font-medium hover:bg-gray-50 rounded-full transition-colors shadow-sm">キャンセル</Link><UpdateButton /></div>
                         </div>
                     </form>

@@ -11,6 +11,7 @@ export default async function EditProcedurePage({ params }: { params: Promise<{ 
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) redirect('/login')
+    const { data: userProfile } = await supabase.from('users').select('role').eq('id', user.id).single()
 
     const { data: proc } = await supabase.from('procedures').select('*').eq('id', id).eq('is_deleted', false).single()
     if (!proc) notFound()
@@ -49,7 +50,7 @@ export default async function EditProcedurePage({ params }: { params: Promise<{ 
                             </div>
                         </div>
                         <div className="pt-4 pb-8 flex justify-between items-center sticky bottom-4">
-                            <ProcedureDeleteButton />
+                            {userProfile?.role === 'admin' ? <ProcedureDeleteButton /> : <div></div>}
                             <div className="flex gap-3"><Link href={`/procedures?tab=${proc.agency}`} className="px-6 py-3 text-[#444746] bg-white border border-[#e1e5ea] font-bold hover:bg-gray-50 rounded-full transition-colors shadow-sm">キャンセル</Link><UpdateButton /></div>
                         </div>
                     </form>

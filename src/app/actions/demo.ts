@@ -6,7 +6,8 @@ export async function clearDemoData() {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error('Unauthorized')
-    const { data: userData } = await supabase.from('users').select('tenant_id').eq('id', user.id).single()
+    const { data: userData } = await supabase.from('users').select('tenant_id, role').eq('id', user.id).single()
+    if (userData?.role !== 'admin') throw new Error('Admin only')
     const tenant_id = userData?.tenant_id
 
     // Xóa rác Demo theo thứ tự khóa ngoại (Procedures -> Audits -> Workers -> Companies)
@@ -23,7 +24,8 @@ export async function injectDemoData() {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error('Unauthorized')
-    const { data: userData } = await supabase.from('users').select('tenant_id').eq('id', user.id).single()
+    const { data: userData } = await supabase.from('users').select('tenant_id, role').eq('id', user.id).single()
+    if (userData?.role !== 'admin') throw new Error('Admin only')
     const tenant_id = userData?.tenant_id
 
     await clearDemoData()

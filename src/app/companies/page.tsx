@@ -36,7 +36,7 @@ export default async function CompaniesList() {
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pl-2">
                         <h2 className="text-[32px] md:text-[40px] font-medium tracking-tight text-[#1f1f1f]">受入企業 管理</h2>
                         <div className="flex items-center gap-3 overflow-x-auto pb-2 md:pb-0">
-                            <ImportModal />
+                            {userProfile?.role === 'admin' && <ImportModal />}
                             <Link href="/companies/new" className="flex items-center gap-2 px-6 py-3 bg-white hover:bg-gray-50 text-[#1f1f1f] rounded-full text-sm font-medium transition-colors shadow-sm border border-[#e1e5ea] shrink-0">
                                 <Plus size={18} strokeWidth={2} /> 新規登録
                             </Link>
@@ -126,10 +126,12 @@ export default async function CompaniesList() {
                                                         <Link href={`/companies/${c.id}/edit`} className="p-2 rounded-full text-[#444746] hover:text-[#4285F4] hover:bg-blue-50 transition-colors" title="編集">
                                                             <Edit2 size={18} strokeWidth={1.5} />
                                                         </Link>
-                                                        <form action={deleteCompany} className="inline-block">
-                                                            <input type="hidden" name="id" value={c.id} />
-                                                            <CompanyDeleteButton />
-                                                        </form>
+                                                        {userProfile?.role === 'admin' && (
+                                                            <form action={deleteCompany} className="inline-block">
+                                                                <input type="hidden" name="id" value={c.id} />
+                                                                <CompanyDeleteButton />
+                                                            </form>
+                                                        )}
                                                     </div>
                                                 </td>
                                             </tr>

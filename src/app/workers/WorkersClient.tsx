@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useState, useMemo } from 'react'
 import { Search, Edit2, Calendar, Building2, FileText, Filter, AlertCircle, RefreshCw, FileSearch } from 'lucide-react'
 
-export function WorkersClient({ workers }: { workers: any[] }) {
+export function WorkersClient({ workers, userRole }: { workers: any[], userRole?: string }) {
     const [searchTerm, setSearchTerm] = useState('')
     const [statusFilter, setStatusFilter] = useState('all')
     const [companyFilter, setCompanyFilter] = useState('all')

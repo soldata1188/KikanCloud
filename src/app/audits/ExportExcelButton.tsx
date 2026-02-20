@@ -27,6 +27,7 @@ export function ExportExcelButton({ data, month }: { data: any[], month: string 
                     'No.': index + 1,
                     '優先度 (Mức độ Rủi ro)': row.priority === 1 ? '1_超過 (緊急)' : row.priority === 2 ? '2_未作成' : row.priority === 4 ? '3_予定あり' : '4_完了済',
                     '受入企業名 (Tên Xí nghiệp)': row.company.name_jp,
+                    '在籍人数 (Số lượng)': `${row.workerCounts.total}名${row.workerCounts.total > 0 ? ` (育成就労: ${row.workerCounts.ikusei}, 特定技能: ${row.workerCounts.tokutei}, 技能実習: ${row.workerCounts.ginou})` : ''}`,
                     '今月の状況 (Tình trạng)': row.statusLabel.text,
                     '訪問種別 (Loại)': typeLabel,
                     '予定日 (Ngày dự kiến)': audit?.scheduled_date ? audit.scheduled_date.replace(/-/g, '/') : '未定',
@@ -44,6 +45,7 @@ export function ExportExcelButton({ data, month }: { data: any[], month: string 
                 { wch: 5 },   // No.
                 { wch: 22 },  // 優先度
                 { wch: 35 },  // 企業名
+                { wch: 50 },  // 在籍人数
                 { wch: 18 },  // 状況
                 { wch: 15 },  // 種別
                 { wch: 15 },  // 予定日

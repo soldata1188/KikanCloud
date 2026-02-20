@@ -21,7 +21,7 @@ export default async function AuditsPage({ searchParams }: { searchParams: Promi
     const { data: userProfile } = await supabase.from('users').select('full_name, role').eq('id', user.id).single()
     const displayName = userProfile?.full_name?.split(' ').pop() || '管理者'
 
-    const { data: companies } = await supabase.from('companies').select('id, name_jp').eq('is_deleted', false).order('name_jp')
+    const { data: companies } = await supabase.from('companies').select('id, name_jp, workers(id, system_type, is_deleted)').eq('is_deleted', false).order('name_jp')
 
     const { data: audits } = await supabase.from('audits')
         .select('id, audit_type, company_id, scheduled_date, actual_date, status, pic_name, notes, companies(name_jp)')
@@ -35,6 +35,14 @@ export default async function AuditsPage({ searchParams }: { searchParams: Promi
 
     const matrixData = companies?.map(company => {
         const currentAudit = audits?.find(a => a.company_id === company.id) || null;
+
+        const activeWorkers = company.workers?.filter((w: any) => !w.is_deleted) || [];
+        const workerCounts = {
+            total: activeWorkers.length,
+            ikusei: activeWorkers.filter((w: any) => w.system_type === 'ikusei_shuro').length,
+            tokutei: activeWorkers.filter((w: any) => w.system_type === 'tokuteigino').length,
+            ginou: activeWorkers.filter((w: any) => w.system_type === 'ginou_jisshu').length,
+        };
 
         let priority = 5;
         let statusLabel = { text: '今月完了済', bg: 'bg-green-100 text-green-700', border: 'border-l-green-500' };
@@ -55,7 +63,7 @@ export default async function AuditsPage({ searchParams }: { searchParams: Promi
             statusLabel = { text: '提出済', bg: 'bg-gray-100 text-gray-500', border: 'border-l-gray-300' };
         }
 
-        return { company, currentAudit, priority, statusLabel };
+        return { company, currentAudit, priority, statusLabel, workerCounts };
     }) || [];
 
     matrixData.sort((a, b) => {
@@ -108,7 +116,14 @@ export default async function AuditsPage({ searchParams }: { searchParams: Promi
                                     <tr key={row.company.id} className="hover:bg-gray-50 transition-colors">
                                         {/* 1. Tên Xí Nghiệp */}
                                         <td className="px-6 py-5">
-                                            <Link href={`/companies/${row.company.id}/edit`} className="font-medium text-[#1f1f1f] text-base hover:text-[#4285F4] transition-colors">{row.company.name_jp}</Link>
+                                            <Link href={`/companies/${row.company.id}/edit`} className="font-medium text-[#1f1f1f] text-base hover:text-[#4285F4] transition-colors block mb-1">{row.company.name_jp}</Link>
+                                            <div className="flex items-center gap-1.5 flex-wrap">
+                                                <span className="text-xs text-gray-500 font-medium whitespace-nowrap">計 <span className="text-[#1f1f1f]">{row.workerCounts.total}</span>名</span>
+                                                {row.workerCounts.total > 0 && <span className="text-gray-300 ml-1 mr-0.5">|</span>}
+                                                {row.workerCounts.ikusei > 0 && <span className="text-[10px] px-1.5 py-0.5 bg-[#c4eed0] text-[#0d652d] rounded font-medium whitespace-nowrap">育成就労 {row.workerCounts.ikusei}</span>}
+                                                {row.workerCounts.tokutei > 0 && <span className="text-[10px] px-1.5 py-0.5 bg-[#c2e7ff] text-[#001d35] rounded font-medium whitespace-nowrap">特定技能 {row.workerCounts.tokutei}</span>}
+                                                {row.workerCounts.ginou > 0 && <span className="text-[10px] px-1.5 py-0.5 bg-[#fce8e6] text-[#b31412] rounded font-medium whitespace-nowrap">技能実習 {row.workerCounts.ginou}</span>}
+                                            </div>
                                         </td>
 
                                         {/* 2. Trạng thái */}

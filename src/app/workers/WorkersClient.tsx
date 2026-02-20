@@ -2,18 +2,7 @@
 
 import Link from 'next/link'
 import { useState, useMemo } from 'react'
-import { Search, Edit2, Calendar, Building2, FileText, Filter, AlertCircle, RefreshCw } from 'lucide-react'
-import { deleteWorker } from './actions'
-
-function DeleteButton() {
-    return (
-        <button type="submit" className="p-2 rounded-full text-red-500 hover:bg-red-50 transition-colors" title="削除" onClick={(e) => {
-            if (!confirm('本当に削除しますか？')) e.preventDefault()
-        }}>
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
-        </button>
-    )
-}
+import { Search, Edit2, Calendar, Building2, FileText, Filter, AlertCircle, RefreshCw, FileSearch } from 'lucide-react'
 
 export function WorkersClient({ workers }: { workers: any[] }) {
     const [searchTerm, setSearchTerm] = useState('')
@@ -242,13 +231,12 @@ export function WorkersClient({ workers }: { workers: any[] }) {
                                         {/* 5. Actions */}
                                         <td className="px-6 py-4 text-right">
                                             <div className="flex items-center justify-end gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
-                                                <Link href={`/workers/${w.id}/edit`} className="p-2 rounded-full text-[#444746] hover:text-[#4285F4] hover:bg-blue-50 transition-colors" title="編集">
-                                                    <Edit2 size={18} strokeWidth={1.5} />
+                                                <Link href={`/workers/${w.id}`} className="px-3 py-1.5 flex items-center gap-1.5 rounded-full text-xs font-medium text-[#444746] hover:text-white hover:bg-[#4285F4] transition-colors border border-transparent hover:border-[#4285F4]" title="詳細">
+                                                    <FileSearch size={14} strokeWidth={2} /> 詳細
                                                 </Link>
-                                                <form action={deleteWorker} className="inline-block">
-                                                    <input type="hidden" name="id" value={w.id} />
-                                                    <DeleteButton />
-                                                </form>
+                                                <Link href={`/workers/${w.id}/edit`} className="px-3 py-1.5 flex items-center gap-1.5 rounded-full text-xs font-medium text-[#444746] hover:text-[#4285F4] hover:bg-blue-50 transition-colors border border-transparent" title="編集">
+                                                    <Edit2 size={14} strokeWidth={2} /> 編集
+                                                </Link>
                                             </div>
                                         </td>
                                     </tr>

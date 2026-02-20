@@ -100,68 +100,70 @@ export default async function AuditsPage({ searchParams }: { searchParams: Promi
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-[32px] overflow-hidden shadow-sm border border-[#e1e5ea]">
-                        <table className="w-full text-left text-sm text-[#444746]">
-                            <thead className="bg-[#4285F4] text-xs uppercase text-white font-medium tracking-wider">
-                                <tr>
-                                    <th className="px-6 py-4 rounded-tl-[32px]">受入企業</th>
-                                    <th className="px-6 py-4">ステータス</th>
-                                    <th className="px-6 py-4">予定日 / 完了日</th>
-                                    <th className="px-6 py-4">担当</th>
-                                    <th className="px-6 py-4 rounded-tr-[32px] text-center w-[160px]">アクション</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-[#e1e5ea]">
-                                {matrixData.map((row) => (
-                                    <tr key={row.company.id} className="hover:bg-gray-50 transition-colors">
-                                        {/* 1. Tên Xí Nghiệp */}
-                                        <td className="px-6 py-5">
-                                            <Link href={`/companies/${row.company.id}/edit`} className="font-medium text-[#1f1f1f] text-base hover:text-[#4285F4] transition-colors block mb-1">{row.company.name_jp}</Link>
-                                            <div className="flex items-center gap-1.5 flex-wrap">
-                                                <span className="text-xs text-gray-500 font-medium whitespace-nowrap">計 <span className="text-[#1f1f1f]">{row.workerCounts.total}</span>名</span>
-                                                {row.workerCounts.total > 0 && <span className="text-gray-300 ml-1 mr-0.5">|</span>}
-                                                {row.workerCounts.ikusei > 0 && <span className="text-[10px] px-1.5 py-0.5 bg-[#c4eed0] text-[#0d652d] rounded font-medium whitespace-nowrap">育成就労 {row.workerCounts.ikusei}</span>}
-                                                {row.workerCounts.tokutei > 0 && <span className="text-[10px] px-1.5 py-0.5 bg-[#c2e7ff] text-[#001d35] rounded font-medium whitespace-nowrap">特定技能 {row.workerCounts.tokutei}</span>}
-                                                {row.workerCounts.ginou > 0 && <span className="text-[10px] px-1.5 py-0.5 bg-[#fce8e6] text-[#b31412] rounded font-medium whitespace-nowrap">技能実習 {row.workerCounts.ginou}</span>}
-                                            </div>
-                                        </td>
-
-                                        {/* 2. Trạng thái */}
-                                        <td className="px-6 py-5">
-                                            <span className={`px-3 py-1.5 rounded-full text-xs font-bold inline-flex items-center gap-1.5 ${row.statusLabel.bg}`}>
-                                                {row.priority === 1 || row.priority === 2 ? <AlertCircle size={14} /> : row.priority === 5 ? <CheckCircle2 size={14} /> : <CalendarCheck size={14} />}
-                                                {row.statusLabel.text}
-                                            </span>
-                                        </td>
-
-                                        {/* 3. Ngày */}
-                                        <td className="px-6 py-5">
-                                            {row.currentAudit ? (
-                                                <div>
-                                                    <div className="flex items-center gap-1.5"><Calendar size={14} className="text-gray-400" /> <span className="text-[#1f1f1f]">{row.currentAudit.scheduled_date.replace(/-/g, '/')}</span> 予定</div>
-                                                    {row.currentAudit.actual_date && <div className="text-xs text-green-600 font-medium mt-1 inline-flex items-center gap-1"><CheckCircle2 size={12} /> {row.currentAudit.actual_date.replace(/-/g, '/')} 完了</div>}
-                                                </div>
-                                            ) : <span className="text-gray-400">-</span>}
-                                        </td>
-
-                                        {/* 4. PIC */}
-                                        <td className="px-6 py-5">
-                                            {row.currentAudit?.pic_name || <span className="text-gray-400">-</span>}
-                                        </td>
-
-                                        {/* 5. Action */}
-                                        <td className="px-6 py-5">
-                                            <SmartActionCell
-                                                auditId={row.currentAudit?.id || null}
-                                                status={row.currentAudit?.status || null}
-                                                companyId={row.company.id}
-                                                filterMonth={filterMonth}
-                                            />
-                                        </td>
+                    <div className="bg-white/80 rounded-[32px] shadow-sm border border-[#e1e5ea] overflow-hidden p-2">
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left text-sm text-[#444746]">
+                                <thead className="bg-transparent text-[13px] font-medium text-gray-500 border-b border-gray-200/50">
+                                    <tr>
+                                        <th className="px-6 py-4 font-normal">受入企業</th>
+                                        <th className="px-6 py-4 font-normal">ステータス</th>
+                                        <th className="px-6 py-4 font-normal">予定日 / 完了日</th>
+                                        <th className="px-6 py-4 font-normal">担当</th>
+                                        <th className="px-6 py-4 font-normal text-right w-[160px]">アクション</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody className="divide-y divide-gray-100/50">
+                                    {matrixData.map((row) => (
+                                        <tr key={row.company.id} className="hover:bg-white transition-colors group">
+                                            {/* 1. Tên Xí Nghiệp */}
+                                            <td className="px-6 py-5">
+                                                <Link href={`/companies/${row.company.id}/edit`} className="font-medium text-[#1f1f1f] text-base hover:text-[#4285F4] transition-colors block mb-1">{row.company.name_jp}</Link>
+                                                <div className="flex items-center gap-1.5 flex-wrap">
+                                                    <span className="text-xs text-gray-500 font-medium whitespace-nowrap">計 <span className="text-[#1f1f1f]">{row.workerCounts.total}</span>名</span>
+                                                    {row.workerCounts.total > 0 && <span className="text-gray-300 ml-1 mr-0.5">|</span>}
+                                                    {row.workerCounts.ikusei > 0 && <span className="text-[10px] px-1.5 py-0.5 bg-[#c4eed0] text-[#0d652d] rounded font-medium whitespace-nowrap">育成就労 {row.workerCounts.ikusei}</span>}
+                                                    {row.workerCounts.tokutei > 0 && <span className="text-[10px] px-1.5 py-0.5 bg-[#c2e7ff] text-[#001d35] rounded font-medium whitespace-nowrap">特定技能 {row.workerCounts.tokutei}</span>}
+                                                    {row.workerCounts.ginou > 0 && <span className="text-[10px] px-1.5 py-0.5 bg-[#fce8e6] text-[#b31412] rounded font-medium whitespace-nowrap">技能実習 {row.workerCounts.ginou}</span>}
+                                                </div>
+                                            </td>
+
+                                            {/* 2. Trạng thái */}
+                                            <td className="px-6 py-5">
+                                                <span className={`px-3 py-1.5 rounded-full text-xs font-bold inline-flex items-center gap-1.5 ${row.statusLabel.bg}`}>
+                                                    {row.priority === 1 || row.priority === 2 ? <AlertCircle size={14} /> : row.priority === 5 ? <CheckCircle2 size={14} /> : <CalendarCheck size={14} />}
+                                                    {row.statusLabel.text}
+                                                </span>
+                                            </td>
+
+                                            {/* 3. Ngày */}
+                                            <td className="px-6 py-5">
+                                                {row.currentAudit ? (
+                                                    <div>
+                                                        <div className="flex items-center gap-1.5"><Calendar size={14} className="text-gray-400" /> <span className="text-[#1f1f1f]">{row.currentAudit.scheduled_date.replace(/-/g, '/')}</span> 予定</div>
+                                                        {row.currentAudit.actual_date && <div className="text-xs text-green-600 font-medium mt-1 inline-flex items-center gap-1"><CheckCircle2 size={12} /> {row.currentAudit.actual_date.replace(/-/g, '/')} 完了</div>}
+                                                    </div>
+                                                ) : <span className="text-gray-400">-</span>}
+                                            </td>
+
+                                            {/* 4. PIC */}
+                                            <td className="px-6 py-5">
+                                                {row.currentAudit?.pic_name || <span className="text-gray-400">-</span>}
+                                            </td>
+
+                                            {/* 5. Action */}
+                                            <td className="px-6 py-5 text-right">
+                                                <SmartActionCell
+                                                    auditId={row.currentAudit?.id || null}
+                                                    status={row.currentAudit?.status || null}
+                                                    companyId={row.company.id}
+                                                    filterMonth={filterMonth}
+                                                />
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </main>

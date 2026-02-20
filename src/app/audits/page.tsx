@@ -166,11 +166,11 @@ export default async function AuditsPage({ searchParams }: { searchParams: Promi
                                                     ) : <div className="h-[42px] flex items-center"><span className="text-gray-300 font-medium">-</span></div>}
 
                                                     {/* History */}
-                                                    {row.lastTwoAudits.length > 0 && (
-                                                        <div className="border-t border-gray-100 pt-2 mt-1">
-                                                            <div className="text-[10px] font-semibold text-gray-400 mb-1.5 tracking-wider">過去2回の履歴</div>
-                                                            <div className="flex flex-col gap-1.5">
-                                                                {row.lastTwoAudits.map((pa: any) => (
+                                                    <div className="border-t border-gray-100 pt-2 mt-1">
+                                                        <div className="text-[10px] font-semibold text-gray-400 mb-1.5 tracking-wider">過去2回の履歴</div>
+                                                        <div className="flex flex-col gap-1.5">
+                                                            {row.lastTwoAudits.length > 0 ? (
+                                                                row.lastTwoAudits.map((pa: any) => (
                                                                     <div key={pa.id} className="text-[11px] text-gray-500 flex items-center justify-between opacity-80 hover:opacity-100 transition-opacity">
                                                                         <div className="flex items-center gap-1.5">
                                                                             <span className="w-1.5 h-1.5 rounded-full bg-gray-300"></span>
@@ -185,10 +185,12 @@ export default async function AuditsPage({ searchParams }: { searchParams: Promi
                                                                             </Link>
                                                                         </div>
                                                                     </div>
-                                                                ))}
-                                                            </div>
+                                                                ))
+                                                            ) : (
+                                                                <div className="text-[11px] text-gray-300 font-medium flex items-center h-[20px]">-</div>
+                                                            )}
                                                         </div>
-                                                    )}
+                                                    </div>
                                                 </div>
                                             </td>
 

@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
-import { Shield, ArrowRight, AlertCircle, Clock, CheckCircle2, CalendarCheck, Calendar, Users, Building2, AlertTriangle, Plus, SlidersHorizontal, Mic } from 'lucide-react'
+import { Shield, ArrowRight, AlertCircle, Clock, CheckCircle2, CalendarCheck, Calendar, Users, Building2, AlertTriangle, Plus, SlidersHorizontal, Mic, FileText } from 'lucide-react'
 import { Sidebar } from '@/components/Sidebar'
 import { DemoManager } from '@/components/DemoManager'
 import { UserMenu } from '@/components/UserMenu'
@@ -108,76 +108,143 @@ export default async function Dashboard() {
             </Link>
           </div>
 
-          {/* 2 KHỐI WIDGETS CẢNH BÁO CHÍNH */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+          {/* 2 KHỐI WIDGETS CẢNH BÁO CHÍNH (LIST VIEW) */}
+          <div className="flex flex-col gap-8 mb-12">
 
             {/* WIDGET 1: CẢNH BÁO HẾT HẠN (ĐỎ) */}
-            <div className="bg-white rounded-[32px] p-6 shadow-sm border border-[#e1e5ea] flex flex-col relative overflow-hidden">
+            <div className="bg-white/80 rounded-[32px] shadow-sm border border-[#e1e5ea] overflow-hidden p-2 relative flex flex-col">
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-400 to-red-600"></div>
-              <h3 className="text-lg font-medium text-[#1f1f1f] mb-4 flex items-center gap-2 mt-2">
-                <AlertCircle className="text-red-500" size={20} /> 期限が迫っている手続き
-              </h3>
-              <div className="flex-1 space-y-3">
-                {expiringWorkers && expiringWorkers.length > 0 ? expiringWorkers.map(w => {
-                  const passExp = w.passport_exp ? new Date(w.passport_exp) : new Date('2099-01-01');
-                  const certExp = w.cert_end_date ? new Date(w.cert_end_date) : new Date('2099-01-01');
-                  const isPassExpiring = passExp <= new Date(next90DaysStr) && passExp >= new Date('2000-01-01');
-                  const isCertExpiring = certExp <= new Date(next90DaysStr) && certExp >= new Date('2000-01-01');
 
-                  let reason = '';
-                  let dateStr = '';
-                  if (isPassExpiring) { reason = 'パスポート'; dateStr = w.passport_exp; }
-                  else if (isCertExpiring) { reason = '認定修了'; dateStr = w.cert_end_date; }
-
-                  return (
-                    <Link href={`/workers/${w.id}/edit`} key={w.id} className="block p-4 rounded-[20px] border border-red-100 bg-red-50/30 hover:bg-red-50/80 transition-colors group">
-                      <div className="flex justify-between items-start mb-1">
-                        <span className="font-medium text-[#1f1f1f] group-hover:text-[#4285F4] transition-colors line-clamp-1 pr-2">{w.full_name_romaji}</span>
-                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-red-100 text-red-700 font-bold whitespace-nowrap">{reason}</span>
-                      </div>
-                      <p className="text-xs text-[#444746] flex items-center gap-1.5"><Clock size={12} className="text-red-400" /> 期限: {dateStr?.replace(/-/g, '/')} <span className="text-gray-300">|</span> {(w.companies as any)?.name_jp || '未配属'}</p>
-                    </Link>
-                  )
-                }) : (
-                  <div className="h-full flex flex-col items-center justify-center text-[#444746]/50 py-10 bg-[#f0f4f9]/50 rounded-[20px]">
-                    <CheckCircle2 size={32} className="text-green-300 mb-2" />
-                    <p className="text-sm font-medium">直近90日以内の期限切れはありません</p>
-                  </div>
-                )}
+              <div className="px-5 py-3.5 flex items-center justify-between border-b border-gray-200/50 bg-white">
+                <h3 className="text-base font-bold text-[#1f1f1f] flex items-center gap-2">
+                  <AlertCircle className="text-red-500" size={18} strokeWidth={2.5} /> 期限が迫っている手続き
+                </h3>
               </div>
-              {urgentCount > 5 && <Link href="/workers" className="mt-4 text-sm text-[#4285F4] hover:underline flex items-center justify-center gap-1">すべて見る <ArrowRight size={14} /></Link>}
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-sm text-[#444746]">
+                  <thead className="bg-transparent text-[12px] font-semibold text-[#444746]/60 border-b border-gray-200/50 uppercase tracking-widest whitespace-nowrap">
+                    <tr>
+                      <th className="px-6 py-4 font-medium">氏名 / 受入企業</th>
+                      <th className="px-6 py-4 font-medium">警告内容</th>
+                      <th className="px-6 py-4 font-medium text-right w-[160px]">期限日</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#e1e5ea]">
+                    {expiringWorkers && expiringWorkers.length > 0 ? expiringWorkers.map(w => {
+                      const passExp = w.passport_exp ? new Date(w.passport_exp) : new Date('2099-01-01');
+                      const certExp = w.cert_end_date ? new Date(w.cert_end_date) : new Date('2099-01-01');
+                      const isPassExpiring = passExp <= new Date(next90DaysStr) && passExp >= new Date('2000-01-01');
+                      const isCertExpiring = certExp <= new Date(next90DaysStr) && certExp >= new Date('2000-01-01');
+
+                      let reason = '';
+                      let dateStr = '';
+                      if (isPassExpiring) { reason = 'パスポート'; dateStr = w.passport_exp; }
+                      else if (isCertExpiring) { reason = '認定修了'; dateStr = w.cert_end_date; }
+
+                      return (
+                        <tr key={w.id} className="hover:bg-red-50/50 transition-colors group">
+                          <td className="px-6 py-4">
+                            <Link href={`/workers/${w.id}/edit`} className="block">
+                              <span className="font-semibold text-[#1f1f1f] group-hover:text-[#4285F4] transition-colors line-clamp-1 mb-1">{w.full_name_romaji}</span>
+                              <span className="text-[12px] text-gray-500">{(w.companies as any)?.name_jp || '未配属'}</span>
+                            </Link>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className="text-[11px] px-2.5 py-1 rounded-full bg-red-50 text-red-600 font-bold border border-red-200 whitespace-nowrap flex items-center gap-1.5 w-max"><AlertCircle size={12} /> {reason}期限迫る</span>
+                          </td>
+                          <td className="px-6 py-4 text-right">
+                            <div className="font-medium text-[#1f1f1f] flex flex-col items-end gap-1">
+                              <span className="flex items-center gap-1.5"><Clock size={14} className="text-red-400" /> {dateStr?.replace(/-/g, '/')}</span>
+                            </div>
+                          </td>
+                        </tr>
+                      )
+                    }) : (
+                      <tr>
+                        <td colSpan={3} className="px-6 py-12 text-center text-[#444746]/50">
+                          <div className="flex flex-col items-center justify-center">
+                            <CheckCircle2 size={32} className="text-green-300 mb-2" />
+                            <p className="text-sm font-medium">直近90日以内の期限切れはありません</p>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+              {urgentCount > 5 && (
+                <div className="px-5 py-3 bg-white border-t border-[#e1e5ea] text-center">
+                  <Link href="/workers" className="text-sm text-[#4285F4] font-bold hover:underline inline-flex items-center gap-1.5">すべて見る ({urgentCount}件) <ArrowRight size={14} strokeWidth={2.5} /></Link>
+                </div>
+              )}
             </div>
 
             {/* WIDGET 2: CÔNG VIỆC KANSA (CAM) */}
-            <div className="bg-white rounded-[32px] p-6 shadow-sm border border-[#e1e5ea] flex flex-col relative overflow-hidden">
+            <div className="bg-white/80 rounded-[32px] shadow-sm border border-[#e1e5ea] overflow-hidden p-2 relative flex flex-col">
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orange-300 to-orange-500"></div>
-              <h3 className="text-lg font-medium text-[#1f1f1f] mb-4 flex items-center gap-2 mt-2">
-                <CalendarCheck className="text-orange-500" size={20} /> 今月の監査・訪問タスク
-              </h3>
-              <div className="flex-1 space-y-3">
-                {pendingAudits && pendingAudits.length > 0 ? pendingAudits.map(a => {
-                  const isOverdue = a.scheduled_date < todayStr;
-                  return (
-                    <Link href={`/audits`} key={a.id} className={`block p-4 rounded-[20px] border ${isOverdue ? 'border-orange-200 bg-orange-50/50 hover:bg-orange-50' : 'border-gray-100 hover:bg-gray-50'} transition-colors group`}>
-                      <div className="flex justify-between items-start mb-1">
-                        <span className="font-medium text-[#1f1f1f] group-hover:text-[#4285F4] transition-colors line-clamp-1">{(a.companies as any)?.name_jp}</span>
-                        {isOverdue && <span className="text-[10px] px-2 py-0.5 rounded-full bg-orange-100 text-orange-700 font-bold shrink-0 animate-pulse">遅延</span>}
-                      </div>
-                      <p className="text-xs text-[#444746] flex items-center gap-1.5">
-                        <Calendar size={12} className={isOverdue ? "text-orange-400" : "text-gray-400"} /> 予定: {a.scheduled_date.replace(/-/g, '/')}
-                        <span className="text-gray-300">|</span>
-                        {a.audit_type === 'kansa' ? '監査' : a.audit_type === 'homon' ? '定期訪問' : '臨時'}
-                      </p>
-                    </Link>
-                  )
-                }) : (
-                  <div className="h-full flex flex-col items-center justify-center text-[#444746]/50 py-10 bg-[#f0f4f9]/50 rounded-[20px]">
-                    <CheckCircle2 size={32} className="text-green-300 mb-2" />
-                    <p className="text-sm font-medium">今月の未完了タスクはありません</p>
-                  </div>
-                )}
+
+              <div className="px-5 py-3.5 flex items-center justify-between border-b border-gray-200/50 bg-white">
+                <h3 className="text-base font-bold text-[#1f1f1f] flex items-center gap-2">
+                  <CalendarCheck className="text-orange-500" size={18} strokeWidth={2.5} /> 今月の監査・訪問タスク
+                </h3>
               </div>
-              {pendingAudits && pendingAudits.length > 5 && <Link href="/audits" className="mt-4 text-sm text-[#4285F4] hover:underline flex items-center justify-center gap-1">ボードを開く <ArrowRight size={14} /></Link>}
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-sm text-[#444746]">
+                  <thead className="bg-transparent text-[12px] font-semibold text-[#444746]/60 border-b border-gray-200/50 uppercase tracking-widest whitespace-nowrap">
+                    <tr>
+                      <th className="px-6 py-4 font-medium">受入企業 / 手続種別</th>
+                      <th className="px-6 py-4 font-medium">ステータス</th>
+                      <th className="px-6 py-4 font-medium text-right w-[160px]">予定日</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#e1e5ea]">
+                    {pendingAudits && pendingAudits.length > 0 ? pendingAudits.map(a => {
+                      const isOverdue = a.scheduled_date < todayStr;
+                      return (
+                        <tr key={a.id} className={`hover:bg-orange-50/30 transition-colors group ${isOverdue ? 'bg-orange-50/20' : ''}`}>
+                          <td className="px-6 py-4">
+                            <Link href={`/audits`} className="block">
+                              <span className="font-semibold text-[#1f1f1f] group-hover:text-[#4285F4] transition-colors line-clamp-1 mb-1">{(a.companies as any)?.name_jp}</span>
+                              <span className="text-[12px] text-gray-500 flex items-center gap-1.5">
+                                <FileText size={12} className="text-gray-400" />
+                                {a.audit_type === 'kansa' ? '監査' : a.audit_type === 'homon' ? '定期訪問' : '臨時'}
+                              </span>
+                            </Link>
+                          </td>
+                          <td className="px-6 py-4">
+                            {isOverdue ? (
+                              <span className="text-[11px] px-2.5 py-1 rounded-full bg-orange-50 text-orange-600 font-bold border border-orange-200 whitespace-nowrap flex items-center gap-1.5 w-max animate-pulse"><AlertTriangle size={12} /> 期限遅延</span>
+                            ) : (
+                              <span className="text-[11px] px-2.5 py-1 rounded-full bg-gray-50 text-gray-600 font-bold border border-gray-200 whitespace-nowrap flex items-center gap-1.5 w-max"><Calendar size={12} /> 今月タスク</span>
+                            )}
+                          </td>
+                          <td className="px-6 py-4 text-right">
+                            <div className={`font-medium flex flex-col items-end gap-1 ${isOverdue ? 'text-orange-600' : 'text-[#1f1f1f]'}`}>
+                              <span className="flex items-center gap-1.5"><CalendarCheck size={14} className={isOverdue ? "text-orange-400" : "text-gray-400"} /> {a.scheduled_date.replace(/-/g, '/')}</span>
+                            </div>
+                          </td>
+                        </tr>
+                      )
+                    }) : (
+                      <tr>
+                        <td colSpan={3} className="px-6 py-12 text-center text-[#444746]/50">
+                          <div className="flex flex-col items-center justify-center">
+                            <CheckCircle2 size={32} className="text-green-300 mb-2" />
+                            <p className="text-sm font-medium">今月の未完了タスクはありません</p>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+              {pendingAudits && pendingAudits.length > 5 && (
+                <div className="px-5 py-3 bg-white border-t border-[#e1e5ea] text-center">
+                  <Link href="/audits" className="text-sm text-[#4285F4] font-bold hover:underline inline-flex items-center gap-1.5">すべて見る ({pendingAudits.length}件) <ArrowRight size={14} strokeWidth={2.5} /></Link>
+                </div>
+              )}
             </div>
 
           </div>

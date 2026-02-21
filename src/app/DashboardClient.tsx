@@ -99,7 +99,7 @@ export default function DashboardClient({ userName, role, systemData }: { userNa
                 {/* Khu vực cuộn tin nhắn */}
                 <div className="flex-1 overflow-y-auto py-6 space-y-4 relative z-10 scrollbar-none">
                     {messages.map((msg) => (
-                        <div key={msg.id} className={`flex gap-4 ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-in slide-in-from-bottom-2 border-b border-black/[0.04] pb-4 last:border-0 last:pb-0`}>
+                        <div key={msg.id} className={`flex gap-4 ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-in slide-in-from-bottom-2 border-b border-[#ededed] pb-4 last:border-0 last:pb-0`}>
                             {msg.role === 'model' && (
                                 <div className="w-8 h-8 flex items-center justify-center shrink-0 mt-0.5 scale-[0.9] origin-top"><AnimatedLogo logoOnly /></div>
                             )}

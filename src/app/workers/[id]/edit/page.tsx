@@ -6,6 +6,7 @@ import { Sidebar } from '@/components/Sidebar'
 import { UpdateButton } from '@/components/SubmitButtons'
 import { AutoDocButton } from '@/components/AutoDocButton'
 import { UserMenu } from '@/components/UserMenu'
+import { AvatarUploadZone } from '@/components/AvatarUploadZone'
 import { redirect, notFound } from 'next/navigation'
 
 export default async function EditWorkerPage({ params }: { params: Promise<{ id: string }> }) {
@@ -58,9 +59,9 @@ export default async function EditWorkerPage({ params }: { params: Promise<{ id:
                         {/* SECTION 1: 基本情報 */}
                         <div className="bg-white rounded-md p-8">
                             <h3 className="text-lg font-medium text-[#1f1f1f] mb-6 flex items-center gap-2"><Sparkles className="text-[#24b47e]" size={20} /> 基本情報</h3>
-                            <div className="mb-6 flex items-center gap-6">
-                                {worker.avatar_url && <img src={worker.avatar_url} alt="Avatar" className="w-16 h-16 rounded-md object-cover border border-[#ededed]" />}
-                                <div className="flex-1"><label className="block text-sm font-medium text-[#1f1f1f] mb-2">{worker.avatar_url ? '顔写真を変更' : '顔写真をアップロード'}</label><input name="avatar_file" type="file" accept="image/*" className="block w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-[#fbfcfd] hover:file:bg-[#e1e5ea] outline-none cursor-pointer" /></div>
+                            <div className="mb-8">
+                                <label className="block text-sm font-medium text-[#1f1f1f] mb-3">顔写真（アバター）</label>
+                                <AvatarUploadZone defaultUrl={worker.avatar_url} />
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div><label className="block text-sm font-medium text-[#1f1f1f] mb-2">氏名（ローマ字） <span className="text-red-500">*</span></label><input name="full_name_romaji" type="text" required defaultValue={worker.full_name_romaji} className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-4 py-3 outline-none uppercase text-[#1f1f1f] transition-all" /></div>

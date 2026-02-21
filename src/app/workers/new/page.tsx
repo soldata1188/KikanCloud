@@ -5,6 +5,7 @@ import { ArrowLeft } from 'lucide-react'
 import { Sidebar } from '@/components/Sidebar'
 import { SaveButton } from '@/components/SubmitButtons'
 import { UserMenu } from '@/components/UserMenu'
+import { AvatarUploadZone } from '@/components/AvatarUploadZone'
 import { redirect } from 'next/navigation'
 
 export default async function NewWorkerPage() {
@@ -51,12 +52,12 @@ export default async function NewWorkerPage() {
                                 <span className="flex items-center justify-center w-6 h-6 rounded-full bg-[#24b47e]/10 text-[#24b47e] text-sm font-bold">1</span>
                                 基本情報
                             </h3>
-                            <div className="mb-6">
+                            <div className="mb-8">
                                 <label className="flex items-center gap-2 text-sm font-medium text-[#1f1f1f] mb-3">
                                     顔写真（アバター）
                                     <span className="text-[10px] font-bold px-1.5 py-0.5 rounded border border-[#ededed] text-[#878787] bg-[#fbfcfd]">任意</span>
                                 </label>
-                                <input name="avatar_file" type="file" accept="image/*" className="block w-full text-sm text-[#878787] file:mr-4 file:py-2.5 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-[#fbfcfd] hover:file:bg-[#e1e5ea] outline-none transition-colors cursor-pointer" />
+                                <AvatarUploadZone />
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>

@@ -144,17 +144,17 @@ export default function DashboardClient({ userName, role, systemData }: { userNa
             </section>
 
             {/* 2. KHỐI THẺ AI PHÂN TÍCH VÀ SYSTEM ALERTS (GIỮ NGUYÊN) */}
-            <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <h3 className="text-[16px] font-semibold text-[#444746] mb-4 tracking-tight">AI タスク提案</h3>
-                    <div className="flex flex-col justify-center transition-shadow min-h-[150px]">
+            <section className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
+                <div className="flex flex-col h-full">
+                    <h3 className="text-[16px] font-semibold text-[#444746] mb-4 tracking-tight shrink-0">AI タスク提案</h3>
+                    <div className="flex-1 flex flex-col justify-center transition-shadow min-h-[150px]">
                         {!aiData ? (
                             <div className="animate-pulse space-y-3 py-1"><div className="h-2 bg-gray-100 rounded w-1/4"></div><div className="h-2 bg-gray-100 rounded w-full"></div><div className="h-2 bg-gray-100 rounded w-5/6"></div></div>
                         ) : (
                             <div className="relative pl-5 py-0.5">
                                 <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#1e8e3e] rounded-full"></div>
                                 <span className="text-[12px] font-bold text-[#1e8e3e] uppercase tracking-wide block mb-2">{aiData.tip?.label || 'TIP'}</span>
-                                <p className="text-[14px] text-[#444746] leading-[1.7]">
+                                <p className="text-[14px] text-[#444746] leading-[1.7] break-words">
                                     <strong className="font-semibold text-[#1f1f1f]">{aiData.tip?.title} </strong> <br />
                                     {aiData.tip?.content}
                                 </p>
@@ -163,25 +163,25 @@ export default function DashboardClient({ userName, role, systemData }: { userNa
                     </div>
                 </div>
 
-                <div>
-                    <h3 className="text-[16px] font-semibold text-[#444746] mb-4 tracking-tight">システムアラート</h3>
-                    <div className="flex flex-col justify-between relative transition-colors duration-500 min-h-[150px]">
+                <div className="flex flex-col h-full">
+                    <h3 className="text-[16px] font-semibold text-[#444746] mb-4 tracking-tight shrink-0">システムアラート</h3>
+                    <div className="flex-1 flex flex-col justify-between relative transition-colors duration-500 min-h-[150px]">
                         {!aiData ? (
                             <div className="animate-pulse space-y-3 py-1"><div className="h-2 bg-gray-100 rounded w-1/4"></div><div className="h-2 bg-gray-100 rounded w-full"></div></div>
                         ) : (
                             <>
-                                <div className="relative pl-5 py-0.5 mb-4 z-10">
+                                <div className="relative pl-5 py-0.5 mb-4 z-10 flex-1">
                                     <div className={`absolute left-0 top-0 bottom-0 w-[3px] rounded-full ${aiData.alert?.hasDanger ? 'bg-[#d93025]' : 'bg-[#24b47e]'}`}></div>
                                     <span className={`text-[12px] font-bold uppercase tracking-wide block mb-2 flex items-center gap-1.5 ${aiData.alert?.hasDanger ? 'text-[#d93025]' : 'text-[#24b47e]'}`}>
                                         {aiData.alert?.hasDanger ? <AlertTriangle size={14} /> : <CheckCircle2 size={14} />} {aiData.alert?.label || 'NOTICE'}
                                     </span>
-                                    <p className="text-[14px] text-[#444746] leading-relaxed">
+                                    <p className="text-[14px] text-[#444746] leading-relaxed break-words">
                                         <strong className="font-semibold text-[#1f1f1f]">{aiData.alert?.title} </strong><br />
                                         {aiData.alert?.content}
                                     </p>
                                 </div>
                                 {aiData.alert?.hasDanger && (
-                                    <Link href="/audits" className="text-[11px] font-bold text-[#1f1f1f] hover:text-[#d93025] flex items-center gap-1.5 transition-colors group w-fit uppercase tracking-widest mt-auto pl-5 z-10">
+                                    <Link href="/audits" className="text-[11px] font-bold text-[#1f1f1f] hover:text-[#d93025] flex items-center gap-1.5 transition-colors group w-fit uppercase tracking-widest mt-auto pl-5 z-10 shrink-0">
                                         保留中のタスクを確認 <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
                                     </Link>
                                 )}

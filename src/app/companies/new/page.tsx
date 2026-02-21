@@ -32,7 +32,7 @@ export default async function NewCompanyPage() {
                         </div>
 
                         {/* SECTION 1: 法人基本情報 */}
-                        <div className="bg-white rounded-md p-6 sm:p-8 border border-[#ededed] shadow-sm relative overflow-hidden">
+                        <div className="bg-white rounded-md p-6 sm:p-8 border border-[#ededed] relative overflow-hidden">
                             <div className="absolute top-0 left-0 w-1 h-full bg-[#24b47e]"></div>
                             <h3 className="text-lg font-medium text-[#1f1f1f] mb-8 flex items-center gap-2">
                                 <span className="flex items-center justify-center w-6 h-6 rounded-full bg-[#24b47e]/10 text-[#24b47e] text-sm font-bold">1</span>
@@ -71,7 +71,7 @@ export default async function NewCompanyPage() {
                         </div>
 
                         {/* SECTION 2: 連絡先・所在地 */}
-                        <div className="bg-white rounded-md p-6 sm:p-8 border border-[#ededed] shadow-sm relative overflow-hidden">
+                        <div className="bg-white rounded-md p-6 sm:p-8 border border-[#ededed] relative overflow-hidden">
                             <div className="absolute top-0 left-0 w-1 h-full bg-[#34A853]"></div>
                             <h3 className="text-lg font-medium text-[#1f1f1f] mb-8 flex items-center gap-2">
                                 <span className="flex items-center justify-center w-6 h-6 rounded-full bg-[#34A853]/10 text-[#34A853] text-sm font-bold">2</span>
@@ -103,7 +103,7 @@ export default async function NewCompanyPage() {
                         </div>
 
                         {/* SECTION 3: 担当者情報（監査用） */}
-                        <div className="bg-white rounded-md p-6 sm:p-8 border border-[#ededed] shadow-sm relative overflow-hidden">
+                        <div className="bg-white rounded-md p-6 sm:p-8 border border-[#ededed] relative overflow-hidden">
                             <div className="absolute top-0 left-0 w-1 h-full bg-[#EA4335]"></div>
                             <h3 className="text-lg font-medium text-[#1f1f1f] mb-8 flex items-center gap-2">
                                 <span className="flex items-center justify-center w-6 h-6 rounded-full bg-[#EA4335]/10 text-[#EA4335] text-sm font-bold">3</span>

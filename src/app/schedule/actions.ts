@@ -44,10 +44,20 @@ export async function saveScheduleEntry(entryDate: string, rowIndex: number, con
         return { success: true }
     }
 
+    // Fetch tenant_id explicitly
+    const { data: userProfile } = await supabase
+        .from('users')
+        .select('tenant_id')
+        .eq('id', user.id)
+        .single()
+
+    if (!userProfile?.tenant_id) throw new Error('Tenant missing')
+
     // Upsert
     const { error } = await supabase
         .from('schedule_entries')
         .upsert({
+            tenant_id: userProfile.tenant_id,
             entry_date: entryDate,
             row_index: rowIndex,
             content: content

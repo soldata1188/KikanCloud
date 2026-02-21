@@ -2,13 +2,14 @@
 import { useState, useRef, useTransition } from 'react'
 import Papa from 'papaparse'
 import { Upload, X, FileText, CheckCircle2, AlertCircle, Download } from 'lucide-react'
-import { importWorkers } from './actions'
+import { ImportWorkerPayload, importWorkers } from './actions'
 import { useRouter } from 'next/navigation'
+import { Worker } from '@/types/schema'
 
 export function ImportModal() {
     const router = useRouter()
     const [isOpen, setIsOpen] = useState(false)
-    const [parsedData, setParsedData] = useState<any[]>([])
+    const [parsedData, setParsedData] = useState<ImportWorkerPayload[]>([])
     const [error, setError] = useState('')
     const [isPending, startTransition] = useTransition()
     const fileInputRef = useRef<HTMLInputElement>(null)

@@ -5,7 +5,7 @@ import { ArrowLeft, Sparkles, Building2, MessageCircle } from 'lucide-react'
 import { ChatBox } from '@/components/ChatBox'
 import { Sidebar } from '@/components/Sidebar'
 import { UpdateButton } from '@/components/SubmitButtons'
-import { ComboboxInput } from '@/components/ComboboxInput'
+
 import { redirect, notFound } from 'next/navigation'
 
 export default async function EditCompanyPage({ params }: { params: Promise<{ id: string }> }) {
@@ -45,17 +45,23 @@ export default async function EditCompanyPage({ params }: { params: Promise<{ id
                                     <span className="text-xs text-[#878787] bg-gray-100 px-3 py-1 rounded-md">編集中</span>
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div className="md:col-span-2"><label className="block text-sm font-medium text-[#1f1f1f] mb-2">企業名（日本語） <span className="text-red-500">*</span></label><input name="name_jp" type="text" required defaultValue={company.name_jp} className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-4 py-3 outline-none text-[#1f1f1f] transition-all" /></div>
-                                    <div><label className="block text-sm font-medium text-[#1f1f1f] mb-2">企業名（ローマ字）</label><input name="name_romaji" type="text" defaultValue={company.name_romaji || ''} className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-4 py-3 outline-none uppercase text-[#1f1f1f] transition-all" /></div>
-                                    <div><label className="block text-sm font-medium text-[#1f1f1f] mb-2">法人番号（13桁）</label><input name="corporate_number" type="text" maxLength={13} defaultValue={company.corporate_number || ''} className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-4 py-3 outline-none font-mono text-[#1f1f1f] transition-all" /></div>
+                                    <div className="md:col-span-2"><label className="block text-sm font-medium text-[#1f1f1f] mb-2">企業名（日本語） <span className="text-red-500">*</span></label><input name="name_jp" type="text" required defaultValue={company.name_jp} className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-3 py-2.5 text-sm outline-none text-[#1f1f1f] transition-all" /></div>
+                                    <div><label className="block text-sm font-medium text-[#1f1f1f] mb-2">企業名（ローマ字）</label><input name="name_romaji" type="text" defaultValue={company.name_romaji || ''} className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-3 py-2.5 text-sm outline-none uppercase text-[#1f1f1f] transition-all" /></div>
+                                    <div><label className="block text-sm font-medium text-[#1f1f1f] mb-2">法人番号（13桁）</label><input name="corporate_number" type="text" maxLength={13} defaultValue={company.corporate_number || ''} className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-3 py-2.5 text-sm outline-none font-mono text-[#1f1f1f] transition-all" /></div>
                                     <div className="md:col-span-2">
                                         <label className="block text-sm font-medium text-[#1f1f1f] mb-2">業種 (Industry)</label>
-                                        <ComboboxInput
+                                        <input
                                             name="industry"
+                                            list="industry-datalist"
                                             defaultValue={company.industry || ''}
                                             placeholder="例：製造業、建設業..."
-                                            options={['建設業', '製造業', '農業']}
+                                            className="w-full bg-[#fbfcfd] focus:bg-white border border-[#878787] focus:border-[#1f1f1f] rounded-md px-3 py-2.5 text-sm outline-none text-[#1f1f1f] transition-all"
                                         />
+                                        <datalist id="industry-datalist">
+                                            <option value="建設業" />
+                                            <option value="製造業" />
+                                            <option value="農業" />
+                                        </datalist>
                                     </div>
                                 </div>
                             </div>
@@ -63,21 +69,21 @@ export default async function EditCompanyPage({ params }: { params: Promise<{ id
                             <div className="bg-white rounded-md p-8">
                                 <h3 className="text-lg font-medium text-[#1f1f1f] mb-6 flex items-center gap-2"><Sparkles className="text-[#34A853]" size={20} /> 連絡先・所在地</h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div><label className="block text-sm font-medium text-[#1f1f1f] mb-2">郵便番号</label><input name="postal_code" type="text" defaultValue={company.postal_code || ''} className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-4 py-3 outline-none text-[#1f1f1f] transition-all" /></div>
-                                    <div><label className="block text-sm font-medium text-[#1f1f1f] mb-2">電話番号</label><input name="phone" type="text" defaultValue={company.phone || ''} className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-4 py-3 outline-none text-[#1f1f1f] transition-all" /></div>
-                                    <div className="md:col-span-2"><label className="block text-sm font-medium text-[#1f1f1f] mb-2">所在地（住所）</label><input name="address" type="text" defaultValue={company.address || ''} className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-4 py-3 outline-none text-[#1f1f1f] transition-all" /></div>
+                                    <div><label className="block text-sm font-medium text-[#1f1f1f] mb-2">郵便番号</label><input name="postal_code" type="text" defaultValue={company.postal_code || ''} className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-3 py-2.5 text-sm outline-none text-[#1f1f1f] transition-all" /></div>
+                                    <div><label className="block text-sm font-medium text-[#1f1f1f] mb-2">電話番号</label><input name="phone" type="text" defaultValue={company.phone || ''} className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-3 py-2.5 text-sm outline-none text-[#1f1f1f] transition-all" /></div>
+                                    <div className="md:col-span-2"><label className="block text-sm font-medium text-[#1f1f1f] mb-2">所在地（住所）</label><input name="address" type="text" defaultValue={company.address || ''} className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-3 py-2.5 text-sm outline-none text-[#1f1f1f] transition-all" /></div>
                                 </div>
                             </div>
 
                             <div className="bg-white rounded-md p-8">
                                 <h3 className="text-lg font-medium text-[#1f1f1f] mb-6 flex items-center gap-2"><Sparkles className="text-[#EA4335]" size={20} /> 担当者情報（監査用）</h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div className="md:col-span-2"><label className="block text-sm font-medium text-[#1f1f1f] mb-2">代表者名</label><input name="representative" type="text" defaultValue={company.representative || ''} className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-4 py-3 outline-none text-[#1f1f1f] transition-all" /></div>
-                                    <div><label className="block text-sm font-medium text-[#1f1f1f] mb-2">責任者</label><input name="manager_name" type="text" defaultValue={company.manager_name || ''} placeholder="例：田中 健太" className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-4 py-3 outline-none text-[#1f1f1f] transition-all" /></div>
-                                    <div><label className="block text-sm font-medium text-[#1f1f1f] mb-2">講習受講日</label><input name="training_date" type="date" defaultValue={company.training_date || ''} className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-4 py-3 outline-none text-[#1f1f1f] transition-all" /></div>
-                                    <div className="md:col-span-2"><label className="block text-sm font-medium text-[#1f1f1f] mb-2">連絡・実習担当者</label><input name="pic_name" type="text" defaultValue={company.pic_name || ''} className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-4 py-3 outline-none text-[#1f1f1f] transition-all" /></div>
-                                    <div><label className="block text-sm font-medium text-[#1f1f1f] mb-2">生活指導員</label><input name="life_advisor" type="text" defaultValue={company.life_advisor || ''} className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-4 py-3 outline-none text-[#1f1f1f] transition-all" /></div>
-                                    <div><label className="block text-sm font-medium text-[#1f1f1f] mb-2">技能指導員</label><input name="tech_advisor" type="text" defaultValue={company.tech_advisor || ''} className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-4 py-3 outline-none text-[#1f1f1f] transition-all" /></div>
+                                    <div className="md:col-span-2"><label className="block text-sm font-medium text-[#1f1f1f] mb-2">代表者名</label><input name="representative" type="text" defaultValue={company.representative || ''} className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-3 py-2.5 text-sm outline-none text-[#1f1f1f] transition-all" /></div>
+                                    <div><label className="block text-sm font-medium text-[#1f1f1f] mb-2">責任者</label><input name="manager_name" type="text" defaultValue={company.manager_name || ''} placeholder="例：田中 健太" className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-3 py-2.5 text-sm outline-none text-[#1f1f1f] transition-all" /></div>
+                                    <div><label className="block text-sm font-medium text-[#1f1f1f] mb-2">講習受講日</label><input name="training_date" type="date" defaultValue={company.training_date || ''} className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-3 py-2.5 text-sm outline-none text-[#1f1f1f] transition-all" /></div>
+                                    <div className="md:col-span-2"><label className="block text-sm font-medium text-[#1f1f1f] mb-2">連絡・実習担当者</label><input name="pic_name" type="text" defaultValue={company.pic_name || ''} className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-3 py-2.5 text-sm outline-none text-[#1f1f1f] transition-all" /></div>
+                                    <div><label className="block text-sm font-medium text-[#1f1f1f] mb-2">生活指導員</label><input name="life_advisor" type="text" defaultValue={company.life_advisor || ''} className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-3 py-2.5 text-sm outline-none text-[#1f1f1f] transition-all" /></div>
+                                    <div><label className="block text-sm font-medium text-[#1f1f1f] mb-2">技能指導員</label><input name="tech_advisor" type="text" defaultValue={company.tech_advisor || ''} className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-3 py-2.5 text-sm outline-none text-[#1f1f1f] transition-all" /></div>
                                 </div>
                             </div>
                         </div>

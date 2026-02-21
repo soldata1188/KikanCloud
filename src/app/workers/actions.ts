@@ -1,7 +1,9 @@
 'use server'
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { Worker } from '@/types/schema'
 import { redirect } from 'next/navigation'
+import { autoScheduleAuditsForWorkers } from '@/app/actions/rpa'
 
 export async function createWorker(formData: FormData) {
     const supabase = await createClient()
@@ -48,6 +50,10 @@ export async function createWorker(formData: FormData) {
     }
 
     await supabase.from('workers').insert(newWorker)
+
+    // RPA: Auto-Schedule routine audits for the new worker
+    await autoScheduleAuditsForWorkers([newWorker as Partial<Worker>])
+
     revalidatePath('/workers')
     revalidatePath('/')
     redirect('/workers')
@@ -114,7 +120,9 @@ export async function deleteWorker(formData: FormData) {
     revalidatePath('/')
 }
 
-export async function importWorkers(workersData: any[]) {
+export type ImportWorkerPayload = Partial<Worker> & { company_name?: string };
+
+export async function importWorkers(workersData: ImportWorkerPayload[]) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error('Unauthorized')
@@ -125,21 +133,21 @@ export async function importWorkers(workersData: any[]) {
     const { data: companies } = await supabase.from('companies').select('id, name_jp').eq('is_deleted', false)
 
     // データ処理用ヘルパー関数
-    const parseDate = (dateStr: string) => {
+    const parseDate = (dateStr?: string | null) => {
         if (!dateStr || String(dateStr).trim() === '') return null;
         const cleanStr = String(dateStr).replace(/\//g, '-');
         const d = new Date(cleanStr);
         return isNaN(d.getTime()) ? null : d.toISOString().split('T')[0];
     }
 
-    const mapSystemType = (text: string) => {
+    const mapSystemType = (text?: string | null) => {
         const t = String(text || '');
         if (t.includes('育成就労')) return 'ikusei_shuro'
         if (t.includes('特定技能')) return 'tokuteigino'
         return 'ginou_jisshu'
     }
 
-    const mapStatus = (text: string) => {
+    const mapStatus = (text?: string | null) => {
         const t = String(text || '');
         if (t.includes('待機') || t.includes('入国待')) return 'waiting'
         if (t.includes('失踪')) return 'missing'
@@ -147,7 +155,7 @@ export async function importWorkers(workersData: any[]) {
         return 'working' // Default là Đang làm việc
     }
 
-    const mapNationality = (text: string) => {
+    const mapNationality = (text?: string | null) => {
         const t = String(text || '');
         if (t.includes('インドネシア')) return 'インドネシア'
         if (t.includes('フィリピン')) return 'フィリピン'
@@ -191,6 +199,9 @@ export async function importWorkers(workersData: any[]) {
         console.error('Worker Import Error:', error)
         throw new Error('インポートに失敗しました。日付の形式（YYYY/MM/DD）等を確認してください。')
     }
+
+    // RPA: Auto-Schedule routine audits for the inserted workers
+    await autoScheduleAuditsForWorkers(payload as Partial<Worker>[])
 
     revalidatePath('/workers')
     revalidatePath('/companies')

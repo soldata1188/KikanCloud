@@ -61,7 +61,7 @@ export default async function ClientWorkerProfile({ params }: { params: Promise<
                         <div className="mb-4 bg-[#fbfcfd] border border-teal-100 rounded-md p-4 text-sm text-teal-800 font-medium">
                             該当する引出しを開いて、毎月の法定書類をアップロードしてください。
                         </div>
-                        {/* Lượt tải xuống (Từ Nghiệp đoàn) */}
+                        {/* ダウンロード数 (機関から) */}
                         <SmartDrawer workerId={id} documents={unionDocsUrls} title="公式書類 (監理団体から共有)" docType="union" icon={<ShieldCheck />} allowUpload={false} />
                         {/* アップロード履歴 (受入企業より) */}
                         <SmartDrawer workerId={id} documents={clientDocsUrls} title="賃金台帳 (給与明細)" docType="payroll" icon={<Banknote />} allowUpload={userProfile?.role === 'company_admin'} />

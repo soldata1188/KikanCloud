@@ -2,6 +2,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import { syncWorkerStatusFromProcedure } from '@/app/actions/rpa'
 
 export async function createProcedure(formData: FormData) {
     const supabase = await createClient()
@@ -60,13 +61,18 @@ export async function updateProcedure(formData: FormData) {
     }
 
     await supabase.from('procedures').update(updatedData).eq('id', id)
+
+    // RPA: Sync Kanban status to Worker profile
+    if (updatedData.status === 'completed' && worker_id) {
+        await syncWorkerStatusFromProcedure(worker_id, updatedData.procedure_name, updatedData.status)
+    }
     revalidatePath('/procedures')
     redirect(`/procedures?tab=${updatedData.agency}`)
 }
 
 export async function quickToggleProcedureStatus(procId: string) {
     const supabase = await createClient()
-    const { data: proc } = await supabase.from('procedures').select('status').eq('id', procId).single()
+    const { data: proc } = await supabase.from('procedures').select('status, worker_id, procedure_name').eq('id', procId).single()
     if (!proc) return
 
     let newStatus = 'preparing'
@@ -85,6 +91,11 @@ export async function quickToggleProcedureStatus(procId: string) {
 
     updateData.status = newStatus
     await supabase.from('procedures').update(updateData).eq('id', procId)
+
+    // RPA: Sync Kanban status to Worker profile
+    if (newStatus === 'completed' && proc.worker_id) {
+        await syncWorkerStatusFromProcedure(proc.worker_id, proc.procedure_name, newStatus)
+    }
     revalidatePath('/procedures')
 }
 

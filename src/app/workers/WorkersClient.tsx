@@ -3,8 +3,9 @@
 import Link from 'next/link'
 import { useState, useMemo } from 'react'
 import { Search, Edit2, Calendar, Building2, FileText, Filter, AlertCircle, RefreshCw, FileSearch } from 'lucide-react'
+import { Worker } from '@/types/schema'
 
-export function WorkersClient({ workers, userRole }: { workers: any[], userRole?: string }) {
+export function WorkersClient({ workers, userRole }: { workers: Worker[], userRole?: string }) {
     const [searchTerm, setSearchTerm] = useState('')
     const [statusFilter, setStatusFilter] = useState('all')
     const [companyFilter, setCompanyFilter] = useState('all')
@@ -155,8 +156,8 @@ export function WorkersClient({ workers, userRole }: { workers: any[], userRole?
                                 </tr>
                             )}
                             {filteredWorkers.map((w) => {
-                                const expSoon = isExpiringSoon(w.cert_end_date)
-                                const expPass = isExpired(w.cert_end_date)
+                                const expSoon = isExpiringSoon(w.cert_end_date || '')
+                                const expPass = isExpired(w.cert_end_date || '')
 
                                 return (
                                     <tr key={w.id} className="hover:bg-white transition-colors group">

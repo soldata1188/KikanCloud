@@ -17,7 +17,7 @@ export default async function WorkerDocumentsPage({ params }: { params: Promise<
     const { data: worker } = await supabase.from('workers').select('full_name_romaji, companies(name_jp)').eq('id', id).eq('is_deleted', false).single()
     if (!worker) notFound()
 
-    // 1. Worker Documents (Nghiệp đoàn)
+    // 1. Worker Documents (機関)
     const { data: documents } = await supabase.from('worker_documents').select('*').eq('worker_id', id).eq('is_deleted', false).order('created_at', { ascending: false })
     let docsWithUrls = []
     if (documents && documents.length > 0) {

@@ -8,8 +8,9 @@ import { deleteWorker } from './actions'
 import { bulkUpdateWorkerStatus, bulkDeleteWorkers } from '@/app/actions/operations'
 import * as XLSX from 'xlsx'
 import { ImportModal } from './ImportModal'
+import { Worker } from '@/types/schema'
 
-export default function WorkersListClient({ initialWorkers, role, next90DaysStr }: { initialWorkers: any[], role: string, next90DaysStr: string }) {
+export default function WorkersListClient({ initialWorkers, role, next90DaysStr }: { initialWorkers: Worker[], role: string, next90DaysStr: string }) {
     const [filtered, setFiltered] = useState(initialWorkers)
     const [selectedIds, setSelectedIds] = useState<string[]>([])
     const [isPending, startTransition] = useTransition()

@@ -141,7 +141,6 @@ export default function DashboardClient({ userName, role, systemData }: { userNa
                             {isPendingChat ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} className="ml-0.5" />}
                         </button>
                     </form>
-                    <div className="text-center mt-3"><p className="text-[10px] text-[#878787] font-medium tracking-wide">Gemini 2.5 Flash can make mistakes. Consider verifying important information.</p></div>
                 </div>
             </section>
 

@@ -85,9 +85,9 @@ export default function DashboardClient({ userName, role, systemData }: { userNa
                                 <span className="text-[10px] font-bold text-[#878787] uppercase tracking-widest bg-white/50 px-2 py-0.5 rounded-full backdrop-blur-sm">AI-Channel</span>
                             </div>
                             <div className="flex items-center gap-3 sm:absolute sm:right-0">
-                                {!aiData && <div className="text-[11px] font-bold text-[#24b47e] bg-[#24b47e]/10 px-2 py-1 rounded-full flex items-center gap-1.5"><Loader2 size={12} className="animate-spin" /> Syncing Live Data</div>}
+                                {!aiData && <div className="text-[11px] font-bold text-[#24b47e] bg-[#24b47e]/10 px-2 py-1 rounded-full flex items-center gap-1.5"><Loader2 size={12} className="animate-spin" /> ライブデータを同期中</div>}
                                 {aiData && (
-                                    <button onClick={resetChat} title="Reset Chat" className="text-[11px] font-bold text-[#878787] hover:text-[#1f1f1f] bg-white/50 border border-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-1.5 transition-all shadow-sm hover:shadow-md hover:bg-white/80">
+                                    <button onClick={resetChat} title="チャットをリセット" className="text-[11px] font-bold text-[#878787] hover:text-[#1f1f1f] bg-white/50 border border-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-1.5 transition-all shadow-sm hover:shadow-md hover:bg-white/80">
                                         <RotateCcw size={12} /> リセット
                                     </button>
                                 )}
@@ -134,7 +134,7 @@ export default function DashboardClient({ userName, role, systemData }: { userNa
                         <form onSubmit={handleChat} className="relative max-w-4xl mx-auto flex items-end gap-3 bg-[#f2f5f8] border border-[#ededed] rounded-[32px] p-2 md:p-2.5 transition-all">
                             <textarea
                                 value={userInput} onChange={e => setUserInput(e.target.value)} onKeyDown={handleKeyDown} disabled={isPendingChat || !aiData}
-                                placeholder="質問、翻訳、メール作成など、何でも聞いてください... (Shift+Enter to newline)"
+                                placeholder="質問、翻訳、メール作成など、何でも聞いてください... (Shift+Enterで改行)"
                                 className="flex-1 max-h-24 min-h-[40px] bg-transparent border-none outline-none resize-none py-2 md:py-2.5 px-4 text-[14px] text-[#1f1f1f] placeholder:text-[#a0a0a0] leading-relaxed disabled:opacity-50"
                                 rows={1}
                             />
@@ -158,7 +158,7 @@ export default function DashboardClient({ userName, role, systemData }: { userNa
                             ) : (
                                 <div className="relative pl-5 py-0.5">
                                     <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#1e8e3e] rounded-full"></div>
-                                    <span className="text-[12px] font-bold text-[#1e8e3e] uppercase tracking-wide block mb-2">{aiData.tip?.label || 'TIP'}</span>
+                                    <span className="text-[12px] font-bold text-[#1e8e3e] uppercase tracking-wide block mb-2">{aiData.tip?.label || 'ヒント'}</span>
                                     <p className="text-[14px] text-[#444746] leading-[1.7] break-words">
                                         <strong className="font-semibold text-[#1f1f1f]">{aiData.tip?.title} </strong> <br />
                                         {aiData.tip?.content}
@@ -178,7 +178,7 @@ export default function DashboardClient({ userName, role, systemData }: { userNa
                                     <div className="relative pl-5 py-0.5 mb-4 z-10 flex-1">
                                         <div className={`absolute left-0 top-0 bottom-0 w-[3px] rounded-full ${aiData.alert?.hasDanger ? 'bg-[#d93025]' : 'bg-[#24b47e]'}`}></div>
                                         <span className={`text-[12px] font-bold uppercase tracking-wide block mb-2 flex items-center gap-1.5 ${aiData.alert?.hasDanger ? 'text-[#d93025]' : 'text-[#24b47e]'}`}>
-                                            {aiData.alert?.hasDanger ? <AlertTriangle size={14} /> : <CheckCircle2 size={14} />} {aiData.alert?.label || 'NOTICE'}
+                                            {aiData.alert?.hasDanger ? <AlertTriangle size={14} /> : <CheckCircle2 size={14} />} {aiData.alert?.label || '通知'}
                                         </span>
                                         <p className="text-[14px] text-[#444746] leading-relaxed break-words">
                                             <strong className="font-semibold text-[#1f1f1f]">{aiData.alert?.title} </strong><br />

@@ -4,11 +4,8 @@ import { User, Bell, LogOut, Clock, Hexagon, Settings } from 'lucide-react'
 import { GlobalSearch } from './GlobalSearch'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
-import { Logo } from './Logo'
-import { BrandModal } from './BrandModal'
 
 export function TopNav({ title, role }: { title: string, role?: string }) {
-    const [isBrandModalOpen, setIsBrandModalOpen] = useState(false)
     const [isAvatarOpen, setIsAvatarOpen] = useState(false)
     const [timeStr, setTimeStr] = useState('')
     const [dateStr, setDateStr] = useState('')
@@ -35,11 +32,7 @@ export function TopNav({ title, role }: { title: string, role?: string }) {
     return (
         <>
             <header className="h-14 bg-white border-b border-[#ededed] flex items-center justify-between px-4 sm:px-6 sticky top-0 z-40 shrink-0 w-full">
-                <div className="flex items-center gap-2 text-[13px] font-sans">
-                    <button onClick={() => setIsBrandModalOpen(true)} className="w-6 h-6 flex items-center justify-center text-[#24b47e] hover:scale-110 transition-transform cursor-pointer focus:outline-none" title="About KikanCloud">
-                        <Logo className="w-5 h-5 shrink-0" />
-                    </button>
-                    <span className="text-[#878787] ml-1">/</span>
+                <div className="flex items-center gap-2 text-[13px] font-sans pl-1">
                     <span className="font-medium text-[#1f1f1f]">KikanCloud</span>
                     <span className="text-[#878787] ml-1">/</span>
                     <span className="text-[#1f1f1f] font-bold">{title}</span>
@@ -86,7 +79,6 @@ export function TopNav({ title, role }: { title: string, role?: string }) {
                     </div>
                 </div>
             </header>
-            <BrandModal isOpen={isBrandModalOpen} onClose={() => setIsBrandModalOpen(false)} />
         </>
     )
 }

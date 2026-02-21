@@ -144,6 +144,13 @@ export default async function NewWorkerPage() {
                                         {companies?.map(c => <option key={c.id} value={c.id}>{c.name_jp}</option>)}
                                     </select>
                                 </div>
+                                <div className="md:col-span-2">
+                                    <label className="flex items-center gap-2 text-sm font-medium text-[#1f1f1f] mb-2">
+                                        職種 (Job Category / Industry)
+                                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded border border-[#ededed] text-[#878787] bg-[#fbfcfd]">任意</span>
+                                    </label>
+                                    <input name="industry_field" type="text" placeholder="例：機械加工、溶接、建設など" className="w-full bg-[#fbfcfd] border border-[#ededed] focus:bg-white focus:border-[#24b47e] focus:ring-[3px] focus:ring-[#24b47e]/10 rounded-md px-4 py-3 outline-none text-[#1f1f1f] transition-all" />
+                                </div>
                                 <div>
                                     <label className="flex items-center gap-2 text-sm font-medium text-[#1f1f1f] mb-2">
                                         送出機関
@@ -176,6 +183,13 @@ export default async function NewWorkerPage() {
                                 期限・証明書
                             </h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label className="flex items-center gap-2 text-sm font-medium text-[#1f1f1f] mb-2">
+                                        在留資格 (Visa Status)
+                                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded border border-[#ededed] text-[#878787] bg-[#fbfcfd]">任意</span>
+                                    </label>
+                                    <input name="visa_status" type="text" placeholder="例：技能実習第1号イ" className="w-full bg-[#fbfcfd] border border-[#ededed] focus:bg-white focus:border-[#24b47e] focus:ring-[3px] focus:ring-[#24b47e]/10 rounded-md px-4 py-3 outline-none text-[#1f1f1f] transition-all" />
+                                </div>
                                 <div>
                                     <label className="flex items-center gap-2 text-sm font-medium text-[#1f1f1f] mb-2">
                                         在留カード番号

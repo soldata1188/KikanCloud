@@ -43,6 +43,8 @@ export async function createWorker(formData: FormData) {
         address: formData.get('address') as string || null,
         nationality: formData.get('nationality') as string || 'VNM',
         sending_org: formData.get('sending_org') as string || null,
+        industry_field: formData.get('industry_field') as string || null,
+        visa_status: formData.get('visa_status') as string || null,
     }
 
     await supabase.from('workers').insert(newWorker)
@@ -90,6 +92,8 @@ export async function updateWorker(formData: FormData) {
         address: formData.get('address') as string || null,
         nationality: formData.get('nationality') as string || 'VNM',
         sending_org: formData.get('sending_org') as string || null,
+        industry_field: formData.get('industry_field') as string || null,
+        visa_status: formData.get('visa_status') as string || null,
     }
 
     await supabase.from('workers').update(updatedData).eq('id', id)

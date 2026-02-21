@@ -16,8 +16,8 @@ export function SmartActionCell({ auditId, status, companyId, filterMonth }: { a
     if (!auditId) {
         // 🟠 Ưu tiên 2: Chưa có lịch (Cam)
         return (
-            <Link href={`/audits/new?company_id=${companyId}&month=${filterMonth}`} className="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-orange-50 hover:bg-orange-100 text-orange-600 text-[12px] font-bold rounded-lg transition-colors border border-orange-200 shadow-sm w-full">
-                <Plus size={14} strokeWidth={2} /> 予定作成
+            <Link href={`/audits/new?company_id=${companyId}&month=${filterMonth}`} className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-[#fbfcfd] hover:bg-[#ededed] text-[#878787] hover:text-[#1f1f1f] text-[11px] font-medium rounded-md transition-colors border border-[#ededed] w-full">
+                <Plus size={12} strokeWidth={2} /> 予定作成
             </Link>
         )
     }
@@ -25,8 +25,8 @@ export function SmartActionCell({ auditId, status, companyId, filterMonth }: { a
     if (status === 'planned' || status === 'in_progress') {
         // 🔴/🔵 Ưu tiên 1 hoặc 4: Có lịch nhưng chưa đi (Chuyển thẳng sang Hoàn thành)
         return (
-            <button onClick={handleToggle} disabled={isPending} className="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-white hover:bg-[#e6f4ea] text-[#4285F4] hover:text-[#137333] text-[12px] font-bold rounded-lg transition-all border border-[#e1e5ea] hover:border-[#a8dab5] shadow-sm w-full disabled:opacity-50">
-                {isPending ? <Clock size={14} className="animate-spin text-gray-400" /> : <CheckCircle2 size={14} />}
+            <button onClick={handleToggle} disabled={isPending} className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-[#1f1f1f] hover:bg-[#24b47e] text-white text-[11px] font-medium rounded-md transition-all border border-[#1f1f1f] hover:border-[#24b47e] w-full disabled:opacity-50">
+                {isPending ? <Clock size={12} className="animate-spin text-white" /> : <CheckCircle2 size={12} />}
                 {isPending ? '処理中...' : '完了にする'}
             </button>
         )
@@ -34,8 +34,8 @@ export function SmartActionCell({ auditId, status, companyId, filterMonth }: { a
 
     // 🟢 Ưu tiên 5: Đã xong
     return (
-        <div className="text-center w-full px-3 py-2 bg-gray-50 text-gray-500 text-[12px] font-bold rounded-lg border border-gray-200 flex items-center justify-center gap-1 shadow-inner opacity-80">
-            <CheckCircle2 size={14} /> 今月完了済
+        <div className="text-center w-full px-3 py-1.5 bg-[#fbfcfd] text-[#878787] text-[11px] font-medium rounded-md border border-[#ededed] flex items-center justify-center gap-1 opacity-80">
+            <CheckCircle2 size={12} /> 今月完了済
         </div>
     )
 }

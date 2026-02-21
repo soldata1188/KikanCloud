@@ -68,7 +68,7 @@ export default async function DashboardPage() {
                     {workers?.map(w => (
                       <tr key={w.id} className="hover:bg-[#fbfcfd] transition-colors group">
                         <td className="px-5 py-4"><Link href={`/workers/${w.id}/edit`} className="font-medium text-[#1f1f1f] hover:text-[#24b47e]">{w.full_name_romaji}</Link></td>
-                        <td className="px-5 py-4"><span className={`px-2 py-0.5 border rounded-full text-[10px] font-bold uppercase tracking-widest bg-transparent ${w.status === 'working' ? 'border-[#24b47e] text-[#24b47e]' : 'border-gray-300 text-gray-500'}`}>{w.status === 'working' ? 'ACTIVE' : w.status}</span></td>
+                        <td className="px-5 py-4"><span className={`px-2 py-0.5 border rounded-full text-[10px] font-bold uppercase tracking-widest bg-transparent ${w.status === 'working' ? 'border-[#24b47e] text-[#24b47e]' : 'border-gray-300 text-[#878787]'}`}>{w.status === 'working' ? 'ACTIVE' : w.status}</span></td>
                         <td className="px-5 py-4"><span className="px-2 py-0.5 border border-[#ededed] text-[#878787] rounded-[4px] text-[10px] font-mono uppercase bg-[#fbfcfd]">{w.system_type}</span></td>
                         <td className="px-5 py-4 text-[#666666] font-mono">{new Date(w.created_at).toISOString().split('T')[0]}</td>
                         <td className="px-5 py-4 text-right"><button className="p-1 rounded border border-transparent text-[#878787] hover:border-[#ededed] hover:bg-white transition-all opacity-0 group-hover:opacity-100"><MoreVertical size={14} /></button></td>

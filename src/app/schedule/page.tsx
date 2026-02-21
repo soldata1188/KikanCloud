@@ -20,14 +20,14 @@ export default async function SchedulePage() {
     const displayName = userProfile?.full_name?.split(' ').pop() || '管理者'
 
     return (
-        <div className="flex h-screen bg-[#f0f4f9] font-sans text-[#1f1f1f] overflow-hidden selection:bg-blue-100">
+        <div className="flex h-screen bg-[#fbfcfd] font-sans text-[#1f1f1f] overflow-hidden selection:bg-[#24b47e]/20">
             <Sidebar active="schedule" />
 
             <main className="flex-1 flex flex-col relative overflow-y-auto no-scrollbar">
-                <header className="flex justify-between items-center px-4 py-3 md:px-6 md:py-4 sticky top-0 bg-[#f0f4f9] z-10 transition-colors">
-                    <h1 className="text-[22px] font-normal text-[#444746] tracking-tight">KikanCloud</h1>
+                <header className="flex justify-between items-center px-4 py-3 md:px-6 md:py-4 sticky top-0 bg-[#fbfcfd] z-10 transition-colors">
+                    <h1 className="text-[22px] font-normal text-[#1f1f1f] tracking-tight">KikanCloud</h1>
                     <div className="flex items-center gap-2">
-                        <span className="hidden sm:flex px-3 py-1 bg-white rounded-[32px] text-[11px] font-semibold text-[#444746] tracking-wider">ULTRA</span>
+                        <span className="hidden sm:flex px-3 py-1 bg-white rounded-md text-[11px] font-semibold text-[#1f1f1f] tracking-wider">ULTRA</span>
                         <UserMenu displayName={displayName} email={user.email || ''} role={userProfile?.role} avatarUrl={userProfile?.avatar_url} />
                     </div>
                 </header>

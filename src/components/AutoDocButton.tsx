@@ -42,13 +42,13 @@ export function AutoDocButton({ worker, role = 'admin' }: { worker: any, role?: 
 
     return (
         <div className="relative">
-            <button onClick={() => setIsOpen(!isOpen)} disabled={isExporting} className="flex items-center gap-2 px-5 py-2.5 bg-[#311b92] text-white hover:bg-[#4527a0] rounded-full text-sm font-bold transition-colors shadow-md disabled:opacity-50">
+            <button onClick={() => setIsOpen(!isOpen)} disabled={isExporting} className="flex items-center gap-2 px-5 py-2.5 bg-[#311b92] text-white hover:bg-[#4527a0] rounded-full text-sm font-bold transition-colors shadow-sm disabled:opacity-50">
                 {isExporting ? <Loader2 size={16} className="animate-spin" /> : <FileSpreadsheet size={16} strokeWidth={2} />} {isExporting ? '生成中...' : '法定書類を出力'} <ChevronDown size={14} />
             </button>
             {isOpen && (
-                <div className="absolute top-full mt-2 right-0 w-64 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-50 overflow-hidden">
-                    <button onClick={() => generateDoc('meibo')} className="w-full text-left px-4 py-3 text-sm font-bold text-[#444746] hover:bg-gray-50 transition-colors">📄 技能実習生名簿 (自動作成)</button>
-                    <button onClick={() => generateDoc('joken')} className="w-full text-left px-4 py-3 text-sm font-bold text-[#444746] hover:bg-gray-50 transition-colors border-t border-gray-50">📄 雇用条件書 (自動作成)</button>
+                <div className="absolute top-full mt-2 right-0 w-64 bg-white rounded-md shadow-sm border border-[#ededed] py-2 z-50 overflow-hidden">
+                    <button onClick={() => generateDoc('meibo')} className="w-full text-left px-4 py-3 text-sm font-bold text-[#1f1f1f] hover:bg-[#fbfcfd] transition-colors">📄 技能実習生名簿 (自動作成)</button>
+                    <button onClick={() => generateDoc('joken')} className="w-full text-left px-4 py-3 text-sm font-bold text-[#1f1f1f] hover:bg-[#fbfcfd] transition-colors border-t border-gray-50">📄 雇用条件書 (自動作成)</button>
                 </div>
             )}
         </div>

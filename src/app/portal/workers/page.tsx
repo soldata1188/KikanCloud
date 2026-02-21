@@ -17,17 +17,17 @@ export default async function PortalWorkersPage() {
     const { data: workers } = await supabase.from('workers').select('*').eq('company_id', userProfile.company_id).eq('is_deleted', false)
 
     return (
-        <div className="flex h-screen bg-[#f4f7f6] font-sans text-[#1f1f1f] overflow-hidden">
+        <div className="flex h-screen bg-[#fbfcfd] font-sans text-[#1f1f1f] overflow-hidden">
             <ClientSidebar active="workers" />
             <main className="flex-1 overflow-y-auto px-4 pb-12 w-full max-w-[1000px] mx-auto mt-4 md:mt-8">
                 <h2 className="text-[32px] font-bold text-teal-800 mb-6 flex items-center gap-2">
                     <Briefcase size={32} /> 人材一覧
                 </h2>
- <div className="bg-white rounded-[32px] p-6"> 
+ <div className="bg-white rounded-md p-6"> 
                     {workers?.map(w => (
                         <div key={w.id} className="p-4 border-b border-gray-50 flex items-center justify-between">
                             <Link href={`/portal/workers/${w.id}`} className="font-bold text-teal-700 hover:underline flex items-center gap-2">{w.full_name_romaji}</Link>
-                            <span className="text-sm text-gray-500">{w.nationality}</span>
+                            <span className="text-sm text-[#878787]">{w.nationality}</span>
                         </div>
                     ))}
                 </div>

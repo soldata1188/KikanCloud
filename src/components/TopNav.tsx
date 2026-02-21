@@ -25,7 +25,7 @@ export function TopNav({ title, role }: { title: string, role?: string }) {
                 </div>
                 <HelpCircle size={18} className="text-[#878787] hover:text-[#1f1f1f] cursor-pointer transition-colors" strokeWidth={1.5} />
                 {role && <NotificationBell role={role} />}
-                <div className="w-7 h-7 rounded-full bg-[#fbfcfd] border border-[#ededed] text-[#878787] flex items-center justify-center text-xs font-bold cursor-pointer hover:bg-gray-50"><User size={14} /></div>
+                <div className="w-7 h-7 rounded-full bg-[#fbfcfd] border border-[#ededed] text-[#878787] flex items-center justify-center text-xs font-bold cursor-pointer hover:bg-[#fbfcfd]"><User size={14} /></div>
             </div>
         </header>
     )

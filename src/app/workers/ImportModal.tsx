@@ -94,48 +94,48 @@ export function ImportModal() {
 
     return (
         <>
- <button onClick={() => setIsOpen(true)} className="flex items-center gap-2 px-6 py-3 bg-white hover:bg-gray-50 text-[#444746] rounded-[32px] text-sm font-medium transition-colors shrink-0"> 
+ <button onClick={() => setIsOpen(true)} className="flex items-center gap-2 px-6 py-3 bg-white hover:bg-[#fbfcfd] text-[#1f1f1f] rounded-md text-sm font-medium transition-colors shrink-0"> 
                 <Upload size={18} strokeWidth={2} /> CSV一括登録
             </button>
 
             {isOpen && (
                 <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 z-[60]">
- <div className="bg-white rounded-[32px] w-full max-w-[1000px] overflow-hidden flex flex-col max-h-[90vh]"> 
+ <div className="bg-white rounded-md w-full max-w-[1000px] overflow-hidden flex flex-col max-h-[90vh]"> 
 
-                        <div className="px-8 py-6 border-b border-gray-100 flex justify-between items-center bg-[#f0f4f9]/50">
-                            <h3 className="text-xl font-medium text-[#1f1f1f] flex items-center gap-2"><Briefcase className="text-[#4285F4]" /> 外国人材 CSVインポート</h3>
- <button onClick={() => { setIsOpen(false); setParsedData([]); setError(''); }} className="p-2 hover:bg-black/5 rounded-[32px] transition-colors text-gray-500"><X size={20} /></button>
+                        <div className="px-8 py-6 border-b border-[#ededed] flex justify-between items-center bg-[#fbfcfd]/50">
+                            <h3 className="text-xl font-medium text-[#1f1f1f] flex items-center gap-2"><Briefcase className="text-[#24b47e]" /> 外国人材 CSVインポート</h3>
+ <button onClick={() => { setIsOpen(false); setParsedData([]); setError(''); }} className="p-2 hover:bg-black/5 rounded-md transition-colors text-[#878787]"><X size={20} /></button>
                         </div>
 
                         <div className="p-8 overflow-y-auto">
                             {!parsedData.length ? (
                                 <div className="space-y-6">
- <div className="bg-blue-50/50 p-4 rounded-[32px] border border-blue-100 flex items-start gap-3">
-                                        <AlertCircle className="text-[#4285F4] shrink-0 mt-0.5" size={20} />
-                                        <div className="text-sm text-[#444746] space-y-2">
+ <div className="bg-[#fbfcfd]/50 p-4 rounded-md border border-blue-100 flex items-start gap-3">
+                                        <AlertCircle className="text-[#24b47e] shrink-0 mt-0.5" size={20} />
+                                        <div className="text-sm text-[#1f1f1f] space-y-2">
                                             <p>数千人規模の実習生・特定技能のデータを一括でシステムに登録します。「配属先企業名」はシステムに登録済みの企業名と完全一致させる必要があります。</p>
-                                            <button onClick={downloadTemplate} className="text-[#4285F4] font-medium hover:underline flex items-center gap-1 mt-2"><Download size={14} /> テンプレートCSVをダウンロード</button>
+                                            <button onClick={downloadTemplate} className="text-[#24b47e] font-medium hover:underline flex items-center gap-1 mt-2"><Download size={14} /> テンプレートCSVをダウンロード</button>
                                         </div>
                                     </div>
 
-                                    <div className="border-2 border-dashed border-[#e1e5ea] rounded-3xl p-10 text-center hover:border-[#4285F4] hover:bg-blue-50/30 transition-colors cursor-pointer relative group">
+                                    <div className="border-2 border-dashed border-[#e1e5ea] rounded-lg p-10 text-center hover:border-[#24b47e] hover:bg-[#fbfcfd]/30 transition-colors cursor-pointer relative group">
                                         <input type="file" accept=".csv" onChange={handleFileUpload} ref={fileInputRef} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
-                                        <Upload size={40} className="mx-auto text-gray-400 mb-4 group-hover:text-[#4285F4] transition-colors" strokeWidth={1.5} />
+                                        <Upload size={40} className="mx-auto text-[#878787] mb-4 group-hover:text-[#24b47e] transition-colors" strokeWidth={1.5} />
                                         <p className="text-[#1f1f1f] font-medium mb-1">クリックまたはドラッグ＆ドロップでファイルを選択</p>
-                                        <p className="text-xs text-gray-400">CSV形式（UTF-8）のみ対応</p>
+                                        <p className="text-xs text-[#878787]">CSV形式（UTF-8）のみ対応</p>
                                     </div>
- {error && <p className="text-red-500 text-sm text-center bg-red-50 py-2 rounded-[32px] border border-red-100">{error}</p>}
+ {error && <p className="text-red-500 text-sm text-center bg-red-50 py-2 rounded-md border border-red-100">{error}</p>}
                                 </div>
                             ) : (
                                 <div className="space-y-4">
- <div className="flex items-center justify-between bg-green-50 px-4 py-3 rounded-[32px] border border-green-100">
+ <div className="flex items-center justify-between bg-green-50 px-4 py-3 rounded-md border border-green-100">
                                         <div className="flex items-center gap-2 text-green-700 font-medium"><CheckCircle2 size={18} /> 読み込み成功: {parsedData.length}名</div>
-                                        <button onClick={() => { setParsedData([]); if (fileInputRef.current) fileInputRef.current.value = ''; }} className="text-xs text-gray-500 hover:text-[#1f1f1f] underline">別のファイルを選択</button>
+                                        <button onClick={() => { setParsedData([]); if (fileInputRef.current) fileInputRef.current.value = ''; }} className="text-xs text-[#878787] hover:text-[#1f1f1f] underline">別のファイルを選択</button>
                                     </div>
 
- <div className="rounded-[32px] overflow-hidden max-h-[350px] overflow-y-auto">
+ <div className="rounded-md overflow-hidden max-h-[350px] overflow-y-auto">
                                         <table className="w-full text-left text-xs whitespace-nowrap">
-                                            <thead className="bg-[#f0f4f9] sticky top-0 z-10 shadow-sm">
+                                            <thead className="bg-[#fbfcfd] sticky top-0 z-10 shadow-sm">
                                                 <tr>
                                                     <th className="px-4 py-3 font-medium text-gray-600">氏名（ローマ字）</th>
                                                     <th className="px-4 py-3 font-medium text-gray-600">生年月日</th>
@@ -146,25 +146,25 @@ export function ImportModal() {
                                             </thead>
                                             <tbody className="divide-y divide-gray-100">
                                                 {parsedData.slice(0, 100).map((row, i) => (
-                                                    <tr key={i} className="hover:bg-gray-50">
+                                                    <tr key={i} className="hover:bg-[#fbfcfd]">
                                                         <td className="px-4 py-3 font-medium text-[#1f1f1f] uppercase">{row.full_name_romaji}</td>
-                                                        <td className="px-4 py-3 text-gray-500">{row.dob || '-'}</td>
+                                                        <td className="px-4 py-3 text-[#878787]">{row.dob || '-'}</td>
                                                         <td className="px-4 py-3"><span className="px-2 py-1 bg-gray-100 rounded text-[10px]">{row.system_type || '-'}</span></td>
-                                                        <td className="px-4 py-3 text-gray-500">{row.company_name || '未配属'}</td>
-                                                        <td className="px-4 py-3 font-mono text-gray-500 uppercase">{row.zairyu_no || '-'}</td>
+                                                        <td className="px-4 py-3 text-[#878787]">{row.company_name || '未配属'}</td>
+                                                        <td className="px-4 py-3 font-mono text-[#878787] uppercase">{row.zairyu_no || '-'}</td>
                                                     </tr>
                                                 ))}
                                             </tbody>
                                         </table>
                                     </div>
-                                    {parsedData.length > 100 && <p className="text-xs text-center text-gray-400">※プレビューは先頭100件のみ表示しています</p>}
+                                    {parsedData.length > 100 && <p className="text-xs text-center text-[#878787]">※プレビューは先頭100件のみ表示しています</p>}
                                 </div>
                             )}
                         </div>
 
-                        <div className="px-8 py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3 mt-auto">
- <button onClick={() => { setIsOpen(false); setParsedData([]); setError(''); }} className="px-6 py-2.5 text-[#444746] font-medium hover:bg-gray-200 rounded-[32px] transition-colors text-sm">キャンセル</button>
- <button onClick={handleImport} disabled={!parsedData.length || isPending} className="px-6 py-2.5 bg-[#4285F4] text-white hover:bg-[#3367d6] font-medium rounded-[32px] transition-colors text-sm disabled:opacity-50 flex items-center gap-2">
+                        <div className="px-8 py-4 border-t border-[#ededed] bg-[#fbfcfd] flex justify-end gap-3 mt-auto">
+ <button onClick={() => { setIsOpen(false); setParsedData([]); setError(''); }} className="px-6 py-2.5 text-[#1f1f1f] font-medium hover:bg-gray-200 rounded-md transition-colors text-sm">キャンセル</button>
+ <button onClick={handleImport} disabled={!parsedData.length || isPending} className="px-6 py-2.5 bg-[#24b47e] text-white hover:bg-[#1e9a6a] font-medium rounded-md transition-colors text-sm disabled:opacity-50 flex items-center gap-2">
                                 {isPending ? '登録処理中...' : `一括インポートを実行 (${parsedData.length}名)`}
                             </button>
                         </div>

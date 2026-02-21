@@ -1,5 +1,5 @@
 'use client'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 
 export function MonthFilter({ defaultValue }: { defaultValue: string }) {
     const router = useRouter()
@@ -13,7 +13,7 @@ export function MonthFilter({ defaultValue }: { defaultValue: string }) {
                 params.set('month', e.target.value)
                 router.push(`/audits?${params.toString()}`)
             }}
- className="px-4 py-2.5 bg-white rounded-[32px] text-sm text-[#444746] outline-none cursor-pointer hover:bg-gray-50 transition-colors" 
+            className="h-[32px] px-3 bg-white border border-[#ededed] rounded-md text-[13px] text-[#1f1f1f] outline-none cursor-pointer hover:bg-[#fbfcfd] transition-colors"
         />
     )
 }

@@ -124,9 +124,9 @@ export default function ScheduleClient() {
                     </h2>
                 </div>
                 <div className="flex items-center gap-2">
-                    <button onClick={prevMonth} className="w-10 h-10 flex items-center justify-center rounded-[32px] bg-white border border-[#e1e5ea] hover:bg-gray-50 transition-colors text-[#444746]">&lt;</button>
-                    <button onClick={goToToday} className="px-6 py-2 bg-white border border-[#e1e5ea] hover:bg-gray-50 rounded-[32px] text-sm font-medium transition-colors text-[#444746]">今日</button>
-                    <button onClick={nextMonth} className="w-10 h-10 flex items-center justify-center rounded-[32px] bg-white border border-[#e1e5ea] hover:bg-gray-50 transition-colors text-[#444746]">&gt;</button>
+                    <button onClick={prevMonth} className="w-10 h-10 flex items-center justify-center rounded-md bg-white border border-[#ededed] hover:bg-[#fbfcfd] transition-colors text-[#1f1f1f]">&lt;</button>
+                    <button onClick={goToToday} className="px-6 py-2 bg-white border border-[#ededed] hover:bg-[#fbfcfd] rounded-md text-sm font-medium transition-colors text-[#1f1f1f]">今日</button>
+                    <button onClick={nextMonth} className="w-10 h-10 flex items-center justify-center rounded-md bg-white border border-[#ededed] hover:bg-[#fbfcfd] transition-colors text-[#1f1f1f]">&gt;</button>
                 </div>
             </div>
 
@@ -164,20 +164,20 @@ export default function ScheduleClient() {
 
                                 const dateStr = formatDateStr(year, cellData.m, cellData.dayNum)
                                 const cellEntries = entries[dateStr] || {}
-                                const todayBg = isToday(cellData.dayNum, cellData.m) ? 'bg-blue-50/60 ring-1 ring-inset ring-blue-200' : ''
+                                const todayBg = isToday(cellData.dayNum, cellData.m) ? 'bg-[#fbfcfd]/60 ring-1 ring-inset ring-blue-200' : ''
                                 const disabledBg = !cellData.isCurrent ? 'bg-gray-100/70' : ''
 
                                 return (
                                     <div key={dayIdx} className={`flex-1 relative flex flex-col z-10 transition-colors ${todayBg} ${disabledBg}`}>
 
                                         {/* Row 0 is the date number slot (disabled for typing) */}
-                                        <div className="flex border-b border-gray-200 last:border-b-0 relative h-7 bg-white/50">
+                                        <div className="flex border-b border-[#ededed] last:border-b-0 relative h-7 bg-white/50">
                                             <div className="absolute top-1 left-2 z-20 font-bold text-base select-none pointer-events-none">
                                                 <span className={textColor}>{cellData.dayNum}</span>
                                             </div>
                                             <input
                                                 type="text"
-                                                className="w-full h-full bg-transparent px-2 outline-none text-sm text-[#444746] opacity-0 cursor-default"
+                                                className="w-full h-full bg-transparent px-2 outline-none text-sm text-[#1f1f1f] opacity-0 cursor-default"
                                                 disabled
                                             />
                                         </div>
@@ -186,13 +186,13 @@ export default function ScheduleClient() {
                                         {Array.from({ length: 4 }).map((_, i) => {
                                             const rIdx = i + 1;
                                             return (
-                                                <div key={rIdx} className="flex-1 border-b border-gray-200 last:border-b-0 flex group">
+                                                <div key={rIdx} className="flex-1 border-b border-[#ededed] last:border-b-0 flex group">
                                                     <input
                                                         type="text"
                                                         value={cellEntries[rIdx] || ''}
                                                         onChange={(e) => handleInputChange(dateStr, rIdx, e.target.value)}
                                                         onBlur={(e) => handleInputBlur(dateStr, rIdx, e.target.value)}
-                                                        className="w-full h-full bg-transparent outline-none text-[13px] md:text-sm font-semibold text-[#1f1f1f] focus:bg-yellow-50 focus:text-blue-900 transition-colors px-2 py-0.5 hover:bg-gray-50/50"
+                                                        className="w-full h-full bg-transparent outline-none text-[13px] md:text-sm font-semibold text-[#1f1f1f] focus:bg-yellow-50 focus:text-blue-900 transition-colors px-2 py-0.5 hover:bg-[#fbfcfd]/50"
                                                         disabled={!cellData.isCurrent}
                                                     />
                                                 </div>

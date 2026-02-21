@@ -59,18 +59,18 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-[#ededed]">
-                            {filtered.length === 0 && <tr><td colSpan={7} className="px-5 py-12 text-center text-gray-400"><Search size={32} className="mx-auto mb-2 opacity-30" />データがありません。</td></tr>}
+                            {filtered.length === 0 && <tr><td colSpan={7} className="px-5 py-12 text-center text-[#878787]"><Search size={32} className="mx-auto mb-2 opacity-30" />データがありません。</td></tr>}
                             {filtered.map((w) => {
                                 const isExpiring = (w.passport_exp && w.passport_exp <= next90DaysStr) || (w.cert_end_date && w.cert_end_date <= next90DaysStr);
                                 const isChecked = selectedIds.includes(w.id);
                                 return (
                                     <tr key={w.id} className={`transition-colors group ${isChecked ? 'bg-[#24b47e]/5' : 'hover:bg-[#fbfcfd]'}`}>
                                         <td className="px-5 py-3.5 cursor-pointer" onClick={() => toggleSelect(w.id)}>{isChecked ? <CheckSquare className="text-[#24b47e]" size={16} /> : <Square className="text-gray-300" size={16} />}</td>
-                                        <td className="px-5 py-3.5"><div className="flex items-center gap-3"><div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center shrink-0 border border-[#ededed] overflow-hidden">{w.avatar_url ? <img src={w.avatar_url} className="w-full h-full object-cover" /> : <UserCircle2 size={16} className="text-[#878787]" />}</div><div><Link href={`/workers/${w.id}/edit`} className="font-medium text-[#1f1f1f] hover:text-[#24b47e] transition-colors">{w.full_name_romaji}</Link><div className="text-[11px] text-gray-500 mt-0.5">{w.companies?.name_jp || '未配属'}</div></div></div></td>
+                                        <td className="px-5 py-3.5"><div className="flex items-center gap-3"><div className="w-8 h-8 rounded-full bg-[#fbfcfd] flex items-center justify-center shrink-0 border border-[#ededed] overflow-hidden">{w.avatar_url ? <img src={w.avatar_url} className="w-full h-full object-cover" /> : <UserCircle2 size={16} className="text-[#878787]" />}</div><div><Link href={`/workers/${w.id}/edit`} className="font-medium text-[#1f1f1f] hover:text-[#24b47e] transition-colors">{w.full_name_romaji}</Link><div className="text-[11px] text-[#878787] mt-0.5">{w.companies?.name_jp || '未配属'}</div></div></div></td>
                                         <td className="px-5 py-3.5"><span className="px-2 py-0.5 border border-[#ededed] text-[#878787] rounded-[4px] text-[10px] font-mono uppercase tracking-wider bg-[#fbfcfd]">{w.system_type === 'tokuteigino' ? '特定技能' : '技能実習'}</span></td>
-                                        <td className="px-5 py-3.5 font-mono text-xs text-gray-500">{w.zairyu_no || '未登録'}</td>
+                                        <td className="px-5 py-3.5 font-mono text-xs text-[#878787]">{w.zairyu_no || '未登録'}</td>
                                         <td className="px-5 py-3.5 text-xs font-medium text-[#1f1f1f]">{w.passport_exp ? <span className={`flex items-center gap-1 ${isExpiring && w.status === 'working' ? 'text-red-600' : ''}`}>{isExpiring && w.status === 'working' && <AlertCircle size={14} />} {w.passport_exp.replace(/-/g, '/')}</span> : '-'}</td>
-                                        <td className="px-5 py-3.5"><span className={`px-2 py-0.5 border rounded-full text-[10px] font-bold uppercase tracking-widest bg-transparent ${w.status === 'working' ? 'border-[#24b47e] text-[#24b47e]' : 'border-gray-300 text-gray-500'}`}>{w.status === 'working' ? 'ACTIVE' : w.status}</span></td>
+                                        <td className="px-5 py-3.5"><span className={`px-2 py-0.5 border rounded-full text-[10px] font-bold uppercase tracking-widest bg-transparent ${w.status === 'working' ? 'border-[#24b47e] text-[#24b47e]' : 'border-gray-300 text-[#878787]'}`}>{w.status === 'working' ? 'ACTIVE' : w.status}</span></td>
                                         <td className="px-5 py-3.5 text-right"><div className="flex items-center justify-end gap-2"><Link href={`/workers/${w.id}/edit`} className="text-[12px] font-medium text-[#878787] hover:text-[#24b47e] transition-colors mr-2">詳細</Link>{role === 'admin' && (<form action={deleteWorker}><input type="hidden" name="id" value={w.id} /><DeleteButton /></form>)}</div></td>
                                     </tr>
                                 )
@@ -81,12 +81,12 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
             </div>
 
             {selectedIds.length > 0 && (
-                <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-gray-900 text-white shadow-2xl rounded-full px-6 py-3 border border-gray-700 flex items-center gap-6 z-50 animate-in slide-in-from-bottom-10 fade-in duration-300">
+                <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-gray-900 text-white shadow-sm rounded-full px-6 py-3 border border-gray-700 flex items-center gap-6 z-50 animate-in slide-in-from-bottom-10 fade-in duration-300">
                     <div className="flex items-center gap-2 font-bold text-sm bg-white/10 px-3 py-1.5 rounded-full"><CheckSquare size={16} className="text-[#24b47e]" /> {selectedIds.length}名を選択中</div>
                     <div className="w-px h-6 bg-gray-700"></div>
                     <div className="flex items-center gap-3">
                         <button onClick={() => handleBulkStatus('working')} disabled={isPending} className="text-sm font-bold text-green-400 hover:text-green-300 flex items-center gap-1 disabled:opacity-50"><Play size={16} /> 就業中へ</button>
-                        <button onClick={() => handleBulkStatus('returned')} disabled={isPending} className="text-sm font-bold text-gray-400 hover:text-white flex items-center gap-1 disabled:opacity-50"><Play size={16} /> 帰国へ</button>
+                        <button onClick={() => handleBulkStatus('returned')} disabled={isPending} className="text-sm font-bold text-[#878787] hover:text-white flex items-center gap-1 disabled:opacity-50"><Play size={16} /> 帰国へ</button>
                         <div className="w-px h-6 bg-gray-700 mx-1"></div>
                         <button onClick={generateLegalRoster} className="text-sm font-bold text-[#24b47e] hover:text-[#1e9a6a] flex items-center gap-1"><FileText size={16} /> 名簿出力</button>
                         {(role === 'admin' || role === 'super_admin') && (

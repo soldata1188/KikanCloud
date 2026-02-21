@@ -56,18 +56,18 @@ export default async function AuditsPage({ searchParams }: { searchParams: Promi
         let statusLabel = { text: '今月完了済', bg: 'bg-transparent text-[#24b47e]', border: 'border-[#24b47e]' };
 
         if (!currentAudit) {
-            priority = 2; // 🟠 Ưu tiên 2 (Cam): Chưa có lịch
+            priority = 2; // 🟠 優先度2 (オレンジ): スケジュール未設定
             statusLabel = { text: '予定未作成', bg: 'bg-[#fbfcfd] text-[#878787]', border: 'border-[#ededed]' };
         } else if (currentAudit.status === 'planned' || currentAudit.status === 'in_progress') {
             if (currentAudit.scheduled_date < todayStr) {
-                priority = 1; // 🔴 Ưu tiên 1 (Đỏ): Trễ hạn
+                priority = 1; // 🔴 優先度1 (赤): 期限遅延
                 statusLabel = { text: '期限超過', bg: 'bg-[#fbfcfd] text-red-600', border: 'border-red-200' };
             } else {
-                priority = 4; // 🔵 Ưu tiên 4 (Xanh dương): Tương lai an toàn
+                priority = 4; // 🔵 優先度4 (青): 将来の予定
                 statusLabel = { text: '予定あり', bg: 'bg-[#fbfcfd] text-blue-600', border: 'border-blue-200' };
             }
         } else if (currentAudit.status === 'completed') {
-            priority = 5; // 🟢 Ưu tiên 5 (Xanh lá - chìm đáy): Đã xong
+            priority = 5; // 🟢 優先度5 (緑 - 最下部): 完了済
             statusLabel = { text: '提出済', bg: 'bg-[#fbfcfd] text-[#878787]', border: 'border-[#ededed]' };
         }
 
@@ -125,7 +125,7 @@ export default async function AuditsPage({ searchParams }: { searchParams: Promi
                                     <tbody className="divide-y divide-[#ededed]">
                                         {matrixData.map((row) => (
                                             <tr key={row.company.id} className="hover:bg-[#fbfcfd] transition-colors group">
-                                                {/* 1. Tên Xí Nghiệp */}
+                                                {/* 1. 企業名 */}
                                                 <td className="px-5 py-3.5">
                                                     <div className="flex gap-3">
                                                         <div className="w-8 h-8 rounded-md border border-[#ededed] bg-[#fbfcfd] flex items-center justify-center shrink-0 text-[#878787]">
@@ -144,7 +144,7 @@ export default async function AuditsPage({ searchParams }: { searchParams: Promi
                                                     </div>
                                                 </td>
 
-                                                {/* 2. Trạng thái */}
+                                                {/* 2. ステータス */}
                                                 <td className="px-5 py-3.5">
                                                     <span className={`px-2 py-0.5 rounded-full text-[10px] uppercase font-bold border inline-flex items-center gap-1 ${row.statusLabel.bg} ${row.statusLabel.border}`}>
                                                         {row.priority === 1 || row.priority === 2 ? <AlertCircle size={10} /> : row.priority === 5 ? <CheckCircle2 size={10} /> : <CalendarCheck size={10} />}
@@ -152,7 +152,7 @@ export default async function AuditsPage({ searchParams }: { searchParams: Promi
                                                     </span>
                                                 </td>
 
-                                                {/* 3. Ngày */}
+                                                {/* 3. 日付 */}
                                                 <td className="px-5 py-3.5 align-top">
                                                     <div className="flex flex-col gap-2">
                                                         {/* Current Month */}

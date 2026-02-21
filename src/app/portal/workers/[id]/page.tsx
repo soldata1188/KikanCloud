@@ -17,7 +17,7 @@ export default async function ClientWorkerProfile({ params }: { params: Promise<
     const { data: worker } = await supabase.from('workers').select('*').eq('id', id).eq('company_id', userProfile?.company_id).eq('is_deleted', false).single()
     if (!worker) notFound()
 
-    // 1. Lấy tài liệu của Nghiệp đoàn chia sẻ (worker_documents)
+    // 1. 監理団体から共有された書類を取得 (worker_documents)
     const { data: unionDocs } = await supabase.from('worker_documents').select('*').eq('worker_id', id).eq('is_deleted', false).order('created_at', { ascending: false })
     let unionDocsUrls = []
     if (unionDocs && unionDocs.length > 0) {
@@ -25,7 +25,7 @@ export default async function ClientWorkerProfile({ params }: { params: Promise<
         unionDocsUrls = unionDocs.map((doc, i) => ({ ...doc, signedUrl: urls?.[i]?.signedUrl }))
     }
 
-    // 2. Lấy tài liệu Xí nghiệp nộp (client_documents)
+    // 2. 受入企業の提出書類を取得 (client_documents)
     const { data: clientDocs } = await supabase.from('client_documents').select('*').eq('worker_id', id).order('created_at', { ascending: false })
     let clientDocsUrls = []
     if (clientDocs && clientDocs.length > 0) {
@@ -63,7 +63,7 @@ export default async function ClientWorkerProfile({ params }: { params: Promise<
                         </div>
                         {/* Lượt tải xuống (Từ Nghiệp đoàn) */}
                         <SmartDrawer workerId={id} documents={unionDocsUrls} title="公式書類 (監理団体から共有)" docType="union" icon={<ShieldCheck />} allowUpload={false} />
-                        {/* Lượt tải lên (Từ Xí nghiệp) */}
+                        {/* アップロード履歴 (受入企業より) */}
                         <SmartDrawer workerId={id} documents={clientDocsUrls} title="賃金台帳 (給与明細)" docType="payroll" icon={<Banknote />} allowUpload={userProfile?.role === 'company_admin'} />
                         <SmartDrawer workerId={id} documents={clientDocsUrls} title="出勤簿・タイムカード" docType="timesheet" icon={<CalendarClock />} allowUpload={userProfile?.role === 'company_admin'} />
                         <SmartDrawer workerId={id} documents={clientDocsUrls} title="作業日報・評価表" docType="worklog" icon={<Hammer />} allowUpload={userProfile?.role === 'company_admin'} />

@@ -80,7 +80,7 @@ export async function importCompanies(companiesData: any[]) {
     const { data: userData } = await supabase.from('users').select('tenant_id, role').eq('id', user.id).single()
     if (userData?.role !== 'admin') throw new Error('管理者権限が必要です。(Admin only)')
 
-    // Chuẩn hóa dữ liệu trước khi insert
+    // 挿入前のデータ正規化
     const payload = companiesData.map(c => ({
         tenant_id: userData?.tenant_id,
         name_jp: c.name_jp,

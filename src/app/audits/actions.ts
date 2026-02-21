@@ -73,11 +73,11 @@ export async function quickToggleAuditStatus(auditId: string) {
     let actualDate = null
 
     if (audit.status === 'planned' || audit.status === 'in_progress') {
-        newStatus = 'completed' // Chuyển thẳng sang Hoàn thành
+        newStatus = 'completed' // 直接完了へ変更
         const d = new Date()
         actualDate = new Date(d.getTime() + (9 * 60 * 60 * 1000)).toISOString().split('T')[0] // Giờ JST
     } else {
-        return // Nếu đã completed thì không làm gì cả
+        return // 完了済みの場合は何もしない
     }
 
     const updateData: any = { status: newStatus }

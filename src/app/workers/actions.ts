@@ -113,10 +113,10 @@ export async function importWorkers(workersData: any[]) {
     const { data: userData } = await supabase.from('users').select('tenant_id, role').eq('id', user.id).single()
     if (userData?.role !== 'admin') throw new Error('管理者権限が必要です。(Admin only)')
 
-    // 1. Fetch toàn bộ Xí nghiệp để Auto-Map ID từ Tên
+    // 1. 全受入企業を取得し、企業名からIDを自動マッピング
     const { data: companies } = await supabase.from('companies').select('id, name_jp').eq('is_deleted', false)
 
-    // Các hàm Helper để xử lý Data
+    // データ処理用ヘルパー関数
     const parseDate = (dateStr: string) => {
         if (!dateStr || String(dateStr).trim() === '') return null;
         const cleanStr = String(dateStr).replace(/\//g, '-');
@@ -148,9 +148,9 @@ export async function importWorkers(workersData: any[]) {
         return 'VNM'
     }
 
-    // 2. Chuẩn hóa và Ép kiểu dữ liệu
+    // 2. データの正規化と型変換
     const payload = workersData.map(w => {
-        // Tìm Company ID nếu người dùng gõ Tên Xí nghiệp vào Excel
+        // Excelに企業名が入力されている場合、Company IDを検索
         let cId = null;
         if (w.company_name) {
             const found = companies?.find(c => c.name_jp === String(w.company_name).trim())
@@ -161,7 +161,7 @@ export async function importWorkers(workersData: any[]) {
             tenant_id: userData?.tenant_id,
             full_name_romaji: w.full_name_romaji ? String(w.full_name_romaji).toUpperCase().trim() : 'UNKNOWN',
             full_name_kana: w.full_name_kana ? String(w.full_name_kana).trim() : '-',
-            dob: parseDate(w.dob) || '2000-01-01', // Bắt buộc có ngày sinh
+            dob: parseDate(w.dob) || '2000-01-01', // 生年月日は必須
             company_id: cId,
             system_type: mapSystemType(w.system_type),
             status: mapStatus(w.status),
@@ -178,7 +178,7 @@ export async function importWorkers(workersData: any[]) {
         }
     })
 
-    // 3. Insert Bulk (Bắn nguyên mảng lên DB 1 lần)
+    // 3. バルクインサート (配列を一度にDBへ保存)
     const { error } = await supabase.from('workers').insert(payload)
     if (error) {
         console.error('Worker Import Error:', error)

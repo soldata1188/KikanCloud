@@ -17,7 +17,7 @@ export default async function WorkerTimelinePage({ params }: { params: Promise<{
     const { data: worker } = await supabase.from('workers').select('id, full_name_romaji, companies(id, name_jp), system_type, entry_date').eq('id', id).eq('is_deleted', false).single()
     if (!worker) notFound()
 
-    // Lấy dữ liệu procedures đã có để Sync
+    // 既存の行政手続データを取得して同期 (Sync)
     const { data: workerProcedures } = await supabase.from('procedures').select('*').eq('worker_id', id).eq('is_deleted', false)
     const timelineEvents = generateWorkerTimeline(worker.system_type, worker.entry_date);
 

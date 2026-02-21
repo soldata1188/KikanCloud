@@ -46,7 +46,7 @@ export function BrandModal({ isOpen, onClose }: { isOpen: boolean, onClose: () =
                     <X size={16} strokeWidth={2.5} />
                 </button>
 
-                {/* Khối Trái: Đám mây Origami */}
+                {/* 左ブロック: 折り紙クラウド */}
                 <div className="md:w-5/12 p-8 bg-[#fbfcfd] border-b md:border-b-0 md:border-r border-[#ededed] flex flex-col items-center justify-center relative group min-h-[250px] md:min-h-[350px]">
                     <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(#1f1f1f 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
 
@@ -89,7 +89,7 @@ export function BrandModal({ isOpen, onClose }: { isOpen: boolean, onClose: () =
                     </div>
                 </div>
 
-                {/* Khối Phải: Tuyên ngôn đã tinh gọn */}
+                {/* 右ブロック: マニフェスト */}
                 <div className="md:w-7/12 p-8 md:p-10 flex flex-col justify-center bg-white relative">
                     <button onClick={onClose} className="absolute top-4 right-4 z-50 w-8 h-8 hidden md:flex items-center justify-center rounded-full bg-white border border-transparent text-[#878787] hover:text-[#1f1f1f] hover:bg-[#fbfcfd] hover:border-[#ededed] transition-all shadow-sm">
                         <X size={16} strokeWidth={2.5} />

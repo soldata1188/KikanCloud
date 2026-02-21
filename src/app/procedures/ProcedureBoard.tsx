@@ -49,7 +49,7 @@ export function ProcedureBoard({ procedures }: { procedures: any[] }) {
 
     return (
         <div className="flex flex-col gap-6">
-            {/* 3 TABS ĐIỀU HƯỚNG */}
+            {/* 3つのナビゲーションタブ */}
             <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-[#ededed] pl-1">
                 {tabs.map(t => (
                     <button

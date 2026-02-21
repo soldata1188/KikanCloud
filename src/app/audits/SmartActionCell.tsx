@@ -14,7 +14,7 @@ export function SmartActionCell({ auditId, status, companyId, filterMonth }: { a
     }
 
     if (!auditId) {
-        // 🟠 Ưu tiên 2: Chưa có lịch (Cam)
+        // 🟠 優先度2: スケジュール未設定 (オレンジ)
         return (
             <Link href={`/audits/new?company_id=${companyId}&month=${filterMonth}`} className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-[#fbfcfd] hover:bg-[#ededed] text-[#878787] hover:text-[#1f1f1f] text-[11px] font-medium rounded-md transition-colors border border-[#ededed] w-full">
                 <Plus size={12} strokeWidth={2} /> 予定作成
@@ -23,7 +23,7 @@ export function SmartActionCell({ auditId, status, companyId, filterMonth }: { a
     }
 
     if (status === 'planned' || status === 'in_progress') {
-        // 🔴/🔵 Ưu tiên 1 hoặc 4: Có lịch nhưng chưa đi (Chuyển thẳng sang Hoàn thành)
+        // 🔴/🔵 優先度1または4: スケジュール済・未実施 (直接完了へ変更)
         return (
             <button onClick={handleToggle} disabled={isPending} className="flex justify-center items-center gap-1.5 w-full bg-[#24b47e] hover:bg-[#1e9a6a] text-white rounded-md text-xs px-3 py-1.5 transition-colors font-medium shadow-sm disabled:opacity-50">
                 {isPending ? <Clock size={12} className="animate-spin" /> : <CheckCircle2 size={12} />}
@@ -32,7 +32,7 @@ export function SmartActionCell({ auditId, status, companyId, filterMonth }: { a
         )
     }
 
-    // 🟢 Ưu tiên 5: Đã xong
+    // 🟢 優先度5: 完了済
     return (
         <div className="text-center w-full px-3 py-1.5 bg-[#fbfcfd] text-[#878787] text-[11px] font-medium rounded-md border border-[#ededed] flex items-center justify-center gap-1 opacity-80">
             <CheckCircle2 size={12} /> 今月完了済

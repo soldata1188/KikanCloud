@@ -15,7 +15,7 @@ export default async function AccountsPage() {
     if (!user) redirect('/login')
 
     const { data: userProfile } = await supabase.from('users').select('role').eq('id', user.id).single()
-    if (userProfile?.role !== 'admin') redirect('/') // CHỈ QUẢN TRỊ TỐI CAO ĐƯỢC VÀO
+    if (userProfile?.role !== 'admin') redirect('/') // 最高管理者のみアクセス可能
 
     const { data: users } = await supabase.from('users').select('id, full_name, email, role, companies(name_jp)').order('created_at', { ascending: true })
     const { data: companies } = await supabase.from('companies').select('id, name_jp').eq('is_deleted', false)

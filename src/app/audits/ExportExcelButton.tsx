@@ -15,7 +15,7 @@ export function ExportExcelButton({ data, month }: { data: any[], month: string 
                 return
             }
 
-            // 1. Format lại dữ liệu cho đẹp để xuất Excel (Chuẩn hóa Header tiếng Nhật)
+            // 1. Excel出力用にデータをフォーマット (日本語ヘッダーへの標準化)
             const exportData = data.map((row, index) => {
                 const audit = row.currentAudit;
                 let typeLabel = '-';
@@ -38,7 +38,7 @@ export function ExportExcelButton({ data, month }: { data: any[], month: string 
             // 2. Khởi tạo Worksheet
             const ws = XLSX.utils.json_to_sheet(exportData);
 
-            // 3. Tùy chỉnh độ rộng các cột (Auto-width) cho đẹp mắt khi mở lên
+            // 3. 各列の幅を自動調整 (開いた際の見栄えを良くするため)
             ws['!cols'] = [
                 { wch: 5 },   // No.
                 { wch: 35 },  // 企業名
@@ -54,7 +54,7 @@ export function ExportExcelButton({ data, month }: { data: any[], month: string 
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, `${month.replace('-', '年')}月 訪問スケジュール`);
 
-            // 5. Tải xuống file (Tên file chứa luôn tháng đang lọc)
+            // 5. ファイルをダウンロード (ファイル名にフィルタリング中の月を含む)
             XLSX.writeFile(wb, `監査訪問スケジュール_${month.replace('-', '年')}月度.xlsx`);
         } catch (error) {
             console.error('Export Error:', error)

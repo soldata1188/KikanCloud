@@ -62,7 +62,7 @@ export async function deleteWorkerDocument(formData: FormData) {
     // Soft delete metadata
     await supabase.from('worker_documents').update({ is_deleted: true }).eq('id', docId)
 
-    // Xóa file vật lý để tiết kiệm dung lượng Storage
+    // ストレージ容量節約のため物理ファイルを削除
     await supabase.storage.from('worker_docs').remove([filePath])
 
     revalidatePath(`/workers/${workerId}/documents`)

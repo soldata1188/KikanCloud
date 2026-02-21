@@ -28,7 +28,7 @@ export function TimelineInteractiveNode({ event, workerId, companyId, existingPr
             case 'submitted': return { label: '申請・審査中', color: 'bg-blue-100 text-blue-700 border-blue-200 hover:bg-blue-200', icon: <PlayCircle size={14} /> }
             case 'issue': return { label: '不備・要対応', color: 'bg-red-100 text-red-700 border-red-200 animate-pulse hover:bg-red-200', icon: <AlertCircle size={14} /> }
             case 'preparing': return { label: '書類準備中', color: 'bg-yellow-100 text-yellow-700 border-yellow-200 hover:bg-yellow-200', icon: <Clock size={14} /> }
-            default: return { label: '未対応 (Chưa処理)', color: 'bg-gray-100 text-[#878787] border-[#ededed] hover:bg-gray-200', icon: null }
+            default: return { label: '未対応 (未処理)', color: 'bg-gray-100 text-[#878787] border-[#ededed] hover:bg-gray-200', icon: null }
         }
     }
 

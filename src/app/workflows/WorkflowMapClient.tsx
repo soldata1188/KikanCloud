@@ -60,7 +60,7 @@ export default function WorkflowMapClient({ dbNodes, dbEdges, role }: { dbNodes:
     const handleSaveMap = () => {
         startTransition(async () => {
             try { await saveWorkflowMap(nodes, edges); setIsEditing(false); alert('マップを保存しました'); }
-            catch (e: any) { alert('Error: ' + e.message); }
+            catch (e: any) { alert('エラー: ' + e.message); }
         });
     };
 

@@ -70,7 +70,7 @@ export async function chatWithOmniAI(history: { role: 'user' | 'model', parts: {
         const apiKey = process.env.GEMINI_API_KEY;
         if (!apiKey) throw new Error('API Key missing');
 
-        const { GoogleGenAI } = await import('@google/genai');
+        const { GoogleGenAI, HarmCategory, HarmBlockThreshold } = await import('@google/genai');
         const ai = new GoogleGenAI({ apiKey });
 
         const systemInstruction = `
@@ -84,7 +84,7 @@ export async function chatWithOmniAI(history: { role: 'user' | 'model', parts: {
       3. Draft emails or documents.
       4. Provide logical advice for daily tasks based on System Data.
       
-      Tone: Professional, empathetic, concise, using perfect Japanese Keigo (or Vietnamese if asked). No heavy markdown bolding unless necessary.
+      Tone: Professional, empathetic, and concise. You MUST respond in the exact same language that the user used in their most recent message, unless explicitly asked otherwise (e.g. if the user speaks Vietnamese, reply in Vietnamese; if Japanese, reply in Japanese). Do not use heavy markdown bolding.
     `;
 
         // Gọi Gemini API với lịch sử hội thoại
@@ -98,10 +98,10 @@ export async function chatWithOmniAI(history: { role: 'user' | 'model', parts: {
                 systemInstruction: systemInstruction,
                 temperature: 0.5,
                 safetySettings: [
-                    { category: 'HARM_CATEGORY_HATE_SPEECH' as any, threshold: 'BLOCK_NONE' as any },
-                    { category: 'HARM_CATEGORY_HARASSMENT' as any, threshold: 'BLOCK_NONE' as any },
-                    { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT' as any, threshold: 'BLOCK_NONE' as any },
-                    { category: 'HARM_CATEGORY_DANGEROUS_CONTENT' as any, threshold: 'BLOCK_NONE' as any }
+                    { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
+                    { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+                    { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
+                    { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE }
                 ]
             }
         });
@@ -109,6 +109,6 @@ export async function chatWithOmniAI(history: { role: 'user' | 'model', parts: {
         return { success: true, text: response.text };
     } catch (error: any) {
         console.error('Omni AI Error:', error);
-        return { success: false, text: "申し訳ありません。AIシステムの接続に問題が発生しました。" };
+        return { success: false, text: `AI Error: ${error.message || 'Unknown error'}` };
     }
 }

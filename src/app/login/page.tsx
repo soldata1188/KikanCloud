@@ -1,5 +1,6 @@
 import { login } from './actions'
-import { Hexagon, Lock, Mail, ArrowRight, ShieldCheck } from 'lucide-react'
+import { Lock, Mail, ArrowRight, ShieldCheck } from 'lucide-react'
+import { Logo } from '@/components/Logo'
 
 export const dynamic = 'force-dynamic';
 
@@ -9,8 +10,8 @@ export default function LoginPage() {
             <div className="w-full max-w-[400px] bg-white rounded-xl shadow-sm border border-[#ededed] overflow-hidden animate-in fade-in zoom-in-95 duration-500">
                 <div className="p-8 md:p-10">
                     <div className="flex justify-center mb-6">
-                        <div className="w-16 h-16 bg-[#1f1f1f] rounded-lg flex items-center justify-center text-white shadow-sm">
-                            <Hexagon size={32} fill="currentColor" strokeWidth={0} />
+                        <div className="w-16 h-16 bg-white border border-[#ededed] rounded-[20px] flex items-center justify-center shadow-sm">
+                            <Logo className="w-10 h-10 drop-shadow-sm" />
                         </div>
                     </div>
                     <h1 className="text-2xl font-semibold text-center text-[#1f1f1f] tracking-tight mb-1">KikanCloud</h1>

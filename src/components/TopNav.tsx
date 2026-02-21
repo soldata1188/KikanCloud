@@ -47,10 +47,10 @@ export function TopNav({ title, role }: { title: string, role?: string }) {
 
                 <div className="flex items-center gap-4">
                     {timeStr && (
-                        <div className="hidden lg:flex items-center gap-2.5 px-3 py-1.5 bg-[#fbfcfd] border border-[#ededed] rounded-md shadow-sm select-none hover:border-[#878787] transition-colors">
+                        <div className="hidden lg:flex items-center gap-2.5 select-none">
                             <Clock size={14} className="text-[#24b47e]" />
                             <span className="text-[11px] font-bold text-[#878787] uppercase tracking-widest">{dateStr}</span>
-                            <span className="text-[#ededed]">|</span>
+                            <span className="text-[#e0e0e0]">|</span>
                             <span className="text-[13px] font-black text-[#1f1f1f] font-mono tabular-nums tracking-tight">{timeStr}</span>
                         </div>
                     )}

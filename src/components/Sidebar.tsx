@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Home, Users, Building2, Landmark, Clock, ShieldAlert, LogOut, Settings, Calendar, Map } from 'lucide-react'
+import { Home, Users, Building2, Landmark, Clock, ShieldAlert, LogOut, Settings, Calendar, Map, Navigation } from 'lucide-react'
 import { SidebarLogo } from './SidebarLogo'
 import { createClient } from '@/lib/supabase/server'
 import { logout } from '@/app/login/actions'
@@ -15,6 +15,7 @@ export async function Sidebar({ active }: { active: string }) {
         { id: 'procedures', icon: Landmark, href: '/procedures', title: '行政手続 (入管・機構)' },
         { id: 'audits', icon: Clock, href: '/audits', title: '監査・訪問・面談' },
         { id: 'workflows', icon: Map, href: '/workflows', title: '業務フロー' },
+        { id: 'routing', icon: Navigation, href: '/routing', title: 'ルート最適化' },
         { id: 'organization', icon: Building2, href: '/organization', title: '機関情報' },
     ]
 

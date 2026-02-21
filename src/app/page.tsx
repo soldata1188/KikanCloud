@@ -117,10 +117,6 @@ export default async function DashboardPage() {
               <h1 className="text-[32px] md:text-[40px] font-bold text-[#1f1f1f] mb-3 tracking-tight">
                 {lastName}さん、 {greeting} <span className="text-3xl ml-1">{emoji}</span>
               </h1>
-
-              <p className="text-[#666666] text-[15px] max-w-lg mx-auto">
-                本日の調子はいかがですか？入管への申請や監査など、フォーカスしたい業務を教えてください。
-              </p>
             </div>
           </div>
 

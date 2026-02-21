@@ -117,24 +117,24 @@ export default function ScheduleClient() {
     return (
         <div className="w-full h-full pb-8 select-none flex flex-col pt-2">
 
-            <div className="flex items-center justify-between mb-6 px-2">
+            <div className="flex items-center justify-between mb-6 px-1">
                 <div className="flex items-center gap-4">
-                    <h2 className="text-[32px] md:text-[40px] font-medium tracking-tight text-[#1f1f1f] flex items-center gap-2">
+                    <h1 className="text-[28px] font-normal tracking-tight text-[#1f1f1f] flex items-center gap-2">
                         {year}年 {month + 1}月
-                    </h2>
+                    </h1>
                 </div>
                 <div className="flex items-center gap-2">
-                    <button onClick={prevMonth} className="w-10 h-10 flex items-center justify-center rounded-md bg-white border border-[#ededed] hover:bg-[#fbfcfd] transition-colors text-[#1f1f1f]">&lt;</button>
-                    <button onClick={goToToday} className="px-6 py-2 bg-white border border-[#ededed] hover:bg-[#fbfcfd] rounded-md text-sm font-medium transition-colors text-[#1f1f1f]">今日</button>
-                    <button onClick={nextMonth} className="w-10 h-10 flex items-center justify-center rounded-md bg-white border border-[#ededed] hover:bg-[#fbfcfd] transition-colors text-[#1f1f1f]">&gt;</button>
+                    <button onClick={prevMonth} className="w-8 h-8 flex items-center justify-center rounded-md bg-[#fbfcfd] border border-[#ededed] hover:bg-[#ededed] transition-colors text-[#878787]">&lt;</button>
+                    <button onClick={goToToday} className="px-4 py-1.5 bg-[#fbfcfd] border border-[#ededed] hover:bg-[#ededed] rounded-md text-[13px] font-medium transition-colors text-[#1f1f1f]">今日</button>
+                    <button onClick={nextMonth} className="w-8 h-8 flex items-center justify-center rounded-md bg-[#fbfcfd] border border-[#ededed] hover:bg-[#ededed] transition-colors text-[#878787]">&gt;</button>
                 </div>
             </div>
 
-            <div className="w-full bg-white rounded-[24px] shadow-sm border border-gray-300 overflow-hidden flex flex-col flex-1">
+            <div className="w-full bg-white rounded-lg shadow-sm border border-[#ededed] overflow-hidden flex flex-col flex-1">
                 {/* Header Row */}
-                <div className="flex w-full border-b border-gray-300 bg-gray-100">
+                <div className="flex w-full border-b border-[#ededed] bg-[#fbfcfd]">
                     {daysOfWeek.map((day, idx) => (
-                        <div key={idx} className={`flex-1 text-center py-2.5 border-r border-gray-300 last:border-r-0 font-bold text-[15px] tracking-wide ${day.color}`}>
+                        <div key={idx} className={`flex-1 text-center py-2.5 border-r border-[#ededed] last:border-r-0 font-medium text-[12px] uppercase tracking-wide ${day.color}`}>
                             {day.name}
                         </div>
                     ))}
@@ -143,12 +143,12 @@ export default function ScheduleClient() {
                 {/* Calendar Grid */}
                 <div className="flex-1 flex flex-col w-full min-w-[800px] overflow-x-auto overflow-y-hidden">
                     {Array.from({ length: gridCells.length / 7 }).map((_, weekIdx) => (
-                        <div key={weekIdx} className="flex relative w-full flex-1 min-h-[140px] border-b border-gray-300 last:border-b-0">
+                        <div key={weekIdx} className="flex relative w-full flex-1 min-h-[140px] border-b border-[#ededed] last:border-b-0">
 
                             {/* Vertical borders */}
                             <div className="absolute inset-0 flex pointer-events-none">
                                 {Array.from({ length: 7 }).map((_, i) => (
-                                    <div key={i} className="flex-1 border-r border-gray-300 last:border-r-0"></div>
+                                    <div key={i} className="flex-1 border-r border-[#ededed] last:border-r-0"></div>
                                 ))}
                             </div>
 
@@ -158,21 +158,21 @@ export default function ScheduleClient() {
                                 const isSunday = dayIdx === 0
                                 const isSaturday = dayIdx === 6
 
-                                let textColor = cellData.isCurrent ? "text-[#1f1f1f]" : "text-gray-300"
+                                let textColor = cellData.isCurrent ? "text-[#1f1f1f]" : "text-[#878787]"
                                 if (isSunday && cellData.isCurrent) textColor = "text-red-500"
                                 if (isSaturday && cellData.isCurrent) textColor = "text-blue-500"
 
                                 const dateStr = formatDateStr(year, cellData.m, cellData.dayNum)
                                 const cellEntries = entries[dateStr] || {}
-                                const todayBg = isToday(cellData.dayNum, cellData.m) ? 'bg-[#fbfcfd]/60 ring-1 ring-inset ring-blue-200' : ''
-                                const disabledBg = !cellData.isCurrent ? 'bg-gray-100/70' : ''
+                                const todayBg = isToday(cellData.dayNum, cellData.m) ? 'bg-[#24b47e]/5 ring-1 ring-inset ring-[#24b47e]/30' : ''
+                                const disabledBg = !cellData.isCurrent ? 'bg-[#fbfcfd]' : ''
 
                                 return (
                                     <div key={dayIdx} className={`flex-1 relative flex flex-col z-10 transition-colors ${todayBg} ${disabledBg}`}>
 
                                         {/* Row 0 is the date number slot (disabled for typing) */}
                                         <div className="flex border-b border-[#ededed] last:border-b-0 relative h-7 bg-white/50">
-                                            <div className="absolute top-1 left-2 z-20 font-bold text-base select-none pointer-events-none">
+                                            <div className="absolute top-1 left-2 z-20 font-medium text-[13px] select-none pointer-events-none">
                                                 <span className={textColor}>{cellData.dayNum}</span>
                                             </div>
                                             <input
@@ -182,7 +182,6 @@ export default function ScheduleClient() {
                                             />
                                         </div>
 
-                                        {/* Rows 1 to 4 */}
                                         {Array.from({ length: 4 }).map((_, i) => {
                                             const rIdx = i + 1;
                                             return (
@@ -192,7 +191,7 @@ export default function ScheduleClient() {
                                                         value={cellEntries[rIdx] || ''}
                                                         onChange={(e) => handleInputChange(dateStr, rIdx, e.target.value)}
                                                         onBlur={(e) => handleInputBlur(dateStr, rIdx, e.target.value)}
-                                                        className="w-full h-full bg-transparent outline-none text-[13px] md:text-sm font-semibold text-[#1f1f1f] focus:bg-yellow-50 focus:text-blue-900 transition-colors px-2 py-0.5 hover:bg-[#fbfcfd]/50"
+                                                        className="w-full h-full bg-transparent outline-none text-[12px] font-medium text-[#1f1f1f] focus:bg-emerald-50 focus:text-emerald-900 transition-colors px-2 py-0.5 hover:bg-[#fbfcfd]"
                                                         disabled={!cellData.isCurrent}
                                                     />
                                                 </div>

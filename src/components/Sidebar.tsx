@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Home, Users, Building2, Landmark, Clock, ShieldAlert, LogOut, Settings, Hexagon } from 'lucide-react'
+import { Home, Users, Building2, Landmark, Clock, ShieldAlert, LogOut, Settings, Hexagon, Calendar } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { logout } from '@/app/login/actions'
 
@@ -12,6 +12,7 @@ export async function Sidebar({ active }: { active: string }) {
         { id: 'workers', icon: Users, href: '/workers' },
         { id: 'companies', icon: Building2, href: '/companies' },
         { id: 'procedures', icon: Landmark, href: '/procedures' },
+        { id: 'schedule', icon: Calendar, href: '/schedule' },
         { id: 'audits', icon: Clock, href: '/audits' },
     ]
 

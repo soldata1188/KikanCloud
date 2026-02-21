@@ -1,5 +1,6 @@
 'use client'
-import { Search, HelpCircle } from 'lucide-react'
+import { HelpCircle } from 'lucide-react'
+import { GlobalSearch } from './GlobalSearch'
 import { NotificationBell } from './NotificationBell'
 import { UserMenu } from './UserMenu'
 import { createClient } from '@/lib/supabase/server'
@@ -19,13 +20,7 @@ export function TopNav({ title, role, userProfileStr }: { title: string, role?: 
             </div>
 
             <div className="flex items-center gap-4">
-                <div className="relative hidden md:block group">
-                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#878787] group-focus-within:text-[#1f1f1f] transition-colors" size={14} />
-                    <input type="text" placeholder="検索..." className="h-[30px] w-52 bg-[#fbfcfd] border border-[#ededed] rounded-md pl-8 pr-12 text-xs outline-none focus:border-[#878787] focus:bg-white transition-all text-[#1f1f1f] placeholder:text-[#878787]" />
-                    <div className="absolute right-1.5 top-1/2 -translate-y-1/2 flex items-center gap-0.5 text-[#878787] text-[10px] font-mono">
-                        <span className="border border-[#ededed] bg-white rounded px-1 shadow-sm">⌘</span><span className="border border-[#ededed] bg-white rounded px-1 shadow-sm">K</span>
-                    </div>
-                </div>
+                <GlobalSearch />
                 <div title="ヘルプ"><HelpCircle size={18} className="text-[#878787] hover:text-[#1f1f1f] cursor-pointer transition-colors" strokeWidth={1.5} /></div>
                 {role && <NotificationBell role={role} />}
                 <UserMenu displayName={displayName} email={email} role={role} avatarUrl={avatarUrl} />

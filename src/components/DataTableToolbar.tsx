@@ -32,7 +32,7 @@ export function DataTableToolbar({ data, filename, searchPlaceholder, onSearch, 
                     </button>
                 )}
                 {importNode}
-                {addLink && role !== 'staff' && role !== 'company_user' && (
+                {addLink && (role === 'admin' || role === 'staff') && (
                     <Link href={addLink} className="h-[32px] px-3 bg-[#24b47e] hover:bg-[#1e9a6a] text-white rounded-md text-[13px] font-medium flex items-center gap-1.5 transition-colors">
                         <Plus size={14} /> 新規登録
                     </Link>

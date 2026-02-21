@@ -11,13 +11,13 @@ export async function getDashboardAIBriefing(userName: string, role: string, sys
         const ai = new GoogleGenAI({ apiKey });
 
         const dataContext = JSON.stringify({ workers: systemData?.stats?.workers || 0, companies: systemData?.stats?.companies || 0, audits: systemData?.stats?.audits || 0 });
-        const prompt = `You are KikanCloud AI Copilot for ${userName}. LIVE DATA: ${dataContext}. Generate JSON: { "question": "Ask what to focus on", "tip": {"label": "TIP", "title": "Advice", "content": "..." }, "alert": {"label": "NOTICE", "title": "Alert", "content": "...", "hasDanger": boolean } }`;
+        const prompt = `You are KikanCloud AI Copilot for ${userName}. LIVE DATA: ${dataContext}. Generate JSON: { "question": "業務のフォーカスについて尋ねる", "tip": {"label": "ヒント", "title": "アドバイス", "content": "..." }, "alert": {"label": "通知", "title": "アラート", "content": "...", "hasDanger": boolean } }`;
 
         const response = await ai.models.generateContent({ model: 'gemini-2.5-flash', contents: prompt, config: { temperature: 0.2, responseMimeType: "application/json" } });
         const cleanJson = response.text?.replace(/```json/g, '').replace(/```/g, '').trim() || '{}';
         return { success: true, data: JSON.parse(cleanJson) };
     } catch (error) {
-        return { success: false, data: { question: "本日の業務フォーカスを教えてください。", tip: { label: "TIP", title: "Task Management", content: "手動でタスクを確認してください。" }, alert: { label: "NOTICE", title: "System Status", content: "現在、緊急のアラートはありません。", hasDanger: false } } };
+        return { success: false, data: { question: "本日の業務フォーカスを教えてください。", tip: { label: "ヒント", title: "タスク管理", content: "手動でタスクを確認してください。" }, alert: { label: "通知", title: "システム状態", content: "現在、緊急のアラートはありません。", hasDanger: false } } };
     }
 }
 
@@ -80,7 +80,7 @@ export async function chatWithOmniAI(history: any[], newMessage: string, userNam
         // XỬ LÝ NẾU GEMINI RA LỆNH: "HÃY TÌM TRONG DATABASE CHO TÔI!"
         if (response.functionCalls && response.functionCalls.length > 0) {
             const call = response.functionCalls[0];
-            let functionResult: any = { error: "No data found or invalid table" };
+            let functionResult: any = { error: "データが見つからないか、無効なテーブルです" };
 
             if (call.name === 'query_kikancloud_database') {
                 const args = call.args as any;
@@ -95,7 +95,7 @@ export async function chatWithOmniAI(history: any[], newMessage: string, userNam
                         .eq('tenant_id', userProfile.tenant_id)
                         .ilike('full_name_romaji', searchTerm)
                         .limit(10); // Giới hạn 10 người để tránh tràn Token
-                    functionResult = data && data.length > 0 ? data : "No workers found matching the keyword.";
+                    functionResult = data && data.length > 0 ? data : "条件に一致する実習生は見つかりませんでした。";
                 }
                 else if (table === 'companies') {
                     const { data } = await supabase.from('companies')
@@ -104,7 +104,7 @@ export async function chatWithOmniAI(history: any[], newMessage: string, userNam
                         .eq('is_deleted', false)
                         .ilike('name_jp', searchTerm)
                         .limit(10);
-                    functionResult = data && data.length > 0 ? data : "No companies found.";
+                    functionResult = data && data.length > 0 ? data : "条件に一致する受入企業は見つかりませんでした。";
                 }
                 else if (table === 'audits') {
                     const { data } = await supabase.from('audits')
@@ -112,7 +112,7 @@ export async function chatWithOmniAI(history: any[], newMessage: string, userNam
                         .eq('tenant_id', userProfile.tenant_id)
                         .eq('status', 'Pending')
                         .limit(10);
-                    functionResult = data && data.length > 0 ? data : "No pending audits at the moment.";
+                    functionResult = data && data.length > 0 ? data : "現在、保留中の監査予定はありません。";
                 }
             }
 

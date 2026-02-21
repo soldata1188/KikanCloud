@@ -9,10 +9,10 @@ export async function getScheduleEntries(startDate: string, endDate: string) {
     if (!user) throw new Error('Unauthorized')
 
     const { data, error } = await supabase
-        .from('schedule_entries')
-        .select('entry_date, row_index, content')
-        .gte('entry_date', startDate)
-        .lte('entry_date', endDate)
+        .rpc('get_schedule_entries_by_user', {
+            p_start_date: startDate,
+            p_end_date: endDate
+        })
 
     if (error) {
         console.error('Error fetching schedule entries:', error)
@@ -27,42 +27,12 @@ export async function saveScheduleEntry(entryDate: string, rowIndex: number, con
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error('Unauthorized')
 
-    if (!content || content.trim() === '') {
-        // If empty, we can just delete the entry to save space
-        const { error } = await supabase
-            .from('schedule_entries')
-            .delete()
-            .match({
-                entry_date: entryDate,
-                row_index: rowIndex
-            })
-
-        if (error) {
-            console.error('Error deleting schedule entry:', error)
-            throw new Error(error.message)
-        }
-        return { success: true }
-    }
-
-    // Fetch tenant_id explicitly
-    const { data: userProfile } = await supabase
-        .from('users')
-        .select('tenant_id')
-        .eq('id', user.id)
-        .single()
-
-    if (!userProfile?.tenant_id) throw new Error('Tenant missing')
-
-    // Upsert
+    // Execute UPSERT or DELETE securely via the database RPC function
     const { error } = await supabase
-        .from('schedule_entries')
-        .upsert({
-            tenant_id: userProfile.tenant_id,
-            entry_date: entryDate,
-            row_index: rowIndex,
-            content: content
-        }, {
-            onConflict: 'tenant_id,entry_date,row_index'
+        .rpc('save_schedule_entry_by_user', {
+            p_date: entryDate,
+            p_row: rowIndex,
+            p_content: content
         })
 
     if (error) {

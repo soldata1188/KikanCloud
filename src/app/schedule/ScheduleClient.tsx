@@ -130,11 +130,11 @@ export default function ScheduleClient() {
                 </div>
             </div>
 
-            <div className="w-full bg-white rounded-lg shadow-sm border border-[#ededed] overflow-hidden flex flex-col flex-1">
+            <div className="w-full bg-white rounded-lg shadow-sm border border-[#d1d5db] overflow-hidden flex flex-col flex-1">
                 {/* Header Row */}
-                <div className="flex w-full border-b border-[#ededed] bg-[#fbfcfd]">
+                <div className="flex w-full border-b border-[#d1d5db] bg-[#fbfcfd]">
                     {daysOfWeek.map((day, idx) => (
-                        <div key={idx} className={`flex-1 text-center py-2.5 border-r border-[#ededed] last:border-r-0 font-medium text-[12px] uppercase tracking-wide ${day.color}`}>
+                        <div key={idx} className={`flex-1 text-center py-2.5 border-r border-[#d1d5db] last:border-r-0 font-medium text-[12px] uppercase tracking-wide ${day.color}`}>
                             {day.name}
                         </div>
                     ))}
@@ -143,12 +143,12 @@ export default function ScheduleClient() {
                 {/* Calendar Grid */}
                 <div className="flex-1 flex flex-col w-full min-w-[800px] overflow-x-auto overflow-y-hidden">
                     {Array.from({ length: gridCells.length / 7 }).map((_, weekIdx) => (
-                        <div key={weekIdx} className="flex relative w-full flex-1 min-h-[140px] border-b border-[#ededed] last:border-b-0">
+                        <div key={weekIdx} className="flex relative w-full flex-1 min-h-[140px] border-b border-[#d1d5db] last:border-b-0">
 
                             {/* Vertical borders */}
                             <div className="absolute inset-0 flex pointer-events-none">
                                 {Array.from({ length: 7 }).map((_, i) => (
-                                    <div key={i} className="flex-1 border-r border-[#ededed] last:border-r-0"></div>
+                                    <div key={i} className="flex-1 border-r border-[#d1d5db] last:border-r-0"></div>
                                 ))}
                             </div>
 
@@ -171,7 +171,7 @@ export default function ScheduleClient() {
                                     <div key={dayIdx} className={`flex-1 relative flex flex-col z-10 transition-colors ${todayBg} ${disabledBg}`}>
 
                                         {/* Row 0 is the date number slot (disabled for typing) */}
-                                        <div className="flex border-b border-[#ededed] last:border-b-0 relative h-7 bg-white/50">
+                                        <div className="flex border-b border-gray-200 last:border-b-0 relative h-7 bg-white/50">
                                             <div className="absolute top-1 left-2 z-20 font-bold text-[14px] select-none pointer-events-none">
                                                 <span className={textColor}>{cellData.dayNum}</span>
                                             </div>
@@ -185,7 +185,7 @@ export default function ScheduleClient() {
                                         {Array.from({ length: 4 }).map((_, i) => {
                                             const rIdx = i + 1;
                                             return (
-                                                <div key={rIdx} className="flex-1 border-b border-[#ededed] last:border-b-0 flex group">
+                                                <div key={rIdx} className="flex-1 border-b border-gray-200 last:border-b-0 flex group">
                                                     <input
                                                         type="text"
                                                         value={cellEntries[rIdx] || ''}

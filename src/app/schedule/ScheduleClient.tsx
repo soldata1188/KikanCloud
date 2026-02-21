@@ -134,7 +134,7 @@ export default function ScheduleClient() {
                 {/* Header Row */}
                 <div className="flex w-full border-b border-[#d1d5db] bg-[#f0f4f9]">
                     {daysOfWeek.map((day, idx) => (
-                        <div key={idx} className={`flex-1 text-center py-2.5 border-r border-[#d1d5db] last:border-r-0 font-bold text-[13px] uppercase tracking-wide ${day.color}`}>
+                        <div key={idx} className={`flex-1 text-center py-2.5 border-r border-[#d1d5db] last:border-r-0 font-bold text-[14px] uppercase tracking-wide ${day.color}`}>
                             {day.name}
                         </div>
                     ))}
@@ -171,8 +171,8 @@ export default function ScheduleClient() {
                                     <div key={dayIdx} className={`flex-1 relative flex flex-col z-10 transition-colors ${todayBg} ${disabledBg}`}>
 
                                         {/* Row 0 is the date number slot (disabled for typing) */}
-                                        <div className="flex border-b border-gray-200 last:border-b-0 relative h-7 bg-[#f8fafc]">
-                                            <div className="absolute top-[3px] left-2 z-20 font-bold text-[14px] select-none pointer-events-none">
+                                        <div className="flex border-b border-gray-200 last:border-b-0 relative h-8 bg-[#f8fafc]">
+                                            <div className="absolute top-[4px] left-2.5 z-20 font-bold text-[16px] select-none pointer-events-none">
                                                 <span className={textColor}>{cellData.dayNum}</span>
                                             </div>
                                             <input

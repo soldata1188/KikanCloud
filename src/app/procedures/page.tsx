@@ -27,8 +27,8 @@ export default async function ProceduresPage() {
                 <header className="flex justify-between items-center px-4 py-3 md:px-6 md:py-4 sticky top-0 bg-[#f0f4f9] z-20">
                     <h1 className="text-[22px] font-normal text-[#444746] tracking-tight">KikanCloud</h1>
                     <div className="flex items-center gap-2">
-                        <button className="flex items-center gap-2 pl-4 pr-1.5 py-1.5 bg-white rounded-[32px] text-sm font-medium text-[#444746] hover:bg-gray-50 transition border border-gray-200 shadow-sm cursor-pointer">
-                            仕事 <div className="w-8 h-8 rounded-[32px] bg-[#d81b60] text-white flex items-center justify-center text-xs font-bold">{displayName.charAt(0)}</div>
+ <button className="flex items-center gap-2 pl-4 pr-1.5 py-1.5 bg-white rounded-[32px] text-sm font-medium text-[#444746] hover:bg-gray-50 transition cursor-pointer"> 
+ 仕事 <div className="w-8 h-8 rounded-[32px] bg-[#d81b60] text-white flex items-center justify-center text-xs font-bold">{displayName.charAt(0)}</div>
                         </button>
                     </div>
                 </header>
@@ -39,7 +39,7 @@ export default async function ProceduresPage() {
                             <h2 className="text-[32px] md:text-[40px] font-medium tracking-tight text-[#1f1f1f]">申請・手続 管理</h2>
                             <p className="text-[#444746] mt-1 text-sm">入管・機構・検定協会への書類提出状況を機関別に一元管理します。</p>
                         </div>
-                        <Link href="/procedures/new" className="flex items-center gap-2 px-6 py-3 bg-[#4285F4] hover:bg-[#3367d6] text-white rounded-[32px] text-sm font-bold transition-colors shadow-sm shrink-0">
+ <Link href="/procedures/new" className="flex items-center gap-2 px-6 py-3 bg-[#4285F4] hover:bg-[#3367d6] text-white rounded-[32px] text-sm font-bold transition-colors shrink-0">
                             <Plus size={18} strokeWidth={2} /> 新規手続を登録
                         </Link>
                     </div>

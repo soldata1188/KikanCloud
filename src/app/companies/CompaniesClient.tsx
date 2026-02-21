@@ -32,8 +32,8 @@ export function CompaniesClient({ companies, userRole }: { companies: any[], use
 
     return (
         <div className="flex-1 flex flex-col w-full max-w-[1200px] mx-auto mt-4 md:mt-8">
-            <div className="bg-white rounded-[32px] p-4 shadow-[0_4px_16px_rgba(0,0,0,0.04)] border border-[#e1e5ea] mb-6 space-y-4">
-                <div className="min-h-[48px] px-4 py-2 flex items-center gap-3 bg-[#f0f4f9] rounded-[32px] border border-transparent focus-within:bg-white focus-within:border-[#4285F4] transition-colors">
+ <div className="bg-white rounded-[32px] p-4 mb-6 space-y-4"> 
+ <div className="min-h-[48px] px-4 py-2 flex items-center gap-3 bg-[#f0f4f9] rounded-[32px] -transparent focus-within:bg-white focus-within: transition-colors"> 
                     <Search size={20} className="text-[#444746]" strokeWidth={1.5} />
                     <input
                         type="text"
@@ -52,7 +52,7 @@ export function CompaniesClient({ companies, userRole }: { companies: any[], use
                     <select
                         value={statusFilter}
                         onChange={(e) => setStatusFilter(e.target.value)}
-                        className="bg-white border border-[#e1e5ea] text-[#1f1f1f] text-sm rounded-[32px] px-4 py-2 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#4285F4]/20 transition-all font-medium appearance-none min-w-[140px] cursor-pointer"
+ className="bg-white text-[#1f1f1f] text-sm rounded-[32px] px-4 py-2 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#4285F4]/20 transition-all font-medium appearance-none min-w-[140px] cursor-pointer" 
                     >
                         <option value="all">すべての受入状況</option>
                         <option value="active">受入中（在籍あり）</option>
@@ -65,7 +65,7 @@ export function CompaniesClient({ companies, userRole }: { companies: any[], use
                                 setSearchTerm('')
                                 setStatusFilter('all')
                             }}
-                            className="ml-auto flex items-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-gray-700 hover:bg-gray-100 px-3 py-1.5 rounded-[32px] transition-colors"
+ className="ml-auto flex items-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-gray-700 hover:bg-gray-100 px-3 py-1.5 rounded-[32px] transition-colors"
                         >
                             <RefreshCw size={12} /> リセット
                         </button>
@@ -73,7 +73,7 @@ export function CompaniesClient({ companies, userRole }: { companies: any[], use
                 </div>
             </div>
 
-            <div className="bg-white/80 rounded-[32px] shadow-sm border border-[#e1e5ea] overflow-hidden p-2">
+ <div className="bg-white/80 rounded-[32px] overflow-hidden p-2"> 
                 <div className="overflow-x-auto">
                     <table className="w-full text-left text-sm text-[#444746]">
                         <thead className="bg-transparent text-[12px] font-semibold text-[#444746]/60 border-b border-gray-200/50 uppercase tracking-widest whitespace-nowrap">
@@ -102,7 +102,7 @@ export function CompaniesClient({ companies, userRole }: { companies: any[], use
                                         {/* 1. Name & Info */}
                                         <td className="px-4 py-2">
                                             <div className="flex items-center gap-3.5">
-                                                <div className="w-11 h-11 rounded-[32px] bg-[#f0f4f9] border border-[#e1e5ea] overflow-hidden flex items-center justify-center shrink-0 shadow-sm text-[#444746]">
+ <div className="w-11 h-11 rounded-[32px] bg-[#f0f4f9] overflow-hidden flex items-center justify-center shrink-0 text-[#444746]">
                                                     <Building2 size={18} strokeWidth={1.5} />
                                                 </div>
                                                 <div>
@@ -148,13 +148,13 @@ export function CompaniesClient({ companies, userRole }: { companies: any[], use
                                         {/* 4. Actions */}
                                         <td className="px-4 py-2 text-right">
                                             <div className="flex items-center justify-end gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
-                                                <Link href={`/companies/${c.id}/edit`} className="px-3 py-1.5 flex items-center gap-1.5 rounded-[32px] text-xs font-medium text-[#444746] hover:text-[#4285F4] hover:bg-blue-50 transition-colors border border-transparent" title="編集">
+ <Link href={`/companies/${c.id}/edit`} className="px-3 py-1.5 flex items-center gap-1.5 rounded-[32px] text-xs font-medium text-[#444746] hover:text-[#4285F4] hover:bg-blue-50 transition-colors border border-transparent" title="編集">
                                                     <Edit2 size={14} strokeWidth={2} /> 編集
                                                 </Link>
                                                 {userRole === 'admin' && (
                                                     <form action={deleteCompany} className="inline-block">
                                                         <input type="hidden" name="id" value={c.id} />
-                                                        <button type="submit" className="px-3 py-1.5 flex items-center gap-1.5 rounded-[32px] text-xs font-medium text-[#444746] hover:text-red-600 hover:bg-red-50 transition-colors border border-transparent" title="削除" onClick={(e) => { if (!confirm('この受入企業を削除してもよろしいですか？\n※所属している外国人材のデータは削除されません。')) e.preventDefault() }}>
+ <button type="submit" className="px-3 py-1.5 flex items-center gap-1.5 rounded-[32px] text-xs font-medium text-[#444746] hover:text-red-600 hover:bg-red-50 transition-colors border border-transparent" title="削除" onClick={(e) => { if (!confirm('この受入企業を削除してもよろしいですか？\n※所属している外国人材のデータは削除されません。')) e.preventDefault() }}>
                                                             <Trash2 size={14} strokeWidth={2} /> 削除
                                                         </button>
                                                     </form>

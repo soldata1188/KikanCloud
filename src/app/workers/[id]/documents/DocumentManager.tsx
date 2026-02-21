@@ -47,7 +47,7 @@ export function DocumentManager({ workerId, documents, role }: { workerId: strin
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* CỘT TRÁI: UPLOAD ZONE */}
             <div className="lg:col-span-1">
-                <div className="bg-white rounded-[32px] shadow-sm border border-[#e1e5ea] p-6 sticky top-24">
+ <div className="bg-white rounded-[32px] p-6 sticky top-24"> 
                     <div className="mb-6">
                         <h3 className="text-lg font-bold text-[#1f1f1f] flex items-center gap-2"><Upload size={20} className="text-[#4285F4]" /> 新規アップロード</h3>
                         <p className="text-xs text-gray-500 mt-1">PDF, JPG, PNG形式対応（最大5MB）</p>
@@ -56,7 +56,7 @@ export function DocumentManager({ workerId, documents, role }: { workerId: strin
                     <div className="space-y-4">
                         <div>
                             <label className="block text-sm font-bold text-[#444746] mb-2">書類の種類 <span className="text-red-500">*</span></label>
-                            <select value={docType} onChange={(e) => setDocType(e.target.value)} disabled={uploading || isPending} className="w-full bg-[#f0f4f9] border border-transparent focus:border-[#4285F4] focus:bg-white rounded-[32px] px-4 py-3 text-sm font-medium outline-none transition-colors cursor-pointer">
+ <select value={docType} onChange={(e) => setDocType(e.target.value)} disabled={uploading || isPending} className="w-full bg-[#f0f4f9] -transparent focus: focus:bg-white rounded-[32px] px-4 py-3 text-sm font-medium outline-none transition-colors cursor-pointer"> 
                                 <option value="zairyu_card">在留カード (表・裏)</option>
                                 <option value="passport">パスポート (顔写真ページ)</option>
                                 <option value="contract">雇用条件書・契約書</option>
@@ -84,10 +84,10 @@ export function DocumentManager({ workerId, documents, role }: { workerId: strin
 
             {/* CỘT PHẢI: DOCUMENT LIST */}
             <div className="lg:col-span-2">
-                <div className="bg-white rounded-[32px] shadow-sm border border-[#e1e5ea] overflow-hidden min-h-[400px]">
+ <div className="bg-white rounded-[32px] overflow-hidden min-h-[400px]"> 
                     <div className="px-4 py-2.5 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
                         <h3 className="text-base font-bold text-[#1f1f1f] flex items-center gap-2"><FolderOpen size={20} className="text-orange-500" /> 保管されたファイル</h3>
-                        <span className="text-xs font-bold text-gray-500 bg-gray-200 px-3 py-1 rounded-[32px] flex items-center gap-1"><ShieldCheck size={14} /> {documents.length}件</span>
+ <span className="text-xs font-bold text-gray-500 bg-gray-200 px-3 py-1 rounded-[32px] flex items-center gap-1"><ShieldCheck size={14} /> {documents.length}件</span>
                     </div>
 
                     {documents.length === 0 ? (
@@ -112,9 +112,9 @@ export function DocumentManager({ workerId, documents, role }: { workerId: strin
                                                 </div>
                                                 <p className="text-[11px] text-gray-500 flex items-center gap-2">
                                                     <span>{formatBytes(doc.file_size)}</span>
-                                                    <span className="w-1 h-1 bg-gray-300 rounded-[32px]"></span>
+ <span className="w-1 h-1 bg-gray-300 rounded-[32px]"></span>
                                                     <span>{new Date(doc.created_at).toLocaleDateString('ja-JP')}</span>
-                                                    <span className="w-1 h-1 bg-gray-300 rounded-[32px]"></span>
+ <span className="w-1 h-1 bg-gray-300 rounded-[32px]"></span>
                                                     <span>{doc.uploaded_by?.split(' ').pop()}</span>
                                                 </p>
                                             </div>
@@ -122,14 +122,14 @@ export function DocumentManager({ workerId, documents, role }: { workerId: strin
 
                                         <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
                                             {doc.signedUrl && (
-                                                <a href={doc.signedUrl} target="_blank" rel="noopener noreferrer" className="p-2.5 text-[#444746] hover:text-[#4285F4] hover:bg-blue-50 rounded-[32px] transition-colors font-bold text-xs flex items-center gap-1" title="プレビュー / ダウンロード"><Download size={14} /> 開く</a>
+ <a href={doc.signedUrl} target="_blank" rel="noopener noreferrer" className="p-2.5 text-[#444746] hover:text-[#4285F4] hover:bg-blue-50 rounded-[32px] transition-colors font-bold text-xs flex items-center gap-1" title="プレビュー / ダウンロード"><Download size={14} /> 開く</a>
                                             )}
                                             {role === 'admin' && (
                                                 <form action={deleteWorkerDocument}>
                                                     <input type="hidden" name="docId" value={doc.id} />
                                                     <input type="hidden" name="filePath" value={doc.file_path} />
                                                     <input type="hidden" name="workerId" value={workerId} />
-                                                    <button type="submit" onClick={(e) => { if (!confirm('このファイルを完全に削除しますか？')) e.preventDefault() }} disabled={isPending} className="p-2.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-[32px] transition-colors disabled:opacity-50" title="削除">
+ <button type="submit" onClick={(e) => { if (!confirm('このファイルを完全に削除しますか？')) e.preventDefault() }} disabled={isPending} className="p-2.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-[32px] transition-colors disabled:opacity-50" title="削除">
                                                         <Trash2 size={18} />
                                                     </button>
                                                 </form>

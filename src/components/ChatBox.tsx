@@ -18,7 +18,7 @@ export function ChatBox({ companyId, currentUserId, messages, sourcePath, isClie
     }
 
     return (
-        <div className="flex flex-col h-[550px] bg-white rounded-[32px] shadow-sm border border-gray-200 overflow-hidden">
+ <div className="flex flex-col h-[550px] bg-white rounded-[32px] border border-gray-200 overflow-hidden">
             <div className={`p-4 border-b border-gray-100 flex items-center gap-3 ${isClient ? 'bg-teal-700 text-white' : 'bg-blue-50 text-[#1f1f1f]'}`}>
                 <div className={`w-10 h-10 rounded-[32px] flex items-center justify-center shrink-0 ${isClient ? 'bg-white/20' : 'bg-white text-[#4285F4]'}`}>
                     {isClient ? <UserCircle2 size={24} /> : <Building2 size={24} />}
@@ -52,7 +52,7 @@ export function ChatBox({ companyId, currentUserId, messages, sourcePath, isClie
 
             <form onSubmit={handleSend} className="p-4 bg-white border-t border-gray-100 flex items-center gap-3">
                 <input type="text" value={content} onChange={e => setContent(e.target.value)} placeholder="メッセージを入力..." className={`flex-1 bg-gray-50 border border-gray-200 rounded-[32px] px-5 py-3 text-sm outline-none transition-colors ${isClient ? 'focus:border-teal-500' : 'focus:border-[#4285F4]'}`} disabled={isPending} />
-                <button type="submit" disabled={!content.trim() || isPending} className={`w-12 h-12 flex items-center justify-center rounded-[32px] text-white shrink-0 shadow-sm disabled:opacity-50 ${isClient ? 'bg-teal-600 hover:bg-teal-700' : 'bg-[#4285F4] hover:bg-[#3367d6]'}`}><Send size={18} className="ml-0.5" /></button>
+ <button type="submit" disabled={!content.trim() || isPending} className={`w-12 h-12 flex items-center justify-center rounded-[32px] text-white shrink-0 disabled:opacity-50 ${isClient ? 'bg-teal-600 hover:bg-teal-700' : 'bg-[#4285F4] hover:bg-[#3367d6]'}`}><Send size={18} className="ml-0.5" /></button>
             </form>
         </div>
     )

@@ -13,7 +13,7 @@ export default async function Dashboard() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const { data: userProfile } = await supabase.from('users').select('full_name, role').eq('id', user.id).single()
+  const { data: userProfile } = await supabase.from('users').select('full_name, role, avatar_url').eq('id', user.id).single()
   const displayName = userProfile?.full_name?.split(' ').pop() || '管理者'
 
   // --- LOGIC XỬ LÝ THỜI GIAN ---
@@ -52,12 +52,12 @@ export default async function Dashboard() {
     <div className="flex h-screen bg-[#f0f4f9] font-sans text-[#1f1f1f] overflow-hidden selection:bg-blue-100">
       <Sidebar active="dashboard" />
       <main className="flex-1 flex flex-col relative overflow-y-auto no-scrollbar">
-        <header className="flex justify-between items-center px-4 py-3 md:px-6 md:py-4 sticky top-0 bg-[#f0f4f9] z-10">
+        <header className="flex justify-between items-center px-4 py-3 md:px-6 md:py-4 sticky top-0 bg-[#f0f4f9] z-10 transition-colors">
           <h1 className="text-[22px] font-normal text-[#444746] tracking-tight">KikanCloud</h1>
           <div className="flex items-center gap-2">
             {userProfile?.role === 'admin' && <DemoManager />}
-            <span className="hidden sm:flex px-3 py-1 bg-white rounded-[32px] text-[11px] font-semibold text-[#444746] tracking-wider border border-gray-200">ULTRA</span>
-            <UserMenu displayName={displayName} email={user.email || ''} role={userProfile?.role} />
+            <span className="hidden sm:flex px-3 py-1 bg-white rounded-[32px] text-[11px] font-semibold text-[#444746] tracking-wider">ULTRA</span>
+            <UserMenu displayName={displayName} email={user.email || ''} role={userProfile?.role} avatarUrl={userProfile?.avatar_url} />
           </div>
         </header>
 
@@ -75,7 +75,7 @@ export default async function Dashboard() {
           </div>
 
           {/* Ô PROMPT AI (TRANG TRÍ UX) */}
-          <div className="bg-white rounded-[32px] p-2 shadow-[0_4px_16px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)] transition-shadow duration-300 border border-[#e1e5ea] mb-8">
+          <div className="bg-white rounded-[32px] p-2 mb-8">
             <div className="min-h-[64px] px-4 pt-3 pb-2 flex items-start gap-3">
               <Shield size={20} className="text-[#4285F4] mt-1 shrink-0" strokeWidth={1.5} />
               <textarea placeholder="KikanCloud のAIに作業を依頼する (例: 期限が近い実習生のリストを出して)" className="w-full bg-transparent outline-none text-[16px] text-[#1f1f1f] placeholder:text-[#444746]/70 resize-none h-12 pt-0.5"></textarea>
@@ -94,16 +94,16 @@ export default async function Dashboard() {
 
           {/* CÁC VIÊN THUỐC LỌC THÔNG MINH (ACTION CHIPS) */}
           <div className="flex flex-wrap gap-3 mb-10 pl-1">
-            <Link href="/workers" className={`bg-white hover:bg-gray-50 border ${urgentCount > 0 ? 'border-red-200 text-red-600 bg-red-50/50 shadow-red-100' : 'border-[#e1e5ea] text-[#444746]'} px-5 py-3.5 rounded-[32px] text-sm font-medium transition-colors flex items-center gap-2 shadow-sm`}>
+            <Link href="/workers" className={`bg-white hover:bg-gray-50 ${urgentCount > 0 ? 'text-red-600 bg-red-50/50' : 'text-[#444746]'} px-5 py-3.5 rounded-[32px] text-sm font-medium transition-colors flex items-center gap-2`}>
               {urgentCount > 0 ? <AlertCircle size={16} /> : '⚠️'} 期限警告 ({urgentCount})
             </Link>
-            <Link href="/audits" className={`bg-white hover:bg-gray-50 border ${overdueAuditsCount > 0 ? 'border-orange-200 text-orange-600 bg-orange-50/50 shadow-orange-100' : 'border-[#e1e5ea] text-[#444746]'} px-5 py-3.5 rounded-[32px] text-sm font-medium transition-colors flex items-center gap-2 shadow-sm`}>
+            <Link href="/audits" className={`bg-white hover:bg-gray-50 ${overdueAuditsCount > 0 ? 'text-orange-600 bg-orange-50/50' : 'text-[#444746]'} px-5 py-3.5 rounded-[32px] text-sm font-medium transition-colors flex items-center gap-2`}>
               {overdueAuditsCount > 0 ? <AlertTriangle size={16} /> : '🚨'} 監査遅延 ({overdueAuditsCount})
             </Link>
-            <Link href="/companies" className="bg-white hover:bg-gray-50 border border-[#e1e5ea] px-5 py-3.5 rounded-[32px] text-sm text-[#444746] font-medium transition-colors flex items-center gap-2 shadow-sm">
+            <Link href="/companies" className="bg-white hover:bg-gray-50 px-5 py-3.5 rounded-[32px] text-sm text-[#444746] font-medium transition-colors flex items-center gap-2">
               🏢 受入企業 ({companyCount || 0})
             </Link>
-            <Link href="/workers" className="bg-white hover:bg-gray-50 border border-[#e1e5ea] px-5 py-3.5 rounded-[32px] text-sm text-[#444746] font-medium transition-colors flex items-center gap-2 shadow-sm">
+            <Link href="/workers" className="bg-white hover:bg-gray-50 px-5 py-3.5 rounded-[32px] text-sm text-[#444746] font-medium transition-colors flex items-center gap-2">
               👥 就業中人材 ({workerCount || 0})
             </Link>
           </div>
@@ -112,7 +112,7 @@ export default async function Dashboard() {
           <div className="flex flex-col gap-8 mb-12">
 
             {/* WIDGET 1: CẢNH BÁO HẾT HẠN (ĐỎ) */}
-            <div className="bg-white/80 rounded-[32px] shadow-sm border border-[#e1e5ea] overflow-hidden p-2 relative flex flex-col">
+            <div className="bg-white/80 rounded-[32px] overflow-hidden p-2 relative flex flex-col">
 
 
               <div className="px-5 py-3.5 flex items-center justify-between border-b border-gray-200/50 bg-white">
@@ -181,7 +181,7 @@ export default async function Dashboard() {
             </div>
 
             {/* WIDGET 2: CÔNG VIỆC KANSA (CAM) */}
-            <div className="bg-white/80 rounded-[32px] shadow-sm border border-[#e1e5ea] overflow-hidden p-2 relative flex flex-col">
+            <div className="bg-white/80 rounded-[32px] overflow-hidden p-2 relative flex flex-col">
 
 
               <div className="px-5 py-3.5 flex items-center justify-between border-b border-gray-200/50 bg-white">

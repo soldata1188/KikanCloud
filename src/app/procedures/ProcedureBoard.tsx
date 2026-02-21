@@ -72,10 +72,10 @@ export function ProcedureBoard({ procedures }: { procedures: any[] }) {
                     if (items.length === 0) return null;
 
                     return (
-                        <div key={col.id} className="bg-white rounded-[24px] shadow-sm border border-[#e1e5ea] overflow-hidden">
+                        <div key={col.id} className="bg-white rounded-[24px] overflow-hidden">
                             <div className="px-5 py-3 border-b border-[#e1e5ea] bg-gray-50/50 flex items-center justify-between">
                                 <h3 className="font-bold text-[#1f1f1f] flex items-center gap-2">{col.icon} {col.title}</h3>
-                                <span className="bg-white text-[#444746] text-xs font-bold px-2.5 py-1 rounded-[32px] border border-gray-200 shadow-sm">{items.length}件</span>
+                                <span className="bg-white text-[#444746] text-xs font-bold px-2.5 py-1 rounded-[32px]">{items.length}件</span>
                             </div>
                             <div className="flex flex-col">
                                 {items.map(proc => {
@@ -94,17 +94,17 @@ export function ProcedureBoard({ procedures }: { procedures: any[] }) {
                                                     {isUrgent && !isOverdue && !isIssue && <span className="flex items-center gap-1 text-[10px] text-orange-600 font-bold bg-orange-50 px-2 py-0.5 rounded-[32px] border border-orange-200"><Clock size={10} /> 期限注意</span>}
                                                 </div>
 
-                                                <div className="flex items-baseline gap-2">
-                                                    {proc.workers ? (
-                                                        <Link href={`/workers/${proc.workers.id}/edit`} className="font-bold text-[#1f1f1f] text-[16px] hover:text-[#4285F4] transition-colors truncate flex items-center gap-1.5">
-                                                            <UserCircle2 size={16} className="text-[#4285F4]" /> {proc.workers.full_name_romaji}
-                                                        </Link>
-                                                    ) : (
-                                                        <span className="font-bold text-[#1f1f1f] text-[16px] truncate flex items-center gap-1.5">
-                                                            <Building2 size={16} className="text-[#34A853]" /> {proc.companies?.name_jp || '企業未定'}
-                                                        </span>
+                                                <div className="flex flex-col gap-1.5 mt-2 mb-3">
+                                                    <div className="text-[11px] text-gray-500 flex items-center gap-1.5 font-medium">
+                                                        <Building2 size={12} className="shrink-0" />
+                                                        <span className="truncate">{proc.companies?.name_jp || '企業未定'}</span>
+                                                    </div>
+                                                    {proc.workers && (
+                                                        <div className="text-[11px] font-bold text-[#4285F4] bg-blue-50/50 border border-blue-100 px-2 py-1 rounded flex items-center gap-1.5 w-fit hover:bg-blue-100 transition-colors">
+                                                            <UserCircle2 size={12} className="shrink-0" />
+                                                            <span className="truncate">{proc.workers.full_name_romaji}</span>
+                                                        </div>
                                                     )}
-                                                    {proc.workers && <span className="text-sm text-gray-500 truncate">({proc.companies?.name_jp || '未配属'})</span>}
                                                 </div>
 
                                                 <div className="text-xs text-gray-500 flex items-center gap-4">
@@ -136,12 +136,12 @@ export function ProcedureBoard({ procedures }: { procedures: any[] }) {
                                             {/* Actions */}
                                             <div className="flex items-center justify-end gap-2 md:w-[220px] shrink-0">
                                                 {(proc.status === 'preparing' || proc.status === 'issue') && (
-                                                    <button onClick={() => handleToggle(proc.id)} disabled={isPending} className="px-5 py-2.5 text-[13px] font-bold text-white bg-[#4285F4] hover:bg-[#3367d6] rounded-[32px] transition-colors flex items-center justify-center gap-1.5 shadow-sm disabled:opacity-50 w-full md:w-[140px]">
+                                                    <button onClick={() => handleToggle(proc.id)} disabled={isPending} className="px-5 py-2.5 text-[13px] font-bold text-white bg-[#4285F4] hover:bg-[#3367d6] rounded-[32px] transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50 w-full md:w-[140px]">
                                                         {isPending ? <Clock size={16} className="animate-spin" /> : <Send size={16} />} 申請にする
                                                     </button>
                                                 )}
                                                 {proc.status === 'submitted' && (
-                                                    <button onClick={() => handleToggle(proc.id)} disabled={isPending} className="px-5 py-2.5 text-[13px] font-bold text-[#137333] bg-[#e6f4ea] hover:bg-[#ceead6] border border-green-200 rounded-[32px] transition-colors flex items-center justify-center gap-1.5 shadow-sm disabled:opacity-50 w-full md:w-[140px]">
+                                                    <button onClick={() => handleToggle(proc.id)} disabled={isPending} className="px-5 py-2.5 text-[13px] font-bold text-[#137333] bg-[#e6f4ea] hover:bg-[#ceead6] border border-green-200 rounded-[32px] transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50 w-full md:w-[140px]">
                                                         {isPending ? <Clock size={16} className="animate-spin" /> : <CheckCircle2 size={16} />} 許可・認定
                                                     </button>
                                                 )}

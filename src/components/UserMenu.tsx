@@ -3,8 +3,9 @@
 import { useState, useRef, useEffect } from 'react'
 import { LogOut, User, Settings, CheckCircle2, Shield } from 'lucide-react'
 import { logout } from '@/app/login/actions'
+import Link from 'next/link'
 
-export function UserMenu({ displayName, email, role }: { displayName: string, email: string, role?: string }) {
+export function UserMenu({ displayName, email, role, avatarUrl }: { displayName: string, email: string, role?: string, avatarUrl?: string | null }) {
     const [isOpen, setIsOpen] = useState(false)
     const [isLogoutPending, setIsLogoutPending] = useState(false)
     const menuRef = useRef<HTMLDivElement>(null)
@@ -23,18 +24,27 @@ export function UserMenu({ displayName, email, role }: { displayName: string, em
         <div className="relative" ref={menuRef}>
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="flex items-center gap-2 pl-4 pr-1.5 py-1.5 bg-white rounded-[32px] text-sm font-medium text-[#444746] hover:bg-gray-50 transition border border-gray-200 shadow-sm cursor-pointer"
+                className="flex items-center gap-2 pl-4 pr-1.5 py-1.5 bg-white rounded-[32px] text-sm font-medium text-[#444746] hover:bg-gray-50 transition border border-gray-200 cursor-pointer"
             >
-                {displayName} <div className="w-8 h-8 rounded-[32px] bg-[#d81b60] text-white flex items-center justify-center text-xs font-bold">{displayName.charAt(0)}</div>
+                {displayName}
+                {avatarUrl ? (
+                    <img src={avatarUrl} alt={displayName} className="w-8 h-8 rounded-[32px] object-cover" />
+                ) : (
+                    <div className="w-8 h-8 rounded-[32px] bg-[#d81b60] text-white flex items-center justify-center text-xs font-bold">{displayName.charAt(0)}</div>
+                )}
             </button>
 
             {isOpen && (
                 <div className="absolute right-0 mt-2 w-72 bg-white rounded-[24px] shadow-lg border border-[#e1e5ea] overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-200">
                     <div className="p-4 border-b border-[#e1e5ea] bg-gradient-to-br from-[#f0f4f9] to-white">
                         <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 rounded-[32px] bg-[#d81b60] text-white flex items-center justify-center text-xl font-bold shrink-0 shadow-inner">
-                                {displayName.charAt(0)}
-                            </div>
+                            {avatarUrl ? (
+                                <img src={avatarUrl} alt={displayName} className="w-12 h-12 rounded-[32px] object-cover shrink-0 shadow-inner" />
+                            ) : (
+                                <div className="w-12 h-12 rounded-[32px] bg-[#d81b60] text-white flex items-center justify-center text-xl font-bold shrink-0 shadow-inner">
+                                    {displayName.charAt(0)}
+                                </div>
+                            )}
                             <div className="overflow-hidden">
                                 <p className="font-semibold text-[#1f1f1f] truncate text-base">{displayName}</p>
                                 <p className="text-xs text-gray-500 truncate mt-0.5">{email}</p>
@@ -54,26 +64,22 @@ export function UserMenu({ displayName, email, role }: { displayName: string, em
                     </div>
 
                     <div className="p-2 flex flex-col gap-1">
-                        <button
-                            onClick={() => {
-                                alert('開発中: プロフィール設定画面を開きます');
-                                setIsOpen(false);
-                            }}
+                        <Link
+                            href="/settings/profile"
+                            onClick={() => setIsOpen(false)}
                             className="flex items-center gap-3 px-3 py-2.5 rounded-[12px] hover:bg-gray-50 text-sm font-medium text-[#444746] transition-colors text-left w-full"
                         >
                             <User size={18} className="text-gray-400" />
                             プロフィール設定
-                        </button>
-                        <button
-                            onClick={() => {
-                                alert('開発中: システム設定画面を開きます');
-                                setIsOpen(false);
-                            }}
+                        </Link>
+                        <Link
+                            href="/settings/system"
+                            onClick={() => setIsOpen(false)}
                             className="flex items-center gap-3 px-3 py-2.5 rounded-[12px] hover:bg-gray-50 text-sm font-medium text-[#444746] transition-colors text-left w-full"
                         >
                             <Settings size={18} className="text-gray-400" />
                             システム設定
-                        </button>
+                        </Link>
                     </div>
 
                     <div className="p-2 border-t border-[#e1e5ea] bg-red-50/30">

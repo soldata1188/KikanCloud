@@ -67,7 +67,7 @@ export function ExportExcelButton({ data, month }: { data: any[], month: string 
         <button
             onClick={handleExport}
             disabled={isExporting}
-            className="flex items-center gap-2 px-6 py-2.5 bg-white border border-[#e1e5ea] hover:bg-[#e6f4ea] hover:text-[#137333] hover:border-[#a8dab5] text-[#444746] rounded-[32px] text-sm font-bold transition-colors shadow-sm shrink-0 disabled:opacity-50"
+ className="flex items-center gap-2 px-6 py-2.5 bg-white hover:bg-[#e6f4ea] hover:text-[#137333] hover: text-[#444746] rounded-[32px] text-sm font-bold transition-colors shrink-0 disabled:opacity-50" 
             title="現在表示されているリストをExcelでダウンロードします"
         >
             <Download size={18} strokeWidth={2.5} /> {isExporting ? '出力中...' : 'Excel出力'}

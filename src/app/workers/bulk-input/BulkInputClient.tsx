@@ -147,13 +147,13 @@ export function BulkInputClient({ companies }: { companies: { id: string, name_j
             </div>
 
             <div className="flex justify-between items-center w-full mb-8">
-                <button onClick={addRow} className="flex items-center gap-2 px-4 py-2 text-[#4285F4] bg-blue-50 hover:bg-blue-100 rounded-[32px] font-medium transition-colors text-sm">
+ <button onClick={addRow} className="flex items-center gap-2 px-4 py-2 text-[#4285F4] bg-blue-50 hover:bg-blue-100 rounded-[32px] font-medium transition-colors text-sm">
                     <Plus size={16} /> 10行追加
                 </button>
                 {error && <span className="text-red-500 text-sm">{error}</span>}
             </div>
 
-            <button onClick={handleSave} disabled={isPending} className="fixed bottom-10 right-10 flex items-center gap-2 px-8 py-4 bg-[#4285F4] hover:bg-[#3367d6] text-white rounded-[32px] font-bold shadow-xl hover:scale-105 transition-all outline-none z-50">
+ <button onClick={handleSave} disabled={isPending} className="fixed bottom-10 right-10 flex items-center gap-2 px-8 py-4 bg-[#4285F4] hover:bg-[#3367d6] text-white rounded-[32px] font-bold hover:scale-105 transition-all outline-none z-50">
                 <Save size={20} /> {isPending ? '保存中...' : '一括登録を実行'}
             </button>
         </div>

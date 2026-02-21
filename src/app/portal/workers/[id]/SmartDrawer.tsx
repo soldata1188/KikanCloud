@@ -46,14 +46,14 @@ export function SmartDrawer({ workerId, documents, title, docType, icon, allowUp
             {isOpen && (
                 <div className="px-6 pb-6 pt-2 border-t border-gray-50 bg-gray-50/50">
                     {allowUpload && (
-                        <div className="mb-6 flex gap-4 items-end bg-white p-4 rounded-[32px] border border-gray-200">
+ <div className="mb-6 flex gap-4 items-end bg-white p-4 rounded-[32px]"> 
                             <div className="w-1/3">
                                 <label className="block text-xs font-bold text-gray-500 mb-1">対象月</label>
-                                <input type="month" value={targetMonth} onChange={(e) => setTargetMonth(e.target.value)} disabled={isPending} className="w-full bg-gray-50 border border-gray-200 rounded-[32px] px-3 py-2 text-sm outline-none focus:border-orange-400" />
+ <input type="month" value={targetMonth} onChange={(e) => setTargetMonth(e.target.value)} disabled={isPending} className="w-full bg-gray-50 border border-gray-200 rounded-[32px] px-3 py-2 text-sm outline-none focus:border-orange-400" />
                             </div>
                             <div className="flex-1 relative">
                                 <input type="file" ref={fileInputRef} onChange={handleUpload} disabled={isPending} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" accept=".pdf,.jpg,.jpeg,.png,.xlsx" />
-                                <button disabled={isPending} className="w-full py-2 bg-orange-50 hover:bg-orange-100 text-orange-600 font-bold text-sm rounded-[32px] border border-orange-200 transition-colors flex items-center justify-center gap-2">
+ <button disabled={isPending} className="w-full py-2 bg-orange-50 hover:bg-orange-100 text-orange-600 font-bold text-sm rounded-[32px] border border-orange-200 transition-colors flex items-center justify-center gap-2">
                                     {isPending ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />} 提出ファイルを選択
                                 </button>
                             </div>
@@ -62,7 +62,7 @@ export function SmartDrawer({ workerId, documents, title, docType, icon, allowUp
 
                     <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2">
                         {filteredDocs.length === 0 ? <p className="text-sm text-gray-400 text-center py-4">データがありません</p> : filteredDocs.map(doc => (
-                            <div key={doc.id} className="flex items-center justify-between p-3 bg-white border border-gray-100 rounded-[32px]">
+ <div key={doc.id} className="flex items-center justify-between p-3 bg-white rounded-[32px]"> 
                                 <div className="flex items-center gap-3 overflow-hidden">
                                     <CheckCircle2 className="text-green-500 shrink-0" size={18} />
                                     <div className="min-w-0">

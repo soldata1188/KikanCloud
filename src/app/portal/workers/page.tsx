@@ -23,7 +23,7 @@ export default async function PortalWorkersPage() {
                 <h2 className="text-[32px] font-bold text-teal-800 mb-6 flex items-center gap-2">
                     <Briefcase size={32} /> 人材一覧
                 </h2>
-                <div className="bg-white rounded-[32px] shadow-sm border border-gray-100 p-6">
+ <div className="bg-white rounded-[32px] p-6"> 
                     {workers?.map(w => (
                         <div key={w.id} className="p-4 border-b border-gray-50 flex items-center justify-between">
                             <Link href={`/portal/workers/${w.id}`} className="font-bold text-teal-700 hover:underline flex items-center gap-2">{w.full_name_romaji}</Link>

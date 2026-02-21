@@ -13,7 +13,7 @@ export default async function WorkerDetailPage(props: { params: Promise<{ id: st
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) redirect('/login')
 
-    const { data: userProfile } = await supabase.from('users').select('full_name, role').eq('id', user.id).single()
+    const { data: userProfile } = await supabase.from('users').select('full_name, role, avatar_url').eq('id', user.id).single()
     const displayName = userProfile?.full_name?.split(' ').pop() || '管理者'
 
     const { data: worker } = await supabase.from('workers')
@@ -35,7 +35,7 @@ export default async function WorkerDetailPage(props: { params: Promise<{ id: st
                 <header className="flex justify-between items-center px-4 py-3 md:px-6 md:py-4 sticky top-0 bg-[#f0f4f9] z-10 print:hidden">
                     <h1 className="text-[22px] font-normal text-[#444746] tracking-tight">KikanCloud</h1>
                     <div className="flex items-center gap-2">
-                        <UserMenu displayName={displayName} email={user.email || ''} role={userProfile?.role} />
+                        <UserMenu displayName={displayName} email={user.email || ''} role={userProfile?.role} avatarUrl={userProfile?.avatar_url} />
                     </div>
                 </header>
 
@@ -56,7 +56,7 @@ export default async function WorkerDetailPage(props: { params: Promise<{ id: st
                     <div className="bg-white rounded-[24px] print:rounded-none p-6 md:p-10 shadow-[0_4px_16px_rgba(0,0,0,0.04)] print:shadow-none border border-[#e1e5ea] print:border-none space-y-10">
                         {/* 1. Header Section */}
                         <div className="flex flex-col md:flex-row gap-8 items-start pb-8 border-b border-gray-100 print:border-b-2 print:border-black/20">
-                            <div className="w-32 h-32 rounded-3xl bg-gray-50 border-2 border-gray-100 overflow-hidden flex items-center justify-center shrink-0 shadow-sm print:border-gray-300 print:rounded-[32px]">
+ <div className="w-32 h-32 rounded-3xl bg-gray-50 border-2 border-gray-100 overflow-hidden flex items-center justify-center shrink-0 print:border-gray-300 print:rounded-[32px]">
                                 {worker.avatar_url ? <img src={worker.avatar_url} alt="Avatar" className="w-full h-full object-cover" /> : <UserIcon size={48} className="text-gray-300" />}
                             </div>
                             <div className="flex-1">
@@ -64,7 +64,7 @@ export default async function WorkerDetailPage(props: { params: Promise<{ id: st
                                     <span className={`px-3 py-1 rounded-[32px] text-xs font-bold border ${worker.status === 'working' ? 'bg-green-50 text-green-700 border-green-200' : worker.status === 'missing' ? 'bg-red-50 text-red-700 border-red-200' : 'bg-gray-100 text-gray-700 border-gray-200'} print:border-gray-500 print:text-black print:bg-transparent`}>
                                         {statusLabels[worker.status as keyof typeof statusLabels] || worker.status}
                                     </span>
-                                    <span className="text-sm font-semibold text-blue-600 bg-blue-50 px-3 py-1 rounded-[32px] border border-blue-100 print:border-gray-500 print:text-black print:bg-transparent">
+ <span className="text-sm font-semibold text-blue-600 bg-blue-50 px-3 py-1 rounded-[32px] border border-blue-100 print:border-gray-500 print:text-black print:bg-transparent">
                                         ID: {worker.id.split('-')[0]}
                                     </span>
                                 </div>
@@ -134,7 +134,7 @@ function DetailItem({ label, value, highlightExp }: { label: string, value: Reac
     }
 
     return (
-        <div className="flex flex-col gap-1.5 p-4 bg-gray-50/70 rounded-[32px] border border-gray-100 print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:border-gray-400 print:rounded-none print:p-2">
+ <div className="flex flex-col gap-1.5 p-4 bg-gray-50/70 rounded-[32px] border border-gray-100 print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:border-gray-400 print:rounded-none print:p-2">
             <span className="text-[11px] font-bold text-gray-400 tracking-wider uppercase print:text-gray-600">{label}</span>
             <div className={`text-[15px] font-medium print:text-[14px] ${expStatus === 'expired' ? 'text-red-600 font-bold' : expStatus === 'warning' ? 'text-orange-600 font-bold' : 'text-gray-900'}`}>
                 {value}

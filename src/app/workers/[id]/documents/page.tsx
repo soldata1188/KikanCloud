@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
-import { ArrowLeft, UserCircle2, FolderOpen, ShieldCheck } from 'lucide-react'
+import { ArrowLeft, UserCircle2, FolderOpen, Building2, Download, Map, FileText } from 'lucide-react'
 import { Sidebar } from '@/components/Sidebar'
 import { DocumentManager } from './DocumentManager'
 import { redirect, notFound } from 'next/navigation'
@@ -13,25 +13,24 @@ export default async function WorkerDocumentsPage({ params }: { params: Promise<
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) redirect('/login')
 
-    // 1. Lấy thông tin User & Worker
     const { data: userData } = await supabase.from('users').select('role').eq('id', user.id).single()
     const { data: worker } = await supabase.from('workers').select('full_name_romaji, companies(name_jp)').eq('id', id).eq('is_deleted', false).single()
     if (!worker) notFound()
 
-    // 2. Lấy danh sách tài liệu
-    const { data: documents } = await supabase.from('worker_documents')
-        .select('*').eq('worker_id', id).eq('is_deleted', false).order('created_at', { ascending: false })
-
-    // 3. Tạo Signed URLs cho toàn bộ file (Hiệu lực 1 tiếng để bảo mật)
+    // 1. Worker Documents (Nghiệp đoàn)
+    const { data: documents } = await supabase.from('worker_documents').select('*').eq('worker_id', id).eq('is_deleted', false).order('created_at', { ascending: false })
     let docsWithUrls = []
     if (documents && documents.length > 0) {
-        const paths = documents.map(d => d.file_path)
-        const { data: signedUrls } = await supabase.storage.from('worker_docs').createSignedUrls(paths, 3600) // 3600 giây = 1 giờ
+        const { data: signedUrls } = await supabase.storage.from('worker_docs').createSignedUrls(documents.map(d => d.file_path), 3600)
+        docsWithUrls = documents.map((doc, index) => ({ ...doc, signedUrl: signedUrls?.[index]?.signedUrl }))
+    }
 
-        docsWithUrls = documents.map((doc, index) => ({
-            ...doc,
-            signedUrl: signedUrls?.[index]?.signedUrl || null
-        }))
+    // 2. Client Documents (Xí nghiệp nộp)
+    const { data: clientDocs } = await supabase.from('client_documents').select('*').eq('worker_id', id).order('created_at', { ascending: false })
+    let clientDocsUrls = []
+    if (clientDocs && clientDocs.length > 0) {
+        const { data: cSignedUrls } = await supabase.storage.from('client_docs').createSignedUrls(clientDocs.map(d => d.file_path), 3600)
+        clientDocsUrls = clientDocs.map((doc, index) => ({ ...doc, signedUrl: cSignedUrls?.[index]?.signedUrl }))
     }
 
     return (
@@ -39,33 +38,45 @@ export default async function WorkerDocumentsPage({ params }: { params: Promise<
             <Sidebar active="workers" />
             <main className="flex-1 flex flex-col relative overflow-y-auto no-scrollbar">
                 <div className="flex-1 flex flex-col px-4 pb-12 w-full max-w-[1100px] mx-auto mt-4 md:mt-8">
-
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pl-2">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pl-2">
                         <div className="flex items-center gap-4">
-                            <Link href={`/workers/${id}/edit`} className="w-10 h-10 flex items-center justify-center rounded-[32px] bg-white shadow-sm border border-gray-200 hover:bg-gray-50 transition-colors text-[#444746]"><ArrowLeft size={20} strokeWidth={2} /></Link>
+                            <Link href="/workers" className="w-10 h-10 flex items-center justify-center rounded-full bg-white shadow-sm border border-gray-200 hover:bg-gray-50 text-[#444746] transition-colors"><ArrowLeft size={20} /></Link>
                             <div>
-                                <h2 className="text-[28px] md:text-[32px] font-bold tracking-tight text-[#1f1f1f] flex items-center gap-3">
-                                    <FolderOpen className="text-[#4285F4]" size={32} /> 関連書類・ファイル管理
-                                </h2>
-                                <p className="text-[#444746] mt-1 text-sm flex items-center gap-2">
-                                    <UserCircle2 size={16} /> <span className="font-bold text-[#1f1f1f]">{worker.full_name_romaji}</span>
-                                    <span className="text-gray-300">|</span>
-                                    <span>{(worker.companies as any)?.name_jp || '未配属'}</span>
-                                </p>
+                                <h2 className="text-[28px] md:text-[32px] font-bold tracking-tight text-[#1f1f1f]">人材プロファイル</h2>
+                                <p className="text-[#444746] mt-1 text-sm flex items-center gap-2"><UserCircle2 size={16} /> <span className="font-bold">{worker.full_name_romaji}</span> <span className="text-gray-300">|</span> <span>{(worker.companies as any)?.name_jp || '未配属'}</span></p>
                             </div>
                         </div>
                     </div>
-
-                    <div className="bg-blue-50/50 p-4 rounded-[32px] border border-blue-100 mb-6 flex items-start gap-3">
-                        <ShieldCheck className="text-[#4285F4] shrink-0 mt-0.5" size={20} />
-                        <div className="text-sm text-[#444746] space-y-1">
-                            <p className="font-bold text-[#1f1f1f]">セキュアなファイル保管庫 (Secure Vault)</p>
-                            <p>パスポートや在留カードなどの機密ファイルは、高度に暗号化されたプライベート領域に保管されます。表示・ダウンロード用のURLは1時間で自動的に無効化され、情報漏洩を防ぎます。</p>
-                        </div>
+                    <div className="flex flex-wrap items-center gap-2 mb-8 p-1.5 bg-white border border-gray-200 rounded-[20px] w-fit shadow-sm">
+                        <Link href={`/workers/${id}/edit`} className="flex items-center gap-2 px-6 py-2.5 rounded-[14px] text-sm font-bold transition-colors text-gray-500 hover:text-gray-800 hover:bg-gray-50"><FileText size={18} /> 基本情報</Link>
+                        <Link href={`/workers/${id}/documents`} className="flex items-center gap-2 px-6 py-2.5 rounded-[14px] text-sm font-bold transition-colors bg-blue-50 text-[#4285F4] shadow-sm pointer-events-none"><FolderOpen size={18} /> 関連書類</Link>
+                        <Link href={`/workers/${id}/timeline`} className="flex items-center gap-2 px-6 py-2.5 rounded-[14px] text-sm font-bold transition-colors text-gray-500 hover:text-gray-800 hover:bg-gray-50"><Map size={18} /> 手続ロードマップ</Link>
                     </div>
 
                     <DocumentManager workerId={id} documents={docsWithUrls} role={userData?.role || 'staff'} />
 
+                    <div className="mt-8 bg-white rounded-[32px] shadow-sm border border-teal-100 overflow-hidden mb-8">
+                        <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-teal-50/30">
+                            <h3 className="text-base font-bold text-teal-800 flex items-center gap-2"><Building2 size={20} className="text-teal-500" /> 企業からの提出書類 (賃金台帳・出勤簿など)</h3>
+                            <span className="text-xs font-bold text-teal-600 bg-teal-100 px-3 py-1 rounded-full">{clientDocsUrls.length}件</span>
+                        </div>
+                        {clientDocsUrls.length === 0 ? <div className="p-8 text-center text-sm text-gray-400">提出された書類はありません。</div> : (
+                            <ul className="divide-y divide-gray-100">
+                                {clientDocsUrls.map(doc => (
+                                    <li key={doc.id} className="p-4 hover:bg-teal-50/30 transition-colors flex items-center justify-between gap-4">
+                                        <div className="min-w-0 flex-1">
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <span className="text-[10px] px-2 py-0.5 rounded bg-teal-100 text-teal-700 font-bold">[{doc.target_month}] {doc.doc_type === 'payroll' ? '賃金台帳' : doc.doc_type === 'timesheet' ? '出勤簿' : '作業日報'}</span>
+                                                <span className="font-bold text-[#1f1f1f] text-sm truncate">{doc.file_name}</span>
+                                            </div>
+                                            <p className="text-[11px] text-gray-500">{new Date(doc.created_at).toLocaleDateString('ja-JP')} • {doc.uploaded_by}</p>
+                                        </div>
+                                        {doc.signedUrl && <a href={doc.signedUrl} target="_blank" rel="noopener noreferrer" className="p-2.5 bg-white border border-gray-200 text-teal-600 hover:bg-teal-50 rounded-xl transition-colors font-bold text-xs flex items-center gap-1 shadow-sm shrink-0"><Download size={14} /> 開く</a>}
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                    </div>
                 </div>
             </main>
         </div>

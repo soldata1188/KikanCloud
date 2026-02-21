@@ -94,23 +94,23 @@ export function ImportModal() {
 
     return (
         <>
-            <button onClick={() => setIsOpen(true)} className="flex items-center gap-2 px-6 py-3 bg-white hover:bg-gray-50 text-[#444746] rounded-[32px] text-sm font-medium transition-colors shadow-sm border border-[#e1e5ea] shrink-0">
+ <button onClick={() => setIsOpen(true)} className="flex items-center gap-2 px-6 py-3 bg-white hover:bg-gray-50 text-[#444746] rounded-[32px] text-sm font-medium transition-colors shrink-0"> 
                 <Upload size={18} strokeWidth={2} /> CSV一括登録
             </button>
 
             {isOpen && (
                 <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 z-[60]">
-                    <div className="bg-white rounded-[32px] w-full max-w-[1000px] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+ <div className="bg-white rounded-[32px] w-full max-w-[1000px] overflow-hidden flex flex-col max-h-[90vh]"> 
 
                         <div className="px-8 py-6 border-b border-gray-100 flex justify-between items-center bg-[#f0f4f9]/50">
                             <h3 className="text-xl font-medium text-[#1f1f1f] flex items-center gap-2"><Briefcase className="text-[#4285F4]" /> 外国人材 CSVインポート</h3>
-                            <button onClick={() => { setIsOpen(false); setParsedData([]); setError(''); }} className="p-2 hover:bg-black/5 rounded-[32px] transition-colors text-gray-500"><X size={20} /></button>
+ <button onClick={() => { setIsOpen(false); setParsedData([]); setError(''); }} className="p-2 hover:bg-black/5 rounded-[32px] transition-colors text-gray-500"><X size={20} /></button>
                         </div>
 
                         <div className="p-8 overflow-y-auto">
                             {!parsedData.length ? (
                                 <div className="space-y-6">
-                                    <div className="bg-blue-50/50 p-4 rounded-[32px] border border-blue-100 flex items-start gap-3">
+ <div className="bg-blue-50/50 p-4 rounded-[32px] border border-blue-100 flex items-start gap-3">
                                         <AlertCircle className="text-[#4285F4] shrink-0 mt-0.5" size={20} />
                                         <div className="text-sm text-[#444746] space-y-2">
                                             <p>数千人規模の実習生・特定技能のデータを一括でシステムに登録します。「配属先企業名」はシステムに登録済みの企業名と完全一致させる必要があります。</p>
@@ -124,16 +124,16 @@ export function ImportModal() {
                                         <p className="text-[#1f1f1f] font-medium mb-1">クリックまたはドラッグ＆ドロップでファイルを選択</p>
                                         <p className="text-xs text-gray-400">CSV形式（UTF-8）のみ対応</p>
                                     </div>
-                                    {error && <p className="text-red-500 text-sm text-center bg-red-50 py-2 rounded-[32px] border border-red-100">{error}</p>}
+ {error && <p className="text-red-500 text-sm text-center bg-red-50 py-2 rounded-[32px] border border-red-100">{error}</p>}
                                 </div>
                             ) : (
                                 <div className="space-y-4">
-                                    <div className="flex items-center justify-between bg-green-50 px-4 py-3 rounded-[32px] border border-green-100">
+ <div className="flex items-center justify-between bg-green-50 px-4 py-3 rounded-[32px] border border-green-100">
                                         <div className="flex items-center gap-2 text-green-700 font-medium"><CheckCircle2 size={18} /> 読み込み成功: {parsedData.length}名</div>
                                         <button onClick={() => { setParsedData([]); if (fileInputRef.current) fileInputRef.current.value = ''; }} className="text-xs text-gray-500 hover:text-[#1f1f1f] underline">別のファイルを選択</button>
                                     </div>
 
-                                    <div className="border border-[#e1e5ea] rounded-[32px] overflow-hidden max-h-[350px] overflow-y-auto">
+ <div className="rounded-[32px] overflow-hidden max-h-[350px] overflow-y-auto">
                                         <table className="w-full text-left text-xs whitespace-nowrap">
                                             <thead className="bg-[#f0f4f9] sticky top-0 z-10 shadow-sm">
                                                 <tr>
@@ -163,8 +163,8 @@ export function ImportModal() {
                         </div>
 
                         <div className="px-8 py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3 mt-auto">
-                            <button onClick={() => { setIsOpen(false); setParsedData([]); setError(''); }} className="px-6 py-2.5 text-[#444746] font-medium hover:bg-gray-200 rounded-[32px] transition-colors text-sm">キャンセル</button>
-                            <button onClick={handleImport} disabled={!parsedData.length || isPending} className="px-6 py-2.5 bg-[#4285F4] text-white hover:bg-[#3367d6] font-medium rounded-[32px] transition-colors text-sm disabled:opacity-50 flex items-center gap-2 shadow-sm">
+ <button onClick={() => { setIsOpen(false); setParsedData([]); setError(''); }} className="px-6 py-2.5 text-[#444746] font-medium hover:bg-gray-200 rounded-[32px] transition-colors text-sm">キャンセル</button>
+ <button onClick={handleImport} disabled={!parsedData.length || isPending} className="px-6 py-2.5 bg-[#4285F4] text-white hover:bg-[#3367d6] font-medium rounded-[32px] transition-colors text-sm disabled:opacity-50 flex items-center gap-2">
                                 {isPending ? '登録処理中...' : `一括インポートを実行 (${parsedData.length}名)`}
                             </button>
                         </div>

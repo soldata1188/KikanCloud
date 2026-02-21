@@ -86,11 +86,6 @@ export default function DashboardClient({ userName, role, systemData }: { userNa
                             </div>
                             <div className="flex items-center gap-3 sm:absolute sm:right-0">
                                 {!aiData && <div className="text-[11px] font-bold text-[#24b47e] bg-[#24b47e]/10 px-2 py-1 rounded-full flex items-center gap-1.5"><Loader2 size={12} className="animate-spin" /> ライブデータを同期中</div>}
-                                {aiData && (
-                                    <button onClick={resetChat} title="チャットをリセット" className="text-[11px] font-bold text-[#878787] hover:text-[#1f1f1f] bg-white/50 border border-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-1.5 transition-all shadow-sm hover:shadow-md hover:bg-white/80">
-                                        <RotateCcw size={12} /> リセット
-                                    </button>
-                                )}
                             </div>
                         </div>
                         <h1 className="text-3xl md:text-[34px] font-black text-[#1f1f1f] leading-tight tracking-tight mix-blend-multiply">

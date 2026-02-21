@@ -53,18 +53,18 @@ export default async function AuditsPage({ searchParams }: { searchParams: Promi
         };
 
         let priority = 5;
-        let statusLabel = { text: '今月完了済', bg: 'bg-green-50 text-green-700', border: 'border-green-200' };
+        let statusLabel = { text: '今月完了済', bg: 'bg-transparent text-[#24b47e]', border: 'border-[#24b47e]' };
 
         if (!currentAudit) {
             priority = 2; // 🟠 Ưu tiên 2 (Cam): Chưa có lịch
-            statusLabel = { text: '予定未作成', bg: 'bg-orange-50 text-orange-700', border: 'border-orange-200' };
+            statusLabel = { text: '予定未作成', bg: 'bg-[#fbfcfd] text-[#878787]', border: 'border-[#ededed]' };
         } else if (currentAudit.status === 'planned' || currentAudit.status === 'in_progress') {
             if (currentAudit.scheduled_date < todayStr) {
                 priority = 1; // 🔴 Ưu tiên 1 (Đỏ): Trễ hạn
-                statusLabel = { text: '期限超過', bg: 'bg-red-50 text-red-700 animate-pulse', border: 'border-red-200' };
+                statusLabel = { text: '期限超過', bg: 'bg-[#fbfcfd] text-red-600', border: 'border-red-200' };
             } else {
                 priority = 4; // 🔵 Ưu tiên 4 (Xanh dương): Tương lai an toàn
-                statusLabel = { text: '予定あり', bg: 'bg-blue-50 text-blue-700', border: 'border-blue-200' };
+                statusLabel = { text: '予定あり', bg: 'bg-[#fbfcfd] text-blue-600', border: 'border-blue-200' };
             }
         } else if (currentAudit.status === 'completed') {
             priority = 5; // 🟢 Ưu tiên 5 (Xanh lá - chìm đáy): Đã xong
@@ -146,8 +146,8 @@ export default async function AuditsPage({ searchParams }: { searchParams: Promi
 
                                                 {/* 2. Trạng thái */}
                                                 <td className="px-5 py-3.5">
-                                                    <span className={`px-2 py-0.5 rounded-[4px] text-[10px] font-bold border uppercase tracking-widest inline-flex items-center gap-1 ${row.statusLabel.bg} ${row.statusLabel.border}`}>
-                                                        {row.priority === 1 || row.priority === 2 ? <AlertCircle size={12} /> : row.priority === 5 ? <CheckCircle2 size={12} /> : <CalendarCheck size={12} />}
+                                                    <span className={`px-2 py-0.5 rounded-full text-[10px] uppercase font-bold border inline-flex items-center gap-1 ${row.statusLabel.bg} ${row.statusLabel.border}`}>
+                                                        {row.priority === 1 || row.priority === 2 ? <AlertCircle size={10} /> : row.priority === 5 ? <CheckCircle2 size={10} /> : <CalendarCheck size={10} />}
                                                         {row.statusLabel.text}
                                                     </span>
                                                 </td>

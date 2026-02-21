@@ -24,11 +24,11 @@ export default async function ProceduresPage() {
         <div className="flex h-screen bg-[#fbfcfd] font-sans text-[#1f1f1f] overflow-hidden selection:bg-[#24b47e]/20">
             <Sidebar active="procedures" />
             <div className="flex-1 flex flex-col relative min-w-0">
-                <TopNav title="Procedures" role={userProfile?.role} />
-                <main className="flex-1 overflow-y-auto p-6 md:p-10">
-                    <div className="max-w-[1200px] mx-auto">
+                <TopNav title="Legal Procedures" role={userProfile?.role} />
+                <main className="flex-1 overflow-x-auto p-6 md:p-10 no-scrollbar">
+                    <div className="min-w-[1200px] h-full">
                         <div className="flex justify-between items-center mb-8">
-                            <h1 className="text-[28px] font-normal tracking-tight text-[#1f1f1f]">Procedures Overview</h1>
+                            <h1 className="text-[28px] font-normal tracking-tight text-[#1f1f1f]">Procedures Kanban</h1>
                             <Link href="/procedures/new" className="h-[32px] px-3 bg-[#24b47e] hover:bg-[#1e9a6a] text-white rounded-md text-[13px] font-medium flex items-center gap-1.5 transition-colors">
                                 <Plus size={14} /> New procedure
                             </Link>

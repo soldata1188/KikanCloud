@@ -25,7 +25,7 @@ export function SmartActionCell({ auditId, status, companyId, filterMonth }: { a
     if (status === 'planned' || status === 'in_progress') {
         // 🔴/🔵 Ưu tiên 1 hoặc 4: Có lịch nhưng chưa đi (Chuyển thẳng sang Hoàn thành)
         return (
-            <button onClick={handleToggle} disabled={isPending} className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-[#1f1f1f] hover:bg-[#24b47e] text-white text-[11px] font-medium rounded-md transition-all border border-[#1f1f1f] hover:border-[#24b47e] w-full disabled:opacity-50">
+            <button onClick={handleToggle} disabled={isPending} className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-[#24b47e] hover:bg-[#1e9a6a] text-white text-xs font-medium rounded-md transition-colors w-full disabled:opacity-50">
                 {isPending ? <Clock size={12} className="animate-spin text-white" /> : <CheckCircle2 size={12} />}
                 {isPending ? '処理中...' : '完了にする'}
             </button>

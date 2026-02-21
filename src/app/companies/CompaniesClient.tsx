@@ -22,8 +22,8 @@ export function CompaniesClient({ companies, userRole }: { companies: any[], use
         <>
             <DataTableToolbar
                 data={filtered}
-                filename="受入企業リスト"
-                searchPlaceholder="企業名、法人番号で検索..."
+                filename="企業リスト"
+                searchPlaceholder="企業名で検索..."
                 onSearch={handleSearch}
                 type="companies"
                 role={userRole || 'staff'}
@@ -85,7 +85,7 @@ export function CompaniesClient({ companies, userRole }: { companies: any[], use
                                         </td>
                                         <td className="px-5 py-3.5">
                                             <div className="flex flex-col items-start gap-1.5">
-                                                <span className={`px-2 py-0.5 rounded-[4px] text-[10px] font-bold border uppercase tracking-widest ${activeWorkers > 0 ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-[#fbfcfd] text-[#878787] border-[#ededed]'}`}>
+                                                <span className="px-2 py-0.5 border border-[#ededed] text-[#878787] rounded-[4px] text-[10px] font-mono uppercase tracking-wider bg-[#fbfcfd]">
                                                     在籍: {activeWorkers}名
                                                 </span>
                                                 <div className="text-[11px] font-medium flex items-center gap-1.5 text-[#878787]">

@@ -6,6 +6,7 @@ import { Sidebar } from '@/components/Sidebar'
 import { SaveButton } from '@/components/SubmitButtons'
 import { UserMenu } from '@/components/UserMenu'
 import { AvatarUploadZone } from '@/components/AvatarUploadZone'
+import { AIScannerZone } from '@/components/AIScannerZone'
 import { redirect } from 'next/navigation'
 
 export default async function NewWorkerPage() {
@@ -44,6 +45,8 @@ export default async function NewWorkerPage() {
                                 <SaveButton />
                             </div>
                         </div>
+
+                        <AIScannerZone />
 
                         {/* SECTION 1: 基本情報 */}
                         <div className="bg-white rounded-lg border border-[#ededed] overflow-hidden mb-6">

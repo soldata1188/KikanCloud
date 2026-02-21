@@ -73,8 +73,8 @@ export default function DashboardClient({ userName, role, systemData }: { userNa
     return (
         <div className="max-w-[1000px] mx-auto space-y-8 animate-in fade-in duration-700 pb-10">
 
-            {/* 1. KHOANG CHAT AI CÁ NHÂN HÓA (OMNI-CHANNEL BOT) */}
-            <section className="bg-white border border-[#ededed] rounded-[24px] shadow-sm relative overflow-hidden flex flex-col h-[500px]">
+            {/* 1. KHOANG CHAT AI CÁ cá NHÂN HÓA (OMNI-CHANNEL BOT) */}
+            <section className="bg-white border border-[#ededed] rounded-[24px] shadow-sm relative overflow-hidden flex flex-col h-[650px] lg:h-[750px]">
                 <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-[#24b47e]/5 to-transparent rounded-bl-full pointer-events-none"></div>
 
                 {/* Header Khoang Chat */}
@@ -134,7 +134,7 @@ export default function DashboardClient({ userName, role, systemData }: { userNa
                         <textarea
                             value={userInput} onChange={e => setUserInput(e.target.value)} onKeyDown={handleKeyDown} disabled={isPendingChat || !aiData}
                             placeholder="質問、翻訳、メール作成など、何でも聞いてください... (Shift+Enter to newline)"
-                            className="flex-1 max-h-32 min-h-[44px] bg-transparent border-none outline-none resize-none py-3 px-3 text-[13.5px] text-[#1f1f1f] placeholder:text-[#a0a0a0] leading-relaxed disabled:opacity-50"
+                            className="flex-1 max-h-24 min-h-[40px] bg-transparent border-none outline-none resize-none py-2 px-3 text-[13.5px] text-[#1f1f1f] placeholder:text-[#a0a0a0] leading-relaxed disabled:opacity-50"
                             rows={1}
                         />
                         <button type="submit" disabled={isPendingChat || !userInput.trim()} className="w-10 h-10 mb-0.5 shrink-0 flex items-center justify-center bg-[#1f1f1f] text-white hover:bg-[#24b47e] rounded-lg transition-colors disabled:opacity-50 disabled:bg-[#fbfcfd] disabled:text-[#878787] disabled:border disabled:border-[#ededed] shadow-sm">

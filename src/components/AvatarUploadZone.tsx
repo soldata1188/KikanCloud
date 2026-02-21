@@ -62,7 +62,7 @@ export function AvatarUploadZone({ defaultUrl = '' }: { defaultUrl?: string }) {
                 className="hidden"
             />
             {preview ? (
-                <div className="relative group w-32 h-32 rounded-xl overflow-hidden border-2 border-[#ededed] shadow-sm">
+                <div className="relative group w-full sm:w-48 h-48 bg-[#f5f7f9] rounded-xl overflow-hidden border-2 border-[#ededed] shadow-sm flex items-center justify-center">
                     <img src={preview} alt="Avatar Preview" className="w-full h-full object-cover" />
                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                         <button
@@ -80,9 +80,9 @@ export function AvatarUploadZone({ defaultUrl = '' }: { defaultUrl?: string }) {
                     onDragOver={handleDragOver}
                     onDragLeave={handleDragLeave}
                     onDrop={handleDrop}
-                    className={`w-full max-w-md h-32 rounded-xl border-2 border-dashed transition-all cursor-pointer flex flex-col items-center justify-center gap-2 group ${isDragging
-                            ? 'border-[#24b47e] bg-[#24b47e]/5 scale-[1.02] shadow-sm'
-                            : 'border-[#dfdfdf] bg-[#fbfcfd] hover:bg-[#f5f7f9] hover:border-[#24b47e]/50'
+                    className={`w-full min-h-[160px] rounded-xl border-2 border-dashed transition-all cursor-pointer flex flex-col items-center justify-center gap-3 p-6 group ${isDragging
+                        ? 'border-[#24b47e] bg-[#24b47e]/5 scale-[1.01] shadow-sm'
+                        : 'border-[#dfdfdf] bg-[#fbfcfd] hover:bg-[#f5f7f9] hover:border-[#24b47e]/50'
                         }`}
                 >
                     <div className={`p-3 rounded-full transition-colors ${isDragging ? 'bg-[#24b47e]/10 text-[#24b47e]' : 'bg-gray-100 text-gray-400 group-hover:text-[#24b47e] group-hover:bg-[#24b47e]/5'}`}>

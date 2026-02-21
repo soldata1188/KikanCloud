@@ -1,8 +1,21 @@
-'use client'
-import { Search, HelpCircle, User, Hexagon } from 'lucide-react'
+import { Search, HelpCircle, Hexagon } from 'lucide-react'
 import { NotificationBell } from './NotificationBell'
+import { UserMenu } from './UserMenu'
+import { createClient } from '@/lib/supabase/server'
 
-export function TopNav({ title, role }: { title: string, role?: string }) {
+export async function TopNav({ title, role }: { title: string, role?: string }) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    let userProfile = null
+    if (user) {
+        const { data } = await supabase.from('users').select('*').eq('id', user.id).single()
+        userProfile = data
+    }
+
+    const displayName = userProfile?.full_name || user?.email?.split('@')[0] || 'User'
+    const email = userProfile?.email || user?.email || ''
+    const avatarUrl = userProfile?.avatar_url
+
     return (
         <header className="h-14 bg-white border-b border-[#ededed] flex items-center justify-between px-4 sm:px-6 sticky top-0 z-40 shrink-0 w-full">
             <div className="flex items-center gap-2 text-[13px]">
@@ -25,7 +38,7 @@ export function TopNav({ title, role }: { title: string, role?: string }) {
                 </div>
                 <div title="ヘルプ"><HelpCircle size={18} className="text-[#878787] hover:text-[#1f1f1f] cursor-pointer transition-colors" strokeWidth={1.5} /></div>
                 {role && <NotificationBell role={role} />}
-                <div className="w-7 h-7 rounded-full bg-[#fbfcfd] border border-[#ededed] text-[#878787] flex items-center justify-center text-xs font-bold cursor-pointer hover:bg-[#fbfcfd]" title="プロフィール"><User size={14} /></div>
+                <UserMenu displayName={displayName} email={email} role={role} avatarUrl={avatarUrl} />
             </div>
         </header>
     )

@@ -77,7 +77,7 @@ export default function DashboardClient({ userName, role, systemData }: { userNa
             {/* Cột trái: Workspace chính (Chatbot) */}
             <div className="flex flex-col">
                 {/* 1. KHOANG CHAT AI CÁ NHÂN HÓA (OMNI-CHANNEL BOT) - INFINITY FEEL */}
-                <section className="relative flex flex-col h-[750px] 2xl:h-[820px] -mx-6 md:mx-0 px-6 md:px-0 mb-8">
+                <section className="relative flex flex-col min-h-[500px] h-full -mx-6 md:mx-0 px-6 md:px-0 mb-8">
                     {/* Header Khoang Chat */}
                     <div className="pt-2 pb-4 shrink-0 relative z-10 flex flex-col items-center justify-center text-center">
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-3 w-full max-w-lg relative">

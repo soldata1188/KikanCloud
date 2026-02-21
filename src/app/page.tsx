@@ -21,7 +21,7 @@ export default async function DashboardPage() {
     <div className="flex h-screen bg-[#fbfcfd] font-sans text-[#1f1f1f] overflow-hidden selection:bg-[#24b47e]/20">
       <Sidebar active="dashboard" />
       <div className="flex-1 flex flex-col relative min-w-0">
-        <TopNav title="ダッシュボード" role={userProfile?.role} />
+        <TopNav title="ダッシュボード" role={userProfile?.role} userProfileStr={JSON.stringify(userProfile)} />
         <main className="flex-1 overflow-y-auto p-6 md:p-10">
           <div className="max-w-[1200px] mx-auto">
             <h1 className="text-[28px] font-normal tracking-tight text-[#1f1f1f] mb-8">ダッシュボード</h1>

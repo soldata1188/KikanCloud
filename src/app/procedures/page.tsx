@@ -24,7 +24,7 @@ export default async function ProceduresPage() {
         <div className="flex h-screen bg-[#fbfcfd] font-sans text-[#1f1f1f] overflow-hidden selection:bg-[#24b47e]/20">
             <Sidebar active="procedures" />
             <div className="flex-1 flex flex-col relative min-w-0">
-                <TopNav title="行政手続管理" role={userProfile?.role} />
+                <TopNav title="行政手続管理" role={userProfile?.role} userProfileStr={JSON.stringify(userProfile)} />
                 <main className="flex-1 overflow-x-auto p-6 md:p-10 no-scrollbar">
                     <div className="min-w-[1200px] h-full">
                         <div className="flex justify-between items-center mb-8">

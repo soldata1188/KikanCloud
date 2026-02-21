@@ -182,7 +182,7 @@ export default function ScheduleClient() {
                                             />
                                         </div>
 
-                                        {Array.from({ length: 4 }).map((_, i) => {
+                                        {Array.from({ length: 5 }).map((_, i) => {
                                             const rIdx = i + 1;
                                             return (
                                                 <div key={rIdx} className="flex-1 border-b border-gray-200 last:border-b-0 flex group">

@@ -71,7 +71,9 @@ export default async function AccountsPage() {
                                                 {companies?.map(c => <option key={c.id} value={c.id}>{c.name_jp}</option>)}
                                             </select>
                                         </div>
-                                        <div className="pt-2"><SaveButton /></div>
+                                        <div className="pt-2 flex justify-center">
+                                            <SaveButton />
+                                        </div>
                                     </form>
                                 </div>
                             </div>

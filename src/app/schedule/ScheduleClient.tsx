@@ -125,7 +125,7 @@ export default function ScheduleClient() {
                 </div>
                 <div className="flex items-center gap-2">
                     <button onClick={prevMonth} className="w-8 h-8 flex items-center justify-center rounded-md bg-[#fbfcfd] border border-[#ededed] hover:bg-[#ededed] transition-colors text-[#878787]">&lt;</button>
-                    <button onClick={goToToday} className="px-4 py-1.5 bg-[#fbfcfd] border border-[#ededed] hover:bg-[#ededed] rounded-md text-[13px] font-medium transition-colors text-[#1f1f1f]">今日</button>
+                    <button onClick={goToToday} className="px-4 py-1.5 bg-[#24b47e] shadow-sm hover:bg-[#1e9a6a] rounded-md text-[13px] font-bold transition-colors text-white tracking-wide">今日</button>
                     <button onClick={nextMonth} className="w-8 h-8 flex items-center justify-center rounded-md bg-[#fbfcfd] border border-[#ededed] hover:bg-[#ededed] transition-colors text-[#878787]">&gt;</button>
                 </div>
             </div>
@@ -164,7 +164,7 @@ export default function ScheduleClient() {
 
                                 const dateStr = formatDateStr(year, cellData.m, cellData.dayNum)
                                 const cellEntries = entries[dateStr] || {}
-                                const todayBg = isToday(cellData.dayNum, cellData.m) ? 'bg-[#24b47e]/5 ring-1 ring-inset ring-[#24b47e]/30' : ''
+                                const todayBg = isToday(cellData.dayNum, cellData.m) ? 'bg-[#24b47e]/5 ring-[1.5px] ring-inset ring-[#24b47e] z-20' : ''
                                 const disabledBg = !cellData.isCurrent ? 'bg-[#fbfcfd]' : ''
 
                                 return (
@@ -172,7 +172,7 @@ export default function ScheduleClient() {
 
                                         {/* Row 0 is the date number slot (disabled for typing) */}
                                         <div className="flex border-b border-[#ededed] last:border-b-0 relative h-7 bg-white/50">
-                                            <div className="absolute top-1 left-2 z-20 font-medium text-[13px] select-none pointer-events-none">
+                                            <div className="absolute top-1 left-2 z-20 font-bold text-[14px] select-none pointer-events-none">
                                                 <span className={textColor}>{cellData.dayNum}</span>
                                             </div>
                                             <input

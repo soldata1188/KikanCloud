@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { createWorker } from '../actions'
-import { ArrowLeft, Sparkles } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react'
 import { Sidebar } from '@/components/Sidebar'
 import { SaveButton } from '@/components/SubmitButtons'
 import { UserMenu } from '@/components/UserMenu'
@@ -23,63 +23,195 @@ export default async function NewWorkerPage() {
                 <header className="flex justify-between items-center px-4 py-3 md:px-6 md:py-4 sticky top-0 bg-[#fbfcfd] z-10">
                     <h1 className="text-[22px] font-normal text-[#1f1f1f] tracking-tight">KikanCloud</h1>
                     <div className="flex items-center gap-2">
- <span className="hidden sm:flex px-3 py-1 bg-white rounded-md text-[11px] font-semibold text-[#1f1f1f] tracking-wider">ULTRA</span> 
+                        <span className="hidden sm:flex px-3 py-1 bg-white rounded-md text-[11px] font-semibold text-[#1f1f1f] tracking-wider">ULTRA</span>
                         <UserMenu displayName={displayName} email={user.email || ''} role={userProfile?.role} avatarUrl={userProfile?.avatar_url} />
                     </div>
                 </header>
 
                 <div className="flex-1 flex flex-col px-4 pb-12 w-full max-w-[800px] mx-auto mt-4 md:mt-8">
-                    <div className="flex items-center gap-4 mb-8 pl-2">
- <Link href="/workers" className="w-10 h-10 flex items-center justify-center rounded-md hover:bg-black/5 transition-colors text-[#1f1f1f]">
-                            <ArrowLeft size={24} strokeWidth={1.5} />
-                        </Link>
-                        <h2 className="text-[32px] md:text-[40px] font-medium tracking-tight text-[#1f1f1f]">新規登録</h2>
-                    </div>
+                    <form action={createWorker} className="flex flex-col h-full relative space-y-6">
+                        {/* Top Menu Sticky Header */}
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 pl-2 sticky top-14 bg-[#fbfcfd] z-20 py-4 -mx-4 px-4 sm:mx-0 sm:px-0">
+                            <div className="flex items-center gap-4">
+                                <Link href="/workers" className="w-10 h-10 flex items-center justify-center rounded-md hover:bg-black/5 transition-colors text-[#1f1f1f]">
+                                    <ArrowLeft size={24} strokeWidth={1.5} />
+                                </Link>
+                                <h2 className="text-[32px] md:text-[40px] font-medium tracking-tight text-[#1f1f1f]">外国人材 新規登録</h2>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <Link href="/workers" className="px-6 py-3 text-[#1f1f1f] bg-white font-medium hover:bg-[#fbfcfd] rounded-md transition-colors border border-[#ededed]">キャンセル</Link>
+                                <SaveButton />
+                            </div>
+                        </div>
 
-                    <form action={createWorker} className="space-y-6">
                         {/* SECTION 1: 基本情報 */}
- <div className="bg-white rounded-md p-8"> 
-                            <h3 className="text-lg font-medium text-[#1f1f1f] mb-6 flex items-center gap-2"><Sparkles className="text-[#24b47e]" size={20} /> 基本情報</h3>
+                        <div className="bg-white rounded-md p-6 sm:p-8 border border-[#ededed] shadow-sm relative overflow-hidden">
+                            <div className="absolute top-0 left-0 w-1 h-full bg-[#24b47e]"></div>
+                            <h3 className="text-lg font-medium text-[#1f1f1f] mb-8 flex items-center gap-2">
+                                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-[#24b47e]/10 text-[#24b47e] text-sm font-bold">1</span>
+                                基本情報
+                            </h3>
                             <div className="mb-6">
-                                <label className="block text-sm font-medium text-[#1f1f1f] mb-2">顔写真（アバター）</label>
- <input name="avatar_file" type="file" accept="image/*" className="block w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-[#fbfcfd] hover:file:bg-[#e1e5ea] outline-none transition-colors cursor-pointer" />
+                                <label className="flex items-center gap-2 text-sm font-medium text-[#1f1f1f] mb-3">
+                                    顔写真（アバター）
+                                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded border border-[#ededed] text-[#878787] bg-[#fbfcfd]">任意</span>
+                                </label>
+                                <input name="avatar_file" type="file" accept="image/*" className="block w-full text-sm text-[#878787] file:mr-4 file:py-2.5 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-[#fbfcfd] hover:file:bg-[#e1e5ea] outline-none transition-colors cursor-pointer" />
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
- <div><label className="block text-sm font-medium text-[#1f1f1f] mb-2">氏名（ローマ字） <span className="text-red-500">*</span></label><input name="full_name_romaji" type="text" required placeholder="例：NGUYEN VAN A" className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-4 py-3 outline-none uppercase text-[#1f1f1f] transition-all" /></div> 
- <div><label className="block text-sm font-medium text-[#1f1f1f] mb-2">氏名（カナ） <span className="text-red-500">*</span></label><input name="full_name_kana" type="text" required placeholder="例：グエン ヴァン ア" className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-4 py-3 outline-none text-[#1f1f1f] transition-all" /></div> 
- <div><label className="block text-sm font-medium text-[#1f1f1f] mb-2">生年月日 <span className="text-red-500">*</span></label><input name="dob" type="date" required className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-4 py-3 outline-none text-[#1f1f1f] transition-all" /></div> 
- <div><label className="block text-sm font-medium text-[#1f1f1f] mb-2">国籍</label><select name="nationality" defaultValue="VNM" className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-4 py-3 outline-none appearance-none text-[#1f1f1f] transition-all"><option value="VNM">ベトナム</option><option value="IDN">インドネシア</option><option value="PHL">フィリピン</option><option value="MMR">ミャンマー</option><option value="CHN">中国</option></select></div> 
- <div className="md:col-span-2"><label className="block text-sm font-medium text-[#1f1f1f] mb-2">現住所</label><input name="address" type="text" placeholder="例：東京都新宿区..." className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-4 py-3 outline-none text-[#1f1f1f] transition-all" /></div> 
+                                <div>
+                                    <label className="flex items-center gap-2 text-sm font-medium text-[#1f1f1f] mb-2">
+                                        氏名（ローマ字）
+                                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-red-50 text-red-600 border border-red-100">必須</span>
+                                    </label>
+                                    <input name="full_name_romaji" type="text" required placeholder="例：NGUYEN VAN A" className="w-full bg-[#fbfcfd] border border-[#ededed] focus:bg-white focus:border-[#24b47e] focus:ring-[3px] focus:ring-[#24b47e]/10 rounded-md px-4 py-3 outline-none uppercase text-[#1f1f1f] transition-all" />
+                                </div>
+                                <div>
+                                    <label className="flex items-center gap-2 text-sm font-medium text-[#1f1f1f] mb-2">
+                                        氏名（カナ）
+                                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-red-50 text-red-600 border border-red-100">必須</span>
+                                    </label>
+                                    <input name="full_name_kana" type="text" required placeholder="例：グエン ヴァン ア" className="w-full bg-[#fbfcfd] border border-[#ededed] focus:bg-white focus:border-[#24b47e] focus:ring-[3px] focus:ring-[#24b47e]/10 rounded-md px-4 py-3 outline-none text-[#1f1f1f] transition-all" />
+                                </div>
+                                <div>
+                                    <label className="flex items-center gap-2 text-sm font-medium text-[#1f1f1f] mb-2">
+                                        生年月日
+                                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-red-50 text-red-600 border border-red-100">必須</span>
+                                    </label>
+                                    <input name="dob" type="date" required className="w-full bg-[#fbfcfd] border border-[#ededed] focus:bg-white focus:border-[#24b47e] focus:ring-[3px] focus:ring-[#24b47e]/10 rounded-md px-4 py-3 outline-none text-[#1f1f1f] transition-all" />
+                                </div>
+                                <div>
+                                    <label className="flex items-center gap-2 text-sm font-medium text-[#1f1f1f] mb-2">
+                                        国籍
+                                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-red-50 text-red-600 border border-red-100">必須</span>
+                                    </label>
+                                    <select name="nationality" defaultValue="VNM" className="w-full bg-[#fbfcfd] border border-[#ededed] focus:bg-white focus:border-[#24b47e] focus:ring-[3px] focus:ring-[#24b47e]/10 rounded-md px-4 py-3 outline-none appearance-none text-[#1f1f1f] transition-all">
+                                        <option value="VNM">ベトナム</option>
+                                        <option value="IDN">インドネシア</option>
+                                        <option value="PHL">フィリピン</option>
+                                        <option value="MMR">ミャンマー</option>
+                                        <option value="CHN">中国</option>
+                                    </select>
+                                </div>
+                                <div className="md:col-span-2">
+                                    <label className="flex items-center gap-2 text-sm font-medium text-[#1f1f1f] mb-2">
+                                        現住所
+                                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded border border-[#ededed] text-[#878787] bg-[#fbfcfd]">任意</span>
+                                    </label>
+                                    <input name="address" type="text" placeholder="例：東京都新宿区..." className="w-full bg-[#fbfcfd] border border-[#ededed] focus:bg-white focus:border-[#24b47e] focus:ring-[3px] focus:ring-[#24b47e]/10 rounded-md px-4 py-3 outline-none text-[#1f1f1f] transition-all" />
+                                </div>
                             </div>
                         </div>
 
                         {/* SECTION 2: 管理情報 */}
- <div className="bg-white rounded-md p-8"> 
-                            <h3 className="text-lg font-medium text-[#1f1f1f] mb-6 flex items-center gap-2"><Sparkles className="text-[#34A853]" size={20} /> 管理情報</h3>
+                        <div className="bg-white rounded-md p-6 sm:p-8 border border-[#ededed] shadow-sm relative overflow-hidden">
+                            <div className="absolute top-0 left-0 w-1 h-full bg-[#34A853]"></div>
+                            <h3 className="text-lg font-medium text-[#1f1f1f] mb-8 flex items-center gap-2">
+                                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-[#34A853]/10 text-[#34A853] text-sm font-bold">2</span>
+                                管理情報
+                            </h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
- <div><label className="block text-sm font-medium text-[#1f1f1f] mb-2">制度区分 <span className="text-red-500">*</span></label><select name="system_type" required defaultValue="ikusei_shuro" className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-4 py-3 outline-none appearance-none text-[#1f1f1f] transition-all"><option value="ikusei_shuro">育成就労</option><option value="tokuteigino">特定技能</option><option value="ginou_jisshu">技能実習</option></select></div> 
- <div><label className="block text-sm font-medium text-[#1f1f1f] mb-2">ステータス <span className="text-red-500">*</span></label><select name="status" required defaultValue="working" className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-4 py-3 outline-none appearance-none text-[#1f1f1f] transition-all"><option value="waiting">入国待ち</option><option value="working">就業中</option><option value="missing">失踪</option><option value="returned">帰国</option></select></div> 
- <div><label className="block text-sm font-medium text-[#1f1f1f] mb-2">配属先企業</label><select name="company_id" defaultValue="" className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-4 py-3 outline-none appearance-none text-[#1f1f1f] transition-all"><option value="">未配属</option>{companies?.map(c => <option key={c.id} value={c.id}>{c.name_jp}</option>)}</select></div> 
- <div><label className="block text-sm font-medium text-[#1f1f1f] mb-2">送出機関</label><input name="sending_org" type="text" placeholder="例：VINAJAPAN JSC" className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-4 py-3 outline-none text-[#1f1f1f] transition-all" /></div> 
- <div><label className="block text-sm font-medium text-[#1f1f1f] mb-2">入国期生</label><input name="entry_batch" type="text" placeholder="例：第15期生" className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-4 py-3 outline-none text-[#1f1f1f] transition-all" /></div> 
- <div><label className="block text-sm font-medium text-[#1f1f1f] mb-2">入国日</label><input name="entry_date" type="date" className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-4 py-3 outline-none text-[#1f1f1f] transition-all" /></div> 
+                                <div>
+                                    <label className="flex items-center gap-2 text-sm font-medium text-[#1f1f1f] mb-2">
+                                        制度区分
+                                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-red-50 text-red-600 border border-red-100">必須</span>
+                                    </label>
+                                    <select name="system_type" required defaultValue="ikusei_shuro" className="w-full bg-[#fbfcfd] border border-[#ededed] focus:bg-white focus:border-[#24b47e] focus:ring-[3px] focus:ring-[#24b47e]/10 rounded-md px-4 py-3 outline-none appearance-none text-[#1f1f1f] transition-all">
+                                        <option value="ikusei_shuro">育成就労</option>
+                                        <option value="tokuteigino">特定技能</option>
+                                        <option value="ginou_jisshu">技能実習</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="flex items-center gap-2 text-sm font-medium text-[#1f1f1f] mb-2">
+                                        ステータス
+                                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-red-50 text-red-600 border border-red-100">必須</span>
+                                    </label>
+                                    <select name="status" required defaultValue="working" className="w-full bg-[#fbfcfd] border border-[#ededed] focus:bg-white focus:border-[#24b47e] focus:ring-[3px] focus:ring-[#24b47e]/10 rounded-md px-4 py-3 outline-none appearance-none text-[#1f1f1f] transition-all">
+                                        <option value="waiting">入国待ち</option>
+                                        <option value="working">就業中</option>
+                                        <option value="missing">失踪</option>
+                                        <option value="returned">帰国</option>
+                                    </select>
+                                </div>
+                                <div className="md:col-span-2">
+                                    <label className="flex items-center gap-2 text-sm font-medium text-[#1f1f1f] mb-2">
+                                        配属先企業
+                                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded border border-[#ededed] text-[#878787] bg-[#fbfcfd]">任意</span>
+                                    </label>
+                                    <select name="company_id" defaultValue="" className="w-full bg-[#fbfcfd] border border-[#ededed] focus:bg-white focus:border-[#24b47e] focus:ring-[3px] focus:ring-[#24b47e]/10 rounded-md px-4 py-3 outline-none appearance-none text-[#1f1f1f] transition-all">
+                                        <option value="">未配属</option>
+                                        {companies?.map(c => <option key={c.id} value={c.id}>{c.name_jp}</option>)}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="flex items-center gap-2 text-sm font-medium text-[#1f1f1f] mb-2">
+                                        送出機関
+                                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded border border-[#ededed] text-[#878787] bg-[#fbfcfd]">任意</span>
+                                    </label>
+                                    <input name="sending_org" type="text" placeholder="例：VINAJAPAN JSC" className="w-full bg-[#fbfcfd] border border-[#ededed] focus:bg-white focus:border-[#24b47e] focus:ring-[3px] focus:ring-[#24b47e]/10 rounded-md px-4 py-3 outline-none text-[#1f1f1f] transition-all" />
+                                </div>
+                                <div>
+                                    <label className="flex items-center gap-2 text-sm font-medium text-[#1f1f1f] mb-2">
+                                        入国期生
+                                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded border border-[#ededed] text-[#878787] bg-[#fbfcfd]">任意</span>
+                                    </label>
+                                    <input name="entry_batch" type="text" placeholder="例：第15期生" className="w-full bg-[#fbfcfd] border border-[#ededed] focus:bg-white focus:border-[#24b47e] focus:ring-[3px] focus:ring-[#24b47e]/10 rounded-md px-4 py-3 outline-none text-[#1f1f1f] transition-all" />
+                                </div>
+                                <div>
+                                    <label className="flex items-center gap-2 text-sm font-medium text-[#1f1f1f] mb-2">
+                                        入国日
+                                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded border border-[#ededed] text-[#878787] bg-[#fbfcfd]">任意</span>
+                                    </label>
+                                    <input name="entry_date" type="date" className="w-full bg-[#fbfcfd] border border-[#ededed] focus:bg-white focus:border-[#24b47e] focus:ring-[3px] focus:ring-[#24b47e]/10 rounded-md px-4 py-3 outline-none text-[#1f1f1f] transition-all" />
+                                </div>
                             </div>
                         </div>
 
                         {/* SECTION 3: 期限・証明書 */}
- <div className="bg-white rounded-md p-8"> 
-                            <h3 className="text-lg font-medium text-[#1f1f1f] mb-6 flex items-center gap-2"><Sparkles className="text-[#EA4335]" size={20} /> 期限・証明書</h3>
+                        <div className="bg-white rounded-md p-6 sm:p-8 border border-[#ededed] shadow-sm relative overflow-hidden">
+                            <div className="absolute top-0 left-0 w-1 h-full bg-[#EA4335]"></div>
+                            <h3 className="text-lg font-medium text-[#1f1f1f] mb-8 flex items-center gap-2">
+                                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-[#EA4335]/10 text-[#EA4335] text-sm font-bold">3</span>
+                                期限・証明書
+                            </h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
- <div><label className="block text-sm font-medium text-[#1f1f1f] mb-2">在留カード番号</label><input name="zairyu_no" type="text" placeholder="例：AB12345678CD" maxLength={12} className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-4 py-3 outline-none uppercase text-[#1f1f1f] transition-all" /></div> 
- <div><label className="block text-sm font-medium text-[#1f1f1f] mb-2">パスポート期限</label><input name="passport_exp" type="date" className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-4 py-3 outline-none text-[#1f1f1f] transition-all" /></div> 
- <div><label className="block text-sm font-medium text-[#1f1f1f] mb-2">認定開始日</label><input name="cert_start_date" type="date" className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-4 py-3 outline-none text-[#1f1f1f] transition-all" /></div> 
- <div><label className="block text-sm font-medium text-[#1f1f1f] mb-2">認定修了日</label><input name="cert_end_date" type="date" className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-4 py-3 outline-none text-[#1f1f1f] transition-all" /></div> 
- <div><label className="block text-sm font-medium text-[#1f1f1f] mb-2">保険期限</label><input name="insurance_exp" type="date" className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-4 py-3 outline-none text-[#1f1f1f] transition-all" /></div> 
+                                <div>
+                                    <label className="flex items-center gap-2 text-sm font-medium text-[#1f1f1f] mb-2">
+                                        在留カード番号
+                                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded border border-[#ededed] text-[#878787] bg-[#fbfcfd]">任意</span>
+                                    </label>
+                                    <input name="zairyu_no" type="text" placeholder="例：AB12345678CD" maxLength={12} className="w-full bg-[#fbfcfd] border border-[#ededed] focus:bg-white focus:border-[#24b47e] focus:ring-[3px] focus:ring-[#24b47e]/10 rounded-md px-4 py-3 outline-none uppercase text-[#1f1f1f] transition-all" />
+                                </div>
+                                <div>
+                                    <label className="flex items-center gap-2 text-sm font-medium text-[#1f1f1f] mb-2">
+                                        パスポート期限
+                                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded border border-[#ededed] text-[#878787] bg-[#fbfcfd]">任意</span>
+                                    </label>
+                                    <input name="passport_exp" type="date" className="w-full bg-[#fbfcfd] border border-[#ededed] focus:bg-white focus:border-[#24b47e] focus:ring-[3px] focus:ring-[#24b47e]/10 rounded-md px-4 py-3 outline-none text-[#1f1f1f] transition-all" />
+                                </div>
+                                <div>
+                                    <label className="flex items-center gap-2 text-sm font-medium text-[#1f1f1f] mb-2">
+                                        認定開始日
+                                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded border border-[#ededed] text-[#878787] bg-[#fbfcfd]">任意</span>
+                                    </label>
+                                    <input name="cert_start_date" type="date" className="w-full bg-[#fbfcfd] border border-[#ededed] focus:bg-white focus:border-[#24b47e] focus:ring-[3px] focus:ring-[#24b47e]/10 rounded-md px-4 py-3 outline-none text-[#1f1f1f] transition-all" />
+                                </div>
+                                <div>
+                                    <label className="flex items-center gap-2 text-sm font-medium text-[#1f1f1f] mb-2">
+                                        認定修了日
+                                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded border border-[#ededed] text-[#878787] bg-[#fbfcfd]">任意</span>
+                                    </label>
+                                    <input name="cert_end_date" type="date" className="w-full bg-[#fbfcfd] border border-[#ededed] focus:bg-white focus:border-[#24b47e] focus:ring-[3px] focus:ring-[#24b47e]/10 rounded-md px-4 py-3 outline-none text-[#1f1f1f] transition-all" />
+                                </div>
+                                <div>
+                                    <label className="flex items-center gap-2 text-sm font-medium text-[#1f1f1f] mb-2">
+                                        保険期限
+                                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded border border-[#ededed] text-[#878787] bg-[#fbfcfd]">任意</span>
+                                    </label>
+                                    <input name="insurance_exp" type="date" className="w-full bg-[#fbfcfd] border border-[#ededed] focus:bg-white focus:border-[#24b47e] focus:ring-[3px] focus:ring-[#24b47e]/10 rounded-md px-4 py-3 outline-none text-[#1f1f1f] transition-all" />
+                                </div>
                             </div>
-                        </div>
-                        <div className="pt-4 pb-8 flex justify-end gap-3 sticky bottom-4">
- <Link href="/workers" className="px-6 py-3 text-[#1f1f1f] bg-white font-medium hover:bg-[#fbfcfd] rounded-md transition-colors">キャンセル</Link> 
-                            <SaveButton />
                         </div>
                     </form>
                 </div>

@@ -126,7 +126,7 @@ export default function DashboardClient({ userName, role, systemData }: { userNa
                     {/* Khung Input Nhập liệu */}
                     <div className="pt-4 pb-2 shrink-0 relative z-10">
                         <div className="absolute inset-0 bg-gradient-to-t from-white to-transparent pointer-events-none -bottom-10 h-32"></div>
-                        <form onSubmit={handleChat} className="relative max-w-4xl mx-auto flex items-end gap-3 bg-[#f2f5f8] border border-[#ededed] rounded-[32px] p-2 md:p-2.5 transition-all">
+                        <form onSubmit={handleChat} className="relative max-w-4xl mx-auto flex items-end gap-3 bg-transparent border-[0.5px] border-gray-300 focus-within:border-[#24b47e] focus-within:shadow-[0_0_0_1px_rgba(36,180,126,0.2)] rounded-[32px] p-2 md:p-2.5 transition-all duration-300">
                             <textarea
                                 value={userInput} onChange={e => setUserInput(e.target.value)} onKeyDown={handleKeyDown} disabled={isPendingChat || !aiData}
                                 placeholder="質問、翻訳、メール作成など、何でも聞いてください... (Shift+Enterで改行)"

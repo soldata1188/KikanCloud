@@ -6,4 +6,3 @@
 .env.keys
 .env.local
 .env.*.local
-GEMINI_API_KEY=AIzaSyC_bqoxEE9MCGkgClJTvlA776XdqdfmoPY

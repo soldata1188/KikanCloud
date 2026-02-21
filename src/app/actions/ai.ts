@@ -23,7 +23,10 @@ export async function extractDocumentAI(base64Image: string, mimeType: string) {
                 "nationality": "string (e.g., ベトナム, インドネシア)",
                 "date_of_birth": "string (YYYY-MM-DD format, convert from Japanese era if needed)",
                 "gender": "string (male or female)",
-                "zairyu_no": "string (12 alphanumeric characters, only if Zairyu card)"
+                "zairyu_no": "string (12 alphanumeric characters, only if Zairyu card)",
+                "address": "string (Extract full Japanese address, e.g., 東京都新宿区...)",
+                "visa_status": "string (Extract residence status/在留資格 exactly as written in Japanese, e.g., 技能実習第1号イ, 特定技能1号, 留学)",
+                "zairyu_exp": "string (YYYY-MM-DD format, extract expiration date/在留期間の満了日, convert from Japanese era if needed)"
             }
 
             Translate the nationality to Japanese (e.g., VIET NAM -> ベトナム, INDONESIA -> インドネシア, CHINA -> 中国, PHILIPPINES -> フィリピン, NEPAL -> ネパール, CAMBODIA -> カンボジア).

@@ -34,6 +34,9 @@ export function AIScannerZone() {
                     setInputValue('nationality', res.data.nationality);
                     setInputValue('dob', res.data.date_of_birth);
                     setInputValue('zairyu_no', res.data.zairyu_no);
+                    setInputValue('address', res.data.address);
+                    setInputValue('visa_status', res.data.visa_status);
+                    setInputValue('zairyu_exp', res.data.zairyu_exp);
                     alert('✨ AIスキャンが完了しました！内容を確認してください。');
                 } else {
                     alert('❌ エラー: ' + res.error);

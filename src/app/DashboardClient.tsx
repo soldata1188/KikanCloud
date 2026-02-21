@@ -138,7 +138,7 @@ export default function DashboardClient({ userName, role, systemData }: { userNa
                                 className="flex-1 max-h-24 min-h-[40px] bg-transparent border-none outline-none resize-none py-2 md:py-2.5 px-4 text-[14px] text-[#1f1f1f] placeholder:text-[#a0a0a0] leading-relaxed disabled:opacity-50"
                                 rows={1}
                             />
-                            <button type="submit" disabled={isPendingChat || !userInput.trim()} className={`h-11 px-4 shrink-0 flex items-center justify-center hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-50 disabled:transform-none text-white rounded-full text-sm font-bold tracking-tight ${userInput.trim() ? 'bg-[#ff6b00] hover:bg-[#e66000] hover:shadow-lg hover:shadow-[#ff6b00]/20' : 'bg-[#e0e0e0] text-[#878787]'}`}>
+                            <button type="submit" disabled={isPendingChat || !userInput.trim()} className={`h-11 px-4 shrink-0 flex items-center justify-center hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-50 disabled:transform-none text-white rounded-full text-sm font-bold tracking-tight ${userInput.trim() ? 'bg-[#24b47e] hover:bg-[#1e9a6b] hover:shadow-lg hover:shadow-[#24b47e]/20' : 'bg-[#e0e0e0] text-[#878787]'}`}>
                                 {isPendingChat ? <Loader2 size={18} className="animate-spin" /> : <span>AIモード</span>}
                             </button>
                         </form>

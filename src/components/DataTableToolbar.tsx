@@ -4,7 +4,7 @@ import { Search, Grid, List, Plus, FileSpreadsheet } from 'lucide-react'
 import Link from 'next/link'
 import * as XLSX from 'xlsx'
 
-export function DataTableToolbar({ data, filename, searchPlaceholder, onSearch, type, role, addLink }: { data: any[], filename: string, searchPlaceholder: string, onSearch: (term: string) => void, type: 'workers' | 'companies', role: string, addLink?: string }) {
+export function DataTableToolbar({ data, filename, searchPlaceholder, onSearch, type, role, addLink, importNode }: { data: any[], filename: string, searchPlaceholder: string, onSearch: (term: string) => void, type: 'workers' | 'companies', role: string, addLink?: string, importNode?: React.ReactNode }) {
     const [searchTerm, setSearchTerm] = useState('')
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => { const term = e.target.value; setSearchTerm(term); onSearch(term); }
     const handleExport = () => { try { let exportData = data.map((d, i) => ({ 'No': i + 1, 'Data': JSON.stringify(d) })); const ws = XLSX.utils.json_to_sheet(exportData); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Data"); XLSX.writeFile(wb, `${filename}.xlsx`); } catch (e) { } }
@@ -31,6 +31,7 @@ export function DataTableToolbar({ data, filename, searchPlaceholder, onSearch, 
                         <FileSpreadsheet size={14} /> Excel出力
                     </button>
                 )}
+                {importNode}
                 {addLink && role !== 'staff' && role !== 'company_user' && (
                     <Link href={addLink} className="h-[32px] px-3 bg-[#24b47e] hover:bg-[#1e9a6a] text-white rounded-md text-[13px] font-medium flex items-center gap-1.5 transition-colors">
                         <Plus size={14} /> 新規登録

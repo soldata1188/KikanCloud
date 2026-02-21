@@ -21,18 +21,16 @@ export function CompaniesClient({ companies, userRole }: { companies: any[], use
 
     return (
         <>
-            <div className="flex justify-between items-center mb-4">
-                <DataTableToolbar
-                    data={filtered}
-                    filename="企業リスト"
-                    searchPlaceholder="企業名で検索..."
-                    onSearch={handleSearch}
-                    type="companies"
-                    role={userRole || 'staff'}
-                    addLink="/companies/new"
-                />
-                <ImportModal />
-            </div>
+            <DataTableToolbar
+                data={filtered}
+                filename="企業リスト"
+                searchPlaceholder="企業名で検索..."
+                onSearch={handleSearch}
+                type="companies"
+                role={userRole || 'staff'}
+                addLink="/companies/new"
+                importNode={<ImportModal />}
+            />
 
             <div className="bg-white border border-[#ededed] rounded-lg shadow-sm overflow-hidden relative pb-16">
                 <div className="overflow-x-auto">

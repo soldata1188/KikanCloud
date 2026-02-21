@@ -49,10 +49,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
 
     return (
         <>
-            <div className="flex justify-between items-center mb-4">
-                <DataTableToolbar data={filtered} filename="外国人材リスト" searchPlaceholder="氏名、企業名で検索..." onSearch={handleSearch} type="workers" role={role} addLink="/workers/new" />
-                <ImportModal />
-            </div>
+            <DataTableToolbar data={filtered} filename="外国人材リスト" searchPlaceholder="氏名、企業名で検索..." onSearch={handleSearch} type="workers" role={role} addLink="/workers/new" importNode={<ImportModal />} />
             <div className="bg-white border border-[#ededed] rounded-lg shadow-sm overflow-hidden relative pb-16">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left text-[13px] text-[#1f1f1f] whitespace-nowrap">

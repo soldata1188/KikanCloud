@@ -73,44 +73,44 @@ export default function DashboardClient({ userName, role, systemData }: { userNa
     return (
         <div className="max-w-[1000px] mx-auto space-y-8 animate-in fade-in duration-700 pb-10">
 
-            {/* 1. KHOANG CHAT AI CÁ cá NHÂN HÓA (OMNI-CHANNEL BOT) */}
-            <section className="bg-white border border-[#ededed] rounded-[24px] shadow-sm relative overflow-hidden flex flex-col h-[650px] lg:h-[750px]">
-                <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-[#24b47e]/5 to-transparent rounded-bl-full pointer-events-none"></div>
+            {/* 1. KHOANG CHAT AI CÁ NHÂN HÓA (OMNI-CHANNEL BOT) - INFINITY FEEL */}
+            <section className="relative flex flex-col h-[650px] lg:h-[750px] -mx-6 md:-mx-10 px-6 md:px-10 mb-8">
+                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-bl from-[#24b47e]/10 via-[#24b47e]/5 to-transparent rounded-bl-full pointer-events-none blur-3xl opacity-50"></div>
 
                 {/* Header Khoang Chat */}
-                <div className="px-6 md:px-8 pt-6 pb-4 shrink-0 relative z-10 border-b border-[#ededed] bg-[#fbfcfd]/80 backdrop-blur-sm">
+                <div className="pt-2 pb-4 shrink-0 relative z-10">
                     <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-full bg-white border border-[#ededed] flex items-center justify-center shadow-sm"><Sparkles size={16} className="text-[#24b47e]" /></div>
-                            <span className="text-[10px] font-bold text-[#878787] uppercase tracking-widest">Omni-Channel Copilot</span>
+                            <div className="w-8 h-8 rounded-full bg-white/50 backdrop-blur-sm border border-white/20 flex items-center justify-center shadow-sm"><Sparkles size={16} className="text-[#24b47e]" /></div>
+                            <span className="text-[10px] font-bold text-[#878787] uppercase tracking-widest bg-white/50 px-2 py-0.5 rounded-full backdrop-blur-sm">Omni-Channel</span>
                         </div>
                         <div className="flex items-center gap-3">
-                            {!aiData && <div className="text-[11px] font-bold text-[#24b47e] bg-[#24b47e]/10 px-2 py-1 rounded flex items-center gap-1.5"><Loader2 size={12} className="animate-spin" /> Syncing Live Data</div>}
+                            {!aiData && <div className="text-[11px] font-bold text-[#24b47e] bg-[#24b47e]/10 px-2 py-1 rounded-full flex items-center gap-1.5"><Loader2 size={12} className="animate-spin" /> Syncing Live Data</div>}
                             {aiData && (
-                                <button onClick={resetChat} title="Reset Chat" className="text-[11px] font-bold text-[#878787] hover:text-[#1f1f1f] bg-white border border-[#ededed] px-2.5 py-1.5 rounded-md flex items-center gap-1.5 transition-colors shadow-sm">
-                                    <RotateCcw size={12} /> リセット (Reset)
+                                <button onClick={resetChat} title="Reset Chat" className="text-[11px] font-bold text-[#878787] hover:text-[#1f1f1f] bg-white/50 border border-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-1.5 transition-all shadow-sm hover:shadow-md hover:bg-white/80">
+                                    <RotateCcw size={12} /> リセット
                                 </button>
                             )}
                         </div>
                     </div>
-                    <h1 className="text-2xl md:text-[28px] font-black text-[#1f1f1f] leading-tight tracking-tight">
+                    <h1 className="text-3xl md:text-[34px] font-black text-[#1f1f1f] leading-tight tracking-tight pl-1 mix-blend-multiply">
                         {timeGreeting || `${userName}さん、お疲れ様です！`}
                     </h1>
                 </div>
 
                 {/* Khu vực cuộn tin nhắn */}
-                <div className="flex-1 overflow-y-auto px-6 md:px-8 py-6 space-y-6 relative z-10 scrollbar-thin scrollbar-thumb-[#ededed] scrollbar-track-transparent bg-[#fbfcfd]/30">
+                <div className="flex-1 overflow-y-auto py-6 space-y-6 relative z-10 scrollbar-none">
                     {messages.map((msg) => (
                         <div key={msg.id} className={`flex gap-4 ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-in slide-in-from-bottom-2`}>
                             {msg.role === 'model' && (
-                                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#24b47e] to-[#6ee7b7] flex items-center justify-center shrink-0 shadow-sm mt-0.5"><Sparkles size={14} className="text-white" /></div>
+                                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#24b47e] to-[#6ee7b7] flex items-center justify-center shrink-0 shadow-md mt-0.5 ring-4 ring-white/50"><Sparkles size={14} className="text-white" /></div>
                             )}
 
-                            <div className={`max-w-[85%] md:max-w-[75%] rounded-2xl px-5 py-3.5 text-[13.5px] leading-relaxed shadow-sm ${msg.role === 'user' ? 'bg-[#1f1f1f] text-white rounded-tr-none' : 'bg-white border border-[#ededed] text-[#444746] rounded-tl-none relative overflow-hidden'}`}>
-                                {msg.role === 'model' && <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#24b47e]"></div>}
+                            <div className={`max-w-[85%] md:max-w-[75%] rounded-2xl md:rounded-[24px] px-5 md:px-6 py-4 text-[14px] leading-relaxed shadow-sm ${msg.role === 'user' ? 'bg-[#1f1f1f] text-white rounded-tr-none' : 'bg-white/80 backdrop-blur-md border border-white/50 text-[#444746] rounded-tl-none relative overflow-hidden'}`}>
+                                {msg.role === 'model' && <div className="absolute left-0 top-0 bottom-0 w-[4px] bg-[#24b47e]"></div>}
 
                                 {msg.isTyping ? (
-                                    <div className="flex items-center gap-1.5 h-5 pl-2">
+                                    <div className="flex items-center gap-1.5 h-6 pl-2">
                                         <span className="w-1.5 h-1.5 bg-[#24b47e]/60 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
                                         <span className="w-1.5 h-1.5 bg-[#24b47e]/60 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
                                         <span className="w-1.5 h-1.5 bg-[#24b47e]/60 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
@@ -121,7 +121,7 @@ export default function DashboardClient({ userName, role, systemData }: { userNa
                             </div>
 
                             {msg.role === 'user' && (
-                                <div className="w-8 h-8 rounded-full bg-white border border-[#ededed] flex items-center justify-center shrink-0 shadow-sm mt-0.5"><User size={14} className="text-[#878787]" /></div>
+                                <div className="w-8 h-8 rounded-full bg-white/80 backdrop-blur-sm border border-white/50 flex items-center justify-center shrink-0 shadow-sm mt-0.5"><User size={14} className="text-[#878787]" /></div>
                             )}
                         </div>
                     ))}
@@ -129,16 +129,17 @@ export default function DashboardClient({ userName, role, systemData }: { userNa
                 </div>
 
                 {/* Khung Input Nhập liệu */}
-                <div className="p-4 md:p-6 shrink-0 border-t border-[#ededed] bg-white relative z-10">
-                    <form onSubmit={handleChat} className="relative max-w-4xl mx-auto flex items-end gap-3 bg-[#fbfcfd] border border-[#ededed] rounded-xl p-2 focus-within:border-[#24b47e] focus-within:ring-4 focus-within:ring-[#24b47e]/10 transition-all shadow-sm">
+                <div className="pt-4 pb-2 shrink-0 relative z-10">
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#fbfcfd] to-transparent pointer-events-none -bottom-10 h-32"></div>
+                    <form onSubmit={handleChat} className="relative max-w-4xl mx-auto flex items-end gap-3 bg-white/70 backdrop-blur-xl border border-white/60 rounded-2xl p-2 md:p-2.5 focus-within:bg-white/90 focus-within:shadow-md transition-all shadow-sm">
                         <textarea
                             value={userInput} onChange={e => setUserInput(e.target.value)} onKeyDown={handleKeyDown} disabled={isPendingChat || !aiData}
                             placeholder="質問、翻訳、メール作成など、何でも聞いてください... (Shift+Enter to newline)"
-                            className="flex-1 max-h-24 min-h-[40px] bg-transparent border-none outline-none resize-none py-2 px-3 text-[13.5px] text-[#1f1f1f] placeholder:text-[#a0a0a0] leading-relaxed disabled:opacity-50"
+                            className="flex-1 max-h-24 min-h-[40px] bg-transparent border-none outline-none resize-none py-2 md:py-2.5 px-4 text-[14px] text-[#1f1f1f] placeholder:text-[#a0a0a0] leading-relaxed disabled:opacity-50"
                             rows={1}
                         />
-                        <button type="submit" disabled={isPendingChat || !userInput.trim()} className="w-10 h-10 mb-0.5 shrink-0 flex items-center justify-center bg-[#1f1f1f] text-white hover:bg-[#24b47e] rounded-lg transition-colors disabled:opacity-50 disabled:bg-[#fbfcfd] disabled:text-[#878787] disabled:border disabled:border-[#ededed] shadow-sm">
-                            {isPendingChat ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} className="ml-0.5" />}
+                        <button type="submit" disabled={isPendingChat || !userInput.trim()} className="w-11 h-11 shrink-0 flex items-center justify-center bg-[#1f1f1f] text-white hover:bg-[#24b47e] hover:shadow-lg hover:-translate-y-0.5 rounded-xl transition-all duration-300 disabled:opacity-50 disabled:bg-[#e0e0e0] disabled:text-[#878787] disabled:shadow-none disabled:transform-none mb-0.5">
+                            {isPendingChat ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} className="ml-0.5" />}
                         </button>
                     </form>
                 </div>

@@ -7,7 +7,6 @@ import { UpdateButton } from '@/components/SubmitButtons'
 import { AutoDocButton } from '@/components/AutoDocButton'
 import { UserMenu } from '@/components/UserMenu'
 import { AvatarUploadZone } from '@/components/AvatarUploadZone'
-import { ComboboxInput } from '@/components/ComboboxInput'
 import { redirect, notFound } from 'next/navigation'
 
 export default async function EditWorkerPage({ params }: { params: Promise<{ id: string }> }) {
@@ -70,12 +69,12 @@ export default async function EditWorkerPage({ params }: { params: Promise<{ id:
                                 <div><label className="block text-sm font-medium text-[#1f1f1f] mb-2">生年月日 <span className="text-red-500">*</span></label><input name="dob" type="date" required defaultValue={worker.dob} className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-4 py-3 outline-none text-[#1f1f1f] transition-all" /></div>
                                 <div>
                                     <label className="block text-sm font-medium text-[#1f1f1f] mb-2">国籍</label>
-                                    <ComboboxInput
-                                        name="nationality"
-                                        defaultValue={worker.nationality === 'VNM' ? 'ベトナム' : worker.nationality === 'IDN' ? 'インドネシア' : worker.nationality === 'PHL' ? 'フィリピン' : worker.nationality === 'MMR' ? 'ミャンマー' : worker.nationality || 'ベトナム'}
-                                        placeholder="例：ベトナム"
-                                        options={['ベトナム', 'インドネシア', 'フィリピン', 'カンボジア']}
-                                    />
+                                    <select name="nationality" required defaultValue={worker.nationality === 'VNM' ? 'ベトナム' : worker.nationality === 'IDN' ? 'インドネシア' : worker.nationality === 'PHL' ? 'フィリピン' : worker.nationality === 'MMR' ? 'ミャンマー' : worker.nationality || 'ベトナム'} className="w-full bg-[#fbfcfd] focus:bg-white focus:border-[#24b47e] focus:ring-[3px] focus:ring-[#24b47e]/10 rounded-md px-4 py-3 outline-none appearance-none text-[#1f1f1f] transition-all">
+                                        <option value="ベトナム">ベトナム</option>
+                                        <option value="インドネシア">インドネシア</option>
+                                        <option value="フィリピン">フィリピン</option>
+                                        <option value="カンボジア">カンボジア</option>
+                                    </select>
                                 </div>
                                 <div className="md:col-span-2"><label className="block text-sm font-medium text-[#1f1f1f] mb-2">現住所</label><input name="address" type="text" defaultValue={worker.address || ''} placeholder="例：東京都新宿区..." className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-4 py-3 outline-none text-[#1f1f1f] transition-all" /></div>
                             </div>

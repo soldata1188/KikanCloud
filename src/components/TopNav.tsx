@@ -1,5 +1,4 @@
 import { Search, HelpCircle } from 'lucide-react'
-import { Logo } from './Logo'
 import { NotificationBell } from './NotificationBell'
 import { UserMenu } from './UserMenu'
 import { createClient } from '@/lib/supabase/server'
@@ -20,11 +19,8 @@ export async function TopNav({ title, role }: { title: string, role?: string }) 
     return (
         <header className="h-14 bg-white border-b border-[#ededed] flex items-center justify-between px-4 sm:px-6 sticky top-0 z-40 shrink-0 w-full">
             <div className="flex items-center gap-2 text-[13px]">
-                <Logo className="w-5 h-5 shrink-0" />
-                <span className="text-[#878787]">/</span>
                 <span className="font-medium text-[#1f1f1f]">KikanCloud</span>
-                <span className="px-1.5 py-0.5 rounded border border-[#ededed] text-[10px] font-mono text-[#878787] uppercase tracking-wider ml-1 bg-[#fbfcfd]">FREE</span>
-                <span className="text-[#878787] ml-1">/</span>
+                <span className="text-[#878787]">/</span>
                 <span className="text-[#1f1f1f]">{title}</span>
             </div>
 

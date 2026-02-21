@@ -110,12 +110,19 @@ export default async function NewCompanyPage() {
                                 担当者情報（監査用）
                             </h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="md:col-span-2">
+                                <div className="md:col-span-1">
                                     <label className="flex items-center gap-2 text-sm font-medium text-[#1f1f1f] mb-2">
                                         代表者名
                                         <span className="text-[10px] font-bold px-1.5 py-0.5 rounded border border-[#ededed] text-[#878787] bg-[#fbfcfd]">任意</span>
                                     </label>
                                     <input name="representative" type="text" placeholder="例：山田 太郎" className="w-full bg-[#fbfcfd] border border-[#ededed] focus:bg-white focus:border-[#24b47e] focus:ring-[3px] focus:ring-[#24b47e]/10 rounded-md px-4 py-3 outline-none text-[#1f1f1f] transition-all" />
+                                </div>
+                                <div className="md:col-span-1">
+                                    <label className="flex items-center gap-2 text-sm font-medium text-[#1f1f1f] mb-2">
+                                        代表者名（ローマ字）
+                                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded border border-[#ededed] text-[#878787] bg-[#fbfcfd]">任意</span>
+                                    </label>
+                                    <input name="representative_romaji" type="text" placeholder="例：YAMADA TARO" className="w-full bg-[#fbfcfd] border border-[#ededed] focus:bg-white focus:border-[#24b47e] focus:ring-[3px] focus:ring-[#24b47e]/10 rounded-md px-4 py-3 outline-none uppercase text-[#1f1f1f] transition-all" />
                                 </div>
                                 <div>
                                     <label className="flex items-center gap-2 text-sm font-medium text-[#1f1f1f] mb-2">
@@ -131,13 +138,6 @@ export default async function NewCompanyPage() {
                                     </label>
                                     <input name="training_date" type="date" className="w-full bg-[#fbfcfd] border border-[#ededed] focus:bg-white focus:border-[#24b47e] focus:ring-[3px] focus:ring-[#24b47e]/10 rounded-md px-4 py-3 outline-none text-[#1f1f1f] transition-all" />
                                 </div>
-                                <div className="md:col-span-2">
-                                    <label className="flex items-center gap-2 text-sm font-medium text-[#1f1f1f] mb-2">
-                                        連絡・実習担当者
-                                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded border border-[#ededed] text-[#878787] bg-[#fbfcfd]">任意</span>
-                                    </label>
-                                    <input name="pic_name" type="text" placeholder="例：鈴木 一郎" className="w-full bg-[#fbfcfd] border border-[#ededed] focus:bg-white focus:border-[#24b47e] focus:ring-[3px] focus:ring-[#24b47e]/10 rounded-md px-4 py-3 outline-none text-[#1f1f1f] transition-all" />
-                                </div>
                                 <div>
                                     <label className="flex items-center gap-2 text-sm font-medium text-[#1f1f1f] mb-2">
                                         生活指導員
@@ -151,6 +151,13 @@ export default async function NewCompanyPage() {
                                         <span className="text-[10px] font-bold px-1.5 py-0.5 rounded border border-[#ededed] text-[#878787] bg-[#fbfcfd]">任意</span>
                                     </label>
                                     <input name="tech_advisor" type="text" placeholder="例：高橋 次郎" className="w-full bg-[#fbfcfd] border border-[#ededed] focus:bg-white focus:border-[#24b47e] focus:ring-[3px] focus:ring-[#24b47e]/10 rounded-md px-4 py-3 outline-none text-[#1f1f1f] transition-all" />
+                                </div>
+                                <div className="md:col-span-2">
+                                    <label className="flex items-center gap-2 text-sm font-medium text-[#1f1f1f] mb-2">
+                                        連絡・実習担当者
+                                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded border border-[#ededed] text-[#878787] bg-[#fbfcfd]">任意</span>
+                                    </label>
+                                    <input name="pic_name" type="text" placeholder="例：鈴木 一郎" className="w-full bg-[#fbfcfd] border border-[#ededed] focus:bg-white focus:border-[#24b47e] focus:ring-[3px] focus:ring-[#24b47e]/10 rounded-md px-4 py-3 outline-none text-[#1f1f1f] transition-all" />
                                 </div>
                             </div>
                         </div>

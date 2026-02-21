@@ -38,7 +38,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
             '生年月日': w.dob?.replace(/-/g, '/') || '', '国籍': w.nationality || '', '性別': w.gender === 'male' ? '男' : w.gender === 'female' ? '女' : '',
             '在留資格区分': w.system_type === 'tokuteigino' ? '特定技能' : w.system_type === 'ikusei_shuro' ? '育成就労' : '技能実習',
             '在留カード番号': w.zairyu_no || '', 'パスポート有効期限': w.passport_exp?.replace(/-/g, '/') || '',
-            '実習実施者名': w.companies?.name_jp || '', '状況': w.status === 'working' ? '就業中' : 'その他'
+            '実習実施者名': w.companies?.name_jp || '', '状況': w.status === 'working' ? '就業中' : w.status === 'standby' ? '待機中' : 'その他'
         }))
         const ws = XLSX.utils.json_to_sheet(exportData)
         ws['!cols'] = [{ wch: 8 }, { wch: 30 }, { wch: 25 }, { wch: 12 }, { wch: 10 }, { wch: 8 }, { wch: 15 }, { wch: 15 }, { wch: 20 }, { wch: 10 }]
@@ -71,7 +71,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                                         <td className="px-5 py-3.5"><span className="px-2 py-0.5 border border-[#ededed] text-[#878787] rounded-[4px] text-[10px] font-mono uppercase tracking-wider bg-[#fbfcfd]">{w.system_type === 'tokuteigino' ? '特定技能' : '技能実習'}</span></td>
                                         <td className="px-5 py-3.5 font-mono text-xs text-[#878787]">{w.zairyu_no || '未登録'}</td>
                                         <td className="px-5 py-3.5 text-xs font-medium text-[#1f1f1f]">{w.passport_exp ? <span className={`flex items-center gap-1 ${isExpiring && w.status === 'working' ? 'text-red-600' : ''}`}>{isExpiring && w.status === 'working' && <AlertCircle size={14} />} {w.passport_exp.replace(/-/g, '/')}</span> : '-'}</td>
-                                        <td className="px-5 py-3.5"><span className={`px-2 py-0.5 border rounded-full text-[10px] font-bold uppercase tracking-widest bg-transparent ${w.status === 'working' ? 'border-[#24b47e] text-[#24b47e]' : 'border-gray-300 text-[#878787]'}`}>{w.status === 'working' ? '就業中' : w.status === 'returned' ? '帰国' : w.status}</span></td>
+                                        <td className="px-5 py-3.5"><span className={`px-2 py-0.5 border rounded-full text-[10px] font-bold uppercase tracking-widest bg-transparent ${w.status === 'working' ? 'border-[#24b47e] text-[#24b47e]' : 'border-gray-300 text-[#878787]'}`}>{w.status === 'working' ? '就業中' : w.status === 'standby' ? '待機中' : w.status === 'returned' ? '帰国' : w.status === 'waiting' ? '入国待ち' : w.status === 'missing' ? '失踪' : w.status}</span></td>
                                         <td className="px-5 py-3.5 text-right"><div className="flex items-center justify-end gap-2"><Link href={`/workers/${w.id}/edit`} className="text-[12px] font-medium text-[#878787] hover:text-[#24b47e] transition-colors mr-2">詳細</Link>{role === 'admin' && (<form action={deleteWorker}><input type="hidden" name="id" value={w.id} /><DeleteButton /></form>)}</div></td>
                                     </tr>
                                 )
@@ -87,6 +87,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                     <div className="w-px h-6 bg-gray-700"></div>
                     <div className="flex items-center gap-3">
                         <button onClick={() => handleBulkStatus('working')} disabled={isPending} className="text-sm font-bold text-green-400 hover:text-green-300 flex items-center gap-1 disabled:opacity-50"><Play size={16} /> 就業中へ</button>
+                        <button onClick={() => handleBulkStatus('standby')} disabled={isPending} className="text-sm font-bold text-orange-400 hover:text-orange-300 flex items-center gap-1 disabled:opacity-50"><Play size={16} /> 待機中へ</button>
                         <button onClick={() => handleBulkStatus('returned')} disabled={isPending} className="text-sm font-bold text-[#878787] hover:text-white flex items-center gap-1 disabled:opacity-50"><Play size={16} /> 帰国へ</button>
                         <div className="w-px h-6 bg-gray-700 mx-1"></div>
                         <button onClick={generateLegalRoster} className="text-sm font-bold text-[#24b47e] hover:text-[#1e9a6a] flex items-center gap-1"><FileText size={16} /> 名簿出力</button>

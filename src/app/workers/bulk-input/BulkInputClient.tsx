@@ -121,7 +121,8 @@ export function BulkInputClient({ companies }: { companies: { id: string, name_j
                                 <td className="px-1 py-1">
                                     <select value={row.status} onChange={(e) => handleChange(row.id, 'status', e.target.value)} className="w-full px-3 py-2 outline-none border border-transparent focus:border-[#24b47e] focus:bg-white rounded transition-colors bg-white hover:bg-[#fbfcfd]">
                                         <option value="working">就業中</option>
-                                        <option value="waiting_entry">入国待ち</option>
+                                        <option value="standby">待機中</option>
+                                        <option value="waiting">入国待ち</option>
                                         <option value="missing">失踪</option>
                                         <option value="returned">帰国</option>
                                     </select>
@@ -147,13 +148,13 @@ export function BulkInputClient({ companies }: { companies: { id: string, name_j
             </div>
 
             <div className="flex justify-between items-center w-full mb-8">
- <button onClick={addRow} className="flex items-center gap-2 px-4 py-2 text-[#24b47e] bg-[#fbfcfd] hover:bg-blue-100 rounded-md font-medium transition-colors text-sm">
+                <button onClick={addRow} className="flex items-center gap-2 px-4 py-2 text-[#24b47e] bg-[#fbfcfd] hover:bg-blue-100 rounded-md font-medium transition-colors text-sm">
                     <Plus size={16} /> 10行追加
                 </button>
                 {error && <span className="text-red-500 text-sm">{error}</span>}
             </div>
 
- <button onClick={handleSave} disabled={isPending} className="fixed bottom-10 right-10 flex items-center gap-2 px-8 py-4 bg-[#24b47e] hover:bg-[#1e9a6a] text-white rounded-md font-bold hover:scale-105 transition-all outline-none z-50">
+            <button onClick={handleSave} disabled={isPending} className="fixed bottom-10 right-10 flex items-center gap-2 px-8 py-4 bg-[#24b47e] hover:bg-[#1e9a6a] text-white rounded-md font-bold hover:scale-105 transition-all outline-none z-50">
                 <Save size={20} /> {isPending ? '保存中...' : '一括登録を実行'}
             </button>
         </div>

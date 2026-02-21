@@ -25,7 +25,7 @@ export default async function WorkerDetailPage(props: { params: Promise<{ id: st
     if (!worker) return notFound()
 
     const sysTypeLabels = { 'tokuteigino': '特定技能', 'ginoshisshu': '技能実習', 'ikusei_shuro': '育成就労' }
-    const statusLabels = { 'working': '就業中', 'missing': '失踪', 'returned': '帰国', 'waiting': '入国待ち' }
+    const statusLabels = { 'working': '就業中', 'missing': '失踪', 'returned': '帰国', 'waiting': '入国待ち', 'standby': '待機中' }
 
     return (
         <div className="flex h-screen bg-[#fbfcfd] font-sans text-[#1f1f1f] overflow-hidden selection:bg-[#24b47e]/20">
@@ -56,7 +56,7 @@ export default async function WorkerDetailPage(props: { params: Promise<{ id: st
                     <div className="bg-white rounded-[24px] print:rounded-none p-6 md:p-10 shadow-[0_4px_16px_rgba(0,0,0,0.04)] print:shadow-none border border-[#ededed] print:border-none space-y-10">
                         {/* 1. Header Section */}
                         <div className="flex flex-col md:flex-row gap-8 items-start pb-8 border-b border-[#ededed] print:border-b-2 print:border-black/20">
- <div className="w-32 h-32 rounded-lg bg-[#fbfcfd] border border-[#ededed] overflow-hidden flex items-center justify-center shrink-0 print:border-gray-300 print:rounded-md">
+                            <div className="w-32 h-32 rounded-lg bg-[#fbfcfd] border border-[#ededed] overflow-hidden flex items-center justify-center shrink-0 print:border-gray-300 print:rounded-md">
                                 {worker.avatar_url ? <img src={worker.avatar_url} alt="Avatar" className="w-full h-full object-cover" /> : <UserIcon size={48} className="text-gray-300" />}
                             </div>
                             <div className="flex-1">
@@ -64,7 +64,7 @@ export default async function WorkerDetailPage(props: { params: Promise<{ id: st
                                     <span className={`px-3 py-1 rounded-md text-xs font-bold border ${worker.status === 'working' ? 'bg-green-50 text-green-700 border-green-200' : worker.status === 'missing' ? 'bg-red-50 text-red-700 border-red-200' : 'bg-gray-100 text-gray-700 border-[#ededed]'} print:border-gray-500 print:text-black print:bg-transparent`}>
                                         {statusLabels[worker.status as keyof typeof statusLabels] || worker.status}
                                     </span>
- <span className="text-sm font-semibold text-blue-600 bg-[#fbfcfd] px-3 py-1 rounded-md border border-blue-100 print:border-gray-500 print:text-black print:bg-transparent">
+                                    <span className="text-sm font-semibold text-blue-600 bg-[#fbfcfd] px-3 py-1 rounded-md border border-blue-100 print:border-gray-500 print:text-black print:bg-transparent">
                                         ID: {worker.id.split('-')[0]}
                                     </span>
                                 </div>
@@ -134,7 +134,7 @@ function DetailItem({ label, value, highlightExp }: { label: string, value: Reac
     }
 
     return (
- <div className="flex flex-col gap-1.5 p-4 bg-[#fbfcfd]/70 rounded-md border border-[#ededed] print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:border-gray-400 print:rounded-none print:p-2">
+        <div className="flex flex-col gap-1.5 p-4 bg-[#fbfcfd]/70 rounded-md border border-[#ededed] print:bg-transparent print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:border-gray-400 print:rounded-none print:p-2">
             <span className="text-[11px] font-bold text-[#878787] tracking-wider uppercase print:text-gray-600">{label}</span>
             <div className={`text-[15px] font-medium print:text-[14px] ${expStatus === 'expired' ? 'text-red-600 font-bold' : expStatus === 'warning' ? 'text-orange-600 font-bold' : 'text-gray-900'}`}>
                 {value}

@@ -55,8 +55,8 @@ export function WorkersClient({ workers, userRole }: { workers: any[], userRole?
 
     return (
         <div className="flex-1 flex flex-col w-full max-w-[1200px] mx-auto mt-4 md:mt-8">
- <div className="bg-white rounded-md p-4 mb-6 space-y-4"> 
- <div className="min-h-[48px] px-4 py-2 flex items-center gap-3 bg-[#fbfcfd] rounded-md -transparent focus-within:bg-white focus-within: transition-colors"> 
+            <div className="bg-white rounded-md p-4 mb-6 space-y-4">
+                <div className="min-h-[48px] px-4 py-2 flex items-center gap-3 bg-[#fbfcfd] rounded-md -transparent focus-within:bg-white focus-within: transition-colors">
                     <Search size={20} className="text-[#1f1f1f]" strokeWidth={1.5} />
                     <input
                         type="text"
@@ -75,11 +75,12 @@ export function WorkersClient({ workers, userRole }: { workers: any[], userRole?
                     <select
                         value={statusFilter}
                         onChange={(e) => setStatusFilter(e.target.value)}
- className="bg-white text-[#1f1f1f] text-sm rounded-md px-4 py-2 hover:bg-[#fbfcfd] focus:outline-none focus:ring-2 focus:ring-[#4285F4]/20 transition-all font-medium appearance-none min-w-[140px] cursor-pointer" 
+                        className="bg-white text-[#1f1f1f] text-sm rounded-md px-4 py-2 hover:bg-[#fbfcfd] focus:outline-none focus:ring-2 focus:ring-[#4285F4]/20 transition-all font-medium appearance-none min-w-[140px] cursor-pointer"
                     >
                         <option value="all">すべてのステータス</option>
                         <option value="working">就業中</option>
-                        <option value="waiting_entry">入国待ち</option>
+                        <option value="standby">待機中</option>
+                        <option value="waiting">入国待ち</option>
                         <option value="missing">失踪</option>
                         <option value="returned">帰国</option>
                     </select>
@@ -87,7 +88,7 @@ export function WorkersClient({ workers, userRole }: { workers: any[], userRole?
                     <select
                         value={companyFilter}
                         onChange={(e) => setCompanyFilter(e.target.value)}
- className="bg-white text-[#1f1f1f] text-sm rounded-md px-4 py-2 hover:bg-[#fbfcfd] focus:outline-none focus:ring-2 focus:ring-[#4285F4]/20 transition-all font-medium appearance-none min-w-[160px] cursor-pointer" 
+                        className="bg-white text-[#1f1f1f] text-sm rounded-md px-4 py-2 hover:bg-[#fbfcfd] focus:outline-none focus:ring-2 focus:ring-[#4285F4]/20 transition-all font-medium appearance-none min-w-[160px] cursor-pointer"
                     >
                         <option value="all">すべての受入企業</option>
                         {uniqueCompanies.map(c => <option key={c} value={c}>{c}</option>)}
@@ -96,7 +97,7 @@ export function WorkersClient({ workers, userRole }: { workers: any[], userRole?
                     <select
                         value={systemTypeFilter}
                         onChange={(e) => setSystemTypeFilter(e.target.value)}
- className="bg-white text-[#1f1f1f] text-sm rounded-md px-4 py-2 hover:bg-[#fbfcfd] focus:outline-none focus:ring-2 focus:ring-[#4285F4]/20 transition-all font-medium appearance-none min-w-[140px] cursor-pointer" 
+                        className="bg-white text-[#1f1f1f] text-sm rounded-md px-4 py-2 hover:bg-[#fbfcfd] focus:outline-none focus:ring-2 focus:ring-[#4285F4]/20 transition-all font-medium appearance-none min-w-[140px] cursor-pointer"
                     >
                         <option value="all">すべての制度</option>
                         <option value="ikusei_shuro">育成就労</option>
@@ -107,7 +108,7 @@ export function WorkersClient({ workers, userRole }: { workers: any[], userRole?
                     <select
                         value={batchFilter}
                         onChange={(e) => setBatchFilter(e.target.value)}
- className="bg-white text-[#1f1f1f] text-sm rounded-md px-4 py-2 hover:bg-[#fbfcfd] focus:outline-none focus:ring-2 focus:ring-[#4285F4]/20 transition-all font-medium appearance-none min-w-[140px] cursor-pointer" 
+                        className="bg-white text-[#1f1f1f] text-sm rounded-md px-4 py-2 hover:bg-[#fbfcfd] focus:outline-none focus:ring-2 focus:ring-[#4285F4]/20 transition-all font-medium appearance-none min-w-[140px] cursor-pointer"
                     >
                         <option value="all">すべての入国期生</option>
                         {uniqueBatches.map(b => <option key={b} value={b}>{b}</option>)}
@@ -122,7 +123,7 @@ export function WorkersClient({ workers, userRole }: { workers: any[], userRole?
                                 setSystemTypeFilter('all')
                                 setBatchFilter('all')
                             }}
- className="ml-auto flex items-center gap-1.5 text-xs font-semibold text-[#878787] hover:text-gray-700 hover:bg-gray-100 px-3 py-1.5 rounded-md transition-colors"
+                            className="ml-auto flex items-center gap-1.5 text-xs font-semibold text-[#878787] hover:text-gray-700 hover:bg-gray-100 px-3 py-1.5 rounded-md transition-colors"
                         >
                             <RefreshCw size={12} /> リセット
                         </button>
@@ -130,7 +131,7 @@ export function WorkersClient({ workers, userRole }: { workers: any[], userRole?
                 </div>
             </div>
 
- <div className="bg-white/80 rounded-md overflow-hidden p-2"> 
+            <div className="bg-white/80 rounded-md overflow-hidden p-2">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left text-sm text-[#1f1f1f]">
                         <thead className="bg-transparent text-[12px] font-semibold text-[#1f1f1f]/60 border-b border-[#ededed]/50 uppercase tracking-widest whitespace-nowrap">
@@ -162,7 +163,7 @@ export function WorkersClient({ workers, userRole }: { workers: any[], userRole?
                                         {/* 1. Name & Info */}
                                         <td className="px-4 py-2">
                                             <div className="flex items-center gap-3.5">
- <div className="w-11 h-11 rounded-md bg-[#fbfcfd] overflow-hidden flex items-center justify-center shrink-0">
+                                                <div className="w-11 h-11 rounded-md bg-[#fbfcfd] overflow-hidden flex items-center justify-center shrink-0">
                                                     {w.avatar_url ? <img src={w.avatar_url} alt="Avatar" className="w-full h-full object-cover" /> : <span className="text-[#1f1f1f] font-medium text-sm">{w.full_name_romaji.charAt(0)}</span>}
                                                 </div>
                                                 <div>
@@ -205,7 +206,7 @@ export function WorkersClient({ workers, userRole }: { workers: any[], userRole?
 
                                                 <div className={`text-[12px] font-medium flex items-center gap-1.5 ${w.status === 'working' ? 'text-green-600' : w.status === 'missing' ? 'text-red-500' : w.status === 'returned' ? 'text-[#878787]' : 'text-orange-500'}`}>
                                                     <span className={`w-1.5 h-1.5 rounded-md shadow-sm ${w.status === 'working' ? 'bg-green-500' : w.status === 'missing' ? 'bg-red-500' : w.status === 'returned' ? 'bg-gray-400' : 'bg-orange-500'}`}></span>
-                                                    {w.status === 'working' ? '就業中' : w.status === 'missing' ? '失踪' : w.status === 'returned' ? '帰国' : '入国待ち'}
+                                                    {w.status === 'working' ? '就業中' : w.status === 'standby' ? '待機中' : w.status === 'missing' ? '失踪' : w.status === 'returned' ? '帰国' : '入国待ち'}
                                                 </div>
                                             </div>
                                         </td>
@@ -231,10 +232,10 @@ export function WorkersClient({ workers, userRole }: { workers: any[], userRole?
                                         {/* 5. Actions */}
                                         <td className="px-4 py-2 text-right">
                                             <div className="flex items-center justify-end gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
- <Link href={`/workers/${w.id}`} className="px-3 py-1.5 flex items-center gap-1.5 rounded-md text-xs font-medium text-[#1f1f1f] hover:text-white hover:bg-[#24b47e] transition-colors border border-transparent hover:border-[#24b47e]" title="詳細">
+                                                <Link href={`/workers/${w.id}`} className="px-3 py-1.5 flex items-center gap-1.5 rounded-md text-xs font-medium text-[#1f1f1f] hover:text-white hover:bg-[#24b47e] transition-colors border border-transparent hover:border-[#24b47e]" title="詳細">
                                                     <FileSearch size={14} strokeWidth={2} /> 詳細
                                                 </Link>
- <Link href={`/workers/${w.id}/edit`} className="px-3 py-1.5 flex items-center gap-1.5 rounded-md text-xs font-medium text-[#1f1f1f] hover:text-[#24b47e] hover:bg-[#fbfcfd] transition-colors border border-transparent" title="編集">
+                                                <Link href={`/workers/${w.id}/edit`} className="px-3 py-1.5 flex items-center gap-1.5 rounded-md text-xs font-medium text-[#1f1f1f] hover:text-[#24b47e] hover:bg-[#fbfcfd] transition-colors border border-transparent" title="編集">
                                                     <Edit2 size={14} strokeWidth={2} /> 編集
                                                 </Link>
                                             </div>

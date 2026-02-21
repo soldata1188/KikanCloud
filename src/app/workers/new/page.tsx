@@ -129,6 +129,7 @@ export default async function NewWorkerPage() {
                                     </label>
                                     <select name="status" required defaultValue="working" className="w-full bg-[#fbfcfd] border border-[#ededed] focus:bg-white focus:border-[#24b47e] focus:ring-[3px] focus:ring-[#24b47e]/10 rounded-md px-4 py-3 outline-none appearance-none text-[#1f1f1f] transition-all">
                                         <option value="waiting">入国待ち</option>
+                                        <option value="standby">待機中</option>
                                         <option value="working">就業中</option>
                                         <option value="missing">失踪</option>
                                         <option value="returned">帰国</option>

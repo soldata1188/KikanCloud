@@ -82,8 +82,7 @@ export default function DashboardClient({ userName, role, systemData }: { userNa
                 <div className="pt-2 pb-4 shrink-0 relative z-10">
                     <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 flex items-center justify-center shrink-0 scale-[0.65] origin-left"><AnimatedLogo logoOnly /></div>
-                            <span className="text-[10px] font-bold text-[#878787] uppercase tracking-widest bg-white/50 px-2 py-0.5 rounded-full backdrop-blur-sm -ml-1">Omni-Channel</span>
+                            <span className="text-[10px] font-bold text-[#878787] uppercase tracking-widest bg-white/50 px-2 py-0.5 rounded-full backdrop-blur-sm">Omni-Channel</span>
                         </div>
                         <div className="flex items-center gap-3">
                             {!aiData && <div className="text-[11px] font-bold text-[#24b47e] bg-[#24b47e]/10 px-2 py-1 rounded-full flex items-center gap-1.5"><Loader2 size={12} className="animate-spin" /> Syncing Live Data</div>}

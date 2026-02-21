@@ -7,6 +7,7 @@ import { DeleteButton } from '@/components/SubmitButtons'
 import { deleteWorker } from './actions'
 import { bulkUpdateWorkerStatus, bulkDeleteWorkers } from '@/app/actions/operations'
 import * as XLSX from 'xlsx'
+import { ImportModal } from './ImportModal'
 
 export default function WorkersListClient({ initialWorkers, role, next90DaysStr }: { initialWorkers: any[], role: string, next90DaysStr: string }) {
     const [filtered, setFiltered] = useState(initialWorkers)
@@ -48,7 +49,10 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
 
     return (
         <>
-            <DataTableToolbar data={filtered} filename="外国人材リスト" searchPlaceholder="氏名、企業名で検索..." onSearch={handleSearch} type="workers" role={role} addLink="/workers/new" />
+            <div className="flex justify-between items-center mb-4">
+                <DataTableToolbar data={filtered} filename="外国人材リスト" searchPlaceholder="氏名、企業名で検索..." onSearch={handleSearch} type="workers" role={role} addLink="/workers/new" />
+                <ImportModal />
+            </div>
             <div className="bg-white border border-[#ededed] rounded-lg shadow-sm overflow-hidden relative pb-16">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left text-[13px] text-[#1f1f1f] whitespace-nowrap">

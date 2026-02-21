@@ -5,6 +5,7 @@ import { useState, useMemo } from 'react'
 import { Edit2, Trash2, Building2, MapPin, Search } from 'lucide-react'
 import { DataTableToolbar } from '@/components/DataTableToolbar'
 import { deleteCompany } from './actions'
+import { ImportModal } from './ImportModal'
 
 export function CompaniesClient({ companies, userRole }: { companies: any[], userRole?: string }) {
     const [filtered, setFiltered] = useState(companies)
@@ -20,15 +21,18 @@ export function CompaniesClient({ companies, userRole }: { companies: any[], use
 
     return (
         <>
-            <DataTableToolbar
-                data={filtered}
-                filename="企業リスト"
-                searchPlaceholder="企業名で検索..."
-                onSearch={handleSearch}
-                type="companies"
-                role={userRole || 'staff'}
-                addLink="/companies/new"
-            />
+            <div className="flex justify-between items-center mb-4">
+                <DataTableToolbar
+                    data={filtered}
+                    filename="企業リスト"
+                    searchPlaceholder="企業名で検索..."
+                    onSearch={handleSearch}
+                    type="companies"
+                    role={userRole || 'staff'}
+                    addLink="/companies/new"
+                />
+                <ImportModal />
+            </div>
 
             <div className="bg-white border border-[#ededed] rounded-lg shadow-sm overflow-hidden relative pb-16">
                 <div className="overflow-x-auto">

@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { Home, Users, Building2, Landmark, Clock, ShieldAlert, LogOut, Settings, Calendar } from 'lucide-react'
-import { Logo } from './Logo'
+import { SidebarLogo } from './SidebarLogo'
 import { createClient } from '@/lib/supabase/server'
 import { logout } from '@/app/login/actions'
 
@@ -19,9 +19,7 @@ export async function Sidebar({ active }: { active: string }) {
 
     return (
         <aside className="w-14 h-screen bg-[#fbfcfd] border-r border-[#ededed] flex flex-col items-center py-4 shrink-0 z-50">
-            <Link href="/" className="w-8 h-8 rounded-md mb-6 hover:bg-[#ededed] transition-colors flex items-center justify-center p-0.5" title="KikanCloud Home">
-                <Logo className="w-6 h-6 shrink-0" variant="color" />
-            </Link>
+            <SidebarLogo />
 
             <nav className="flex-1 w-full flex flex-col items-center gap-2 px-2">
                 {navItems.map(item => (

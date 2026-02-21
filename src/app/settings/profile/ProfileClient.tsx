@@ -54,7 +54,7 @@ export default function ProfileClient({ initialData }: { initialData: any }) {
                 <div className="flex flex-col gap-3">
                     <label className="text-sm font-semibold text-[#1f1f1f]">プロフィール画像</label>
                     <div className="flex items-center gap-6">
-                        <div className="relative group w-24 h-24 rounded-full overflow-hidden border border-[#ededed] bg-[#fbfcfd] flex shrink-0 items-center justify-center">
+                        <div className="relative group w-24 h-24 rounded-full overflow-hidden border border-gray-200 bg-white flex shrink-0 items-center justify-center">
                             {avatarPreview ? (
                                 <img src={avatarPreview} alt="Avatar" className="w-full h-full object-cover" />
                             ) : (
@@ -78,7 +78,7 @@ export default function ProfileClient({ initialData }: { initialData: any }) {
                             />
                             <button
                                 onClick={() => fileInputRef.current?.click()}
-                                className="flex items-center gap-2 px-4 py-2 bg-white border border-[#ededed] hover:bg-[#fbfcfd] text-[#1f1f1f] rounded-md text-sm font-medium transition-colors"
+                                className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 hover:bg-gray-50 text-[#1f1f1f] rounded-md text-sm font-medium transition-colors"
                             >
                                 <Upload size={16} /> 写真を変更
                             </button>
@@ -94,14 +94,25 @@ export default function ProfileClient({ initialData }: { initialData: any }) {
                         type="text"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        className="w-full px-4 py-3 bg-[#fbfcfd] border border-transparent focus:border-[#24b47e] focus:bg-white rounded-[16px] outline-none text-[#1f1f1f] transition-all"
+                        className="w-full px-4 py-3 bg-white border border-transparent focus:border-[#24b47e] focus:bg-white rounded-[16px] outline-none text-[#1f1f1f] transition-all"
                         placeholder="氏名を入力..."
                     />
                 </div>
 
                 <div className="flex flex-col gap-3">
+                    <label className="text-sm font-semibold text-[#1f1f1f]">メールアドレス (Email)</label>
+                    <input
+                        type="email"
+                        value={initialData?.email || ''}
+                        readOnly
+                        className="w-full px-4 py-3 bg-white/50 border border-transparent rounded-[16px] text-[#878787] cursor-not-allowed outline-none"
+                    />
+                    <p className="text-[11px] text-[#878787]">※メールアドレスの変更はセキュリティの観点から現在サポートされていません。</p>
+                </div>
+
+                <div className="flex flex-col gap-3">
                     <label className="text-sm font-semibold text-[#1f1f1f]">権限 (Role)</label>
-                    <div className="w-full px-4 py-3 bg-[#fbfcfd]/50 text-[#878787] rounded-[16px] cursor-not-allowed">
+                    <div className="w-full px-4 py-3 bg-white/50 text-[#878787] rounded-[16px] cursor-not-allowed">
                         {initialData?.role === 'super_admin' ? 'Super Admin' :
                             initialData?.role === 'union_admin' ? '管理者 (Admin)' : 'スタッフ (Staff)'}
                     </div>

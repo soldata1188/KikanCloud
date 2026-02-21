@@ -15,7 +15,7 @@ export default async function WorkersPage() {
     const { data: workers } = await supabase.from('workers').select('*, companies(name_jp)').eq('is_deleted', false).order('created_at', { ascending: false })
 
     return (
-        <div className="flex h-screen bg-[#fbfcfd] font-sans text-[#1f1f1f] overflow-hidden selection:bg-[#24b47e]/20">
+        <div className="flex h-screen bg-white font-sans text-[#1f1f1f] overflow-hidden selection:bg-[#24b47e]/20">
             <Sidebar active="workers" />
             <div className="flex-1 flex flex-col relative min-w-0">
                 <TopNav title="外国人材管理" role={userProfile?.role} userProfileStr={JSON.stringify(userProfile)} />

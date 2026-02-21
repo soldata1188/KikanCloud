@@ -12,7 +12,7 @@ export function KanbanBoard({ audits }: { audits: any[] }) {
     }
 
     const columns = [
-        { id: 'planned', title: '予定（未実施）', icon: <Calendar size={18} className="text-[#24b47e]" />, bg: 'bg-[#fbfcfd]', border: 'border-t-[#4285F4]' },
+        { id: 'planned', title: '予定（未実施）', icon: <Calendar size={18} className="text-[#24b47e]" />, bg: 'bg-white', border: 'border-t-[#4285F4]' },
         { id: 'in_progress', title: '報告書作成中', icon: <FileText size={18} className="text-[#FABB05]" />, bg: 'bg-[#fff8e1]', border: 'border-t-[#FABB05]' },
         { id: 'completed', title: '完了（提出済）', icon: <CheckCircle2 size={18} className="text-[#34A853]" />, bg: 'bg-[#e6f4ea]', border: 'border-t-[#34A853]' }
     ]
@@ -43,7 +43,7 @@ export function KanbanBoard({ audits }: { audits: any[] }) {
                                         <span className={`text-[10px] px-2 py-1 rounded-md font-medium ${typeInfo.style}`}>{typeInfo.label}</span>
                                         <div className="flex items-center gap-2">
  {isOverdue && <span className="flex items-center gap-1 text-[10px] text-red-600 font-bold bg-red-50 px-2 py-1 rounded-md animate-pulse"><AlertCircle size={12} /> 期限超過</span>}
- <Link href={`/audits/${audit.id}/edit`} className="opacity-0 group-hover:opacity-100 p-1.5 rounded-md text-[#1f1f1f] hover:text-[#24b47e] hover:bg-[#fbfcfd] transition-colors" title="編集"><Edit2 size={14} /></Link>
+ <Link href={`/audits/${audit.id}/edit`} className="opacity-0 group-hover:opacity-100 p-1.5 rounded-md text-[#1f1f1f] hover:text-[#24b47e] hover:bg-gray-50 transition-colors" title="編集"><Edit2 size={14} /></Link>
                                         </div>
                                     </div>
 
@@ -55,13 +55,13 @@ export function KanbanBoard({ audits }: { audits: any[] }) {
                                     <div className="space-y-2 mb-4">
                                         <p className={`text-sm flex items-center gap-2 ${isOverdue ? 'text-red-600 font-medium' : 'text-[#1f1f1f]'}`}><Calendar size={14} className={isOverdue ? 'text-red-500' : 'text-[#878787]'} /> 予定日: {audit.scheduled_date.replace(/-/g, '/')}</p>
                                         <p className="text-sm text-[#1f1f1f] flex items-center gap-2"><UserCircle2 size={14} className="text-[#878787]" /> 担当: {audit.pic_name || '未定'}</p>
-                                        {audit.notes && <p className="text-xs text-[#878787] bg-[#fbfcfd] p-2 rounded-lg line-clamp-2 mt-2">{audit.notes}</p>}
+                                        {audit.notes && <p className="text-xs text-[#878787] bg-white p-2 rounded-lg line-clamp-2 mt-2">{audit.notes}</p>}
                                     </div>
 
                                     {/* 1-Click Actions */}
-                                    <div className="pt-3 border-t border-[#ededed]">
+                                    <div className="pt-3 border-t border-gray-200">
                                         {audit.status === 'planned' && (
- <button onClick={() => handleStatusChange(audit.id, 'in_progress')} disabled={isPending} className="w-full flex items-center justify-center gap-2 bg-[#fbfcfd] hover:bg-[#e1e5ea] text-[#1f1f1f] text-xs font-medium py-2.5 rounded-md transition-colors disabled:opacity-50">
+ <button onClick={() => handleStatusChange(audit.id, 'in_progress')} disabled={isPending} className="w-full flex items-center justify-center gap-2 bg-white hover:bg-[#e1e5ea] text-[#1f1f1f] text-xs font-medium py-2.5 rounded-md transition-colors disabled:opacity-50">
                                                 訪問完了（報告書作成へ） <ArrowRight size={14} />
                                             </button>
                                         )}

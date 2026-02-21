@@ -17,7 +17,7 @@ export default async function CompaniesPage() {
     const { data: companies } = await supabase.from('companies').select('*, workers(count)').eq('is_deleted', false).order('created_at', { ascending: false })
 
     return (
-        <div className="flex h-screen bg-[#fbfcfd] font-sans text-[#1f1f1f] overflow-hidden selection:bg-[#24b47e]/20">
+        <div className="flex h-screen bg-white font-sans text-[#1f1f1f] overflow-hidden selection:bg-[#24b47e]/20">
             <Sidebar active="companies" />
             <div className="flex-1 flex flex-col relative min-w-0">
                 <TopNav title="受入企業管理" role={userProfile?.role} userProfileStr={JSON.stringify(userProfile)} />

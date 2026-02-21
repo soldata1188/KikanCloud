@@ -32,9 +32,9 @@ export function SmartDrawer({ workerId, documents, title, docType, icon, allowUp
 
     return (
         <div className="bg-white rounded-[24px] shadow-sm border border-teal-100 overflow-hidden mb-4">
-            <button onClick={() => setIsOpen(!isOpen)} className="w-full px-4 py-2 flex items-center justify-between bg-white hover:bg-[#fbfcfd]/50 transition-colors">
+            <button onClick={() => setIsOpen(!isOpen)} className="w-full px-4 py-2 flex items-center justify-between bg-white hover:bg-gray-50/50 transition-colors">
                 <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-md flex items-center justify-center shrink-0 ${allowUpload ? 'bg-orange-50 text-orange-600' : 'bg-[#fbfcfd] text-teal-600'}`}>{icon}</div>
+                    <div className={`w-10 h-10 rounded-md flex items-center justify-center shrink-0 ${allowUpload ? 'bg-orange-50 text-orange-600' : 'bg-white text-teal-600'}`}>{icon}</div>
                     <div className="text-left">
                         <h3 className="font-bold text-[#1f1f1f]">{title}</h3>
                         <p className="text-xs text-[#878787]">{filteredDocs.length}件のファイル</p>
@@ -44,12 +44,12 @@ export function SmartDrawer({ workerId, documents, title, docType, icon, allowUp
             </button>
 
             {isOpen && (
-                <div className="px-6 pb-6 pt-2 border-t border-gray-50 bg-[#fbfcfd]/50">
+                <div className="px-6 pb-6 pt-2 border-t border-gray-50 bg-white/50">
                     {allowUpload && (
  <div className="mb-6 flex gap-4 items-end bg-white p-4 rounded-md"> 
                             <div className="w-1/3">
                                 <label className="block text-xs font-bold text-[#878787] mb-1">対象月</label>
- <input type="month" value={targetMonth} onChange={(e) => setTargetMonth(e.target.value)} disabled={isPending} className="w-full bg-[#fbfcfd] border border-[#ededed] rounded-md px-3 py-2 text-sm outline-none focus:border-orange-400" />
+ <input type="month" value={targetMonth} onChange={(e) => setTargetMonth(e.target.value)} disabled={isPending} className="w-full bg-white border border-gray-200 rounded-md px-3 py-2 text-sm outline-none focus:border-orange-400" />
                             </div>
                             <div className="flex-1 relative">
                                 <input type="file" ref={fileInputRef} onChange={handleUpload} disabled={isPending} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" accept=".pdf,.jpg,.jpeg,.png,.xlsx" />
@@ -70,7 +70,7 @@ export function SmartDrawer({ workerId, documents, title, docType, icon, allowUp
                                         <p className="text-[10px] text-[#878787]">{new Date(doc.created_at).toLocaleDateString('ja-JP')} <span className="mx-1">|</span> {doc.uploaded_by}</p>
                                     </div>
                                 </div>
-                                {doc.signedUrl && <a href={doc.signedUrl} target="_blank" rel="noopener noreferrer" className="p-2 bg-[#fbfcfd] hover:bg-[#fbfcfd] text-gray-600 hover:text-teal-600 rounded-lg transition-colors shrink-0"><Download size={16} /></a>}
+                                {doc.signedUrl && <a href={doc.signedUrl} target="_blank" rel="noopener noreferrer" className="p-2 bg-white hover:bg-gray-50 text-gray-600 hover:text-teal-600 rounded-lg transition-colors shrink-0"><Download size={16} /></a>}
                             </div>
                         ))}
                     </div>

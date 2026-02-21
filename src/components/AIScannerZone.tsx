@@ -81,7 +81,7 @@ export function AIScannerZone() {
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
-            className={`border-2 border-dashed rounded-lg p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative overflow-hidden group mb-6 transition-colors ${isDragging ? 'border-[#24b47e] bg-[#24b47e]/5' : 'border-[#24b47e]/30 bg-[#fbfcfd]'}`}
+            className={`border-2 border-dashed rounded-lg p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative overflow-hidden group mb-6 transition-colors ${isDragging ? 'border-[#24b47e] bg-[#24b47e]/5' : 'border-[#24b47e]/30 bg-white'}`}
         >
             <div className="absolute -right-10 -top-10 text-[#24b47e]/5 transform rotate-12 group-hover:scale-110 transition-transform duration-700 pointer-events-none">
                 <Sparkles size={120} />
@@ -101,7 +101,7 @@ export function AIScannerZone() {
                 type="button"
                 onClick={() => !isPending && fileInputRef.current?.click()}
                 disabled={isPending}
-                className="shrink-0 relative z-10 flex items-center gap-2 px-6 py-3 bg-white border border-[#ededed] hover:border-[#24b47e] text-[#1f1f1f] hover:text-[#24b47e] rounded-md text-[13px] font-bold transition-all shadow-sm disabled:opacity-50"
+                className="shrink-0 relative z-10 flex items-center gap-2 px-6 py-3 bg-white border border-gray-200 hover:border-[#24b47e] text-[#1f1f1f] hover:text-[#24b47e] rounded-md text-[13px] font-bold transition-all shadow-sm disabled:opacity-50"
             >
                 {isPending ? (
                     <><Loader2 size={16} className="animate-spin text-[#24b47e]" /> 解析中... ({timer}秒)</>

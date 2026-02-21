@@ -56,7 +56,7 @@ export function DocumentManager({ workerId, documents, role }: { workerId: strin
                     <div className="space-y-4">
                         <div>
                             <label className="block text-sm font-bold text-[#1f1f1f] mb-2">書類の種類 <span className="text-red-500">*</span></label>
- <select value={docType} onChange={(e) => setDocType(e.target.value)} disabled={uploading || isPending} className="w-full bg-[#fbfcfd] -transparent focus: focus:bg-white rounded-md px-4 py-3 text-sm font-medium outline-none transition-colors cursor-pointer"> 
+ <select value={docType} onChange={(e) => setDocType(e.target.value)} disabled={uploading || isPending} className="w-full bg-white -transparent focus: focus:bg-white rounded-md px-4 py-3 text-sm font-medium outline-none transition-colors cursor-pointer"> 
                                 <option value="zairyu_card">在留カード (表・裏)</option>
                                 <option value="passport">パスポート (顔写真ページ)</option>
                                 <option value="contract">雇用条件書・契約書</option>
@@ -69,7 +69,7 @@ export function DocumentManager({ workerId, documents, role }: { workerId: strin
                             onDragOver={(e) => { e.preventDefault(); setDragActive(true); }}
                             onDragLeave={() => setDragActive(false)}
                             onDrop={(e) => { e.preventDefault(); setDragActive(false); if (e.dataTransfer.files?.[0]) handleUpload(e.dataTransfer.files[0]); }}
-                            className={`border-2 border-dashed rounded-[20px] p-8 text-center transition-colors relative cursor-pointer group ${dragActive ? 'border-[#24b47e] bg-[#fbfcfd]/50' : 'border-[#e1e5ea] hover:border-[#24b47e] hover:bg-[#fbfcfd]/30'}`}
+                            className={`border-2 border-dashed rounded-[20px] p-8 text-center transition-colors relative cursor-pointer group ${dragActive ? 'border-[#24b47e] bg-white/50' : 'border-[#e1e5ea] hover:border-[#24b47e] hover:bg-gray-50/30'}`}
                         >
                             <input type="file" ref={fileInputRef} onChange={(e) => e.target.files?.[0] && handleUpload(e.target.files[0])} accept=".pdf,.jpg,.jpeg,.png" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" disabled={uploading || isPending} />
                             <div className="flex flex-col items-center justify-center gap-2">
@@ -85,7 +85,7 @@ export function DocumentManager({ workerId, documents, role }: { workerId: strin
             {/* CỘT PHẢI: DOCUMENT LIST */}
             <div className="lg:col-span-2">
  <div className="bg-white rounded-md overflow-hidden min-h-[400px]"> 
-                    <div className="px-4 py-2.5 border-b border-[#ededed] flex items-center justify-between bg-[#fbfcfd]/50">
+                    <div className="px-4 py-2.5 border-b border-gray-200 flex items-center justify-between bg-white/50">
                         <h3 className="text-base font-bold text-[#1f1f1f] flex items-center gap-2"><FolderOpen size={20} className="text-orange-500" /> 保管されたファイル</h3>
  <span className="text-xs font-bold text-[#878787] bg-gray-200 px-3 py-1 rounded-md flex items-center gap-1"><ShieldCheck size={14} /> {documents.length}件</span>
                     </div>
@@ -100,9 +100,9 @@ export function DocumentManager({ workerId, documents, role }: { workerId: strin
                             {documents.map(doc => {
                                 const typeStyle = getTypeStyle(doc.doc_type)
                                 return (
-                                    <li key={doc.id} className="p-4 hover:bg-[#fbfcfd]/30 transition-colors flex items-center justify-between gap-4 group">
+                                    <li key={doc.id} className="p-4 hover:bg-gray-50/30 transition-colors flex items-center justify-between gap-4 group">
                                         <div className="flex items-center gap-4 min-w-0 flex-1">
-                                            <div className={`w-12 h-12 rounded-md flex items-center justify-center shrink-0 border border-[#ededed] bg-white shadow-sm`}>
+                                            <div className={`w-12 h-12 rounded-md flex items-center justify-center shrink-0 border border-gray-200 bg-white shadow-sm`}>
                                                 {typeStyle.icon}
                                             </div>
                                             <div className="min-w-0 flex-1">
@@ -122,7 +122,7 @@ export function DocumentManager({ workerId, documents, role }: { workerId: strin
 
                                         <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
                                             {doc.signedUrl && (
- <a href={doc.signedUrl} target="_blank" rel="noopener noreferrer" className="p-2.5 text-[#1f1f1f] hover:text-[#24b47e] hover:bg-[#fbfcfd] rounded-md transition-colors font-bold text-xs flex items-center gap-1" title="プレビュー / ダウンロード"><Download size={14} /> 開く</a>
+ <a href={doc.signedUrl} target="_blank" rel="noopener noreferrer" className="p-2.5 text-[#1f1f1f] hover:text-[#24b47e] hover:bg-gray-50 rounded-md transition-colors font-bold text-xs flex items-center gap-1" title="プレビュー / ダウンロード"><Download size={14} /> 開く</a>
                                             )}
                                             {role === 'admin' && (
                                                 <form action={deleteWorkerDocument}>

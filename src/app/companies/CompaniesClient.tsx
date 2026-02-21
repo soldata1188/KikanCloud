@@ -32,10 +32,10 @@ export function CompaniesClient({ companies, userRole }: { companies: any[], use
                 importNode={<ImportModal />}
             />
 
-            <div className="bg-white border border-[#ededed] rounded-lg shadow-sm overflow-hidden relative pb-16">
+            <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden relative pb-16">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left text-[13px] text-[#1f1f1f] whitespace-nowrap">
-                        <thead className="bg-[#fbfcfd] border-b border-[#ededed] text-[11px] font-medium text-[#878787] uppercase tracking-wider">
+                        <thead className="bg-white border-b border-gray-200 text-[11px] font-medium text-[#878787] uppercase tracking-wider">
                             <tr>
                                 <th className="px-5 py-3 font-medium">企業名 / 基本情報</th>
                                 <th className="px-5 py-3 font-medium">所在地 / 代表者</th>
@@ -57,16 +57,16 @@ export function CompaniesClient({ companies, userRole }: { companies: any[], use
                             {filtered.map((c) => {
                                 const activeWorkers = c.workers?.filter((w: any) => w.status === 'working' && w.is_deleted === false).length || 0;
                                 return (
-                                    <tr key={c.id} className="hover:bg-[#fbfcfd] transition-colors group">
+                                    <tr key={c.id} className="hover:bg-gray-50 transition-colors group">
                                         <td className="px-5 py-3.5">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-md bg-[#fbfcfd] border border-[#ededed] flex items-center justify-center shrink-0 text-[#878787]">
+                                                <div className="w-8 h-8 rounded-md bg-white border border-gray-200 flex items-center justify-center shrink-0 text-[#878787]">
                                                     <Building2 size={16} />
                                                 </div>
                                                 <div>
                                                     <Link href={`/companies/${c.id}/edit`} className="font-medium text-[#1f1f1f] hover:text-[#24b47e] transition-colors flex items-center gap-2">
                                                         {c.name_jp}
-                                                        {c.name_romaji && <span className="text-[10px] px-1.5 py-0.5 bg-[#fbfcfd] text-[#878787] rounded-[4px] border border-[#ededed] uppercase tracking-wide">{c.name_romaji}</span>}
+                                                        {c.name_romaji && <span className="text-[10px] px-1.5 py-0.5 bg-white text-[#878787] rounded-[4px] border border-gray-200 uppercase tracking-wide">{c.name_romaji}</span>}
                                                     </Link>
                                                     <div className="text-[11px] text-[#878787] font-mono mt-0.5">
                                                         法人番号: {c.corporate_number || '未設定'}
@@ -87,7 +87,7 @@ export function CompaniesClient({ companies, userRole }: { companies: any[], use
                                         </td>
                                         <td className="px-5 py-3.5">
                                             <div className="flex flex-col items-start gap-1.5">
-                                                <span className="px-2 py-0.5 border border-[#ededed] text-[#878787] rounded-[4px] text-[10px] font-mono uppercase tracking-wider bg-[#fbfcfd]">
+                                                <span className="px-2 py-0.5 border border-gray-200 text-[#878787] rounded-[4px] text-[10px] font-mono uppercase tracking-wider bg-white">
                                                     在籍: {activeWorkers}名
                                                 </span>
                                                 <div className="text-[11px] font-medium flex items-center gap-1.5 text-[#878787]">
@@ -97,7 +97,7 @@ export function CompaniesClient({ companies, userRole }: { companies: any[], use
                                         </td>
                                         <td className="px-5 py-3.5 text-right">
                                             <div className="flex items-center justify-end gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
-                                                <Link href={`/companies/${c.id}/edit`} className="px-2 py-1 flex items-center gap-1 rounded-md text-[12px] font-medium text-[#878787] hover:text-[#24b47e] hover:bg-[#fbfcfd] transition-colors">
+                                                <Link href={`/companies/${c.id}/edit`} className="px-2 py-1 flex items-center gap-1 rounded-md text-[12px] font-medium text-[#878787] hover:text-[#24b47e] hover:bg-gray-50 transition-colors">
                                                     詳細
                                                 </Link>
                                                 {userRole === 'admin' && (

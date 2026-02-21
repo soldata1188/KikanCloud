@@ -21,7 +21,7 @@ export default async function ProceduresPage() {
         .order('target_date', { ascending: true })
 
     return (
-        <div className="flex h-screen bg-[#fbfcfd] font-sans text-[#1f1f1f] overflow-hidden selection:bg-[#24b47e]/20">
+        <div className="flex h-screen bg-white font-sans text-[#1f1f1f] overflow-hidden selection:bg-[#24b47e]/20">
             <Sidebar active="procedures" />
             <div className="flex-1 flex flex-col relative min-w-0">
                 <TopNav title="行政手続管理" role={userProfile?.role} userProfileStr={JSON.stringify(userProfile)} />

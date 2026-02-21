@@ -57,18 +57,18 @@ export default async function AuditsPage({ searchParams }: { searchParams: Promi
 
         if (!currentAudit) {
             priority = 2; // 🟠 優先度2 (オレンジ): スケジュール未設定
-            statusLabel = { text: '予定未作成', bg: 'bg-[#fbfcfd] text-[#878787]', border: 'border-[#ededed]' };
+            statusLabel = { text: '予定未作成', bg: 'bg-white text-[#878787]', border: 'border-gray-200' };
         } else if (currentAudit.status === 'planned' || currentAudit.status === 'in_progress') {
             if (currentAudit.scheduled_date < todayStr) {
                 priority = 1; // 🔴 優先度1 (赤): 期限遅延
-                statusLabel = { text: '期限超過', bg: 'bg-[#fbfcfd] text-red-600', border: 'border-red-200' };
+                statusLabel = { text: '期限超過', bg: 'bg-white text-red-600', border: 'border-red-200' };
             } else {
                 priority = 4; // 🔵 優先度4 (青): 将来の予定
-                statusLabel = { text: '予定あり', bg: 'bg-[#fbfcfd] text-blue-600', border: 'border-blue-200' };
+                statusLabel = { text: '予定あり', bg: 'bg-white text-blue-600', border: 'border-blue-200' };
             }
         } else if (currentAudit.status === 'completed') {
             priority = 5; // 🟢 優先度5 (緑 - 最下部): 完了済
-            statusLabel = { text: '提出済', bg: 'bg-[#fbfcfd] text-[#878787]', border: 'border-[#ededed]' };
+            statusLabel = { text: '提出済', bg: 'bg-white text-[#878787]', border: 'border-gray-200' };
         }
 
         const pastAudits = pastAuditsData?.filter(a => a.company_id === company.id) || [];
@@ -86,7 +86,7 @@ export default async function AuditsPage({ searchParams }: { searchParams: Promi
     });
 
     return (
-        <div className="flex h-screen bg-[#fbfcfd] font-sans text-[#1f1f1f] overflow-hidden selection:bg-[#24b47e]/20">
+        <div className="flex h-screen bg-white font-sans text-[#1f1f1f] overflow-hidden selection:bg-[#24b47e]/20">
             <Sidebar active="audits" />
             <div className="flex-1 flex flex-col relative min-w-0">
                 <TopNav title="監査・訪問指導" role={userProfile?.role} userProfileStr={JSON.stringify(userProfile)} />
@@ -100,7 +100,7 @@ export default async function AuditsPage({ searchParams }: { searchParams: Promi
 
                                 {userProfile?.role === 'admin' && <ExportExcelButton data={matrixData} month={filterMonth} />}
 
-                                <Link href={`/audits/print?month=${filterMonth}`} target="_blank" className="h-[32px] px-3 bg-[#fbfcfd] border border-[#ededed] hover:bg-[#f4f5f7] text-[#1f1f1f] rounded-md text-[13px] font-medium flex items-center gap-1.5 transition-colors">
+                                <Link href={`/audits/print?month=${filterMonth}`} target="_blank" className="h-[32px] px-3 bg-white border border-gray-200 hover:bg-[#f4f5f7] text-[#1f1f1f] rounded-md text-[13px] font-medium flex items-center gap-1.5 transition-colors">
                                     <Printer size={14} /> PDF出力
                                 </Link>
 
@@ -110,10 +110,10 @@ export default async function AuditsPage({ searchParams }: { searchParams: Promi
                             </div>
                         </div>
 
-                        <div className="bg-white border border-[#ededed] rounded-lg shadow-sm overflow-hidden mb-12">
+                        <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden mb-12">
                             <div className="overflow-x-auto">
                                 <table className="w-full text-left text-[13px]">
-                                    <thead className="bg-[#fbfcfd] border-b border-[#ededed] text-[11px] font-medium text-[#878787] uppercase tracking-wider">
+                                    <thead className="bg-white border-b border-gray-200 text-[11px] font-medium text-[#878787] uppercase tracking-wider">
                                         <tr>
                                             <th className="px-5 py-3 font-medium">受入企業</th>
                                             <th className="px-5 py-3 font-medium">ステータス</th>
@@ -124,11 +124,11 @@ export default async function AuditsPage({ searchParams }: { searchParams: Promi
                                     </thead>
                                     <tbody className="divide-y divide-[#ededed]">
                                         {matrixData.map((row) => (
-                                            <tr key={row.company.id} className="hover:bg-[#fbfcfd] transition-colors group">
+                                            <tr key={row.company.id} className="hover:bg-gray-50 transition-colors group">
                                                 {/* 1. 企業名 */}
                                                 <td className="px-5 py-3.5">
                                                     <div className="flex gap-3">
-                                                        <div className="w-8 h-8 rounded-md border border-[#ededed] bg-[#fbfcfd] flex items-center justify-center shrink-0 text-[#878787]">
+                                                        <div className="w-8 h-8 rounded-md border border-gray-200 bg-white flex items-center justify-center shrink-0 text-[#878787]">
                                                             <Building2 size={16} />
                                                         </div>
                                                         <div>
@@ -136,9 +136,9 @@ export default async function AuditsPage({ searchParams }: { searchParams: Promi
                                                             <div className="flex items-center gap-1.5 flex-wrap">
                                                                 <span className="text-[11px] text-[#878787] font-medium whitespace-nowrap">計 <span className="text-[#1f1f1f]">{row.workerCounts.total}</span>名</span>
                                                                 {row.workerCounts.total > 0 && <span className="text-gray-300 ml-1 mr-0.5">|</span>}
-                                                                {row.workerCounts.ikusei > 0 && <span className="text-[10px] px-1.5 py-0.5 bg-[#fbfcfd] text-[#878787] border border-[#ededed] rounded-[4px] flex items-center gap-1 whitespace-nowrap">育成 {row.workerCounts.ikusei}</span>}
-                                                                {row.workerCounts.tokutei > 0 && <span className="text-[10px] px-1.5 py-0.5 bg-[#fbfcfd] text-[#878787] border border-[#ededed] rounded-[4px] flex items-center gap-1 whitespace-nowrap">特定 {row.workerCounts.tokutei}</span>}
-                                                                {row.workerCounts.ginou > 0 && <span className="text-[10px] px-1.5 py-0.5 bg-[#fbfcfd] text-[#878787] border border-[#ededed] rounded-[4px] flex items-center gap-1 whitespace-nowrap">技能 {row.workerCounts.ginou}</span>}
+                                                                {row.workerCounts.ikusei > 0 && <span className="text-[10px] px-1.5 py-0.5 bg-white text-[#878787] border border-gray-200 rounded-[4px] flex items-center gap-1 whitespace-nowrap">育成 {row.workerCounts.ikusei}</span>}
+                                                                {row.workerCounts.tokutei > 0 && <span className="text-[10px] px-1.5 py-0.5 bg-white text-[#878787] border border-gray-200 rounded-[4px] flex items-center gap-1 whitespace-nowrap">特定 {row.workerCounts.tokutei}</span>}
+                                                                {row.workerCounts.ginou > 0 && <span className="text-[10px] px-1.5 py-0.5 bg-white text-[#878787] border border-gray-200 rounded-[4px] flex items-center gap-1 whitespace-nowrap">技能 {row.workerCounts.ginou}</span>}
                                                             </div>
                                                         </div>
                                                     </div>
@@ -158,12 +158,12 @@ export default async function AuditsPage({ searchParams }: { searchParams: Promi
                                                         {/* Current Month */}
                                                         {row.currentAudit ? (
                                                             <div className="flex flex-col gap-1">
-                                                                <div className="flex items-center gap-2"><Calendar size={12} className="text-[#878787]" /> <span className="text-[12px] text-[#1f1f1f] font-mono">{row.currentAudit.scheduled_date.replace(/-/g, '/')}</span> <span className="text-[9px] px-1 bg-[#fbfcfd] text-[#878787] rounded border border-[#ededed]">予定</span></div>
+                                                                <div className="flex items-center gap-2"><Calendar size={12} className="text-[#878787]" /> <span className="text-[12px] text-[#1f1f1f] font-mono">{row.currentAudit.scheduled_date.replace(/-/g, '/')}</span> <span className="text-[9px] px-1 bg-white text-[#878787] rounded border border-gray-200">予定</span></div>
                                                             </div>
                                                         ) : <div className="h-[24px] flex items-center"><span className="text-gray-300 font-medium">-</span></div>}
 
                                                         {/* History */}
-                                                        <div className="border-t border-[#ededed] pt-2 mt-1">
+                                                        <div className="border-t border-gray-200 pt-2 mt-1">
                                                             <div className="flex flex-col gap-1">
                                                                 {row.lastTwoAudits.length > 0 ? (
                                                                     row.lastTwoAudits.map((pa: any) => (
@@ -172,7 +172,7 @@ export default async function AuditsPage({ searchParams }: { searchParams: Promi
                                                                                 <span className="font-mono tracking-tight">{pa.actual_date?.replace(/-/g, '/')}</span>
                                                                             </div>
                                                                             <div className="flex items-center gap-1.5">
-                                                                                <span className="px-1 py-0.5 bg-[#fbfcfd] border border-[#ededed] rounded-[4px] text-[9px] text-[#878787]">
+                                                                                <span className="px-1 py-0.5 bg-white border border-gray-200 rounded-[4px] text-[9px] text-[#878787]">
                                                                                     {pa.audit_type === 'kansa' ? '監査' : pa.audit_type === 'homon' ? '訪問' : '臨時'}
                                                                                 </span>
                                                                                 <Link href={`/audits/${pa.id}/edit`} className="text-[#878787] hover:text-[#24b47e] transition-colors p-0.5 rounded-[4px] hover:bg-[#ededed]" title="編集">
@@ -193,7 +193,7 @@ export default async function AuditsPage({ searchParams }: { searchParams: Promi
                                                 <td className="px-5 py-3.5">
                                                     {row.currentAudit?.pic_name ? (
                                                         <div className="flex items-center gap-2">
-                                                            <div className="w-5 h-5 rounded-[4px] bg-[#fbfcfd] text-[#878787] flex items-center justify-center text-[10px] font-bold shrink-0 border border-[#ededed]">
+                                                            <div className="w-5 h-5 rounded-[4px] bg-white text-[#878787] flex items-center justify-center text-[10px] font-bold shrink-0 border border-gray-200">
                                                                 {row.currentAudit.pic_name.charAt(0)}
                                                             </div>
                                                             <span className="text-[12px] font-medium text-[#1f1f1f]">{row.currentAudit.pic_name}</span>

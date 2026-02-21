@@ -51,10 +51,10 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
     return (
         <>
             <DataTableToolbar data={filtered} filename="外国人材リスト" searchPlaceholder="氏名、企業名で検索..." onSearch={handleSearch} type="workers" role={role} addLink="/workers/new" importNode={<ImportModal />} />
-            <div className="bg-white border border-[#ededed] rounded-lg shadow-sm overflow-hidden relative pb-16">
+            <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden relative pb-16">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left text-[13px] text-[#1f1f1f] whitespace-nowrap">
-                        <thead className="bg-[#fbfcfd] border-b border-[#ededed] text-[11px] font-medium text-[#878787] uppercase tracking-wider">
+                        <thead className="bg-white border-b border-gray-200 text-[11px] font-medium text-[#878787] uppercase tracking-wider">
                             <tr>
                                 <th className="px-5 py-3 font-medium w-10 cursor-pointer" onClick={toggleSelectAll}>{selectedIds.length === filtered.length && filtered.length > 0 ? <CheckSquare className="text-[#24b47e]" size={16} /> : <Square className="text-gray-300" size={16} />}</th>
                                 <th className="px-5 py-3 font-medium">氏名 / 企業名</th><th className="px-5 py-3 font-medium">区分</th><th className="px-5 py-3 font-medium">在留カード</th><th className="px-5 py-3 font-medium">パスポート期限</th><th className="px-5 py-3 font-medium">ステータス</th><th className="px-5 py-3 font-medium text-right">操作</th>
@@ -66,10 +66,10 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                                 const isExpiring = (w.passport_exp && w.passport_exp <= next90DaysStr) || (w.cert_end_date && w.cert_end_date <= next90DaysStr);
                                 const isChecked = selectedIds.includes(w.id);
                                 return (
-                                    <tr key={w.id} className={`transition-colors group ${isChecked ? 'bg-[#24b47e]/5' : 'hover:bg-[#fbfcfd]'}`}>
+                                    <tr key={w.id} className={`transition-colors group ${isChecked ? 'bg-[#24b47e]/5' : 'hover:bg-gray-50'}`}>
                                         <td className="px-5 py-3.5 cursor-pointer" onClick={() => toggleSelect(w.id)}>{isChecked ? <CheckSquare className="text-[#24b47e]" size={16} /> : <Square className="text-gray-300" size={16} />}</td>
-                                        <td className="px-5 py-3.5"><div className="flex items-center gap-3"><div className="w-8 h-8 rounded-full bg-[#fbfcfd] flex items-center justify-center shrink-0 border border-[#ededed] overflow-hidden">{w.avatar_url ? <img src={w.avatar_url} className="w-full h-full object-cover" /> : <UserCircle2 size={16} className="text-[#878787]" />}</div><div><Link href={`/workers/${w.id}/edit`} className="font-medium text-[#1f1f1f] hover:text-[#24b47e] transition-colors">{w.full_name_romaji}</Link><div className="text-[11px] text-[#878787] mt-0.5">{w.companies?.name_jp || '未配属'}</div></div></div></td>
-                                        <td className="px-5 py-3.5"><span className="px-2 py-0.5 border border-[#ededed] text-[#878787] rounded-[4px] text-[10px] font-mono uppercase tracking-wider bg-[#fbfcfd]">{w.system_type === 'tokuteigino' ? '特定技能' : '技能実習'}</span></td>
+                                        <td className="px-5 py-3.5"><div className="flex items-center gap-3"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shrink-0 border border-gray-200 overflow-hidden">{w.avatar_url ? <img src={w.avatar_url} className="w-full h-full object-cover" /> : <UserCircle2 size={16} className="text-[#878787]" />}</div><div><Link href={`/workers/${w.id}/edit`} className="font-medium text-[#1f1f1f] hover:text-[#24b47e] transition-colors">{w.full_name_romaji}</Link><div className="text-[11px] text-[#878787] mt-0.5">{w.companies?.name_jp || '未配属'}</div></div></div></td>
+                                        <td className="px-5 py-3.5"><span className="px-2 py-0.5 border border-gray-200 text-[#878787] rounded-[4px] text-[10px] font-mono uppercase tracking-wider bg-white">{w.system_type === 'tokuteigino' ? '特定技能' : '技能実習'}</span></td>
                                         <td className="px-5 py-3.5 font-mono text-xs text-[#878787]">{w.zairyu_no || '未登録'}</td>
                                         <td className="px-5 py-3.5 text-xs font-medium text-[#1f1f1f]">{w.passport_exp ? <span className={`flex items-center gap-1 ${isExpiring && w.status === 'working' ? 'text-red-600' : ''}`}>{isExpiring && w.status === 'working' && <AlertCircle size={14} />} {w.passport_exp.replace(/-/g, '/')}</span> : '-'}</td>
                                         <td className="px-5 py-3.5"><span className={`px-2 py-0.5 border rounded-full text-[10px] font-bold uppercase tracking-widest bg-transparent ${w.status === 'working' ? 'border-[#24b47e] text-[#24b47e]' : 'border-gray-300 text-[#878787]'}`}>{w.status === 'working' ? '就業中' : w.status === 'standby' ? '待機中' : w.status === 'returned' ? '帰国' : w.status === 'waiting' ? '入国待ち' : w.status === 'missing' ? '失踪' : w.status}</span></td>

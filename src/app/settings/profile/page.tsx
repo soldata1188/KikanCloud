@@ -13,6 +13,10 @@ export default async function ProfileSettingsPage() {
         .eq('id', user.id)
         .single()
 
+    if (userProfile) {
+        userProfile.email = user.email
+    }
+
     return (
         <div>
             <h3 className="text-2xl font-semibold mb-6">プロフィール設定</h3>

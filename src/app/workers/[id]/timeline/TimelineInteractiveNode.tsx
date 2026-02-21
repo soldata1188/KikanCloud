@@ -28,13 +28,13 @@ export function TimelineInteractiveNode({ event, workerId, companyId, existingPr
             case 'submitted': return { label: '申請・審査中', color: 'bg-blue-100 text-blue-700 border-blue-200 hover:bg-blue-200', icon: <PlayCircle size={14} /> }
             case 'issue': return { label: '不備・要対応', color: 'bg-red-100 text-red-700 border-red-200 animate-pulse hover:bg-red-200', icon: <AlertCircle size={14} /> }
             case 'preparing': return { label: '書類準備中', color: 'bg-yellow-100 text-yellow-700 border-yellow-200 hover:bg-yellow-200', icon: <Clock size={14} /> }
-            default: return { label: '未対応 (未処理)', color: 'bg-gray-100 text-[#878787] border-[#ededed] hover:bg-gray-200', icon: null }
+            default: return { label: '未対応 (未処理)', color: 'bg-gray-100 text-[#878787] border-gray-200 hover:bg-gray-200', icon: null }
         }
     }
 
     const getAgencyInfo = () => {
-        if (agency === 'nyukan') return <span className="text-blue-600 bg-[#fbfcfd] px-2 py-0.5 rounded flex items-center gap-1"><Landmark size={10} /> 入管</span>
-        if (agency === 'kikou') return <span className="text-teal-600 bg-[#fbfcfd] px-2 py-0.5 rounded flex items-center gap-1"><Building2 size={10} /> 機構</span>
+        if (agency === 'nyukan') return <span className="text-blue-600 bg-white px-2 py-0.5 rounded flex items-center gap-1"><Landmark size={10} /> 入管</span>
+        if (agency === 'kikou') return <span className="text-teal-600 bg-white px-2 py-0.5 rounded flex items-center gap-1"><Building2 size={10} /> 機構</span>
         if (agency === 'kentei') return <span className="text-purple-600 bg-purple-50 px-2 py-0.5 rounded flex items-center gap-1"><FileText size={10} /> 検定</span>
         return null
     }
@@ -57,7 +57,7 @@ export function TimelineInteractiveNode({ event, workerId, companyId, existingPr
             </div>
 
             <div className={`flex-1 py-3 px-4 sm:px-5 rounded-md transition-all duration-300 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border
-        ${isCurrent ? 'bg-[#fbfcfd]/50 border-blue-200 shadow-sm ml-1 sm:ml-2' : currentStatus !== 'none' ? 'bg-white border-[#ededed] shadow-sm' : 'border-transparent opacity-80 hover:opacity-100 hover:bg-white'}`}>
+        ${isCurrent ? 'bg-white/50 border-blue-200 shadow-sm ml-1 sm:ml-2' : currentStatus !== 'none' ? 'bg-white border-gray-200 shadow-sm' : 'border-transparent opacity-80 hover:opacity-100 hover:bg-white'}`}>
                 <div>
                     <div className="flex items-center gap-2 mb-1">
                         <h4 className={`text-base font-bold ${currentStatus === 'completed' ? 'text-[#878787] line-through' : currentStatus === 'issue' ? 'text-red-600' : isCurrent ? 'text-[#24b47e]' : 'text-[#1f1f1f]'}`}>{event.title}</h4>
@@ -72,12 +72,12 @@ export function TimelineInteractiveNode({ event, workerId, companyId, existingPr
                             {isPending ? <Loader2 size={14} className="animate-spin mx-auto" /> : (<><span className="flex items-center gap-1.5 truncate">{ui.icon} {ui.label}</span> <ChevronDown size={14} className="opacity-50" /></>)}
                         </button>
                         {isOpen && (
-                            <div className="absolute top-full mt-1 right-0 w-[180px] bg-white rounded-xl shadow-sm border border-[#ededed] py-1.5 z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                            <div className="absolute top-full mt-1 right-0 w-[180px] bg-white rounded-xl shadow-sm border border-gray-200 py-1.5 z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                                 <button onClick={() => handleUpdate('preparing')} className="w-full text-left px-4 py-2 text-xs font-bold text-yellow-700 hover:bg-yellow-50 flex items-center gap-2"><Clock size={14} /> 書類準備中 (Preparing)</button>
-                                <button onClick={() => handleUpdate('submitted')} className="w-full text-left px-4 py-2 text-xs font-bold text-blue-700 hover:bg-[#fbfcfd] flex items-center gap-2"><PlayCircle size={14} /> 申請・審査中 (Submitted)</button>
+                                <button onClick={() => handleUpdate('submitted')} className="w-full text-left px-4 py-2 text-xs font-bold text-blue-700 hover:bg-gray-50 flex items-center gap-2"><PlayCircle size={14} /> 申請・審査中 (Submitted)</button>
                                 <button onClick={() => handleUpdate('issue')} className="w-full text-left px-4 py-2 text-xs font-bold text-red-700 hover:bg-red-50 flex items-center gap-2"><AlertCircle size={14} /> 不備・要対応 (Issue)</button>
                                 <button onClick={() => handleUpdate('completed')} className="w-full text-left px-4 py-2 text-xs font-bold text-green-700 hover:bg-green-50 flex items-center gap-2 border-t border-gray-50"><CheckCircle2 size={14} /> 許可・完了 (Completed)</button>
-                                {currentStatus !== 'none' && <button onClick={() => handleUpdate('none')} className="w-full text-left px-4 py-2 text-xs font-bold text-[#878787] hover:bg-[#fbfcfd] border-t border-gray-50 flex items-center gap-2"><X size={14} /> リセット (Reset)</button>}
+                                {currentStatus !== 'none' && <button onClick={() => handleUpdate('none')} className="w-full text-left px-4 py-2 text-xs font-bold text-[#878787] hover:bg-gray-50 border-t border-gray-50 flex items-center gap-2"><X size={14} /> リセット (Reset)</button>}
                             </div>
                         )}
                     </div>

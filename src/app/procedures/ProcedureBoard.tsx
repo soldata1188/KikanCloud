@@ -30,9 +30,9 @@ export function ProcedureBoard({ procedures }: { procedures: any[] }) {
     const filteredProcs = procedures.filter(p => p.agency === activeTab)
 
     const tabs = [
-        { id: 'nyukan', label: '出入国在留管理局 (入管)', icon: <Landmark size={14} />, color: 'bg-[#1f1f1f] text-white', inactive: 'bg-white text-[#878787] hover:bg-[#fbfcfd]' },
-        { id: 'kikou', label: '外国人技能実習機構 (OTIT)', icon: <Building2 size={14} />, color: 'bg-[#1f1f1f] text-white', inactive: 'bg-white text-[#878787] hover:bg-[#fbfcfd]' },
-        { id: 'kentei', label: '各種検定協会 (技能検定)', icon: <GraduationCap size={14} />, color: 'bg-[#1f1f1f] text-white', inactive: 'bg-white text-[#878787] hover:bg-[#fbfcfd]' }
+        { id: 'nyukan', label: '出入国在留管理局 (入管)', icon: <Landmark size={14} />, color: 'bg-[#1f1f1f] text-white', inactive: 'bg-white text-[#878787] hover:bg-gray-50' },
+        { id: 'kikou', label: '外国人技能実習機構 (OTIT)', icon: <Building2 size={14} />, color: 'bg-[#1f1f1f] text-white', inactive: 'bg-white text-[#878787] hover:bg-gray-50' },
+        { id: 'kentei', label: '各種検定協会 (技能検定)', icon: <GraduationCap size={14} />, color: 'bg-[#1f1f1f] text-white', inactive: 'bg-white text-[#878787] hover:bg-gray-50' }
     ]
 
     const columns = [
@@ -42,15 +42,15 @@ export function ProcedureBoard({ procedures }: { procedures: any[] }) {
     ]
 
     const getAgencyTagStyle = (agency: string) => {
-        if (agency === 'nyukan') return 'bg-[#fbfcfd] text-[#1f1f1f] border border-[#ededed]'
-        if (agency === 'kikou') return 'bg-[#fbfcfd] text-[#1f1f1f] border border-[#ededed]'
-        return 'bg-[#fbfcfd] text-[#1f1f1f] border border-[#ededed]'
+        if (agency === 'nyukan') return 'bg-white text-[#1f1f1f] border border-gray-200'
+        if (agency === 'kikou') return 'bg-white text-[#1f1f1f] border border-gray-200'
+        return 'bg-white text-[#1f1f1f] border border-gray-200'
     }
 
     return (
         <div className="flex flex-col gap-6">
             {/* 3つのナビゲーションタブ */}
-            <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-[#ededed] pl-1">
+            <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-gray-200 pl-1">
                 {tabs.map(t => (
                     <button
                         key={t.id}
@@ -72,10 +72,10 @@ export function ProcedureBoard({ procedures }: { procedures: any[] }) {
                     if (items.length === 0) return null;
 
                     return (
-                        <div key={col.id} className="bg-[#fbfcfd] border border-[#ededed] rounded-lg p-3 flex flex-col w-full md:w-[320px] shrink-0">
-                            <h3 className="text-[11px] font-medium text-[#878787] uppercase tracking-wider border-b border-[#ededed] pb-3 mb-3 flex justify-between items-center">
+                        <div key={col.id} className="bg-white border border-gray-200 rounded-lg p-3 flex flex-col w-full md:w-[320px] shrink-0">
+                            <h3 className="text-[11px] font-medium text-[#878787] uppercase tracking-wider border-b border-gray-200 pb-3 mb-3 flex justify-between items-center">
                                 <span className="flex items-center gap-1.5">{col.icon} {col.title}</span>
-                                <span className="bg-white border border-[#ededed] text-[#878787] text-[10px] font-mono px-2 py-0.5 rounded">{items.length}</span>
+                                <span className="bg-white border border-gray-200 text-[#878787] text-[10px] font-mono px-2 py-0.5 rounded">{items.length}</span>
                             </h3>
                             <div className="flex flex-col">
                                 {items.map(proc => {
@@ -85,7 +85,7 @@ export function ProcedureBoard({ procedures }: { procedures: any[] }) {
                                     const isIssue = proc.status === 'issue';
 
                                     return (
-                                        <div key={proc.id} className="bg-white p-3.5 mb-3 rounded-md shadow-sm border border-[#ededed] hover:border-[#878787] transition-all cursor-grab active:cursor-grabbing group flex flex-col gap-3">
+                                        <div key={proc.id} className="bg-white p-3.5 mb-3 rounded-md shadow-sm border border-gray-200 hover:border-[#878787] transition-all cursor-grab active:cursor-grabbing group flex flex-col gap-3">
                                             <div className="flex items-start justify-between gap-2">
                                                 <h4 className="text-[13px] font-medium text-[#1f1f1f] leading-snug mb-2">{proc.procedure_name}</h4>
                                                 <div className="flex flex-col gap-1 items-end shrink-0">
@@ -109,7 +109,7 @@ export function ProcedureBoard({ procedures }: { procedures: any[] }) {
                                             </div>
 
                                             <div className="flex items-center gap-2 mt-1">
-                                                <span className="px-1.5 py-0.5 border border-[#ededed] text-[#878787] rounded-[4px] text-[10px] font-medium uppercase tracking-wider bg-[#fbfcfd]">
+                                                <span className="px-1.5 py-0.5 border border-gray-200 text-[#878787] rounded-[4px] text-[10px] font-medium uppercase tracking-wider bg-white">
                                                     {proc.agency === 'nyukan' ? '入管' : proc.agency === 'kikou' ? '機構' : '検定'}
                                                 </span>
                                                 <div className="text-[11px] text-[#878787] truncate">
@@ -117,7 +117,7 @@ export function ProcedureBoard({ procedures }: { procedures: any[] }) {
                                                 </div>
                                             </div>
 
-                                            <div className="flex items-center justify-between border-t border-[#ededed] pt-3 mt-1">
+                                            <div className="flex items-center justify-between border-t border-gray-200 pt-3 mt-1">
                                                 <div className="text-[11px]">
                                                     {proc.status === 'preparing' || proc.status === 'issue' ? (
                                                         <div className={isOverdue ? 'text-red-600' : isUrgent ? 'text-orange-600' : 'text-[#878787]'} title="目標">
@@ -157,7 +157,7 @@ export function ProcedureBoard({ procedures }: { procedures: any[] }) {
                     )
                 })}
                 {filteredProcs.length === 0 && (
-                    <div className="text-center py-12 text-[13px] text-[#878787] border border-dashed border-[#ededed] bg-white rounded-lg w-full">タスクはありません</div>
+                    <div className="text-center py-12 text-[13px] text-[#878787] border border-dashed border-gray-200 bg-white rounded-lg w-full">タスクはありません</div>
                 )}
             </div>
         </div>

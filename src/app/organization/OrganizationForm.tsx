@@ -49,32 +49,32 @@ export default function OrganizationForm({ initialData }: { initialData: any }) 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="md:col-span-2">
                         <label className="block text-sm font-medium text-[#1f1f1f] mb-2">機関名 / 組合名 <span className="text-red-500">*</span></label>
-                        <input name="name" type="text" required defaultValue={initialData.name} className="w-full bg-[#fbfcfd] focus:bg-white border border-[#878787] focus:border-[#1f1f1f] rounded-md px-3 py-2.5 text-sm outline-none text-[#1f1f1f] transition-all" />
+                        <input name="name" type="text" required defaultValue={initialData.name} className="w-full bg-white focus:bg-white border border-[#878787] focus:border-[#1f1f1f] rounded-md px-3 py-2.5 text-sm outline-none text-[#1f1f1f] transition-all" />
                     </div>
 
                     <div>
                         <label className="block text-sm font-medium text-[#1f1f1f] mb-2">許可番号 / 登録番号</label>
-                        <input name="license_number" type="text" defaultValue={initialData.license_number} className="w-full bg-[#fbfcfd] focus:bg-white border border-[#878787] focus:border-[#1f1f1f] rounded-md px-3 py-2.5 text-sm outline-none text-[#1f1f1f] transition-all" />
+                        <input name="license_number" type="text" defaultValue={initialData.license_number} className="w-full bg-white focus:bg-white border border-[#878787] focus:border-[#1f1f1f] rounded-md px-3 py-2.5 text-sm outline-none text-[#1f1f1f] transition-all" />
                     </div>
 
                     <div>
                         <label className="block text-sm font-medium text-[#1f1f1f] mb-2">代表者名</label>
-                        <input name="representative" type="text" defaultValue={initialData.representative} className="w-full bg-[#fbfcfd] focus:bg-white border border-[#878787] focus:border-[#1f1f1f] rounded-md px-3 py-2.5 text-sm outline-none text-[#1f1f1f] transition-all" />
+                        <input name="representative" type="text" defaultValue={initialData.representative} className="w-full bg-white focus:bg-white border border-[#878787] focus:border-[#1f1f1f] rounded-md px-3 py-2.5 text-sm outline-none text-[#1f1f1f] transition-all" />
                     </div>
 
                     <div className="md:col-span-2">
                         <label className="block text-sm font-medium text-[#1f1f1f] mb-2">所在地</label>
-                        <input name="address" type="text" defaultValue={initialData.address} className="w-full bg-[#fbfcfd] focus:bg-white border border-[#878787] focus:border-[#1f1f1f] rounded-md px-3 py-2.5 text-sm outline-none text-[#1f1f1f] transition-all" />
+                        <input name="address" type="text" defaultValue={initialData.address} className="w-full bg-white focus:bg-white border border-[#878787] focus:border-[#1f1f1f] rounded-md px-3 py-2.5 text-sm outline-none text-[#1f1f1f] transition-all" />
                     </div>
 
                     <div>
                         <label className="block text-sm font-medium text-[#1f1f1f] mb-2">電話番号</label>
-                        <input name="phone" type="text" defaultValue={initialData.phone} className="w-full bg-[#fbfcfd] focus:bg-white border border-[#878787] focus:border-[#1f1f1f] rounded-md px-3 py-2.5 text-sm outline-none text-[#1f1f1f] transition-all" />
+                        <input name="phone" type="text" defaultValue={initialData.phone} className="w-full bg-white focus:bg-white border border-[#878787] focus:border-[#1f1f1f] rounded-md px-3 py-2.5 text-sm outline-none text-[#1f1f1f] transition-all" />
                     </div>
 
                     <div>
                         <label className="block text-sm font-medium text-[#1f1f1f] mb-2">代表Email</label>
-                        <input name="email" type="email" defaultValue={initialData.email} className="w-full bg-[#fbfcfd] focus:bg-white border border-[#878787] focus:border-[#1f1f1f] rounded-md px-3 py-2.5 text-sm outline-none text-[#1f1f1f] transition-all" />
+                        <input name="email" type="email" defaultValue={initialData.email} className="w-full bg-white focus:bg-white border border-[#878787] focus:border-[#1f1f1f] rounded-md px-3 py-2.5 text-sm outline-none text-[#1f1f1f] transition-all" />
                     </div>
                 </div>
 

@@ -42,12 +42,12 @@ export function BrandModal({ isOpen, onClose }: { isOpen: boolean, onClose: () =
                 ref={modalRef}
                 className={`relative bg-white w-full max-w-[800px] rounded-[24px] shadow-[0_20px_40px_rgba(0,0,0,0.2)] overflow-hidden flex flex-col md:flex-row transition-all duration-400 ease-[cubic-bezier(0.34,1.56,0.64,1)] transform ${isOpen ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 translate-y-4'}`}
             >
-                <button onClick={onClose} className="absolute top-4 right-4 z-50 w-8 h-8 flex items-center justify-center rounded-full bg-white/80 border border-[#ededed] text-[#878787] hover:text-[#1f1f1f] hover:bg-[#fbfcfd] transition-colors shadow-sm md:hidden">
+                <button onClick={onClose} className="absolute top-4 right-4 z-50 w-8 h-8 flex items-center justify-center rounded-full bg-white/80 border border-gray-200 text-[#878787] hover:text-[#1f1f1f] hover:bg-gray-50 transition-colors shadow-sm md:hidden">
                     <X size={16} strokeWidth={2.5} />
                 </button>
 
                 {/* 左ブロック: 折り紙クラウド */}
-                <div className="md:w-5/12 p-8 bg-[#fbfcfd] border-b md:border-b-0 md:border-r border-[#ededed] flex flex-col items-center justify-center relative group min-h-[250px] md:min-h-[350px]">
+                <div className="md:w-5/12 p-8 bg-white border-b md:border-b-0 md:border-r border-gray-200 flex flex-col items-center justify-center relative group min-h-[250px] md:min-h-[350px]">
                     <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(#1f1f1f 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
 
                     <div className="relative z-10 flex flex-col items-center">
@@ -91,7 +91,7 @@ export function BrandModal({ isOpen, onClose }: { isOpen: boolean, onClose: () =
 
                 {/* 右ブロック: マニフェスト */}
                 <div className="md:w-7/12 p-8 md:p-10 flex flex-col justify-center bg-white relative">
-                    <button onClick={onClose} className="absolute top-4 right-4 z-50 w-8 h-8 hidden md:flex items-center justify-center rounded-full bg-white border border-transparent text-[#878787] hover:text-[#1f1f1f] hover:bg-[#fbfcfd] hover:border-[#ededed] transition-all shadow-sm">
+                    <button onClick={onClose} className="absolute top-4 right-4 z-50 w-8 h-8 hidden md:flex items-center justify-center rounded-full bg-white border border-transparent text-[#878787] hover:text-[#1f1f1f] hover:bg-gray-50 hover:border-gray-200 transition-all shadow-sm">
                         <X size={16} strokeWidth={2.5} />
                     </button>
 
@@ -118,7 +118,7 @@ export function BrandModal({ isOpen, onClose }: { isOpen: boolean, onClose: () =
                         </div>
                     </div>
 
-                    <div className="mt-8 pt-5 border-t border-[#ededed]">
+                    <div className="mt-8 pt-5 border-t border-gray-200">
                         <p className="text-[11px] font-bold text-[#444746] mb-1 flex items-center gap-1.5">
                             本製品は <span className="text-[#1f1f1f] font-black">Arata-Biz</span> によって開発・所有されています。
                         </p>

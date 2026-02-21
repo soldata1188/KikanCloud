@@ -16,7 +16,7 @@ export function SmartActionCell({ auditId, status, companyId, filterMonth }: { a
     if (!auditId) {
         // 🟠 優先度2: スケジュール未設定 (オレンジ)
         return (
-            <Link href={`/audits/new?company_id=${companyId}&month=${filterMonth}`} className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-[#fbfcfd] hover:bg-[#ededed] text-[#878787] hover:text-[#1f1f1f] text-[11px] font-medium rounded-md transition-colors border border-[#ededed] w-full">
+            <Link href={`/audits/new?company_id=${companyId}&month=${filterMonth}`} className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-white hover:bg-[#ededed] text-[#878787] hover:text-[#1f1f1f] text-[11px] font-medium rounded-md transition-colors border border-gray-200 w-full">
                 <Plus size={12} strokeWidth={2} /> 予定作成
             </Link>
         )
@@ -34,7 +34,7 @@ export function SmartActionCell({ auditId, status, companyId, filterMonth }: { a
 
     // 🟢 優先度5: 完了済
     return (
-        <div className="text-center w-full px-3 py-1.5 bg-[#fbfcfd] text-[#878787] text-[11px] font-medium rounded-md border border-[#ededed] flex items-center justify-center gap-1 opacity-80">
+        <div className="text-center w-full px-3 py-1.5 bg-white text-[#878787] text-[11px] font-medium rounded-md border border-gray-200 flex items-center justify-center gap-1 opacity-80">
             <CheckCircle2 size={12} /> 今月完了済
         </div>
     )

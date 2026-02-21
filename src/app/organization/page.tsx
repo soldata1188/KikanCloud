@@ -29,7 +29,7 @@ export default async function OrganizationPage({ searchParams }: { searchParams:
     const { data: staffData } = await supabase.from('users').select('*').eq('tenant_id', tenant.id).order('created_at', { ascending: true })
 
     return (
-        <div className="flex h-screen bg-[#fbfcfd] font-sans text-[#1f1f1f] overflow-hidden selection:bg-[#24b47e]/20">
+        <div className="flex h-screen bg-white font-sans text-[#1f1f1f] overflow-hidden selection:bg-[#24b47e]/20">
             <Sidebar active="organization" />
             <div className="flex-1 flex flex-col relative min-w-0">
                 <TopNav title="機関情報" role={userProfile.role} userProfileStr={JSON.stringify(userProfile)} />
@@ -40,8 +40,8 @@ export default async function OrganizationPage({ searchParams }: { searchParams:
                             <p className="text-[13px] text-[#878787] mt-1">基本情報とスタッフ名簿を管理します。</p>
                         </div>
 
-                        <div className="bg-white rounded-lg border border-[#ededed] overflow-hidden mb-6">
-                            <div className="flex border-b border-[#ededed] bg-[#fbfcfd]">
+                        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden mb-6">
+                            <div className="flex border-b border-gray-200 bg-white">
                                 <a href="?tab=profile" className={`flex items-center gap-2 px-6 py-4 text-sm font-medium border-b-2 transition-colors ${activeTab === 'profile' ? 'border-[#24b47e] text-[#24b47e] bg-white' : 'border-transparent text-[#878787] hover:text-[#1f1f1f] hover:bg-gray-50'}`}>
                                     <Building2 size={16} /> 基本情報 (Profile)
                                 </a>

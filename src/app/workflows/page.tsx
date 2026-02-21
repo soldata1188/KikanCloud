@@ -37,7 +37,7 @@ export default async function WorkflowsPage() {
     const initialEdges = workflowData?.edges && Array.isArray(workflowData.edges) && workflowData.edges.length > 0 ? workflowData.edges : defaultEdges;
 
     return (
-        <div className="flex h-screen bg-[#fbfcfd] font-sans text-[#1f1f1f] overflow-hidden selection:bg-[#24b47e]/20">
+        <div className="flex h-screen bg-white font-sans text-[#1f1f1f] overflow-hidden selection:bg-[#24b47e]/20">
             <Sidebar active="workflows" />
             <div className="flex-1 flex flex-col relative min-w-0">
                 <TopNav title="業務フロービルダー" role={userProfile?.role} />

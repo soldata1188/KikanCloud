@@ -46,9 +46,9 @@ export function AutoDocButton({ worker, role = 'admin' }: { worker: any, role?: 
                 {isExporting ? <Loader2 size={16} className="animate-spin" /> : <FileSpreadsheet size={16} strokeWidth={2} />} {isExporting ? '生成中...' : '法定書類を出力'} <ChevronDown size={14} />
             </button>
             {isOpen && (
-                <div className="absolute top-full mt-2 right-0 w-64 bg-white rounded-md shadow-sm border border-[#ededed] py-2 z-50 overflow-hidden">
-                    <button onClick={() => generateDoc('meibo')} className="w-full text-left px-4 py-3 text-sm font-bold text-[#1f1f1f] hover:bg-[#fbfcfd] transition-colors">📄 技能実習生名簿 (自動作成)</button>
-                    <button onClick={() => generateDoc('joken')} className="w-full text-left px-4 py-3 text-sm font-bold text-[#1f1f1f] hover:bg-[#fbfcfd] transition-colors border-t border-gray-50">📄 雇用条件書 (自動作成)</button>
+                <div className="absolute top-full mt-2 right-0 w-64 bg-white rounded-md shadow-sm border border-gray-200 py-2 z-50 overflow-hidden">
+                    <button onClick={() => generateDoc('meibo')} className="w-full text-left px-4 py-3 text-sm font-bold text-[#1f1f1f] hover:bg-gray-50 transition-colors">📄 技能実習生名簿 (自動作成)</button>
+                    <button onClick={() => generateDoc('joken')} className="w-full text-left px-4 py-3 text-sm font-bold text-[#1f1f1f] hover:bg-gray-50 transition-colors border-t border-gray-50">📄 雇用条件書 (自動作成)</button>
                 </div>
             )}
         </div>

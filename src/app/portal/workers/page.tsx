@@ -17,7 +17,7 @@ export default async function PortalWorkersPage() {
     const { data: workers } = await supabase.from('workers').select('*').eq('company_id', userProfile.company_id).eq('is_deleted', false)
 
     return (
-        <div className="flex h-screen bg-[#fbfcfd] font-sans text-[#1f1f1f] overflow-hidden">
+        <div className="flex h-screen bg-white font-sans text-[#1f1f1f] overflow-hidden">
             <ClientSidebar active="workers" />
             <main className="flex-1 overflow-y-auto px-4 pb-12 w-full max-w-[1000px] mx-auto mt-4 md:mt-8">
                 <h2 className="text-[32px] font-bold text-teal-800 mb-6 flex items-center gap-2">

@@ -14,20 +14,20 @@ export function DataTableToolbar({ data, filename, searchPlaceholder, onSearch, 
             <div className="flex items-center gap-3 w-full sm:w-auto">
                 <div className="relative w-full sm:w-[260px]">
                     <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#878787]" size={14} />
-                    <input type="text" value={searchTerm} onChange={handleSearch} placeholder={searchPlaceholder} className="w-full h-[32px] bg-white border border-[#ededed] rounded-md pl-8 pr-3 text-[13px] outline-none focus:border-[#878787] transition-colors text-[#1f1f1f] placeholder:text-[#878787]" />
+                    <input type="text" value={searchTerm} onChange={handleSearch} placeholder={searchPlaceholder} className="w-full h-[32px] bg-white border border-gray-200 rounded-md pl-8 pr-3 text-[13px] outline-none focus:border-[#878787] transition-colors text-[#1f1f1f] placeholder:text-[#878787]" />
                 </div>
-                <button className="h-[32px] px-3 bg-white border border-[#ededed] rounded-md text-[13px] text-[#1f1f1f] flex items-center gap-2 hover:bg-[#fbfcfd]">
+                <button className="h-[32px] px-3 bg-white border border-gray-200 rounded-md text-[13px] text-[#1f1f1f] flex items-center gap-2 hover:bg-gray-50">
                     ステータス <span className="text-[10px] text-[#878787]">▼</span>
                 </button>
             </div>
 
             <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
-                <div className="flex items-center bg-[#fbfcfd] border border-[#ededed] rounded-md p-0.5">
+                <div className="flex items-center bg-white border border-gray-200 rounded-md p-0.5">
                     <button className="p-1 rounded text-[#878787] hover:text-[#1f1f1f] hover:bg-[#ededed]"><Grid size={14} /></button>
-                    <button className="p-1 rounded bg-white text-[#1f1f1f] shadow-sm border border-[#ededed]"><List size={14} /></button>
+                    <button className="p-1 rounded bg-white text-[#1f1f1f] shadow-sm border border-gray-200"><List size={14} /></button>
                 </div>
                 {role === 'admin' && (
-                    <button onClick={handleExport} className="h-[32px] px-3 bg-white border border-[#ededed] hover:bg-[#fbfcfd] text-[#1f1f1f] rounded-md text-[13px] font-medium transition-colors flex items-center gap-2">
+                    <button onClick={handleExport} className="h-[32px] px-3 bg-white border border-gray-200 hover:bg-gray-50 text-[#1f1f1f] rounded-md text-[13px] font-medium transition-colors flex items-center gap-2">
                         <FileSpreadsheet size={14} /> Excel出力
                     </button>
                 )}

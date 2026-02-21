@@ -13,7 +13,7 @@ export default async function SystemSettingsPage() {
 
             <div className="flex flex-col gap-8 text-[#1f1f1f]">
                 {/* Visual Settings */}
-                <div className="bg-[#fbfcfd] p-6 rounded-[24px]">
+                <div className="bg-white p-6 rounded-[24px]">
                     <h4 className="flex items-center gap-2 font-semibold mb-4 text-base">
                         <Palette className="text-[#24b47e]" size={20} /> 表示とテーマ
                     </h4>
@@ -36,7 +36,7 @@ export default async function SystemSettingsPage() {
                 </div>
 
                 {/* Language Settings */}
-                <div className="bg-[#fbfcfd] p-6 rounded-[24px]">
+                <div className="bg-white p-6 rounded-[24px]">
                     <h4 className="flex items-center gap-2 font-semibold mb-4 text-base">
                         <Globe className="text-green-500" size={20} /> 言語・地域
                     </h4>
@@ -46,7 +46,7 @@ export default async function SystemSettingsPage() {
                                 <p className="font-medium">システム言語</p>
                                 <p className="text-sm text-[#878787]">KikanCloud 全体の表示言語を選択します。</p>
                             </div>
-                            <select className="px-3 py-1.5 bg-white border border-[#ededed] rounded-lg text-sm text-[#1f1f1f]" disabled>
+                            <select className="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-sm text-[#1f1f1f]" disabled>
                                 <option>日本語 (Japanese)</option>
                                 <option>English</option>
                                 <option>Tiếng Việt</option>
@@ -56,13 +56,13 @@ export default async function SystemSettingsPage() {
                             <div>
                                 <p className="font-medium">タイムゾーン</p>
                             </div>
-                            <span className="text-sm text-[#878787] bg-white px-3 py-1.5 rounded-lg border border-[#ededed]">Asia/Tokyo</span>
+                            <span className="text-sm text-[#878787] bg-white px-3 py-1.5 rounded-lg border border-gray-200">Asia/Tokyo</span>
                         </div>
                     </div>
                 </div>
 
                 {/* Notifications */}
-                <div className="bg-[#fbfcfd] p-6 rounded-[24px]">
+                <div className="bg-white p-6 rounded-[24px]">
                     <h4 className="flex items-center gap-2 font-semibold mb-4 text-base">
                         <Bell className="text-orange-500" size={20} /> 通知設定
                     </h4>

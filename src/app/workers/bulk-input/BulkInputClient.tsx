@@ -83,9 +83,9 @@ export function BulkInputClient({ companies }: { companies: { id: string, name_j
 
     return (
         <div className="flex-1 flex flex-col items-start w-full relative">
-            <div className="w-full overflow-x-auto border border-[#ededed] rounded-xl mb-4">
+            <div className="w-full overflow-x-auto border border-gray-200 rounded-xl mb-4">
                 <table className="w-full text-left text-sm whitespace-nowrap min-w-[1000px]">
-                    <thead className="bg-[#fbfcfd]">
+                    <thead className="bg-white">
                         <tr>
                             <th className="px-3 py-3 w-10 text-center text-[#878787]">#</th>
                             <th className="px-3 py-3 font-medium text-gray-700">氏名（ローマ字） <span className="text-red-500">*</span></th>
@@ -100,7 +100,7 @@ export function BulkInputClient({ companies }: { companies: { id: string, name_j
                     </thead>
                     <tbody className="divide-y divide-[#e1e5ea]">
                         {rows.map((row, idx) => (
-                            <tr key={row.id} className="hover:bg-[#fbfcfd]/50 group">
+                            <tr key={row.id} className="hover:bg-gray-50/50 group">
                                 <td className="px-3 py-2 text-center text-[#878787] text-xs">{idx + 1}</td>
                                 <td className="px-1 py-1">
                                     <input type="text" value={row.full_name_romaji} onChange={(e) => handleChange(row.id, 'full_name_romaji', e.target.value)} placeholder="NGUYEN VAN A" className="w-full px-3 py-2 uppercase outline-none border border-transparent focus:border-[#24b47e] focus:bg-white rounded transition-colors bg-transparent hover:bg-white/50" />
@@ -112,14 +112,14 @@ export function BulkInputClient({ companies }: { companies: { id: string, name_j
                                     <input type="date" value={row.dob} onChange={(e) => handleChange(row.id, 'dob', e.target.value)} className="w-full px-3 py-2 outline-none border border-transparent focus:border-[#24b47e] focus:bg-white rounded transition-colors bg-transparent hover:bg-white/50" />
                                 </td>
                                 <td className="px-1 py-1">
-                                    <select value={row.system_type} onChange={(e) => handleChange(row.id, 'system_type', e.target.value)} className="w-full px-3 py-2 outline-none border border-transparent focus:border-[#24b47e] focus:bg-white rounded transition-colors bg-white hover:bg-[#fbfcfd]">
+                                    <select value={row.system_type} onChange={(e) => handleChange(row.id, 'system_type', e.target.value)} className="w-full px-3 py-2 outline-none border border-transparent focus:border-[#24b47e] focus:bg-white rounded transition-colors bg-white hover:bg-gray-50">
                                         <option value="ikusei_shuro">育成就労</option>
                                         <option value="tokuteigino">特定技能</option>
                                         <option value="ginou_jisshu">技能実習</option>
                                     </select>
                                 </td>
                                 <td className="px-1 py-1">
-                                    <select value={row.status} onChange={(e) => handleChange(row.id, 'status', e.target.value)} className="w-full px-3 py-2 outline-none border border-transparent focus:border-[#24b47e] focus:bg-white rounded transition-colors bg-white hover:bg-[#fbfcfd]">
+                                    <select value={row.status} onChange={(e) => handleChange(row.id, 'status', e.target.value)} className="w-full px-3 py-2 outline-none border border-transparent focus:border-[#24b47e] focus:bg-white rounded transition-colors bg-white hover:bg-gray-50">
                                         <option value="working">就業中</option>
                                         <option value="standby">待機中</option>
                                         <option value="waiting">入国待ち</option>
@@ -128,7 +128,7 @@ export function BulkInputClient({ companies }: { companies: { id: string, name_j
                                     </select>
                                 </td>
                                 <td className="px-1 py-1">
-                                    <select value={row.company_id} onChange={(e) => handleChange(row.id, 'company_id', e.target.value)} className="w-full px-3 py-2 outline-none border border-transparent focus:border-[#24b47e] focus:bg-white rounded transition-colors bg-white hover:bg-[#fbfcfd]">
+                                    <select value={row.company_id} onChange={(e) => handleChange(row.id, 'company_id', e.target.value)} className="w-full px-3 py-2 outline-none border border-transparent focus:border-[#24b47e] focus:bg-white rounded transition-colors bg-white hover:bg-gray-50">
                                         <option value="">-- 未配属 --</option>
                                         {companies.map(c => <option key={c.id} value={c.id}>{c.name_jp}</option>)}
                                     </select>
@@ -148,7 +148,7 @@ export function BulkInputClient({ companies }: { companies: { id: string, name_j
             </div>
 
             <div className="flex justify-between items-center w-full mb-8">
-                <button onClick={addRow} className="flex items-center gap-2 px-4 py-2 text-[#24b47e] bg-[#fbfcfd] hover:bg-blue-100 rounded-md font-medium transition-colors text-sm">
+                <button onClick={addRow} className="flex items-center gap-2 px-4 py-2 text-[#24b47e] bg-white hover:bg-blue-100 rounded-md font-medium transition-colors text-sm">
                     <Plus size={16} /> 10行追加
                 </button>
                 {error && <span className="text-red-500 text-sm">{error}</span>}

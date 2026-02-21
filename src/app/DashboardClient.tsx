@@ -129,14 +129,14 @@ export default function DashboardClient({ userName, role, systemData }: { userNa
                 {/* Khung Input Nhập liệu */}
                 <div className="pt-4 pb-2 shrink-0 relative z-10">
                     <div className="absolute inset-0 bg-gradient-to-t from-white to-transparent pointer-events-none -bottom-10 h-32"></div>
-                    <form onSubmit={handleChat} className="relative max-w-4xl mx-auto flex items-end gap-3 bg-blue-50/80 backdrop-blur-xl border border-blue-100/50 rounded-[32px] p-2 md:p-2.5 focus-within:bg-blue-50 focus-within:shadow-md transition-all shadow-sm">
+                    <form onSubmit={handleChat} className="relative max-w-4xl mx-auto flex items-end gap-3 bg-blue-50/80 backdrop-blur-xl border border-blue-100/50 rounded-[32px] p-2 md:p-2.5 transition-all">
                         <textarea
                             value={userInput} onChange={e => setUserInput(e.target.value)} onKeyDown={handleKeyDown} disabled={isPendingChat || !aiData}
                             placeholder="質問、翻訳、メール作成など、何でも聞いてください... (Shift+Enter to newline)"
                             className="flex-1 max-h-24 min-h-[40px] bg-transparent border-none outline-none resize-none py-2 md:py-2.5 px-4 text-[14px] text-[#1f1f1f] placeholder:text-[#a0a0a0] leading-relaxed disabled:opacity-50"
                             rows={1}
                         />
-                        <button type="submit" disabled={isPendingChat || !userInput.trim()} className="w-11 h-11 shrink-0 flex items-center justify-center bg-[#1f1f1f] text-white hover:bg-[#24b47e] hover:shadow-lg hover:-translate-y-0.5 rounded-full transition-all duration-300 disabled:opacity-50 disabled:bg-[#e0e0e0] disabled:text-[#878787] disabled:shadow-none disabled:transform-none mb-0.5">
+                        <button type="submit" disabled={isPendingChat || !userInput.trim()} className="w-11 h-11 shrink-0 flex items-center justify-center bg-[#1f1f1f] text-white hover:bg-[#24b47e] hover:-translate-y-0.5 rounded-full transition-all duration-300 disabled:opacity-50 disabled:bg-[#e0e0e0] disabled:text-[#878787] disabled:shadow-none disabled:transform-none mb-0.5">
                             {isPendingChat ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} className="ml-0.5" />}
                         </button>
                     </form>
@@ -147,7 +147,7 @@ export default function DashboardClient({ userName, role, systemData }: { userNa
             <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <h3 className="text-[16px] font-semibold text-[#444746] mb-4 tracking-tight">AI Task Suggestion</h3>
-                    <div className="bg-white border border-[#ededed] rounded-xl p-6 shadow-sm min-h-[150px] flex flex-col justify-center hover:shadow-md transition-shadow">
+                    <div className="bg-white border border-[#ededed] rounded-xl p-6 min-h-[150px] flex flex-col justify-center transition-shadow">
                         {!aiData ? (
                             <div className="animate-pulse space-y-3 py-1"><div className="h-2 bg-gray-100 rounded w-1/4"></div><div className="h-2 bg-gray-100 rounded w-full"></div><div className="h-2 bg-gray-100 rounded w-5/6"></div></div>
                         ) : (
@@ -165,7 +165,7 @@ export default function DashboardClient({ userName, role, systemData }: { userNa
 
                 <div>
                     <h3 className="text-[16px] font-semibold text-[#444746] mb-4 tracking-tight">System Alerts</h3>
-                    <div className={`${aiData?.alert?.hasDanger ? 'bg-white border-[#fce8e6]' : 'bg-white border-[#ededed]'} border rounded-xl p-6 shadow-sm min-h-[150px] flex flex-col justify-between relative overflow-hidden transition-colors duration-500 hover:shadow-md`}>
+                    <div className={`${aiData?.alert?.hasDanger ? 'bg-white border-[#fce8e6]' : 'bg-white border-[#ededed]'} border rounded-xl p-6 min-h-[150px] flex flex-col justify-between relative overflow-hidden transition-colors duration-500`}>
                         {!aiData ? (
                             <div className="animate-pulse space-y-3 py-1"><div className="h-2 bg-gray-100 rounded w-1/4"></div><div className="h-2 bg-gray-100 rounded w-full"></div></div>
                         ) : (
@@ -193,10 +193,10 @@ export default function DashboardClient({ userName, role, systemData }: { userNa
 
             {/* 3. KHỐI THỐNG KÊ DATA */}
             <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="bg-white border border-[#ededed] rounded-xl p-5 flex flex-col items-center justify-center text-center gap-2 shadow-sm"><Users size={20} className="text-[#878787]" /><div><p className="text-[10px] font-bold text-[#878787] uppercase tracking-widest">Workers</p><p className="text-2xl font-black text-[#1f1f1f] font-mono">{systemData.stats.workers}</p></div></div>
-                <div className="bg-white border border-[#ededed] rounded-xl p-5 flex flex-col items-center justify-center text-center gap-2 shadow-sm"><Building2 size={20} className="text-[#878787]" /><div><p className="text-[10px] font-bold text-[#878787] uppercase tracking-widest">Companies</p><p className="text-2xl font-black text-[#1f1f1f] font-mono">{systemData.stats.companies}</p></div></div>
-                <div className="bg-white border border-[#ededed] rounded-xl p-5 flex flex-col items-center justify-center text-center gap-2 shadow-sm"><Clock size={20} className="text-[#878787]" /><div><p className="text-[10px] font-bold text-[#878787] uppercase tracking-widest">Pending Audits</p><p className="text-2xl font-black text-[#1f1f1f] font-mono">{systemData.stats.audits}</p></div></div>
-                <div className={`${systemData.stats.audits > 0 ? 'bg-white border-[#fce8e6]' : 'bg-white border-[#ededed]'} border rounded-xl p-5 flex flex-col items-center justify-center text-center gap-2 shadow-sm relative overflow-hidden group`}>
+                <div className="bg-white border border-[#ededed] rounded-xl p-5 flex flex-col items-center justify-center text-center gap-2"><Users size={20} className="text-[#878787]" /><div><p className="text-[10px] font-bold text-[#878787] uppercase tracking-widest">Workers</p><p className="text-2xl font-black text-[#1f1f1f] font-mono">{systemData.stats.workers}</p></div></div>
+                <div className="bg-white border border-[#ededed] rounded-xl p-5 flex flex-col items-center justify-center text-center gap-2"><Building2 size={20} className="text-[#878787]" /><div><p className="text-[10px] font-bold text-[#878787] uppercase tracking-widest">Companies</p><p className="text-2xl font-black text-[#1f1f1f] font-mono">{systemData.stats.companies}</p></div></div>
+                <div className="bg-white border border-[#ededed] rounded-xl p-5 flex flex-col items-center justify-center text-center gap-2"><Clock size={20} className="text-[#878787]" /><div><p className="text-[10px] font-bold text-[#878787] uppercase tracking-widest">Pending Audits</p><p className="text-2xl font-black text-[#1f1f1f] font-mono">{systemData.stats.audits}</p></div></div>
+                <div className={`${systemData.stats.audits > 0 ? 'bg-white border-[#fce8e6]' : 'bg-white border-[#ededed]'} border rounded-xl p-5 flex flex-col items-center justify-center text-center gap-2 relative overflow-hidden group`}>
                     <div className={`absolute bottom-0 left-0 right-0 h-1 ${systemData.stats.audits > 0 ? 'bg-[#d93025]' : 'bg-[#24b47e]'}`}></div>
                     {systemData.stats.audits > 0 ? <AlertTriangle size={20} className="text-[#d93025] group-hover:scale-110 transition-transform" /> : <CheckCircle2 size={20} className="text-[#24b47e] group-hover:scale-110 transition-transform" />}
                     <div><p className={`text-[10px] font-bold uppercase tracking-widest ${systemData.stats.audits > 0 ? 'text-[#d93025]' : 'text-[#24b47e]'}`}>System Status</p><p className="text-lg font-black text-[#1f1f1f]">{systemData.stats.audits > 0 ? 'Action Needed' : 'Optimal'}</p></div>

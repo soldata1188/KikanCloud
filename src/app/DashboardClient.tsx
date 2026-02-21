@@ -77,12 +77,12 @@ export default function DashboardClient({ userName, role, systemData }: { userNa
             {/* 1. KHOANG CHAT AI CÁ NHÂN HÓA (OMNI-CHANNEL BOT) - INFINITY FEEL */}
             <section className="relative flex flex-col h-[500px] -mx-6 md:-mx-10 px-6 md:px-10 mb-8">
                 {/* Header Khoang Chat */}
-                <div className="pt-2 pb-4 shrink-0 relative z-10">
-                    <div className="flex items-center justify-between mb-3">
+                <div className="pt-2 pb-4 shrink-0 relative z-10 flex flex-col items-center justify-center text-center">
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-3 w-full max-w-lg relative">
                         <div className="flex items-center gap-2">
-                            <span className="text-[10px] font-bold text-[#878787] uppercase tracking-widest bg-white/50 px-2 py-0.5 rounded-full backdrop-blur-sm -ml-1">AI-Channel</span>
+                            <span className="text-[10px] font-bold text-[#878787] uppercase tracking-widest bg-white/50 px-2 py-0.5 rounded-full backdrop-blur-sm">AI-Channel</span>
                         </div>
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-3 sm:absolute sm:right-0">
                             {!aiData && <div className="text-[11px] font-bold text-[#24b47e] bg-[#24b47e]/10 px-2 py-1 rounded-full flex items-center gap-1.5"><Loader2 size={12} className="animate-spin" /> Syncing Live Data</div>}
                             {aiData && (
                                 <button onClick={resetChat} title="Reset Chat" className="text-[11px] font-bold text-[#878787] hover:text-[#1f1f1f] bg-white/50 border border-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-1.5 transition-all shadow-sm hover:shadow-md hover:bg-white/80">
@@ -91,7 +91,7 @@ export default function DashboardClient({ userName, role, systemData }: { userNa
                             )}
                         </div>
                     </div>
-                    <h1 className="text-3xl md:text-[34px] font-black text-[#1f1f1f] leading-tight tracking-tight pl-1 mix-blend-multiply">
+                    <h1 className="text-3xl md:text-[34px] font-black text-[#1f1f1f] leading-tight tracking-tight mix-blend-multiply">
                         {timeGreeting || `${userName}さん、お疲れ様です！`}
                     </h1>
                 </div>

@@ -1,11 +1,24 @@
 'use client'
-import React, { useRef, useTransition } from 'react'
-import { Sparkles, ImagePlus, Loader2 } from 'lucide-react'
+import React, { useRef, useState, useEffect, useTransition } from 'react'
+import { Sparkles, Loader2, UploadCloud } from 'lucide-react'
 import { extractDocumentAI } from '@/app/actions/ai'
 
 export function AIScannerZone() {
     const fileInputRef = useRef<HTMLInputElement>(null)
     const [isPending, startTransition] = useTransition()
+    const [isDragging, setIsDragging] = useState(false)
+    const [timer, setTimer] = useState(0)
+
+    useEffect(() => {
+        let interval: NodeJS.Timeout;
+        if (isPending) {
+            setTimer(0);
+            interval = setInterval(() => setTimer(t => t + 1), 1000);
+        } else {
+            setTimer(0);
+        }
+        return () => clearInterval(interval);
+    }, [isPending])
 
     const setInputValue = (name: string, value: string) => {
         if (!value) return;
@@ -17,10 +30,7 @@ export function AIScannerZone() {
         }
     }
 
-    const handleAIScan = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-
+    const processFile = (file: File) => {
         startTransition(() => {
             const reader = new FileReader();
             reader.readAsDataURL(file);
@@ -46,8 +56,33 @@ export function AIScannerZone() {
         });
     }
 
+    const handleAIScan = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) processFile(file);
+    }
+
+    const handleDragOver = (e: React.DragEvent) => {
+        e.preventDefault();
+        setIsDragging(true);
+    }
+    const handleDragLeave = (e: React.DragEvent) => {
+        e.preventDefault();
+        setIsDragging(false);
+    }
+    const handleDrop = (e: React.DragEvent) => {
+        e.preventDefault();
+        setIsDragging(false);
+        const file = e.dataTransfer.files?.[0];
+        if (file) processFile(file);
+    }
+
     return (
-        <div className="bg-[#fbfcfd] border border-[#24b47e]/30 rounded-lg p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative overflow-hidden group mb-6">
+        <div
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            className={`border-2 border-dashed rounded-lg p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative overflow-hidden group mb-6 transition-colors ${isDragging ? 'border-[#24b47e] bg-[#24b47e]/5' : 'border-[#24b47e]/30 bg-[#fbfcfd]'}`}
+        >
             <div className="absolute -right-10 -top-10 text-[#24b47e]/5 transform rotate-12 group-hover:scale-110 transition-transform duration-700 pointer-events-none">
                 <Sparkles size={120} />
             </div>
@@ -55,21 +90,23 @@ export function AIScannerZone() {
                 <h3 className="text-[14px] font-bold text-[#1f1f1f] flex items-center gap-2 mb-1">
                     <Sparkles size={16} className="text-[#24b47e]" /> AI スマート入力（在留カード・パスポート解析）
                 </h3>
-                <p className="text-[12px] text-[#666666]">画像をアップロードすると、AIが情報を抽出しフォームに自動入力します。</p>
+                <p className="text-[12px] text-[#666666]">
+                    画像またはPDFをドラッグ＆ドロップ、もしくはファイルを選択してください。
+                </p>
             </div>
 
-            <input type="file" accept="image/*" className="hidden" ref={fileInputRef} onChange={handleAIScan} />
+            <input type="file" accept="image/*,application/pdf" className="hidden" ref={fileInputRef} onChange={handleAIScan} />
 
             <button
                 type="button"
-                onClick={() => fileInputRef.current?.click()}
+                onClick={() => !isPending && fileInputRef.current?.click()}
                 disabled={isPending}
                 className="shrink-0 relative z-10 flex items-center gap-2 px-6 py-3 bg-white border border-[#ededed] hover:border-[#24b47e] text-[#1f1f1f] hover:text-[#24b47e] rounded-md text-[13px] font-bold transition-all shadow-sm disabled:opacity-50"
             >
                 {isPending ? (
-                    <><Loader2 size={16} className="animate-spin text-[#24b47e]" /> 解析中...</>
+                    <><Loader2 size={16} className="animate-spin text-[#24b47e]" /> 解析中... ({timer}秒)</>
                 ) : (
-                    <><ImagePlus size={16} className="text-[#24b47e]" /> 画像を選択</>
+                    <><UploadCloud size={16} className="text-[#24b47e]" /> ファイルを選択</>
                 )}
             </button>
         </div>

@@ -7,11 +7,11 @@ export async function extractDocumentAI(base64Image: string, mimeType: string) {
         if (!apiKey) throw new Error('システムエラー: GEMINI_API_KEYが環境変数に設定されていません。管理者に連絡してください。');
 
         const ai = new GoogleGenAI({ apiKey });
-        const base64Data = base64Image.replace(/^data:image\/(png|jpeg|jpg);base64,/, "");
+        const base64Data = base64Image.replace(/^data:(.*);base64,/, "");
 
         const prompt = `
             You are an expert Japanese immigration document OCR assistant.
-            Analyze the provided image of an identity document (Zairyu Card or Passport).
+            Analyze the provided document (Zairyu Card, Passport, or PDF).
             Extract the following information and return it EXACTLY as a valid JSON object.
             If a field is unreadable or missing, leave it as an empty string "".
             Do not include markdown formatting like \`\`\`json.

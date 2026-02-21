@@ -41,7 +41,7 @@ export default async function EditWorkerPage({ params }: { params: Promise<{ id:
                             <h2 className="text-[28px] md:text-[32px] font-bold tracking-tight text-[#1f1f1f]">人材プロファイル</h2>
                         </div>
                         <div className="flex items-center gap-3">
-                            <AutoDocButton worker={worker} />
+                            <AutoDocButton worker={worker} role={userProfile?.role} />
                             <span className="text-xs text-gray-500 bg-gray-100 px-3 py-2 rounded-full font-medium border border-gray-200 hidden sm:block">編集中</span>
                         </div>
                     </div>

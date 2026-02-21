@@ -25,8 +25,8 @@ export function NotificationBell({ role, companyId }: { role: string, companyId?
 
     return (
         <div className="relative" ref={dropdownRef}>
-            <button onClick={() => setIsOpen(!isOpen)} className="relative w-10 h-10 flex items-center justify-center rounded-full bg-white border border-gray-200 hover:bg-gray-50 transition-colors text-[#444746] shadow-sm">
-                <Bell size={20} strokeWidth={1.5} className={notifications.length > 0 ? "animate-pulse text-red-500" : ""} />
+            <button onClick={() => setIsOpen(!isOpen)} className="relative w-8 h-8 flex items-center justify-center rounded-md hover:bg-[#ededed] transition-colors text-[#878787] hover:text-[#1f1f1f]">
+                <Bell size={18} strokeWidth={1.5} className={notifications.length > 0 ? "animate-pulse text-[#24b47e]" : ""} />
                 {notifications.length > 0 && <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white shadow-sm">{notifications.length}</span>}
             </button>
 

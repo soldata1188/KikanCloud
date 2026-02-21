@@ -22,6 +22,15 @@ export async function login(formData: FormData) {
         }
     }
 
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user) {
+        const { data: userData } = await supabase.from('users').select('role').eq('id', user.id).single()
+        if (userData?.role === 'company_admin' || userData?.role === 'company_user') {
+            revalidatePath('/', 'layout')
+            redirect('/portal')
+        }
+    }
+
     revalidatePath('/', 'layout')
     redirect('/')
 }

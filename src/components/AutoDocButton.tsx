@@ -3,9 +3,11 @@ import { useState } from 'react'
 import { FileSpreadsheet, ChevronDown, Loader2 } from 'lucide-react'
 import * as XLSX from 'xlsx'
 
-export function AutoDocButton({ worker }: { worker: any }) {
+export function AutoDocButton({ worker, role = 'admin' }: { worker: any, role?: string }) {
     const [isOpen, setIsOpen] = useState(false)
     const [isExporting, setIsExporting] = useState(false)
+
+    if (role !== 'admin') return null;
 
     const generateDoc = (type: 'meibo' | 'joken') => {
         setIsExporting(true); setIsOpen(false)

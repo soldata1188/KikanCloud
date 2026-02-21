@@ -13,7 +13,7 @@ export default async function ClientWorkerProfile({ params }: { params: Promise<
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) redirect('/login')
 
-    const { data: userProfile } = await supabase.from('users').select('company_id').eq('id', user.id).single()
+    const { data: userProfile } = await supabase.from('users').select('company_id, role').eq('id', user.id).single()
     const { data: worker } = await supabase.from('workers').select('*').eq('id', id).eq('company_id', userProfile?.company_id).eq('is_deleted', false).single()
     if (!worker) notFound()
 
@@ -38,19 +38,19 @@ export default async function ClientWorkerProfile({ params }: { params: Promise<
             <ClientSidebar active="workers" />
             <main className="flex-1 flex flex-col relative overflow-y-auto no-scrollbar px-4 pb-12 w-full max-w-[1000px] mx-auto mt-4 md:mt-8">
                 <div className="flex items-center gap-4 mb-8">
- <Link href="/portal/workers" className="w-10 h-10 flex items-center justify-center rounded-[32px] bg-white hover:bg-gray-50 text-[#444746]"><ArrowLeft size={20} /></Link> 
+                    <Link href="/portal/workers" className="w-10 h-10 flex items-center justify-center rounded-[32px] bg-white hover:bg-gray-50 text-[#444746]"><ArrowLeft size={20} /></Link>
                     <h2 className="text-[28px] font-bold text-teal-800">人材プロフィール・書類管理</h2>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div className="lg:col-span-1">
- <div className="bg-white rounded-[32px] p-6 flex flex-col items-center text-center"> 
- <div className="w-24 h-24 rounded-[32px] bg-teal-50 flex items-center justify-center border-4 border-teal-100 overflow-hidden mb-4">
+                        <div className="bg-white rounded-[32px] p-6 flex flex-col items-center text-center">
+                            <div className="w-24 h-24 rounded-[32px] bg-teal-50 flex items-center justify-center border-4 border-teal-100 overflow-hidden mb-4">
                                 {worker.avatar_url ? <img src={worker.avatar_url} className="w-full h-full object-cover" /> : <UserCircle2 size={40} className="text-teal-400" />}
                             </div>
                             <h3 className="text-xl font-bold">{worker.full_name_romaji}</h3>
                             <p className="text-sm text-gray-500 mt-1">{worker.nationality} • {worker.system_type === 'tokuteigino' ? '特定技能' : '技能実習'}</p>
- <div className="w-full mt-6 space-y-3 text-left bg-gray-50 p-4 rounded-[32px]">
+                            <div className="w-full mt-6 space-y-3 text-left bg-gray-50 p-4 rounded-[32px]">
                                 <div><p className="text-[10px] text-gray-400 font-bold">在留カード番号</p><p className="text-sm font-mono font-bold text-[#1f1f1f]">{worker.zairyu_no || '-'}</p></div>
                                 <div><p className="text-[10px] text-gray-400 font-bold">パスポート期限</p><p className="text-sm font-bold text-red-600">{worker.passport_exp?.replace(/-/g, '/') || '-'}</p></div>
                             </div>
@@ -58,15 +58,15 @@ export default async function ClientWorkerProfile({ params }: { params: Promise<
                     </div>
 
                     <div className="lg:col-span-2">
- <div className="mb-4 bg-teal-50 border border-teal-100 rounded-[32px] p-4 text-sm text-teal-800 font-medium">
+                        <div className="mb-4 bg-teal-50 border border-teal-100 rounded-[32px] p-4 text-sm text-teal-800 font-medium">
                             該当する引出しを開いて、毎月の法定書類をアップロードしてください。
                         </div>
                         {/* Lượt tải xuống (Từ Nghiệp đoàn) */}
                         <SmartDrawer workerId={id} documents={unionDocsUrls} title="公式書類 (監理団体から共有)" docType="union" icon={<ShieldCheck />} allowUpload={false} />
                         {/* Lượt tải lên (Từ Xí nghiệp) */}
-                        <SmartDrawer workerId={id} documents={clientDocsUrls} title="賃金台帳 (給与明細)" docType="payroll" icon={<Banknote />} />
-                        <SmartDrawer workerId={id} documents={clientDocsUrls} title="出勤簿・タイムカード" docType="timesheet" icon={<CalendarClock />} />
-                        <SmartDrawer workerId={id} documents={clientDocsUrls} title="作業日報・評価表" docType="worklog" icon={<Hammer />} />
+                        <SmartDrawer workerId={id} documents={clientDocsUrls} title="賃金台帳 (給与明細)" docType="payroll" icon={<Banknote />} allowUpload={userProfile?.role === 'company_admin'} />
+                        <SmartDrawer workerId={id} documents={clientDocsUrls} title="出勤簿・タイムカード" docType="timesheet" icon={<CalendarClock />} allowUpload={userProfile?.role === 'company_admin'} />
+                        <SmartDrawer workerId={id} documents={clientDocsUrls} title="作業日報・評価表" docType="worklog" icon={<Hammer />} allowUpload={userProfile?.role === 'company_admin'} />
                     </div>
                 </div>
             </main>

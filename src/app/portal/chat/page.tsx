@@ -11,7 +11,7 @@ export default async function ClientChatPage() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) redirect('/login')
 
-    const { data: userProfile } = await supabase.from('users').select('company_id').eq('id', user.id).single()
+    const { data: userProfile } = await supabase.from('users').select('company_id, role').eq('id', user.id).single()
     if (!userProfile?.company_id) redirect('/')
 
     const { data: messages } = await supabase.from('messages').select('*').eq('company_id', userProfile.company_id).order('created_at', { ascending: true })
@@ -21,7 +21,11 @@ export default async function ClientChatPage() {
             <ClientSidebar active="chat" />
             <main className="flex-1 flex flex-col relative overflow-y-auto no-scrollbar px-4 pb-12 w-full max-w-[800px] mx-auto mt-4 md:mt-8">
                 <h2 className="text-[32px] font-bold tracking-tight text-teal-800 mb-6 flex items-center gap-3"><MessageCircle size={32} /> 連絡チャット</h2>
-                <ChatBox companyId={userProfile.company_id} currentUserId={user.id} messages={messages || []} sourcePath="/portal/chat" isClient={true} />
+                {userProfile.role === 'company_admin' ? (
+                    <ChatBox companyId={userProfile.company_id} currentUserId={user.id} messages={messages || []} sourcePath="/portal/chat" isClient={true} />
+                ) : (
+                    <div className="flex-1 flex flex-col items-center justify-center p-8 text-center text-gray-400 bg-white/50 rounded-3xl m-4 border border-gray-100"><p className="font-bold text-[#1f1f1f] text-base">閲覧専用アカウントです</p><p className="text-sm mt-1">メッセージの送信権限がありません。</p></div>
+                )}
             </main>
         </div>
     )

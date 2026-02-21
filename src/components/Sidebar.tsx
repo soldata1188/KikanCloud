@@ -1,49 +1,46 @@
-'use client'
 import Link from 'next/link'
-import { useState } from 'react'
-import { Menu, Sparkles, Briefcase, Building2, CalendarCheck, Landmark, Settings, CalendarDays } from 'lucide-react'
+import { Home, Users, Building2, Landmark, Clock, ShieldAlert, LogOut, Settings, Hexagon } from 'lucide-react'
+import { createClient } from '@/lib/supabase/server'
 import { logout } from '@/app/login/actions'
 
-export function Sidebar({ active }: { active?: 'dashboard' | 'workers' | 'companies' | 'audits' | 'procedures' | 'settings' | 'schedule' }) {
-    const [isExpanded, setIsExpanded] = useState(false)
+export async function Sidebar({ active }: { active: string }) {
+    const supabase = await createClient(); const { data: { user } } = await supabase.auth.getUser();
+    let userRole = 'staff'; if (user) { const { data } = await supabase.from('users').select('role').eq('id', user.id).single(); userRole = data?.role || 'staff'; }
+
+    const navItems = [
+        { id: 'dashboard', icon: Home, href: '/' },
+        { id: 'workers', icon: Users, href: '/workers' },
+        { id: 'companies', icon: Building2, href: '/companies' },
+        { id: 'procedures', icon: Landmark, href: '/procedures' },
+        { id: 'audits', icon: Clock, href: '/audits' },
+    ]
 
     return (
-        <aside className={`${isExpanded ? 'w-[240px]' : 'w-[68px]'} flex flex-col items-center py-4 shrink-0 bg-[#e3e8ef] z-20 shadow-[1px_0_10px_rgba(0,0,0,0.02)] border-r border-[#e1e5ea]/50 transition-all duration-300 relative`}>
-            <button onClick={() => setIsExpanded(!isExpanded)} className="w-12 h-12 flex items-center justify-center rounded-[32px] hover:bg-black/5 transition-colors text-[#444746] mb-4 shrink-0"><Menu size={24} strokeWidth={1.5} /></button>
+        <aside className="w-14 h-screen bg-[#fbfcfd] border-r border-[#ededed] flex flex-col items-center py-4 shrink-0 z-50">
+            <Link href="/" className="w-8 h-8 rounded-md bg-[#1f1f1f] flex items-center justify-center text-white mb-6 shadow-sm hover:opacity-80 transition-opacity">
+                <Hexagon size={18} fill="currentColor" strokeWidth={0} />
+            </Link>
 
-            <div className="flex flex-col gap-2 w-full px-2 overflow-y-auto overflow-x-hidden no-scrollbar">
-                <Link href="/" className={`h-12 flex items-center ${isExpanded ? 'px-4 rounded-full justify-start' : 'justify-center w-12 rounded-[32px] mx-auto'} transition-colors ${active === 'dashboard' ? 'bg-[#e8def8] text-[#1d192b]' : 'hover:bg-black/5 text-[#444746]'}`} title={!isExpanded ? "ダッシュボード" : ""}>
-                    <Sparkles size={20} className="shrink-0" strokeWidth={active === 'dashboard' ? 2 : 1.5} />
-                    {isExpanded && <span className="ml-4 font-medium text-sm whitespace-nowrap">ダッシュボード</span>}
-                </Link>
-                <Link href="/schedule" className={`h-12 flex items-center ${isExpanded ? 'px-4 rounded-full justify-start' : 'justify-center w-12 rounded-[32px] mx-auto'} transition-colors ${active === 'schedule' ? 'bg-[#c2e7ff] text-[#001d35]' : 'hover:bg-black/5 text-[#444746]'}`} title={!isExpanded ? "スケジュール" : ""}>
-                    <CalendarDays size={20} className="shrink-0" strokeWidth={active === 'schedule' ? 2 : 1.5} />
-                    {isExpanded && <span className="ml-4 font-medium text-sm whitespace-nowrap">スケジュール</span>}
-                </Link>
-                <Link href="/workers" className={`h-12 flex items-center ${isExpanded ? 'px-4 rounded-full justify-start' : 'justify-center w-12 rounded-[32px] mx-auto'} transition-colors ${active === 'workers' ? 'bg-[#c2e7ff] text-[#001d35]' : 'hover:bg-black/5 text-[#444746]'}`} title={!isExpanded ? "外国人材管理" : ""}>
-                    <Briefcase size={20} className="shrink-0" strokeWidth={active === 'workers' ? 2 : 1.5} />
-                    {isExpanded && <span className="ml-4 font-medium text-sm whitespace-nowrap">外国人材管理</span>}
-                </Link>
-                <Link href="/companies" className={`h-12 flex items-center ${isExpanded ? 'px-4 rounded-full justify-start' : 'justify-center w-12 rounded-[32px] mx-auto'} transition-colors ${active === 'companies' ? 'bg-[#c2e7ff] text-[#001d35]' : 'hover:bg-black/5 text-[#444746]'}`} title={!isExpanded ? "受入企業管理" : ""}>
-                    <Building2 size={20} className="shrink-0" strokeWidth={active === 'companies' ? 2 : 1.5} />
-                    {isExpanded && <span className="ml-4 font-medium text-sm whitespace-nowrap">受入企業管理</span>}
-                </Link>
-                <Link href="/audits" className={`h-12 flex items-center ${isExpanded ? 'px-4 rounded-full justify-start' : 'justify-center w-12 rounded-[32px] mx-auto'} transition-colors ${active === 'audits' ? 'bg-[#c2e7ff] text-[#001d35]' : 'hover:bg-black/5 text-[#444746]'}`} title={!isExpanded ? "監査・定期訪問" : ""}>
-                    <CalendarCheck size={20} className="shrink-0" strokeWidth={active === 'audits' ? 2 : 1.5} />
-                    {isExpanded && <span className="ml-4 font-medium text-sm whitespace-nowrap">監査・定期訪問</span>}
-                </Link>
-                <Link href="/procedures" className={`h-12 flex items-center ${isExpanded ? 'px-4 rounded-full justify-start' : 'justify-center w-12 rounded-[32px] mx-auto'} transition-colors ${active === 'procedures' ? 'bg-[#c2e7ff] text-[#001d35]' : 'hover:bg-black/5 text-[#444746]'}`} title={!isExpanded ? "申請・手続管理" : ""}>
-                    <Landmark size={20} className="shrink-0" strokeWidth={active === 'procedures' ? 2 : 1.5} />
-                    {isExpanded && <span className="ml-4 font-medium text-sm whitespace-nowrap">申請・手続管理</span>}
-                </Link>
-            </div>
+            <nav className="flex-1 w-full flex flex-col items-center gap-2 px-2">
+                {navItems.map(item => (
+                    <Link key={item.id} href={item.href} title={item.id} className={`w-10 h-10 flex items-center justify-center rounded-md transition-colors ${active === item.id ? 'bg-[#ededed] text-[#1f1f1f]' : 'text-[#878787] hover:bg-[#f4f5f7] hover:text-[#1f1f1f]'}`}>
+                        <item.icon size={18} strokeWidth={active === item.id ? 2 : 1.5} />
+                    </Link>
+                ))}
+                {userRole === 'admin' && (
+                    <>
+                        <div className="w-6 h-px bg-[#ededed] my-2"></div>
+                        <Link href="/accounts" title="IAM Roles" className={`w-10 h-10 flex items-center justify-center rounded-md transition-colors ${active === 'accounts' ? 'bg-[#ededed] text-[#1f1f1f]' : 'text-[#878787] hover:bg-[#f4f5f7] hover:text-[#1f1f1f]'}`}>
+                            <ShieldAlert size={18} strokeWidth={active === 'accounts' ? 2 : 1.5} />
+                        </Link>
+                    </>
+                )}
+            </nav>
 
-            <div className="mt-auto flex flex-col gap-4 w-full px-2">
-                <form action={logout}>
-                    <button type="submit" className={`h-12 flex items-center ${isExpanded ? 'px-4 rounded-full justify-start w-full' : 'justify-center w-12 rounded-[32px] mx-auto'} hover:bg-black/5 transition-colors text-[#444746]`} title={!isExpanded ? "ログアウト" : ""}>
-                        <Settings size={22} className="shrink-0" strokeWidth={1.5} />
-                        {isExpanded && <span className="ml-4 font-medium text-sm whitespace-nowrap">ログアウト</span>}
-                    </button>
+            <div className="w-full flex flex-col items-center gap-2 px-2 pt-4 mt-auto">
+                <button title="Settings" className="w-10 h-10 flex items-center justify-center rounded-md text-[#878787] hover:bg-[#ededed] hover:text-[#1f1f1f] transition-colors"><Settings size={18} strokeWidth={1.5} /></button>
+                <form action={logout} className="w-full flex justify-center">
+                    <button type="submit" title="Logout" className="w-10 h-10 flex items-center justify-center rounded-md text-[#878787] hover:bg-red-50 hover:text-red-600 transition-colors"><LogOut size={18} strokeWidth={1.5} className="ml-1" /></button>
                 </form>
             </div>
         </aside>

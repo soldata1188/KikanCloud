@@ -14,7 +14,7 @@ CREATE TABLE public.users (
     id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
     tenant_id UUID NOT NULL REFERENCES public.tenants(id) ON DELETE CASCADE,
     company_id UUID, full_name TEXT NOT NULL,
-    role TEXT CHECK (role IN ('super_admin', 'union_admin', 'union_staff', 'company_client')) DEFAULT 'union_staff',
+    role TEXT CONSTRAINT users_role_check CHECK (role IN ('super_admin', 'union_admin', 'union_staff', 'company_client', 'admin', 'staff', 'company_admin', 'company_user', 'worker')) DEFAULT 'union_staff',
     is_deleted BOOLEAN DEFAULT false, created_at TIMESTAMPTZ DEFAULT now(), updated_at TIMESTAMPTZ DEFAULT now()
 );
 

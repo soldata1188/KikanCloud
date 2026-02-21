@@ -34,5 +34,5 @@ INSERT INTO auth.users (instance_id, id, aud, role, email, encrypted_password, e
 VALUES ('00000000-0000-0000-0000-000000000000', '99999999-9999-9999-9999-999999999999', 'authenticated', 'authenticated', 'admin@mirai.com', crypt('password123', gen_salt('bf')), now(), now(), now());
 -- Map tài khoản đó vào bảng users của SaaS (Gắn với Nghiệp đoàn Demo 11111111-1111-1111-1111-111111111111)
 INSERT INTO public.users (id, tenant_id, full_name, role)
-VALUES ('99999999-9999-9999-9999-999999999999', '11111111-1111-1111-1111-111111111111', 'Admin Mirai', 'union_admin')
+VALUES ('99999999-9999-9999-9999-999999999999', '11111111-1111-1111-1111-111111111111', 'Admin Mirai', 'admin')
 ON CONFLICT DO NOTHING;

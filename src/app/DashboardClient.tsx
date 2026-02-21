@@ -131,7 +131,7 @@ export default function DashboardClient({ userName, role, systemData }: { userNa
                 {/* Khung Input Nhập liệu */}
                 <div className="pt-4 pb-2 shrink-0 relative z-10">
                     <div className="absolute inset-0 bg-gradient-to-t from-[#fbfcfd] to-transparent pointer-events-none -bottom-10 h-32"></div>
-                    <form onSubmit={handleChat} className="relative max-w-4xl mx-auto flex items-end gap-3 bg-white/70 backdrop-blur-xl border border-white/60 rounded-2xl p-2 md:p-2.5 focus-within:bg-white/90 focus-within:shadow-md transition-all shadow-sm">
+                    <form onSubmit={handleChat} className="relative max-w-4xl mx-auto flex items-end gap-3 bg-white backdrop-blur-xl border border-white/60 rounded-2xl p-2 md:p-2.5 focus-within:bg-white focus-within:shadow-md transition-all shadow-sm">
                         <textarea
                             value={userInput} onChange={e => setUserInput(e.target.value)} onKeyDown={handleKeyDown} disabled={isPendingChat || !aiData}
                             placeholder="質問、翻訳、メール作成など、何でも聞いてください... (Shift+Enter to newline)"
@@ -151,7 +151,7 @@ export default function DashboardClient({ userName, role, systemData }: { userNa
                     <h3 className="text-[16px] font-semibold text-[#444746] mb-4 tracking-tight">AI Task Suggestion</h3>
                     <div className="bg-white border border-[#ededed] rounded-xl p-6 shadow-sm min-h-[150px] flex flex-col justify-center hover:shadow-md transition-shadow">
                         {!aiData ? (
-                            <div className="animate-pulse space-y-3 py-1"><div className="h-2 bg-[#fbfcfd] rounded w-1/4"></div><div className="h-2 bg-[#fbfcfd] rounded w-full"></div><div className="h-2 bg-[#fbfcfd] rounded w-5/6"></div></div>
+                            <div className="animate-pulse space-y-3 py-1"><div className="h-2 bg-gray-100 rounded w-1/4"></div><div className="h-2 bg-gray-100 rounded w-full"></div><div className="h-2 bg-gray-100 rounded w-5/6"></div></div>
                         ) : (
                             <div className="relative pl-5 py-0.5">
                                 <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#1e8e3e] rounded-full"></div>
@@ -167,9 +167,9 @@ export default function DashboardClient({ userName, role, systemData }: { userNa
 
                 <div>
                     <h3 className="text-[16px] font-semibold text-[#444746] mb-4 tracking-tight">System Alerts</h3>
-                    <div className={`${aiData?.alert?.hasDanger ? 'bg-[#fff9f9] border-[#fce8e6]' : 'bg-white border-[#ededed]'} border rounded-xl p-6 shadow-sm min-h-[150px] flex flex-col justify-between relative overflow-hidden transition-colors duration-500 hover:shadow-md`}>
+                    <div className={`${aiData?.alert?.hasDanger ? 'bg-white border-[#fce8e6]' : 'bg-white border-[#ededed]'} border rounded-xl p-6 shadow-sm min-h-[150px] flex flex-col justify-between relative overflow-hidden transition-colors duration-500 hover:shadow-md`}>
                         {!aiData ? (
-                            <div className="animate-pulse space-y-3 py-1"><div className="h-2 bg-[#fbfcfd] rounded w-1/4"></div><div className="h-2 bg-[#fbfcfd] rounded w-full"></div></div>
+                            <div className="animate-pulse space-y-3 py-1"><div className="h-2 bg-gray-100 rounded w-1/4"></div><div className="h-2 bg-gray-100 rounded w-full"></div></div>
                         ) : (
                             <>
                                 <div className="relative pl-5 py-0.5 mb-4 z-10">
@@ -198,7 +198,7 @@ export default function DashboardClient({ userName, role, systemData }: { userNa
                 <div className="bg-white border border-[#ededed] rounded-xl p-5 flex flex-col items-center justify-center text-center gap-2 shadow-sm"><Users size={20} className="text-[#878787]" /><div><p className="text-[10px] font-bold text-[#878787] uppercase tracking-widest">Workers</p><p className="text-2xl font-black text-[#1f1f1f] font-mono">{systemData.stats.workers}</p></div></div>
                 <div className="bg-white border border-[#ededed] rounded-xl p-5 flex flex-col items-center justify-center text-center gap-2 shadow-sm"><Building2 size={20} className="text-[#878787]" /><div><p className="text-[10px] font-bold text-[#878787] uppercase tracking-widest">Companies</p><p className="text-2xl font-black text-[#1f1f1f] font-mono">{systemData.stats.companies}</p></div></div>
                 <div className="bg-white border border-[#ededed] rounded-xl p-5 flex flex-col items-center justify-center text-center gap-2 shadow-sm"><Clock size={20} className="text-[#878787]" /><div><p className="text-[10px] font-bold text-[#878787] uppercase tracking-widest">Pending Audits</p><p className="text-2xl font-black text-[#1f1f1f] font-mono">{systemData.stats.audits}</p></div></div>
-                <div className={`${systemData.stats.audits > 0 ? 'bg-[#fff9f9] border-[#fce8e6]' : 'bg-[#fbfcfd] border-[#ededed]'} border rounded-xl p-5 flex flex-col items-center justify-center text-center gap-2 shadow-sm relative overflow-hidden group`}>
+                <div className={`${systemData.stats.audits > 0 ? 'bg-white border-[#fce8e6]' : 'bg-white border-[#ededed]'} border rounded-xl p-5 flex flex-col items-center justify-center text-center gap-2 shadow-sm relative overflow-hidden group`}>
                     <div className={`absolute bottom-0 left-0 right-0 h-1 ${systemData.stats.audits > 0 ? 'bg-[#d93025]' : 'bg-[#24b47e]'}`}></div>
                     {systemData.stats.audits > 0 ? <AlertTriangle size={20} className="text-[#d93025] group-hover:scale-110 transition-transform" /> : <CheckCircle2 size={20} className="text-[#24b47e] group-hover:scale-110 transition-transform" />}
                     <div><p className={`text-[10px] font-bold uppercase tracking-widest ${systemData.stats.audits > 0 ? 'text-[#d93025]' : 'text-[#24b47e]'}`}>System Status</p><p className="text-lg font-black text-[#1f1f1f]">{systemData.stats.audits > 0 ? 'Action Needed' : 'Optimal'}</p></div>

@@ -3,6 +3,7 @@ import { useState, useEffect, useTransition, useRef } from 'react'
 import { Sparkles, Send, Loader2, ArrowRight, Users, Building2, AlertTriangle, CheckCircle2, User, Clock, RotateCcw } from 'lucide-react'
 import { getDashboardAIBriefing, chatWithOmniAI } from './actions/dashboardAi'
 import Link from 'next/link'
+import { AnimatedLogo } from '@/components/AnimatedLogo'
 
 type Message = { id: string; role: 'user' | 'model'; text: string; isTyping?: boolean }
 
@@ -81,7 +82,7 @@ export default function DashboardClient({ userName, role, systemData }: { userNa
                 <div className="pt-2 pb-4 shrink-0 relative z-10">
                     <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-full bg-white/50 backdrop-blur-sm border border-white/20 flex items-center justify-center shadow-sm"><Sparkles size={16} className="text-[#24b47e]" /></div>
+                            <div className="w-8 h-8 rounded-full bg-white/50 backdrop-blur-sm border border-white/20 flex items-center justify-center shadow-sm overflow-hidden p-1.5"><AnimatedLogo /></div>
                             <span className="text-[10px] font-bold text-[#878787] uppercase tracking-widest bg-white/50 px-2 py-0.5 rounded-full backdrop-blur-sm">Omni-Channel</span>
                         </div>
                         <div className="flex items-center gap-3">
@@ -103,7 +104,7 @@ export default function DashboardClient({ userName, role, systemData }: { userNa
                     {messages.map((msg) => (
                         <div key={msg.id} className={`flex gap-4 ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-in slide-in-from-bottom-2`}>
                             {msg.role === 'model' && (
-                                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#24b47e] to-[#6ee7b7] flex items-center justify-center shrink-0 shadow-md mt-0.5 ring-4 ring-white/50"><Sparkles size={14} className="text-white" /></div>
+                                <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shrink-0 shadow-md mt-0.5 ring-4 ring-white/50 overflow-hidden p-1.5"><AnimatedLogo /></div>
                             )}
 
                             <div className={`max-w-[85%] md:max-w-[75%] rounded-2xl md:rounded-[24px] px-5 md:px-6 py-4 text-[14px] leading-relaxed shadow-sm ${msg.role === 'user' ? 'bg-[#1f1f1f] text-white rounded-tr-none' : 'bg-white/80 backdrop-blur-md border border-white/50 text-[#444746] rounded-tl-none relative overflow-hidden'}`}>

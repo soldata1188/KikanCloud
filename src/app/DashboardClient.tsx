@@ -144,7 +144,7 @@ export default function DashboardClient({ userName, role, systemData }: { userNa
             </section>
 
             {/* 2. KHỐI THẺ AI PHÂN TÍCH VÀ SYSTEM ALERTS (GIỮ NGUYÊN) */}
-            <section className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch mt-[10px]">
+            <section className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch mt-12">
                 <div className="flex flex-col h-full">
                     <h3 className="text-[16px] font-semibold text-[#444746] mb-4 tracking-tight shrink-0">AI タスク提案</h3>
                     <div className="flex-1 flex flex-col justify-center transition-shadow min-h-[150px]">

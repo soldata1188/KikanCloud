@@ -146,7 +146,7 @@ export default function ScheduleClient() {
                         <div key={weekIdx} className="flex relative w-full flex-1 min-h-[140px] border-b border-[#d1d5db] last:border-b-0">
 
                             {/* Vertical borders */}
-                            <div className="absolute inset-0 flex pointer-events-none">
+                            <div className="absolute inset-0 flex pointer-events-none z-30">
                                 {Array.from({ length: 7 }).map((_, i) => (
                                     <div key={i} className="flex-1 border-r border-[#d1d5db] last:border-r-0"></div>
                                 ))}

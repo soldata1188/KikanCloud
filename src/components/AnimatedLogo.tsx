@@ -1,10 +1,10 @@
 'use client'
 
-export function AnimatedLogo() {
+export function AnimatedLogo({ logoOnly = false }: { logoOnly?: boolean }) {
     return (
-        <div className="mb-6 flex items-center justify-center h-16 cursor-default group">
-            <div className="flex items-center bg-transparent rounded-3xl overflow-visible transition-all duration-700 ease-[cubic-bezier(0.34,1.56,0.64,1)]">
-                <div className="w-16 h-16 bg-transparent flex items-center justify-center shrink-0 z-10 relative">
+        <div className={`${logoOnly ? 'flex items-center justify-center cursor-default group' : 'mb-6 flex items-center justify-center h-16 cursor-default group'}`}>
+            <div className={`flex items-center bg-transparent rounded-3xl overflow-visible transition-all duration-700 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${logoOnly ? '' : ''}`}>
+                <div className={`${logoOnly ? 'w-auto h-auto' : 'w-16 h-16'} bg-transparent flex items-center justify-center shrink-0 z-10 relative`}>
                     <style>{`
             .origami-logo { transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
             .origami-poly { transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); transform-origin: center; }
@@ -19,7 +19,7 @@ export function AnimatedLogo() {
             .group:hover .poly-8 { transform: translate(4px, -2px); }
             .group:hover .poly-9 { transform: translate(3px, 3px); }
           `}</style>
-                    <svg width="40" height="40" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="origami-logo">
+                    <svg width="40" height="40" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="origami-logo relative z-20">
                         <g stroke="#ffffff" strokeWidth="0.5" strokeLinejoin="round">
                             <polygon points="10,80 30,40 40,60" fill="#34d399" className="origami-poly poly-1" />
                             <polygon points="10,80 40,60 40,80" fill="#10b981" className="origami-poly poly-2" />
@@ -33,11 +33,13 @@ export function AnimatedLogo() {
                         </g>
                     </svg>
                 </div>
-                <div className="w-0 overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover:w-[150px] opacity-0 group-hover:opacity-100 flex items-center justify-center bg-transparent">
-                    <span className="text-[20px] font-black tracking-tight text-[#1f1f1f] whitespace-nowrap pl-2 pr-5">
-                        Kikan<span className="text-[#24b47e]">Cloud</span>
-                    </span>
-                </div>
+                {!logoOnly && (
+                    <div className="w-0 overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover:w-[150px] opacity-0 group-hover:opacity-100 flex items-center justify-center bg-transparent pr-4">
+                        <span className="text-[20px] font-black tracking-tight text-[#1f1f1f] whitespace-nowrap pl-2">
+                            Kikan<span className="text-[#24b47e]">Cloud</span>
+                        </span>
+                    </div>
+                )}
             </div>
         </div>
     )

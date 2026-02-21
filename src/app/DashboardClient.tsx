@@ -75,7 +75,7 @@ export default function DashboardClient({ userName, role, systemData }: { userNa
         <div className="max-w-[1000px] mx-auto space-y-8 animate-in fade-in duration-700 pb-10">
 
             {/* 1. KHOANG CHAT AI CÁ NHÂN HÓA (OMNI-CHANNEL BOT) - INFINITY FEEL */}
-            <section className="relative flex flex-col h-[650px] lg:h-[750px] -mx-6 md:-mx-10 px-6 md:px-10 mb-8">
+            <section className="relative flex flex-col h-[500px] -mx-6 md:-mx-10 px-6 md:px-10 mb-8">
                 {/* Header Khoang Chat */}
                 <div className="pt-2 pb-4 shrink-0 relative z-10">
                     <div className="flex items-center justify-between mb-3">

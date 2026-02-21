@@ -41,7 +41,7 @@ export async function createWorker(formData: FormData) {
         cert_end_date: formData.get('cert_end_date') as string || null,
         insurance_exp: formData.get('insurance_exp') as string || null,
         address: formData.get('address') as string || null,
-        nationality: formData.get('nationality') as string || 'VNM',
+        nationality: formData.get('nationality') as string || 'ベトナム',
         sending_org: formData.get('sending_org') as string || null,
         industry_field: formData.get('industry_field') as string || null,
         visa_status: formData.get('visa_status') as string || null,
@@ -90,7 +90,7 @@ export async function updateWorker(formData: FormData) {
         cert_end_date: formData.get('cert_end_date') as string || null,
         insurance_exp: formData.get('insurance_exp') as string || null,
         address: formData.get('address') as string || null,
-        nationality: formData.get('nationality') as string || 'VNM',
+        nationality: formData.get('nationality') as string || 'ベトナム',
         sending_org: formData.get('sending_org') as string || null,
         industry_field: formData.get('industry_field') as string || null,
         visa_status: formData.get('visa_status') as string || null,
@@ -149,11 +149,10 @@ export async function importWorkers(workersData: any[]) {
 
     const mapNationality = (text: string) => {
         const t = String(text || '');
-        if (t.includes('インドネシア')) return 'IDN'
-        if (t.includes('フィリピン')) return 'PHL'
-        if (t.includes('ミャンマー')) return 'MMR'
-        if (t.includes('中国')) return 'CHN'
-        return 'VNM'
+        if (t.includes('インドネシア')) return 'インドネシア'
+        if (t.includes('フィリピン')) return 'フィリピン'
+        if (t.includes('カンボジア')) return 'カンボジア'
+        return t.trim() || 'ベトナム'
     }
 
     // 2. データの正規化と型変換

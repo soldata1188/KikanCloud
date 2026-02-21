@@ -67,7 +67,16 @@ export default async function EditWorkerPage({ params }: { params: Promise<{ id:
                                 <div><label className="block text-sm font-medium text-[#1f1f1f] mb-2">氏名（ローマ字） <span className="text-red-500">*</span></label><input name="full_name_romaji" type="text" required defaultValue={worker.full_name_romaji} className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-4 py-3 outline-none uppercase text-[#1f1f1f] transition-all" /></div>
                                 <div><label className="block text-sm font-medium text-[#1f1f1f] mb-2">氏名（カナ） <span className="text-red-500">*</span></label><input name="full_name_kana" type="text" required defaultValue={worker.full_name_kana} className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-4 py-3 outline-none text-[#1f1f1f] transition-all" /></div>
                                 <div><label className="block text-sm font-medium text-[#1f1f1f] mb-2">生年月日 <span className="text-red-500">*</span></label><input name="dob" type="date" required defaultValue={worker.dob} className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-4 py-3 outline-none text-[#1f1f1f] transition-all" /></div>
-                                <div><label className="block text-sm font-medium text-[#1f1f1f] mb-2">国籍</label><select name="nationality" defaultValue={worker.nationality || 'VNM'} className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-4 py-3 outline-none appearance-none text-[#1f1f1f] transition-all"><option value="VNM">ベトナム</option><option value="IDN">インドネシア</option><option value="PHL">フィリピン</option><option value="MMR">ミャンマー</option><option value="CHN">中国</option></select></div>
+                                <div>
+                                    <label className="block text-sm font-medium text-[#1f1f1f] mb-2">国籍</label>
+                                    <input name="nationality" type="text" list="nationality-suggestions" defaultValue={worker.nationality === 'VNM' ? 'ベトナム' : worker.nationality === 'IDN' ? 'インドネシア' : worker.nationality === 'PHL' ? 'フィリピン' : worker.nationality === 'MMR' ? 'ミャンマー' : worker.nationality || 'ベトナム'} placeholder="例：ベトナム" className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-4 py-3 outline-none text-[#1f1f1f] transition-all" />
+                                    <datalist id="nationality-suggestions">
+                                        <option value="ベトナム"></option>
+                                        <option value="インドネシア"></option>
+                                        <option value="フィリピン"></option>
+                                        <option value="カンボジア"></option>
+                                    </datalist>
+                                </div>
                                 <div className="md:col-span-2"><label className="block text-sm font-medium text-[#1f1f1f] mb-2">現住所</label><input name="address" type="text" defaultValue={worker.address || ''} placeholder="例：東京都新宿区..." className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-4 py-3 outline-none text-[#1f1f1f] transition-all" /></div>
                             </div>
                         </div>

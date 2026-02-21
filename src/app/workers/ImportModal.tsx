@@ -93,7 +93,7 @@ export function ImportModal() {
     return (
         <>
             <button onClick={() => setIsOpen(true)} className="h-[32px] px-3 bg-white border border-[#ededed] text-[#1f1f1f] rounded-md text-[13px] font-medium hover:bg-[#fbfcfd] transition-colors flex items-center gap-1.5 shadow-sm">
-                <Upload size={14} /> 一括入力 (CSV)
+                <Upload size={14} /> 一括入力
             </button>
 
             {isOpen && (

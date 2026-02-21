@@ -107,8 +107,8 @@ export default function DashboardClient({ userName, role, systemData }: { userNa
                                 <div className="w-8 h-8 flex items-center justify-center shrink-0 mt-0.5 scale-[0.7] origin-top"><AnimatedLogo /></div>
                             )}
 
-                            <div className={`max-w-[85%] md:max-w-[75%] rounded-2xl md:rounded-[24px] px-5 md:px-6 py-4 text-[14px] leading-relaxed shadow-sm ${msg.role === 'user' ? 'bg-[#1f1f1f] text-white rounded-tr-none' : 'bg-white/80 backdrop-blur-md border border-white/50 text-[#444746] rounded-tl-none relative overflow-hidden'}`}>
-                                {msg.role === 'model' && <div className="absolute left-0 top-0 bottom-0 w-[4px] bg-[#24b47e]"></div>}
+                            <div className={`max-w-[85%] md:max-w-[75%] px-2 md:px-4 py-1 text-[14.5px] leading-relaxed relative overflow-hidden flex flex-col justify-center ${msg.role === 'user' ? 'text-[#1f1f1f] font-medium' : 'text-[#444746]'}`}>
+                                {msg.role === 'model' && <div className="absolute left-0 top-0 bottom-0 w-[4px] bg-[#24b47e] rounded-full opacity-0"></div>}
 
                                 {msg.isTyping ? (
                                     <div className="flex items-center gap-1.5 h-6 pl-2">

@@ -129,14 +129,14 @@ export default function DashboardClient({ userName, role, systemData }: { userNa
                 {/* Khung Input Nhập liệu */}
                 <div className="pt-4 pb-2 shrink-0 relative z-10">
                     <div className="absolute inset-0 bg-gradient-to-t from-white to-transparent pointer-events-none -bottom-10 h-32"></div>
-                    <form onSubmit={handleChat} className="relative max-w-4xl mx-auto flex items-end gap-3 bg-white backdrop-blur-xl border border-white/60 rounded-2xl p-2 md:p-2.5 focus-within:bg-white focus-within:shadow-md transition-all shadow-sm">
+                    <form onSubmit={handleChat} className="relative max-w-4xl mx-auto flex items-end gap-3 bg-white backdrop-blur-xl border border-white/60 rounded-[32px] p-2 md:p-2.5 focus-within:bg-white focus-within:shadow-md transition-all shadow-sm">
                         <textarea
                             value={userInput} onChange={e => setUserInput(e.target.value)} onKeyDown={handleKeyDown} disabled={isPendingChat || !aiData}
                             placeholder="質問、翻訳、メール作成など、何でも聞いてください... (Shift+Enter to newline)"
                             className="flex-1 max-h-24 min-h-[40px] bg-transparent border-none outline-none resize-none py-2 md:py-2.5 px-4 text-[14px] text-[#1f1f1f] placeholder:text-[#a0a0a0] leading-relaxed disabled:opacity-50"
                             rows={1}
                         />
-                        <button type="submit" disabled={isPendingChat || !userInput.trim()} className="w-11 h-11 shrink-0 flex items-center justify-center bg-[#1f1f1f] text-white hover:bg-[#24b47e] hover:shadow-lg hover:-translate-y-0.5 rounded-xl transition-all duration-300 disabled:opacity-50 disabled:bg-[#e0e0e0] disabled:text-[#878787] disabled:shadow-none disabled:transform-none mb-0.5">
+                        <button type="submit" disabled={isPendingChat || !userInput.trim()} className="w-11 h-11 shrink-0 flex items-center justify-center bg-[#1f1f1f] text-white hover:bg-[#24b47e] hover:shadow-lg hover:-translate-y-0.5 rounded-full transition-all duration-300 disabled:opacity-50 disabled:bg-[#e0e0e0] disabled:text-[#878787] disabled:shadow-none disabled:transform-none mb-0.5">
                             {isPendingChat ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} className="ml-0.5" />}
                         </button>
                     </form>

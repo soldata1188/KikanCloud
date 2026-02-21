@@ -146,7 +146,7 @@ export default function DashboardClient({ userName, role, systemData }: { userNa
             {/* 2. KHỐI THẺ AI PHÂN TÍCH VÀ SYSTEM ALERTS (GIỮ NGUYÊN) */}
             <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <h3 className="text-[16px] font-semibold text-[#444746] mb-4 tracking-tight">AI Task Suggestion</h3>
+                    <h3 className="text-[16px] font-semibold text-[#444746] mb-4 tracking-tight">AI タスク提案</h3>
                     <div className="flex flex-col justify-center transition-shadow min-h-[150px]">
                         {!aiData ? (
                             <div className="animate-pulse space-y-3 py-1"><div className="h-2 bg-gray-100 rounded w-1/4"></div><div className="h-2 bg-gray-100 rounded w-full"></div><div className="h-2 bg-gray-100 rounded w-5/6"></div></div>
@@ -164,7 +164,7 @@ export default function DashboardClient({ userName, role, systemData }: { userNa
                 </div>
 
                 <div>
-                    <h3 className="text-[16px] font-semibold text-[#444746] mb-4 tracking-tight">System Alerts</h3>
+                    <h3 className="text-[16px] font-semibold text-[#444746] mb-4 tracking-tight">システムアラート</h3>
                     <div className="flex flex-col justify-between relative transition-colors duration-500 min-h-[150px]">
                         {!aiData ? (
                             <div className="animate-pulse space-y-3 py-1"><div className="h-2 bg-gray-100 rounded w-1/4"></div><div className="h-2 bg-gray-100 rounded w-full"></div></div>
@@ -182,7 +182,7 @@ export default function DashboardClient({ userName, role, systemData }: { userNa
                                 </div>
                                 {aiData.alert?.hasDanger && (
                                     <Link href="/audits" className="text-[11px] font-bold text-[#1f1f1f] hover:text-[#d93025] flex items-center gap-1.5 transition-colors group w-fit uppercase tracking-widest mt-auto pl-5 z-10">
-                                        Review Pending Tasks <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                                        保留中のタスクを確認 <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
                                     </Link>
                                 )}
                             </>
@@ -193,13 +193,13 @@ export default function DashboardClient({ userName, role, systemData }: { userNa
 
             {/* 3. KHỐI THỐNG KÊ DATA */}
             <section className="grid grid-cols-2 md:grid-cols-4 gap-4 pb-8">
-                <div className="flex flex-col items-center justify-center text-center gap-2"><Users size={20} className="text-[#878787]" /><div><p className="text-[10px] font-bold text-[#878787] uppercase tracking-widest">Workers</p><p className="text-2xl font-black text-[#1f1f1f] font-mono">{systemData.stats.workers}</p></div></div>
-                <div className="flex flex-col items-center justify-center text-center gap-2"><Building2 size={20} className="text-[#878787]" /><div><p className="text-[10px] font-bold text-[#878787] uppercase tracking-widest">Companies</p><p className="text-2xl font-black text-[#1f1f1f] font-mono">{systemData.stats.companies}</p></div></div>
-                <div className="flex flex-col items-center justify-center text-center gap-2"><Clock size={20} className="text-[#878787]" /><div><p className="text-[10px] font-bold text-[#878787] uppercase tracking-widest">Pending Audits</p><p className="text-2xl font-black text-[#1f1f1f] font-mono">{systemData.stats.audits}</p></div></div>
+                <div className="flex flex-col items-center justify-center text-center gap-2"><Users size={20} className="text-[#878787]" /><div><p className="text-[10px] font-bold text-[#878787] uppercase tracking-widest">外国人材</p><p className="text-2xl font-black text-[#1f1f1f] font-mono">{systemData.stats.workers}</p></div></div>
+                <div className="flex flex-col items-center justify-center text-center gap-2"><Building2 size={20} className="text-[#878787]" /><div><p className="text-[10px] font-bold text-[#878787] uppercase tracking-widest">受入企業</p><p className="text-2xl font-black text-[#1f1f1f] font-mono">{systemData.stats.companies}</p></div></div>
+                <div className="flex flex-col items-center justify-center text-center gap-2"><Clock size={20} className="text-[#878787]" /><div><p className="text-[10px] font-bold text-[#878787] uppercase tracking-widest">監査予定</p><p className="text-2xl font-black text-[#1f1f1f] font-mono">{systemData.stats.audits}</p></div></div>
                 <div className="flex flex-col items-center justify-center text-center gap-2 relative group">
                     <div className={`absolute bottom-0 left-0 right-0 h-1 ${systemData.stats.audits > 0 ? 'bg-[#d93025]' : 'bg-[#24b47e]'}`}></div>
                     {systemData.stats.audits > 0 ? <AlertTriangle size={20} className="text-[#d93025] group-hover:scale-110 transition-transform" /> : <CheckCircle2 size={20} className="text-[#24b47e] group-hover:scale-110 transition-transform" />}
-                    <div><p className={`text-[10px] font-bold uppercase tracking-widest ${systemData.stats.audits > 0 ? 'text-[#d93025]' : 'text-[#24b47e]'}`}>System Status</p><p className="text-lg font-black text-[#1f1f1f]">{systemData.stats.audits > 0 ? 'Action Needed' : 'Optimal'}</p></div>
+                    <div><p className={`text-[10px] font-bold uppercase tracking-widest ${systemData.stats.audits > 0 ? 'text-[#d93025]' : 'text-[#24b47e]'}`}>システム状態</p><p className="text-lg font-black text-[#1f1f1f]">{systemData.stats.audits > 0 ? '対応が必要' : '最適'}</p></div>
                 </div>
             </section>
         </div>

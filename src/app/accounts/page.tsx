@@ -35,7 +35,7 @@ export default async function AccountsPage() {
         <div className="flex h-screen bg-white font-sans text-[#1f1f1f] overflow-hidden selection:bg-[#24b47e]/20">
             <Sidebar active="accounts" />
             <div className="flex-1 flex flex-col relative min-w-0">
-                <TopNav title="IAM Roles" role={userProfile?.role} userProfileStr={JSON.stringify(userProfile)} />
+                <TopNav title="IAM Roles" role={userProfile?.role} />
                 <main className="flex-1 overflow-y-auto p-6 md:p-10">
                     <div className="max-w-[1200px] mx-auto">
                         <div className="flex items-center gap-4 mb-8">

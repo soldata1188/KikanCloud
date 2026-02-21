@@ -1,18 +1,18 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { HelpCircle, Clock } from 'lucide-react'
-import { NotificationBell } from './NotificationBell'
-import { UserMenu } from './UserMenu'
-import { createClient } from '@/lib/supabase/server'
+import { User, Bell, LogOut, Clock, Hexagon, Settings } from 'lucide-react'
+import { GlobalSearch } from './GlobalSearch'
+import { createClient } from '@/lib/supabase/client'
+import { useRouter } from 'next/navigation'
+import { Logo } from './Logo'
+import { BrandModal } from './BrandModal'
 
-export function TopNav({ title, role, userProfileStr }: { title: string, role?: string, userProfileStr?: string }) {
-    const userProfile = userProfileStr ? JSON.parse(userProfileStr) : null;
-    const displayName = userProfile?.full_name || userProfile?.email?.split('@')[0] || 'User'
-    const email = userProfile?.email || ''
-    const avatarUrl = userProfile?.avatar_url
-
+export function TopNav({ title, role }: { title: string, role?: string }) {
+    const [isBrandModalOpen, setIsBrandModalOpen] = useState(false)
+    const [isAvatarOpen, setIsAvatarOpen] = useState(false)
     const [timeStr, setTimeStr] = useState('')
     const [dateStr, setDateStr] = useState('')
+    const router = useRouter()
 
     useEffect(() => {
         const updateTime = () => {
@@ -26,30 +26,67 @@ export function TopNav({ title, role, userProfileStr }: { title: string, role?: 
         return () => clearInterval(timer)
     }, [])
 
+    const handleLogout = async () => {
+        const supabase = createClient()
+        await supabase.auth.signOut()
+        router.push('/login')
+    }
+
     return (
-        <header className="h-14 bg-white border-b border-gray-200 flex items-center justify-between px-4 sm:px-6 sticky top-0 z-40 shrink-0 w-full">
-            <div className="flex items-center gap-2 text-[13px]">
-                <span className="font-medium text-[#1f1f1f]">KikanCloud</span>
-                <span className="text-[#878787]">/</span>
-                <span className="text-[#1f1f1f]">{title}</span>
-            </div>
+        <>
+            <header className="h-14 bg-white border-b border-[#ededed] flex items-center justify-between px-4 sm:px-6 sticky top-0 z-40 shrink-0 w-full">
+                <div className="flex items-center gap-2 text-[13px] font-sans">
+                    <button onClick={() => setIsBrandModalOpen(true)} className="w-6 h-6 flex items-center justify-center text-[#24b47e] hover:scale-110 transition-transform cursor-pointer focus:outline-none" title="About KikanCloud">
+                        <Logo className="w-5 h-5 shrink-0" />
+                    </button>
+                    <span className="text-[#878787] ml-1">/</span>
+                    <span className="font-medium text-[#1f1f1f]">KikanCloud</span>
+                    <span className="text-[#878787] ml-1">/</span>
+                    <span className="text-[#1f1f1f] font-bold">{title}</span>
+                </div>
 
-            <div className="flex items-center gap-4">
-                {timeStr && (
-                    <div className="hidden lg:flex items-center gap-2.5 px-3 py-1.5 bg-[#fbfcfd] border border-gray-200 rounded-md shadow-sm select-none hover:border-[#878787] transition-colors">
-                        <Clock size={14} className="text-[#24b47e]" />
-                        <span className="text-[11px] font-bold text-[#878787] uppercase tracking-widest">{dateStr}</span>
-                        <span className="text-gray-200">|</span>
-                        <span className="text-[13px] font-black text-[#1f1f1f] font-mono tabular-nums tracking-tight">{timeStr}</span>
-                        <span className="text-[9px] font-bold text-[#24b47e] bg-[#24b47e]/10 border border-[#24b47e]/20 px-1.5 py-0.5 rounded ml-0.5">JST</span>
+                <div className="flex items-center gap-4">
+                    {timeStr && (
+                        <div className="hidden lg:flex items-center gap-2.5 px-3 py-1.5 bg-[#fbfcfd] border border-[#ededed] rounded-md shadow-sm select-none hover:border-[#878787] transition-colors">
+                            <Clock size={14} className="text-[#24b47e]" />
+                            <span className="text-[11px] font-bold text-[#878787] uppercase tracking-widest">{dateStr}</span>
+                            <span className="text-[#ededed]">|</span>
+                            <span className="text-[13px] font-black text-[#1f1f1f] font-mono tabular-nums tracking-tight">{timeStr}</span>
+                        </div>
+                    )}
+
+                    <div className="w-px h-5 bg-[#ededed] hidden md:block mx-1"></div>
+
+                    <GlobalSearch />
+
+                    <div className="relative cursor-pointer hover:bg-gray-50 p-1.5 rounded-full transition-colors">
+                        <Bell size={16} className="text-[#878787]" />
+                        <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-[#d93025] rounded-full border border-white"></span>
                     </div>
-                )}
-                <div className="w-px h-5 bg-gray-200 hidden md:block mx-1"></div>
 
-                <div title="ヘルプ"><HelpCircle size={18} className="text-[#878787] hover:text-[#1f1f1f] cursor-pointer transition-colors" strokeWidth={1.5} /></div>
-                {role && <NotificationBell role={role} />}
-                <UserMenu displayName={displayName} email={email} role={role} avatarUrl={avatarUrl} />
-            </div>
-        </header>
+                    <div className="relative">
+                        <div onClick={() => setIsAvatarOpen(!isAvatarOpen)} className="w-8 h-8 rounded-full bg-[#fbfcfd] border border-[#ededed] text-[#878787] flex items-center justify-center text-xs font-bold cursor-pointer hover:bg-gray-50 hover:text-[#1f1f1f] transition-colors shadow-sm"><User size={14} /></div>
+                        {isAvatarOpen && (
+                            <>
+                                <div className="fixed inset-0 z-40" onClick={() => setIsAvatarOpen(false)}></div>
+                                <div className="absolute right-0 top-10 w-48 bg-white border border-[#ededed] rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.08)] z-50 py-1 animate-in fade-in slide-in-from-top-2 duration-200">
+                                    <div className="px-4 py-2 border-b border-[#ededed] mb-1 bg-[#fbfcfd]">
+                                        <p className="text-[10px] font-bold text-[#878787] uppercase tracking-widest">Signed in as</p>
+                                        <p className="text-[12px] font-bold text-[#1f1f1f] truncate capitalize">{role?.replace('_', ' ') || 'User'}</p>
+                                    </div>
+                                    <button onClick={() => { setIsAvatarOpen(false); router.push('/accounts') }} className="w-full text-left px-4 py-2 text-[13px] font-medium text-[#444746] hover:bg-[#fbfcfd] hover:text-[#1f1f1f] flex items-center gap-2 transition-colors">
+                                        <Settings size={14} /> Account Settings
+                                    </button>
+                                    <button onClick={handleLogout} className="w-full text-left px-4 py-2 text-[13px] font-medium text-red-600 hover:bg-red-50 flex items-center gap-2 transition-colors border-t border-[#ededed] mt-1 pt-2">
+                                        <LogOut size={14} /> サインアウト (Sign Out)
+                                    </button>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                </div>
+            </header>
+            <BrandModal isOpen={isBrandModalOpen} onClose={() => setIsBrandModalOpen(false)} />
+        </>
     )
 }

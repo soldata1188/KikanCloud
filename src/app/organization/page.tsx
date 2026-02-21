@@ -32,7 +32,7 @@ export default async function OrganizationPage({ searchParams }: { searchParams:
         <div className="flex h-screen bg-white font-sans text-[#1f1f1f] overflow-hidden selection:bg-[#24b47e]/20">
             <Sidebar active="organization" />
             <div className="flex-1 flex flex-col relative min-w-0">
-                <TopNav title="機関情報" role={userProfile.role} userProfileStr={JSON.stringify(userProfile)} />
+                <TopNav title="機関情報" role={userProfile.role} />
                 <main className="flex-1 overflow-y-auto p-6 md:p-10">
                     <div className="max-w-[1000px] mx-auto">
                         <div className="mb-8">

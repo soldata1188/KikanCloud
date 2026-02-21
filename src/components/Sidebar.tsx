@@ -14,7 +14,7 @@ export async function Sidebar({ active }: { active: string }) {
         { id: 'companies', icon: Building2, href: '/companies', title: '受入企業管理' },
         { id: 'procedures', icon: Landmark, href: '/procedures', title: '行政手続 (入管・機構)' },
         { id: 'audits', icon: Clock, href: '/audits', title: '監査・訪問・面談' },
-        { id: 'workflows', icon: Map, href: '/workflows', title: '業務フロー (Workflows)' },
+        { id: 'workflows', icon: Map, href: '/workflows', title: '業務フロー' },
         { id: 'organization', icon: Building2, href: '/organization', title: '機関情報' },
     ]
 

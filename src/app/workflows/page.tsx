@@ -16,13 +16,13 @@ export default async function WorkflowsPage() {
     const { data: workflowData } = await supabase.from('workflow_maps').select('nodes, edges').eq('tenant_id', userProfile?.tenant_id).single()
 
     const defaultNodes = [
-        { id: '1', type: 'custom', position: { x: 250, y: 50 }, data: { step: '1', phase: 'SALES', status: 'done', label: '企業登録・求人 (Đăng ký Xí nghiệp)', duration: '随時', content: '受入企業の基本情報を登録し、求人票を作成します。入管法および技能実習法の要件を満たしているか確認します。', docs: ['企業登記簿', '決算書', '求人票'] } },
-        { id: '2', type: 'custom', position: { x: 250, y: 200 }, data: { step: '2', phase: 'INTERVIEW', status: 'done', label: '面接・内定 (Phỏng vấn & Trúng tuyển)', duration: '約1ヶ月', content: '現地面接またはオンライン面接を実施。合格者と雇用契約を締結します。母国語での十分な説明が必要です。', docs: ['面接評価表', '雇用条件通知書', '雇用契約書'] } },
-        { id: '3', type: 'custom', position: { x: 250, y: 350 }, data: { step: '3', phase: 'OTIT', status: 'pending', label: '技能実習計画認定申請 (Xin OTIT)', duration: '約1〜2ヶ月', content: '外国人技能実習機構（OTIT）へ計画認定申請を行います。審査が完了し認定証が交付されるまで待機します。', docs: ['技能実習計画認定申請書', '送出機関の推薦状'] } },
-        { id: '4', type: 'custom', position: { x: 250, y: 500 }, data: { step: '4', phase: 'NYUKAN', status: 'pending', label: '在留資格認定証明書 (Xin COE)', duration: '約1〜3ヶ月', content: '管轄の出入国在留管理局へCOE（在留資格認定証明書）の交付申請を行います。OTIT認定証の写しが必須です。', docs: ['在留資格認定証明書交付申請書', 'OTIT認定証の写し'] } },
-        { id: '5', type: 'custom', position: { x: 250, y: 650 }, data: { step: '5', phase: 'ENTRY', status: 'pending', label: 'ビザ発給・入国 (Xin Visa & Nhập cảnh)', duration: '約2週間', content: 'COE原本を現地送出機関へ郵送し、日本大使館でビザを発給。航空券を手配し日本へ入国させます。', docs: ['COE原本', '査証申請書', '航空券手配'] } },
-        { id: '6', type: 'custom', position: { x: 250, y: 800 }, data: { step: '6', phase: 'TRAINING', status: 'pending', label: '入国後講習・配属 (Đào tạo & Phân bổ)', duration: '約1ヶ月', content: '約1ヶ月間の入国後講習（日本語、法的保護など）を実施後、受入企業へ配属し就労を開始します。市役所で住所登録を行います。', docs: ['講習実施記録', '転出転入届', 'マイナンバー申請'] } },
-        { id: '7', type: 'custom', position: { x: 250, y: 950 }, data: { step: '7', phase: 'AUDIT', status: 'pending', label: '訪問指導・監査 (Thăm hỏi & Thanh tra)', duration: '毎月/3ヶ月毎', content: '毎月の訪問指導（第1号の場合）、3ヶ月ごとの定期監査を実施し、賃金台帳やタイムカードを確認。機構へ報告します。', docs: ['訪問指導記録書', '定期監査報告書', '出勤簿・賃金台帳'] } },
+        { id: '1', type: 'custom', position: { x: 250, y: 50 }, data: { step: '1', phase: '�c��', status: 'done', label: '企業登録・求人', duration: '随時', content: '受入企業の基本情報を登録し、求人票を作成します。入管法および技能実習法の要件を満たしているか確認します。', docs: ['企業登記簿', '決算書', '求人票'] } },
+        { id: '2', type: 'custom', position: { x: 250, y: 200 }, data: { step: '2', phase: '�ʐ�', status: 'done', label: '面接・内定', duration: '約1ヶ月', content: '現地面接またはオンライン面接を実施。合格者と雇用契約を締結します。母国語での十分な説明が必要です。', docs: ['面接評価表', '雇用条件通知書', '雇用契約書'] } },
+        { id: '3', type: 'custom', position: { x: 250, y: 350 }, data: { step: '3', phase: '�@����', status: 'pending', label: '技能実習計画認定申請', duration: '約1〜2ヶ月', content: '外国人技能実習機構（OTIT）へ計画認定申請を行います。審査が完了し認定証が交付されるまで待機します。', docs: ['技能実習計画認定申請書', '送出機関の推薦状'] } },
+        { id: '4', type: 'custom', position: { x: 250, y: 500 }, data: { step: '4', phase: '���ǐ��', status: 'pending', label: '在留資格認定証明書', duration: '約1〜3ヶ月', content: '管轄の出入国在留管理局へCOE（在留資格認定証明書）の交付申請を行います。OTIT認定証の写しが必須です。', docs: ['在留資格認定証明書交付申請書', 'OTIT認定証の写し'] } },
+        { id: '5', type: 'custom', position: { x: 250, y: 650 }, data: { step: '5', phase: '����', status: 'pending', label: 'ビザ発給・入国', duration: '約2週間', content: 'COE原本を現地送出機関へ郵送し、日本大使館でビザを発給。航空券を手配し日本へ入国させます。', docs: ['COE原本', '査証申請書', '航空券手配'] } },
+        { id: '6', type: 'custom', position: { x: 250, y: 800 }, data: { step: '6', phase: '�u�K', status: 'pending', label: '入国後講習・配属', duration: '約1ヶ月', content: '約1ヶ月間の入国後講習（日本語、法的保護など）を実施後、受入企業へ配属し就労を開始します。市役所で住所登録を行います。', docs: ['講習実施記録', '転出転入届', 'マイナンバー申請'] } },
+        { id: '7', type: 'custom', position: { x: 250, y: 950 }, data: { step: '7', phase: '�č�', status: 'pending', label: '訪問指導・監査', duration: '毎月/3ヶ月毎', content: '毎月の訪問指導（第1号の場合）、3ヶ月ごとの定期監査を実施し、賃金台帳やタイムカードを確認。機構へ報告します。', docs: ['訪問指導記録書', '定期監査報告書', '出勤簿・賃金台帳'] } },
     ];
     const defaultEdges = [
         { id: 'e1-2', source: '1', target: '2', animated: true, style: { stroke: '#24b47e', strokeWidth: 2 }, markerEnd: { type: MarkerType.ArrowClosed, color: '#24b47e' } },
@@ -40,7 +40,7 @@ export default async function WorkflowsPage() {
         <div className="flex h-screen bg-[#fbfcfd] font-sans text-[#1f1f1f] overflow-hidden selection:bg-[#24b47e]/20">
             <Sidebar active="workflows" />
             <div className="flex-1 flex flex-col relative min-w-0">
-                <TopNav title="Interactive Workflow Builder" role={userProfile?.role} />
+                <TopNav title="業務フロービルダー" role={userProfile?.role} />
                 <main className="flex-1 p-6 md:p-8 relative">
                     <WorkflowMapClient dbNodes={initialNodes} dbEdges={initialEdges} role={userProfile?.role || 'staff'} />
                 </main>

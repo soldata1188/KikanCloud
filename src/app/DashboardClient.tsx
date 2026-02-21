@@ -136,8 +136,8 @@ export default function DashboardClient({ userName, role, systemData }: { userNa
                             className="flex-1 max-h-24 min-h-[40px] bg-transparent border-none outline-none resize-none py-2 md:py-2.5 px-4 text-[14px] text-[#1f1f1f] placeholder:text-[#a0a0a0] leading-relaxed disabled:opacity-50"
                             rows={1}
                         />
-                        <button type="submit" disabled={isPendingChat || !userInput.trim()} className="w-11 h-11 shrink-0 flex items-center justify-center bg-[#1f1f1f] text-white hover:bg-[#24b47e] hover:-translate-y-0.5 rounded-full transition-all duration-300 disabled:opacity-50 disabled:bg-[#e0e0e0] disabled:text-[#878787] disabled:shadow-none disabled:transform-none mb-0.5 relative overflow-hidden">
-                            {isPendingChat ? <Loader2 size={18} className="animate-spin" /> : <div className="scale-[0.45] pointer-events-none origin-center absolute inset-0 flex items-center justify-center mt-0.5 ml-0.5"><AnimatedLogo logoOnly /></div>}
+                        <button type="submit" disabled={isPendingChat || !userInput.trim()} className="w-11 h-11 shrink-0 flex items-center justify-center hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-50 disabled:transform-none relative overflow-visible">
+                            {isPendingChat ? <Loader2 size={20} className="animate-spin text-[#24b47e]" /> : <div className="scale-[0.55] pointer-events-none origin-center absolute inset-0 flex items-center justify-center -ml-1"><AnimatedLogo logoOnly /></div>}
                         </button>
                     </form>
                 </div>

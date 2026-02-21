@@ -65,7 +65,12 @@ export default async function NewCompanyPage() {
                                         業種 (Industry)
                                         <span className="text-[10px] font-bold px-1.5 py-0.5 rounded border border-[#ededed] text-[#878787] bg-[#fbfcfd]">任意</span>
                                     </label>
-                                    <input name="industry" type="text" placeholder="例：製造業、建設業..." className="w-full bg-[#fbfcfd] border border-[#ededed] focus:bg-white focus:border-[#24b47e] focus:ring-[3px] focus:ring-[#24b47e]/10 rounded-md px-4 py-3 outline-none text-[#1f1f1f] transition-all" />
+                                    <input name="industry" type="text" list="industry-suggestions" placeholder="例：製造業、建設業..." className="w-full bg-[#fbfcfd] border border-[#ededed] focus:bg-white focus:border-[#24b47e] focus:ring-[3px] focus:ring-[#24b47e]/10 rounded-md px-4 py-3 outline-none text-[#1f1f1f] transition-all" />
+                                    <datalist id="industry-suggestions">
+                                        <option value="建設業"></option>
+                                        <option value="製造業"></option>
+                                        <option value="農業"></option>
+                                    </datalist>
                                 </div>
                             </div>
                         </div>

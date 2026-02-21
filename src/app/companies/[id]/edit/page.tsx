@@ -47,7 +47,15 @@ export default async function EditCompanyPage({ params }: { params: Promise<{ id
                                     <div className="md:col-span-2"><label className="block text-sm font-medium text-[#1f1f1f] mb-2">企業名（日本語） <span className="text-red-500">*</span></label><input name="name_jp" type="text" required defaultValue={company.name_jp} className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-4 py-3 outline-none text-[#1f1f1f] transition-all" /></div>
                                     <div><label className="block text-sm font-medium text-[#1f1f1f] mb-2">企業名（ローマ字）</label><input name="name_romaji" type="text" defaultValue={company.name_romaji || ''} className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-4 py-3 outline-none uppercase text-[#1f1f1f] transition-all" /></div>
                                     <div><label className="block text-sm font-medium text-[#1f1f1f] mb-2">法人番号（13桁）</label><input name="corporate_number" type="text" maxLength={13} defaultValue={company.corporate_number || ''} className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-4 py-3 outline-none font-mono text-[#1f1f1f] transition-all" /></div>
-                                    <div className="md:col-span-2"><label className="block text-sm font-medium text-[#1f1f1f] mb-2">業種 (Industry)</label><input name="industry" type="text" defaultValue={company.industry || ''} placeholder="例：製造業、建設業..." className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-4 py-3 outline-none text-[#1f1f1f] transition-all" /></div>
+                                    <div className="md:col-span-2">
+                                        <label className="block text-sm font-medium text-[#1f1f1f] mb-2">業種 (Industry)</label>
+                                        <input name="industry" type="text" list="industry-suggestions" defaultValue={company.industry || ''} placeholder="例：製造業、建設業..." className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-4 py-3 outline-none text-[#1f1f1f] transition-all" />
+                                        <datalist id="industry-suggestions">
+                                            <option value="建設業"></option>
+                                            <option value="製造業"></option>
+                                            <option value="農業"></option>
+                                        </datalist>
+                                    </div>
                                 </div>
                             </div>
 

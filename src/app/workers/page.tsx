@@ -18,10 +18,10 @@ export default async function WorkersPage() {
         <div className="flex h-screen bg-[#fbfcfd] font-sans text-[#1f1f1f] overflow-hidden selection:bg-[#24b47e]/20">
             <Sidebar active="workers" />
             <div className="flex-1 flex flex-col relative min-w-0">
-                <TopNav title="Workers" role={userProfile?.role} />
+                <TopNav title="外国人材管理" role={userProfile?.role} />
                 <main className="flex-1 overflow-y-auto p-6 md:p-10">
                     <div className="max-w-[1200px] mx-auto">
-                        <h1 className="text-[28px] font-normal tracking-tight text-[#1f1f1f] mb-8">Workers Overview</h1>
+                        <h1 className="text-[28px] font-normal tracking-tight text-[#1f1f1f] mb-8">外国人材 一覧</h1>
                         <WorkersListClient initialWorkers={workers || []} role={userProfile?.role || 'staff'} next90DaysStr={''} />
                     </div>
                 </main>

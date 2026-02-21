@@ -15,17 +15,17 @@ export function TopNav({ title, role }: { title: string, role?: string }) {
             </div>
 
             <div className="flex items-center gap-4">
-                <div className="hidden sm:block text-[13px] text-[#878787] hover:text-[#1f1f1f] cursor-pointer transition-colors mr-2">Feedback</div>
+                <div className="hidden sm:block text-[13px] text-[#878787] hover:text-[#1f1f1f] cursor-pointer transition-colors mr-2">フィードバック</div>
                 <div className="relative hidden md:block group">
                     <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#878787] group-focus-within:text-[#1f1f1f] transition-colors" size={14} />
-                    <input type="text" placeholder="Search..." className="h-[30px] w-52 bg-[#fbfcfd] border border-[#ededed] rounded-md pl-8 pr-12 text-xs outline-none focus:border-[#878787] focus:bg-white transition-all text-[#1f1f1f] placeholder:text-[#878787]" />
+                    <input type="text" placeholder="検索..." className="h-[30px] w-52 bg-[#fbfcfd] border border-[#ededed] rounded-md pl-8 pr-12 text-xs outline-none focus:border-[#878787] focus:bg-white transition-all text-[#1f1f1f] placeholder:text-[#878787]" />
                     <div className="absolute right-1.5 top-1/2 -translate-y-1/2 flex items-center gap-0.5 text-[#878787] text-[10px] font-mono">
                         <span className="border border-[#ededed] bg-white rounded px-1 shadow-sm">⌘</span><span className="border border-[#ededed] bg-white rounded px-1 shadow-sm">K</span>
                     </div>
                 </div>
-                <HelpCircle size={18} className="text-[#878787] hover:text-[#1f1f1f] cursor-pointer transition-colors" strokeWidth={1.5} />
+                <div title="ヘルプ"><HelpCircle size={18} className="text-[#878787] hover:text-[#1f1f1f] cursor-pointer transition-colors" strokeWidth={1.5} /></div>
                 {role && <NotificationBell role={role} />}
-                <div className="w-7 h-7 rounded-full bg-[#fbfcfd] border border-[#ededed] text-[#878787] flex items-center justify-center text-xs font-bold cursor-pointer hover:bg-[#fbfcfd]"><User size={14} /></div>
+                <div className="w-7 h-7 rounded-full bg-[#fbfcfd] border border-[#ededed] text-[#878787] flex items-center justify-center text-xs font-bold cursor-pointer hover:bg-[#fbfcfd]" title="プロフィール"><User size={14} /></div>
             </div>
         </header>
     )

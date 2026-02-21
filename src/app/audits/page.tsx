@@ -89,11 +89,11 @@ export default async function AuditsPage({ searchParams }: { searchParams: Promi
         <div className="flex h-screen bg-[#fbfcfd] font-sans text-[#1f1f1f] overflow-hidden selection:bg-[#24b47e]/20">
             <Sidebar active="audits" />
             <div className="flex-1 flex flex-col relative min-w-0">
-                <TopNav title="Audits" role={userProfile?.role} />
+                <TopNav title="監査・訪問指導" role={userProfile?.role} />
                 <main className="flex-1 overflow-y-auto p-6 md:p-10">
                     <div className="max-w-[1200px] mx-auto">
                         <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
-                            <h1 className="text-[28px] font-normal tracking-tight text-[#1f1f1f]">Audits & Visits</h1>
+                            <h1 className="text-[28px] font-normal tracking-tight text-[#1f1f1f]">監査・訪問指導 一覧</h1>
 
                             <div className="flex items-center gap-3">
                                 <MonthFilter defaultValue={filterMonth} />
@@ -105,7 +105,7 @@ export default async function AuditsPage({ searchParams }: { searchParams: Promi
                                 </Link>
 
                                 <Link href="/audits/new" className="h-[32px] px-3 bg-[#24b47e] hover:bg-[#1e9a6a] text-white rounded-md text-[13px] font-medium flex items-center gap-1.5 transition-colors">
-                                    <Plus size={14} /> New audit
+                                    <Plus size={14} /> 新規登録
                                 </Link>
                             </div>
                         </div>
@@ -119,7 +119,7 @@ export default async function AuditsPage({ searchParams }: { searchParams: Promi
                                             <th className="px-5 py-3 font-medium">ステータス</th>
                                             <th className="px-5 py-3 font-medium">予定日 / 完了日</th>
                                             <th className="px-5 py-3 font-medium">担当</th>
-                                            <th className="px-5 py-3 font-medium text-right w-[160px]">アクション</th>
+                                            <th className="px-5 py-3 font-medium text-right w-[160px]">操作</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-[#ededed]">

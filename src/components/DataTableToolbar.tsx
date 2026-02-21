@@ -17,7 +17,7 @@ export function DataTableToolbar({ data, filename, searchPlaceholder, onSearch, 
                     <input type="text" value={searchTerm} onChange={handleSearch} placeholder={searchPlaceholder} className="w-full h-[32px] bg-white border border-[#ededed] rounded-md pl-8 pr-3 text-[13px] outline-none focus:border-[#878787] transition-colors text-[#1f1f1f] placeholder:text-[#878787]" />
                 </div>
                 <button className="h-[32px] px-3 bg-white border border-[#ededed] rounded-md text-[13px] text-[#1f1f1f] flex items-center gap-2 hover:bg-[#fbfcfd]">
-                    Status <span className="text-[10px] text-[#878787]">▼</span>
+                    ステータス <span className="text-[10px] text-[#878787]">▼</span>
                 </button>
             </div>
 
@@ -28,12 +28,12 @@ export function DataTableToolbar({ data, filename, searchPlaceholder, onSearch, 
                 </div>
                 {role === 'admin' && (
                     <button onClick={handleExport} className="h-[32px] px-3 bg-white border border-[#ededed] hover:bg-[#fbfcfd] text-[#1f1f1f] rounded-md text-[13px] font-medium transition-colors flex items-center gap-2">
-                        <FileSpreadsheet size={14} /> Excel
+                        <FileSpreadsheet size={14} /> Excel出力
                     </button>
                 )}
                 {addLink && role !== 'staff' && role !== 'company_user' && (
                     <Link href={addLink} className="h-[32px] px-3 bg-[#24b47e] hover:bg-[#1e9a6a] text-white rounded-md text-[13px] font-medium flex items-center gap-1.5 transition-colors">
-                        <Plus size={14} /> New project
+                        <Plus size={14} /> 新規登録
                     </Link>
                 )}
             </div>

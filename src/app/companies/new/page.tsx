@@ -126,6 +126,13 @@ export default async function NewCompanyPage() {
                                 </div>
                                 <div>
                                     <label className="flex items-center gap-2 text-sm font-medium text-[#1f1f1f] mb-2">
+                                        講習受講日
+                                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded border border-[#ededed] text-[#878787] bg-[#fbfcfd]">任意</span>
+                                    </label>
+                                    <input name="training_date" type="date" className="w-full bg-[#fbfcfd] border border-[#ededed] focus:bg-white focus:border-[#24b47e] focus:ring-[3px] focus:ring-[#24b47e]/10 rounded-md px-4 py-3 outline-none text-[#1f1f1f] transition-all" />
+                                </div>
+                                <div className="md:col-span-2">
+                                    <label className="flex items-center gap-2 text-sm font-medium text-[#1f1f1f] mb-2">
                                         連絡・実習担当者
                                         <span className="text-[10px] font-bold px-1.5 py-0.5 rounded border border-[#ededed] text-[#878787] bg-[#fbfcfd]">任意</span>
                                     </label>

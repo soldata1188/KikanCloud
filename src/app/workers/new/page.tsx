@@ -6,6 +6,7 @@ import { Sidebar } from '@/components/Sidebar'
 import { SaveButton } from '@/components/SubmitButtons'
 import { UserMenu } from '@/components/UserMenu'
 import { AvatarUploadZone } from '@/components/AvatarUploadZone'
+import { ComboboxInput } from '@/components/ComboboxInput'
 import { redirect } from 'next/navigation'
 
 export default async function NewWorkerPage() {
@@ -86,13 +87,13 @@ export default async function NewWorkerPage() {
                                         国籍
                                         <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-red-50 text-red-600 border border-red-100">必須</span>
                                     </label>
-                                    <input name="nationality" type="text" list="nationality-suggestions" required defaultValue="ベトナム" placeholder="例：ベトナム" className="w-full bg-[#fbfcfd] border border-[#ededed] focus:bg-white focus:border-[#24b47e] focus:ring-[3px] focus:ring-[#24b47e]/10 rounded-md px-4 py-3 outline-none text-[#1f1f1f] transition-all" />
-                                    <datalist id="nationality-suggestions">
-                                        <option value="ベトナム"></option>
-                                        <option value="インドネシア"></option>
-                                        <option value="フィリピン"></option>
-                                        <option value="カンボジア"></option>
-                                    </datalist>
+                                    <ComboboxInput
+                                        name="nationality"
+                                        required
+                                        defaultValue="ベトナム"
+                                        placeholder="例：ベトナム"
+                                        options={['ベトナム', 'インドネシア', 'フィリピン', 'カンボジア']}
+                                    />
                                 </div>
                                 <div className="md:col-span-2">
                                     <label className="flex items-center gap-2 text-sm font-medium text-[#1f1f1f] mb-2">

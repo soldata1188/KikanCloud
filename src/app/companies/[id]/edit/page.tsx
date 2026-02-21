@@ -5,6 +5,7 @@ import { ArrowLeft, Sparkles, Building2, MessageCircle } from 'lucide-react'
 import { ChatBox } from '@/components/ChatBox'
 import { Sidebar } from '@/components/Sidebar'
 import { UpdateButton } from '@/components/SubmitButtons'
+import { ComboboxInput } from '@/components/ComboboxInput'
 import { redirect, notFound } from 'next/navigation'
 
 export default async function EditCompanyPage({ params }: { params: Promise<{ id: string }> }) {
@@ -49,12 +50,12 @@ export default async function EditCompanyPage({ params }: { params: Promise<{ id
                                     <div><label className="block text-sm font-medium text-[#1f1f1f] mb-2">法人番号（13桁）</label><input name="corporate_number" type="text" maxLength={13} defaultValue={company.corporate_number || ''} className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-4 py-3 outline-none font-mono text-[#1f1f1f] transition-all" /></div>
                                     <div className="md:col-span-2">
                                         <label className="block text-sm font-medium text-[#1f1f1f] mb-2">業種 (Industry)</label>
-                                        <input name="industry" type="text" list="industry-suggestions" defaultValue={company.industry || ''} placeholder="例：製造業、建設業..." className="w-full bg-[#fbfcfd] focus:bg-white -transparent focus: rounded-md px-4 py-3 outline-none text-[#1f1f1f] transition-all" />
-                                        <datalist id="industry-suggestions">
-                                            <option value="建設業"></option>
-                                            <option value="製造業"></option>
-                                            <option value="農業"></option>
-                                        </datalist>
+                                        <ComboboxInput
+                                            name="industry"
+                                            defaultValue={company.industry || ''}
+                                            placeholder="例：製造業、建設業..."
+                                            options={['建設業', '製造業', '農業']}
+                                        />
                                     </div>
                                 </div>
                             </div>

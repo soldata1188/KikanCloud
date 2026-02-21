@@ -31,7 +31,7 @@ export function TopNav({ title, role }: { title: string, role?: string }) {
 
     return (
         <>
-            <header className="h-14 bg-white border-b border-[#ededed] flex items-center justify-between px-4 sm:px-6 sticky top-0 z-40 shrink-0 w-full">
+            <header className="h-14 bg-[#fbfcfd] border-b border-[#ededed] flex items-center justify-between px-4 sm:px-6 sticky top-0 z-40 shrink-0 w-full">
                 <div className="flex items-center gap-2 text-[13px] font-sans pl-1">
                     <span className="font-medium text-[#1f1f1f]">KikanCloud</span>
                     <span className="text-[#878787] ml-1">/</span>

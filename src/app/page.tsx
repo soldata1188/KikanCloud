@@ -103,7 +103,7 @@ export default async function DashboardPage() {
   }
 
   return (
-    <div className="flex h-screen bg-[#fbfcfd] font-sans text-[#1f1f1f] overflow-hidden selection:bg-[#24b47e]/20">
+    <div className="flex h-screen bg-white font-sans text-[#1f1f1f] overflow-hidden selection:bg-[#24b47e]/20">
       <Sidebar active="dashboard" />
 
       <div className="flex-1 flex flex-col relative min-w-0">

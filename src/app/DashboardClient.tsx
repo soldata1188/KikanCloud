@@ -82,7 +82,8 @@ export default function DashboardClient({ userName, role, systemData }: { userNa
                 <div className="pt-2 pb-4 shrink-0 relative z-10">
                     <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-2">
-                            <span className="text-[10px] font-bold text-[#878787] uppercase tracking-widest bg-white/50 px-2 py-0.5 rounded-full backdrop-blur-sm">AI-Channel</span>
+                            <div className="w-8 h-8 flex items-center justify-center shrink-0 scale-[0.85] origin-left"><AnimatedLogo logoOnly /></div>
+                            <span className="text-[10px] font-bold text-[#878787] uppercase tracking-widest bg-white/50 px-2 py-0.5 rounded-full backdrop-blur-sm -ml-1">AI-Channel</span>
                         </div>
                         <div className="flex items-center gap-3">
                             {!aiData && <div className="text-[11px] font-bold text-[#24b47e] bg-[#24b47e]/10 px-2 py-1 rounded-full flex items-center gap-1.5"><Loader2 size={12} className="animate-spin" /> Syncing Live Data</div>}
@@ -103,7 +104,7 @@ export default function DashboardClient({ userName, role, systemData }: { userNa
                     {messages.map((msg) => (
                         <div key={msg.id} className={`flex gap-4 ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-in slide-in-from-bottom-2`}>
                             {msg.role === 'model' && (
-                                <div className="w-8 h-8 flex items-center justify-center shrink-0 mt-0.5 scale-[0.7] origin-top"><AnimatedLogo logoOnly /></div>
+                                <div className="w-8 h-8 flex items-center justify-center shrink-0 mt-0.5 scale-[0.9] origin-top"><AnimatedLogo logoOnly /></div>
                             )}
 
                             <div className={`max-w-[85%] md:max-w-[75%] px-2 md:px-4 py-1 text-[14.5px] leading-relaxed relative overflow-hidden flex flex-col justify-center ${msg.role === 'user' ? 'text-[#1f1f1f] font-medium' : 'text-[#444746]'}`}>

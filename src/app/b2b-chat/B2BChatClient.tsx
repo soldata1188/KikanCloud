@@ -1,9 +1,14 @@
 'use client'
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { Search, MoreVertical, Paperclip, Send, FileText, Download, Folder, Image as ImageIcon, File, Info, ChevronDown } from 'lucide-react'
 
-// --- Mock Data ---
-const MOCK_COMPANIES = [
+// --- Types ---
+type Company = { id: string; name: string; avatar: string; lastMessage: string; unread: number; time: string; }
+type FileData = { id: string; name: string; size: string; type: 'pdf' | 'word' | 'image' | 'excel' | 'other'; date: string }
+type Message = { id: string; sender: 'me' | 'them'; type: 'text' | 'file'; content?: string; file?: FileData; time: string }
+
+// --- Initial Data ---
+const INITIAL_COMPANIES: Company[] = [
     { id: '1', name: '株式会社テクノソリューションズ', avatar: 'T', lastMessage: '書類を確認しました。ありがとうございます。', unread: 2, time: '10:30' },
     { id: '2', name: 'グローバル製造株式会社', avatar: 'G', lastMessage: '面接の日程ですが、来週の水曜日は...', unread: 0, time: '昨日' },
     { id: '3', name: 'さくら建設工業', avatar: 'S', lastMessage: 'よろしくお願いします。', unread: 0, time: '10/24' },
@@ -11,22 +16,49 @@ const MOCK_COMPANIES = [
     { id: '5', name: 'ひまわり介護サービス', avatar: 'H', lastMessage: '新しい候補者の履歴書をお待ちしております。', unread: 0, time: '10/20' },
 ]
 
-type FileData = { name: string; size: string; type: 'pdf' | 'word' | 'image' | 'excel' | 'other' }
-type Message = { id: string; sender: 'me' | 'them'; type: 'text' | 'file'; content?: string; file?: FileData; time: string }
+const INITIAL_MESSAGES: Record<string, Message[]> = {
+    '1': [
+        { id: 'm1', sender: 'me', type: 'text', content: 'お世話になっております。次期の実習生に関する書類を送付いたします。ご確認のほどよろしくお願いいたします。', time: '10:00' },
+        { id: 'm2', sender: 'me', type: 'file', file: { id: 'f1', name: '実習生候補者名簿_2026.pdf', size: '2.4 MB', type: 'pdf', date: '今日 10:01' }, time: '10:01' },
+        { id: 'm3', sender: 'them', type: 'text', content: '書類を確認しました。ありがとうございます。\nいくつか修正点がありますので、別途ファイルの確認をお願いできますでしょうか？', time: '10:30' },
+        { id: 'm4', sender: 'them', type: 'file', file: { id: 'f2', name: '要件修正依頼_2026.docx', size: '1.2 MB', type: 'word', date: '今日 10:31' }, time: '10:31' },
+    ],
+    '2': [
+        { id: 'm2-1', sender: 'them', type: 'text', content: 'お世話になっております。\n面接の日程ですが、来週の水曜日はご都合いかがでしょうか？', time: '昨日' }
+    ]
+}
 
-const MOCK_MESSAGES: Message[] = [
-    { id: 'm1', sender: 'me', type: 'text', content: 'お世話になっております。次期の実習生に関する書類を送付いたします。ご確認のほどよろしくお願いいたします。', time: '10:00' },
-    { id: 'm2', sender: 'me', type: 'file', file: { name: '実習生候補者名簿_2026.pdf', size: '2.4 MB', type: 'pdf' }, time: '10:01' },
-    { id: 'm3', sender: 'them', type: 'text', content: '書類を確認しました。ありがとうございます。\nいくつか修正点がありますので、別途ファイルの確認をお願いできますでしょうか？', time: '10:30' },
-    { id: 'm4', sender: 'them', type: 'file', file: { name: '要件修正依頼_2026.docx', size: '1.2 MB', type: 'word' }, time: '10:31' },
-]
+const INITIAL_FILES: Record<string, FileData[]> = {
+    '1': [
+        { id: 'f2', name: '要件修正依頼_2026.docx', size: '1.2 MB', date: '今日 10:31', type: 'word' },
+        { id: 'f1', name: '実習生候補者名簿_2026.pdf', size: '2.4 MB', date: '今日 10:01', type: 'pdf' },
+        { id: 'f3', name: '会社案内パンフレット.pdf', size: '5.6 MB', date: '10/12', type: 'pdf' },
+        { id: 'f4', name: '採用条件シート.xlsx', size: '840 KB', date: '10/05', type: 'excel' },
+    ],
+    '2': []
+}
 
-const MOCK_FILES = [
-    { id: 'f2', name: '要件修正依頼_2026.docx', size: '1.2 MB', date: '今日 10:31', type: 'word' },
-    { id: 'f1', name: '実習生候補者名簿_2026.pdf', size: '2.4 MB', date: '今日 10:01', type: 'pdf' },
-    { id: 'f3', name: '会社案内パンフレット.pdf', size: '5.6 MB', date: '10/12', type: 'pdf' },
-    { id: 'f4', name: '採用条件シート.xlsx', size: '840 KB', date: '10/05', type: 'excel' },
-]
+const getCurrentTimeStr = () => {
+    const now = new Date();
+    return `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+}
+
+const getFileType = (fileName: string): 'pdf' | 'word' | 'image' | 'excel' | 'other' => {
+    const ext = fileName.split('.').pop()?.toLowerCase() || '';
+    if (['pdf'].includes(ext)) return 'pdf';
+    if (['doc', 'docx'].includes(ext)) return 'word';
+    if (['xls', 'xlsx'].includes(ext)) return 'excel';
+    if (['png', 'jpg', 'jpeg', 'gif'].includes(ext)) return 'image';
+    return 'other';
+}
+
+const formatBytes = (bytes: number) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+}
 
 const FileIcon = ({ type, className = "" }: { type: string, className?: string }) => {
     switch (type) {
@@ -39,17 +71,117 @@ const FileIcon = ({ type, className = "" }: { type: string, className?: string }
 }
 
 export default function B2BChatClient() {
+    // State
+    const [companies, setCompanies] = useState<Company[]>(INITIAL_COMPANIES)
+    const [messagesMap, setMessagesMap] = useState<Record<string, Message[]>>(INITIAL_MESSAGES)
+    const [filesMap, setFilesMap] = useState<Record<string, FileData[]>>(INITIAL_FILES)
+
     const [selectedCompanyId, setSelectedCompanyId] = useState('1')
     const [searchQuery, setSearchQuery] = useState('')
     const [messageInput, setMessageInput] = useState('')
     const [isDragging, setIsDragging] = useState(false)
     const [activeTab, setActiveTab] = useState<'files' | 'info'>('files')
+    const [fileInputKey, setFileInputKey] = useState(0)
+
     const messagesEndRef = useRef<HTMLDivElement>(null)
+    const fileInputRef = useRef<HTMLInputElement>(null)
 
-    const selectedCompany = MOCK_COMPANIES.find(c => c.id === selectedCompanyId) || MOCK_COMPANIES[0]
-    const filteredCompanies = MOCK_COMPANIES.filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase()))
+    // Derived values
+    const selectedCompany = companies.find(c => c.id === selectedCompanyId) || companies[0]
+    const filteredCompanies = companies.filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase()))
+    const currentMessages = messagesMap[selectedCompanyId] || []
+    const currentFiles = filesMap[selectedCompanyId] || []
 
-    // Setup drag and drop
+    // Read messages when company selected
+    useEffect(() => {
+        setCompanies(prev => prev.map(c =>
+            c.id === selectedCompanyId ? { ...c, unread: 0 } : c
+        ))
+    }, [selectedCompanyId])
+
+    useEffect(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }, [currentMessages, selectedCompanyId])
+
+    const updateCompanyStatus = useCallback((companyId: string, lastMessage: string, time: string) => {
+        setCompanies(prev => {
+            const index = prev.findIndex(c => c.id === companyId)
+            if (index === -1) return prev;
+            const company = prev[index];
+            const updatedCompany = { ...company, lastMessage, time };
+            const newCompanies = [...prev];
+            newCompanies.splice(index, 1);
+            return [updatedCompany, ...newCompanies];
+        })
+    }, [])
+
+    const handleSendMessage = () => {
+        if (!messageInput.trim()) return
+
+        const timeStr = getCurrentTimeStr()
+        const newMsg: Message = {
+            id: Date.now().toString(),
+            sender: 'me',
+            type: 'text',
+            content: messageInput,
+            time: timeStr
+        }
+
+        setMessagesMap(prev => ({
+            ...prev,
+            [selectedCompanyId]: [...(prev[selectedCompanyId] || []), newMsg]
+        }))
+
+        updateCompanyStatus(selectedCompanyId, messageInput.slice(0, 20) + (messageInput.length > 20 ? '...' : ''), timeStr)
+        setMessageInput('')
+    }
+
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault()
+            handleSendMessage()
+        }
+    }
+
+    const handleFilesAttached = (files: FileList | File[]) => {
+        const timeStr = getCurrentTimeStr()
+        const newMessages: Message[] = []
+        const newSharedFiles: FileData[] = []
+
+        Array.from(files).forEach((file, idx) => {
+            const fileData: FileData = {
+                id: `f-$Date.now()}-$idx}`,
+                name: file.name,
+                size: formatBytes(file.size),
+                type: getFileType(file.name),
+                date: `今日 $timeStr}`
+            }
+            newSharedFiles.push(fileData)
+            newMessages.push({
+                id: `msg-$Date.now()}-$idx}`,
+                sender: 'me',
+                type: 'file',
+                file: fileData,
+                time: timeStr
+            })
+        })
+
+        if (newMessages.length > 0) {
+            setMessagesMap(prev => ({
+                ...prev,
+                [selectedCompanyId]: [...(prev[selectedCompanyId] || []), ...newMessages]
+            }))
+
+            setFilesMap(prev => ({
+                ...prev,
+                [selectedCompanyId]: [...newSharedFiles, ...(prev[selectedCompanyId] || [])]
+            }))
+
+            updateCompanyStatus(selectedCompanyId, `$newMessages.length} 個のファイルを送信しました`, timeStr)
+        }
+    }
+
+    // Drag and Drop Handlers
     const handleDragEnter = (e: React.DragEvent) => { e.preventDefault(); e.stopPropagation(); setIsDragging(true); }
     const handleDragLeave = (e: React.DragEvent) => { e.preventDefault(); e.stopPropagation(); setIsDragging(false); }
     const handleDragOver = (e: React.DragEvent) => { e.preventDefault(); e.stopPropagation(); }
@@ -58,13 +190,16 @@ export default function B2BChatClient() {
         e.stopPropagation()
         setIsDragging(false)
         if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-            alert(`Dropped ${e.dataTransfer.files.length} files. (UI Mock only)`)
+            handleFilesAttached(e.dataTransfer.files)
         }
     }
 
-    useEffect(() => {
-        messagesEndRef.current?.scrollIntoView()
-    }, [selectedCompanyId])
+    const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files.length > 0) {
+            handleFilesAttached(e.target.files)
+            setFileInputKey(prev => prev + 1) // Reset input
+        }
+    }
 
     return (
         <div className="flex w-full h-full bg-[#f4f7f6]">
@@ -124,6 +259,11 @@ export default function B2BChatClient() {
                             </div>
                         </button>
                     ))}
+                    {filteredCompanies.length === 0 && (
+                        <div className="text-center p-4 text-sm text-gray-400">
+                            見つかりませんでした
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -169,11 +309,23 @@ export default function B2BChatClient() {
 
                 {/* Chat Body */}
                 <div className="flex-1 overflow-y-auto p-4 md:p-6 bg-[#f4f7f6] flex flex-col gap-5">
-                    <div className="text-center my-4">
-                        <span className="text-[11px] font-bold text-gray-400 bg-white px-3 py-1 rounded-full shadow-sm">今日</span>
-                    </div>
+                    {currentMessages.length > 0 ? (
+                        <div className="text-center my-4">
+                            <span className="text-[11px] font-bold text-gray-400 bg-white px-3 py-1 rounded-full shadow-sm">今日</span>
+                        </div>
+                    ) : (
+                        <div className="flex-1 flex items-center justify-center">
+                            <div className="text-center text-gray-400 flex flex-col items-center">
+                                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-3">
+                                    <Send size={24} className="text-gray-300 ml-1" />
+                                </div>
+                                <p className="text-sm">メッセージ履歴がありません</p>
+                                <p className="text-xs mt-1">メッセージを送るか、ファイルをドロップして共有を開始</p>
+                            </div>
+                        </div>
+                    )}
 
-                    {MOCK_MESSAGES.map((msg) => (
+                    {currentMessages.map((msg) => (
                         <div key={msg.id} className={`flex max-w-[85%] ${msg.sender === 'me' ? 'self-end flex-row-reverse' : 'self-start'} gap-3`}>
                             {/* Avatar for 'them' */}
                             {msg.sender === 'them' && (
@@ -209,7 +361,7 @@ export default function B2BChatClient() {
                                                 <p className="text-sm font-semibold text-gray-800 truncate" title={msg.file.name}>{msg.file.name}</p>
                                                 <p className="text-[11px] text-gray-500 font-medium">{msg.file.size}</p>
                                             </div>
-                                            <button className="p-2 text-gray-400 hover:text-[#24b47e] hover:bg-green-50 rounded-full transition-colors">
+                                            <button className="p-2 text-gray-400 hover:text-[#24b47e] hover:bg-green-50 rounded-full transition-colors cursor-pointer z-10">
                                                 <Download size={18} />
                                             </button>
                                         </div>
@@ -226,7 +378,18 @@ export default function B2BChatClient() {
                 <div className="bg-white border-t border-gray-200 p-4 shrink-0 shadow-[0_-4px_10px_rgba(0,0,0,0.02)] z-10">
                     <div className="max-w-4xl mx-auto bg-[#f8f9fa] border border-gray-200 rounded-[24px] p-1.5 flex items-end focus-within:ring-2 focus-within:ring-[#24b47e]/30 focus-within:border-[#24b47e] focus-within:bg-white transition-all">
                         <div className="flex items-center self-end mb-1 ml-1 shrink-0">
-                            <button className="p-2 text-gray-500 hover:text-[#24b47e] hover:bg-[#e8f5f0] rounded-full transition-colors relative group">
+                            <input
+                                type="file"
+                                multiple
+                                className="hidden"
+                                ref={fileInputRef}
+                                onChange={handleFileSelect}
+                                key={fileInputKey}
+                            />
+                            <button
+                                onClick={() => fileInputRef.current?.click()}
+                                className="p-2 text-gray-500 hover:text-[#24b47e] hover:bg-[#e8f5f0] rounded-full transition-colors relative group"
+                            >
                                 <Paperclip size={20} />
                                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-gray-800 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity">ファイルを添付</div>
                             </button>
@@ -235,6 +398,7 @@ export default function B2BChatClient() {
                         <textarea
                             value={messageInput}
                             onChange={(e) => setMessageInput(e.target.value)}
+                            onKeyDown={handleKeyDown}
                             placeholder="メッセージを入力...（ファイルをここにドロップ可能）"
                             className="flex-1 max-h-32 min-h-[40px] bg-transparent border-none resize-none px-3 py-2.5 text-[15px] text-gray-800 outline-none placeholder:text-gray-400"
                             rows={1}
@@ -242,6 +406,7 @@ export default function B2BChatClient() {
 
                         <div className="self-end mb-1 mr-1 shrink-0">
                             <button
+                                onClick={handleSendMessage}
                                 disabled={!messageInput.trim()}
                                 className={`p-2.5 rounded-full transition-all duration-200 shadow-sm
                                     ${messageInput.trim()
@@ -293,7 +458,7 @@ export default function B2BChatClient() {
                             </div>
 
                             <div className="space-y-3">
-                                {MOCK_FILES.map(file => (
+                                {currentFiles.map(file => (
                                     <div key={file.id} className="flex items-start gap-3 p-2 hover:bg-gray-50 rounded-xl transition-colors group cursor-pointer border border-transparent hover:border-gray-100">
                                         <FileIcon type={file.type} className="shadow-sm" />
                                         <div className="flex-1 min-w-0">
@@ -308,14 +473,19 @@ export default function B2BChatClient() {
                                         </button>
                                     </div>
                                 ))}
+                                {currentFiles.length === 0 && (
+                                    <div className="text-center py-6 text-xs text-gray-400">ファイルはありません</div>
+                                )}
                             </div>
 
-                            <div className="mt-6">
-                                <button className="w-full flex items-center gap-2 px-4 py-2 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-lg text-sm font-semibold transition-colors justify-center border border-gray-200 shadow-sm">
-                                    <Folder size={16} className="text-yellow-500" />
-                                    共有フォルダを開く
-                                </button>
-                            </div>
+                            {currentFiles.length > 0 && (
+                                <div className="mt-6">
+                                    <button className="w-full flex items-center gap-2 px-4 py-2 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-lg text-sm font-semibold transition-colors justify-center border border-gray-200 shadow-sm">
+                                        <Folder size={16} className="text-yellow-500" />
+                                        共有フォルダを開く
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     )}
 

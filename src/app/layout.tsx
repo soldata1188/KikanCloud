@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { FilledInputBackground } from "@/components/FilledInputBackground";
-import { FloatingChatDrawer } from "@/components/FloatingChatDrawer";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,7 +16,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body className={inter.className} suppressHydrationWarning>
         {children}
         <FilledInputBackground />
-        <FloatingChatDrawer />
       </body>
     </html>
   );

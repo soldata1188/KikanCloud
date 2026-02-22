@@ -192,6 +192,10 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                                         <span className="font-medium text-[#1f1f1f] truncate max-w-[150px]" title={w.industry_field || ''}>{w.industry_field || '-'}</span>
                                     </div>
                                     <div className="flex items-center justify-between text-xs mt-2">
+                                        <span className="text-[#878787]">入国日</span>
+                                        <span className="font-mono font-medium text-[#1f1f1f]">{w.entry_date ? w.entry_date.replace(/-/g, '/') : '-'}</span>
+                                    </div>
+                                    <div className="flex items-center justify-between text-xs mt-2">
                                         <span className="text-[#878787]">在留期限</span>
                                         <span className={`font-mono font-medium ${w.zairyu_exp && w.zairyu_exp <= next90DaysStr ? 'text-red-600' : 'text-[#1f1f1f]'}`}>{w.zairyu_exp ? w.zairyu_exp.replace(/-/g, '/') : '-'}</span>
                                     </div>
@@ -226,7 +230,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                             <thead className="bg-white border-b border-gray-300 text-[11px] font-medium text-[#878787] uppercase tracking-wider">
                                 <tr>
                                     <th className="px-5 py-3 font-medium w-10 cursor-pointer" onClick={toggleSelectAll}>{selectedIds.length === filtered.length && filtered.length > 0 ? <CheckSquare className="text-[#24b47e]" size={16} /> : <Square className="text-gray-300" size={16} />}</th>
-                                    <th className="px-5 py-3 font-medium">氏名 / 企業名</th><th className="px-5 py-3 font-medium">在留資格 / 職種</th><th className="px-5 py-3 font-medium">在留期限</th><th className="px-5 py-3 font-medium">認定修了日</th><th className="px-5 py-3 font-medium">ステータス</th><th className="px-5 py-3 font-medium text-right">操作</th>
+                                    <th className="px-5 py-3 font-medium">氏名 / 企業名</th><th className="px-5 py-3 font-medium">在留資格 / 職種</th><th className="px-5 py-3 font-medium">入国日 / 在留期限</th><th className="px-5 py-3 font-medium">認定修了日</th><th className="px-5 py-3 font-medium">ステータス</th><th className="px-5 py-3 font-medium text-right">操作</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-[#ededed]">
@@ -242,7 +246,10 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                                                 <div className="text-xs text-[#1f1f1f] whitespace-nowrap">{w.visa_status || '-'}</div>
                                                 <div className="text-[11px] text-[#878787] mt-0.5 truncate max-w-[150px]" title={w.industry_field || ''}>{w.industry_field || '-'}</div>
                                             </td>
-                                            <td className="px-5 py-3.5"><span className="font-mono text-xs text-[#1f1f1f] whitespace-nowrap">{w.zairyu_exp ? w.zairyu_exp.replace(/-/g, '/') : '-'}</span></td>
+                                            <td className="px-5 py-3.5">
+                                                <div className="font-mono text-xs text-[#1f1f1f] whitespace-nowrap">{w.entry_date ? w.entry_date.replace(/-/g, '/') : '-'}</div>
+                                                <div className={`font-mono text-[11px] mt-0.5 whitespace-nowrap ${w.zairyu_exp && w.zairyu_exp <= next90DaysStr ? 'text-red-600 font-medium' : 'text-[#878787]'}`}>{w.zairyu_exp ? w.zairyu_exp.replace(/-/g, '/') : '-'}</div>
+                                            </td>
                                             <td className="px-5 py-3.5"><span className="font-mono text-xs text-[#1f1f1f] whitespace-nowrap">{w.cert_end_date ? w.cert_end_date.replace(/-/g, '/') : '-'}</span></td>
                                             <td className="px-5 py-3.5"><span className={`px-2 py-0.5 border rounded-full text-[10px] font-bold uppercase tracking-widest bg-transparent ${w.status === 'working' ? 'border-[#24b47e] text-[#24b47e]' : 'border-gray-300 text-[#878787]'}`}>{w.status === 'working' ? '就業中' : w.status === 'standby' ? '待機中' : w.status === 'returned' ? '帰国' : w.status === 'waiting' ? '入国待ち' : w.status === 'missing' ? '失踪' : w.status}</span></td>
                                             <td className="px-5 py-3.5 text-right"><div className="flex items-center justify-end gap-2"><Link href={`/workers/${w.id}/edit`} className="px-2 py-1 flex items-center gap-1 rounded-md text-[12px] font-medium text-[#878787] hover:text-[#24b47e] hover:bg-gray-50 transition-colors mr-1">詳細</Link>{role === 'admin' && (<form action={deleteWorker} className="inline-block"><input type="hidden" name="id" value={w.id} /><DeleteButton /></form>)}</div></td>

@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { LayoutDashboard, Users, Building2, ShieldCheck, GitMerge, Map, Settings, LogOut, Sparkles } from 'lucide-react'
+import { LayoutDashboard, Users, Building2, ShieldCheck, GitMerge, Map, Settings, LogOut, Sparkles, MessageSquare } from 'lucide-react'
 import { SidebarLogo } from './SidebarLogo'
 import { createClient } from '@/lib/supabase/server'
 import { logout } from '@/app/login/actions'
@@ -10,6 +10,7 @@ const NAV_ITEMS = [
     { id: "companies", name: "受入企業管理", href: "/companies", icon: Building2 },
     { id: "audits", name: "監査・訪問・面談", href: "/audits", icon: ShieldCheck },
     { id: "workflows", name: "業務フロー", href: "/workflows", icon: GitMerge },
+    { id: "b2b-chat", name: "企業連絡", href: "/b2b-chat", icon: MessageSquare },
     { id: "routing", name: "ルート最適化", href: "/routing", icon: Map },
     { id: "chat", name: "AIチャット", href: "/chat", icon: Sparkles },
     { id: "settings", name: "設定", href: "/settings", icon: Settings },

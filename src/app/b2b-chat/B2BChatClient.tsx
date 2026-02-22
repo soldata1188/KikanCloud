@@ -1,10 +1,11 @@
 'use client'
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { Search, MoreVertical, Paperclip, Send, FileText, Download, Folder, Image as ImageIcon, File as FileIconLucide, Info, ChevronDown } from 'lucide-react'
+import { Search, MoreVertical, Paperclip, Send, FileText, Download, Folder, Image as ImageIcon, File as FileIconLucide, Info, ChevronDown, Loader2 } from 'lucide-react'
+import { useFirebaseUpload } from '@/hooks/useFirebaseUpload'
 
 // --- Types ---
 type Company = { id: string; name: string; avatar: string; lastMessage: string; unread: number; time: string; }
-type FileData = { id: string; name: string; size: string; type: 'pdf' | 'word' | 'image' | 'excel' | 'other'; date: string }
+type FileData = { id: string; name: string; url?: string; size: string; type: 'pdf' | 'word' | 'image' | 'excel' | 'other'; date: string }
 type Message = { id: string; sender: 'me' | 'them'; type: 'text' | 'file'; content?: string; file?: FileData; time: string }
 
 // --- Initial Data ---
@@ -85,6 +86,9 @@ export default function B2BChatClient() {
 
     const messagesEndRef = useRef<HTMLDivElement>(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
+
+    // Firebase Upload Hook
+    const { progress, error: uploadError, isUploading, uploadFile } = useFirebaseUpload('b2b_chat_files')
 
     // Derived values
     const selectedCompany = companies.find(c => c.id === selectedCompanyId) || companies[0]
@@ -207,10 +211,19 @@ export default function B2BChatClient() {
 
         const processedFiles = await Promise.all(Array.from(files).map(f => compressImage(f as File)));
 
-        processedFiles.forEach((file, idx) => {
+        for (let idx = 0; idx < processedFiles.length; idx++) {
+            const file = processedFiles[idx];
+            let fileUrl = '';
+            try {
+                fileUrl = (await uploadFile(file)) || '';
+            } catch (err) {
+                console.error("Lỗi khi tải file:", err);
+            }
+
             const fileData: FileData = {
                 id: `f-${Date.now()}-${idx}`,
                 name: file.name,
+                url: fileUrl,
                 size: formatBytes(file.size), // Displays compressed size
                 type: getFileType(file.name),
                 date: `今日 ${timeStr}`
@@ -223,7 +236,7 @@ export default function B2BChatClient() {
                 file: fileData,
                 time: timeStr
             })
-        })
+        }
 
         if (newMessages.length > 0) {
             setMessagesMap(prev => ({
@@ -418,11 +431,21 @@ export default function B2BChatClient() {
                                             <FileIcon type={msg.file.type} />
                                             <div className="flex-1 min-w-0 pr-2">
                                                 <p className="text-sm font-semibold text-gray-800 truncate" title={msg.file.name}>{msg.file.name}</p>
-                                                <p className="text-[11px] text-gray-500 font-medium">{msg.file.size}</p>
+                                                <div className="flex items-center gap-2">
+                                                    <p className="text-[11px] text-gray-500 font-medium">{msg.file.size}</p>
+                                                    {msg.file.url && (
+                                                        <span className="text-[10px] text-blue-500 font-medium bg-blue-50 px-1.5 py-0.5 rounded">Uploaded</span>
+                                                    )}
+                                                </div>
                                             </div>
-                                            <button className="p-2 text-gray-400 hover:text-[#24b47e] hover:bg-green-50 rounded-full transition-colors cursor-pointer z-10">
+                                            <a
+                                                href={msg.file.url || '#'}
+                                                target={msg.file.url ? "_blank" : "_self"}
+                                                rel="noopener noreferrer"
+                                                className={`p-2 rounded-full transition-colors z-10 ${msg.file.url ? 'text-[#24b47e] hover:bg-green-50' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'}`}
+                                            >
                                                 <Download size={18} />
-                                            </button>
+                                            </a>
                                         </div>
                                         {msg.sender === 'me' && <span className="text-[10px] text-[#24b47e] text-right px-2 font-medium">送信済み</span>}
                                     </div>
@@ -447,10 +470,11 @@ export default function B2BChatClient() {
                             />
                             <button
                                 onClick={() => fileInputRef.current?.click()}
-                                className="p-2 text-gray-500 hover:text-[#24b47e] hover:bg-[#e8f5f0] rounded-full transition-colors relative group"
+                                disabled={isUploading}
+                                className={`p-2 rounded-full transition-colors relative group ${isUploading ? 'text-gray-300 cursor-not-allowed' : 'text-gray-500 hover:text-[#24b47e] hover:bg-[#e8f5f0]'}`}
                             >
                                 <Paperclip size={20} />
-                                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-gray-800 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity">ファイルを添付</div>
+                                {!isUploading && <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-gray-800 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity">ファイルを添付</div>}
                             </button>
                         </div>
 
@@ -458,17 +482,24 @@ export default function B2BChatClient() {
                             value={messageInput}
                             onChange={(e) => setMessageInput(e.target.value)}
                             onKeyDown={handleKeyDown}
-                            placeholder="メッセージを入力...（ファイルをここにドロップ可能）"
-                            className="flex-1 max-h-32 min-h-[40px] bg-transparent border-none resize-none px-3 py-2.5 text-[15px] text-gray-800 outline-none placeholder:text-gray-400"
+                            disabled={isUploading}
+                            placeholder={isUploading ? "ファイルをアップロード中..." : "メッセージを入力...（ファイルをここにドロップ可能）"}
+                            className="flex-1 max-h-32 min-h-[40px] bg-transparent border-none resize-none px-3 py-2.5 text-[15px] text-gray-800 outline-none placeholder:text-gray-400 disabled:opacity-50"
                             rows={1}
                         />
 
-                        <div className="self-end mb-1 mr-1 shrink-0">
+                        <div className="flex items-center self-end mb-1 mr-1 shrink-0 gap-2">
+                            {isUploading && (
+                                <div className="flex items-center gap-1.5 px-2 py-1 bg-blue-50 text-blue-600 rounded-full border border-blue-100">
+                                    <Loader2 size={14} className="animate-spin" />
+                                    <span className="text-[11px] font-bold">{progress}%</span>
+                                </div>
+                            )}
                             <button
                                 onClick={handleSendMessage}
-                                disabled={!messageInput.trim()}
+                                disabled={!messageInput.trim() || isUploading}
                                 className={`p-2.5 rounded-full transition-all duration-200 shadow-sm
-                                    ${messageInput.trim()
+                                    ${messageInput.trim() && !isUploading
                                         ? 'bg-[#24b47e] text-white hover:bg-[#1e9668] hover:scale-105 active:scale-95'
                                         : 'bg-gray-200 text-gray-400 cursor-not-allowed'}
                                 `}

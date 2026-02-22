@@ -11,7 +11,7 @@ const NAV_ITEMS = [
     { id: "audits", name: "監査・訪問・面談", href: "/audits", icon: ShieldCheck },
     { id: "workflows", name: "業務フロー", href: "/workflows", icon: GitMerge },
     { id: "routing", name: "ルート最適化", href: "/routing", icon: Map },
-    { id: "chat", name: "AI 連絡チャット", href: "/chat", icon: Sparkles },
+    { id: "chat", name: "AIチャット", href: "/chat", icon: Sparkles },
     { id: "settings", name: "設定", href: "/settings", icon: Settings },
 ];
 

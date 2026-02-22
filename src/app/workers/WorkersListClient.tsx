@@ -188,6 +188,10 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                                         <span className="font-medium text-[#1f1f1f] truncate max-w-[150px]" title={w.visa_status || ''}>{w.visa_status || '-'}</span>
                                     </div>
                                     <div className="flex items-center justify-between text-xs mt-2">
+                                        <span className="text-[#878787]">受入職種</span>
+                                        <span className="font-medium text-[#1f1f1f] truncate max-w-[150px]" title={w.industry_field || ''}>{w.industry_field || '-'}</span>
+                                    </div>
+                                    <div className="flex items-center justify-between text-xs mt-2">
                                         <span className="text-[#878787]">在留期限</span>
                                         <span className={`font-mono font-medium ${w.zairyu_exp && w.zairyu_exp <= next90DaysStr ? 'text-red-600' : 'text-[#1f1f1f]'}`}>{w.zairyu_exp ? w.zairyu_exp.replace(/-/g, '/') : '-'}</span>
                                     </div>
@@ -222,7 +226,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                             <thead className="bg-white border-b border-gray-300 text-[11px] font-medium text-[#878787] uppercase tracking-wider">
                                 <tr>
                                     <th className="px-5 py-3 font-medium w-10 cursor-pointer" onClick={toggleSelectAll}>{selectedIds.length === filtered.length && filtered.length > 0 ? <CheckSquare className="text-[#24b47e]" size={16} /> : <Square className="text-gray-300" size={16} />}</th>
-                                    <th className="px-5 py-3 font-medium">氏名 / 企業名</th><th className="px-5 py-3 font-medium">在留資格</th><th className="px-5 py-3 font-medium">在留期限</th><th className="px-5 py-3 font-medium">認定修了日</th><th className="px-5 py-3 font-medium">ステータス</th><th className="px-5 py-3 font-medium text-right">操作</th>
+                                    <th className="px-5 py-3 font-medium">氏名 / 企業名</th><th className="px-5 py-3 font-medium">在留資格 / 職種</th><th className="px-5 py-3 font-medium">在留期限</th><th className="px-5 py-3 font-medium">認定修了日</th><th className="px-5 py-3 font-medium">ステータス</th><th className="px-5 py-3 font-medium text-right">操作</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-[#ededed]">
@@ -234,7 +238,10 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                                         <tr key={w.id} className={`transition-colors group ${isChecked ? 'bg-[#24b47e]/5' : 'hover:bg-gray-50'}`}>
                                             <td className="px-5 py-3.5 cursor-pointer" onClick={() => toggleSelect(w.id)}>{isChecked ? <CheckSquare className="text-[#24b47e]" size={16} /> : <Square className="text-gray-300" size={16} />}</td>
                                             <td className="px-5 py-3.5"><div className="flex items-center gap-3"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shrink-0 border border-gray-300 overflow-hidden">{w.avatar_url ? <img src={w.avatar_url} className="w-full h-full object-cover" /> : <UserCircle2 size={16} className="text-[#878787]" />}</div><div><Link href={`/workers/${w.id}/edit`} className="font-medium text-[#1f1f1f] hover:text-[#24b47e] transition-colors">{w.full_name_romaji}</Link><div className="text-[11px] text-[#878787] mt-0.5">{w.companies?.name_jp || '未配属'}</div></div></div></td>
-                                            <td className="px-5 py-3.5"><span className="text-xs text-[#1f1f1f] whitespace-nowrap">{w.visa_status || '-'}</span></td>
+                                            <td className="px-5 py-3.5">
+                                                <div className="text-xs text-[#1f1f1f] whitespace-nowrap">{w.visa_status || '-'}</div>
+                                                <div className="text-[11px] text-[#878787] mt-0.5 truncate max-w-[150px]" title={w.industry_field || ''}>{w.industry_field || '-'}</div>
+                                            </td>
                                             <td className="px-5 py-3.5"><span className="font-mono text-xs text-[#1f1f1f] whitespace-nowrap">{w.zairyu_exp ? w.zairyu_exp.replace(/-/g, '/') : '-'}</span></td>
                                             <td className="px-5 py-3.5"><span className="font-mono text-xs text-[#1f1f1f] whitespace-nowrap">{w.cert_end_date ? w.cert_end_date.replace(/-/g, '/') : '-'}</span></td>
                                             <td className="px-5 py-3.5"><span className={`px-2 py-0.5 border rounded-full text-[10px] font-bold uppercase tracking-widest bg-transparent ${w.status === 'working' ? 'border-[#24b47e] text-[#24b47e]' : 'border-gray-300 text-[#878787]'}`}>{w.status === 'working' ? '就業中' : w.status === 'standby' ? '待機中' : w.status === 'returned' ? '帰国' : w.status === 'waiting' ? '入国待ち' : w.status === 'missing' ? '失踪' : w.status}</span></td>

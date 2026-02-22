@@ -374,23 +374,23 @@ export default function ChatClient() {
 
                 {/* Input Footer */}
                 <div className="p-4 md:p-6 bg-white border-t border-[#e5e7eb] shrink-0">
-                    <div className="max-w-4xl mx-auto relative flex items-end gap-2 bg-gray-50 border border-gray-200 rounded-2xl p-2.5 focus-within:ring-2 focus-within:ring-indigo-100 focus-within:border-indigo-400 transition-all shadow-sm">
+                    <div className="max-w-4xl mx-auto relative flex items-end gap-2 bg-white border border-gray-300 rounded-[32px] p-2 focus-within:ring-2 focus-within:ring-[#24b47e]/20 focus-within:border-[#24b47e] transition-all shadow-sm">
                         <textarea
                             value={inputValue}
                             onChange={(e) => setInputValue(e.target.value)}
                             onKeyDown={handleKeyDown}
                             disabled={isTyping}
                             placeholder="AIにメッセージを送信... (Enterで送信, Shift+Enterで改行)"
-                            className="flex-1 max-h-32 min-h-[44px] bg-transparent border-none resize-none px-3 py-2.5 text-[15px] text-[#1f1f1f] outline-none disabled:opacity-50"
+                            className="flex-1 max-h-32 min-h-[44px] bg-transparent border-none resize-none px-4 py-3 text-[15px] text-[#1f1f1f] outline-none disabled:opacity-50"
                             rows={1}
                         />
                         <button
                             onClick={handleSend}
                             disabled={!inputValue.trim() || isTyping}
-                            className={`p-3.5 rounded-xl shrink-0 transition-all duration-200 shadow-sm mb-0.5
+                            className={`p-3.5 rounded-[24px] shrink-0 transition-all duration-200 shadow-sm
                                 ${inputValue.trim() && !isTyping
-                                    ? 'bg-gradient-to-br from-indigo-500 to-purple-600 text-white hover:opacity-90 hover:scale-[1.02] active:scale-95'
-                                    : 'bg-gray-200 text-gray-400 cursor-not-allowed'}
+                                    ? 'bg-[#24b47e] text-white hover:opacity-90 hover:scale-[1.02] active:scale-95'
+                                    : 'bg-gray-100 text-gray-400 cursor-not-allowed'}
                             `}
                         >
                             <Send size={18} className="translate-x-0.5" />

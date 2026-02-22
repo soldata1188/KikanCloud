@@ -1,11 +1,18 @@
 'use client'
-import { useState, useRef, useEffect } from 'react'
-import { Sparkles, Send, User, MessageSquarePlus, Trash2, Search, Settings } from 'lucide-react'
+import { useState, useRef, useEffect, useCallback } from 'react'
+import { Sparkles, Send, User, MessageSquarePlus, Trash2, Search, Settings, Plus } from 'lucide-react'
 
 type Message = {
     id: string
     role: 'ai' | 'user'
     content: string
+}
+
+type ChatSession = {
+    id: string
+    title: string
+    messages: Message[]
+    updatedAt: number
 }
 
 const TypingIndicator = () => (
@@ -24,14 +31,69 @@ const TypingIndicator = () => (
 export default function ChatClient() {
     const [isTyping, setIsTyping] = useState(false)
     const [inputValue, setInputValue] = useState('')
-    const [messages, setMessages] = useState<Message[]>([
-        {
-            id: 'welcome',
-            role: 'ai',
-            content: 'こんにちは！KikanCloudのAIアシスタントです。\nどのようなご用件でしょうか？サポートが必要な内容を入力してください。'
-        }
-    ])
+    const [searchQuery, setSearchQuery] = useState('')
+
+    // Session State
+    const [sessions, setSessions] = useState<ChatSession[]>([])
+    const [currentSessionId, setCurrentSessionId] = useState<string | null>(null)
+    const [isClient, setIsClient] = useState(false) // hydration fix
+
     const messagesEndRef = useRef<HTMLDivElement>(null)
+
+    // Helper functions
+    const createNewSession = useCallback(() => {
+        const newSession: ChatSession = {
+            id: Date.now().toString(),
+            title: '新しいチャット',
+            messages: [{
+                id: 'welcome',
+                role: 'ai',
+                content: 'こんにちは！KikanCloudのAIアシスタントです。\nどのようなご用件でしょうか？サポートが必要な内容を入力してください。'
+            }],
+            updatedAt: Date.now()
+        }
+        setSessions(prev => [newSession, ...prev])
+        setCurrentSessionId(newSession.id)
+    }, [])
+
+    // Initialize & Load from localStorage with 30-day retention policy
+    useEffect(() => {
+        setIsClient(true)
+        const saved = localStorage.getItem('kikan_ai_chats')
+        if (saved) {
+            try {
+                const parsed: ChatSession[] = JSON.parse(saved)
+                const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000
+                const now = Date.now()
+                // Auto-delete sessions older than 30 days
+                const validSessions = parsed.filter(s => (now - s.updatedAt) < thirtyDaysMs)
+
+                if (validSessions.length > 0) {
+                    // Sort descending
+                    validSessions.sort((a, b) => b.updatedAt - a.updatedAt)
+                    setSessions(validSessions)
+                    setCurrentSessionId(validSessions[0].id)
+                } else {
+                    createNewSession()
+                }
+            } catch (error) {
+                console.error("Error parsing chat history", error)
+                createNewSession()
+            }
+        } else {
+            createNewSession()
+        }
+    }, [createNewSession])
+
+    // Save to localStorage when sessions change
+    useEffect(() => {
+        if (isClient && sessions.length > 0) {
+            localStorage.setItem('kikan_ai_chats', JSON.stringify(sessions))
+        }
+    }, [sessions, isClient])
+
+    const currentSession = sessions.find(s => s.id === currentSessionId)
+    const messages = currentSession?.messages || []
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -43,17 +105,30 @@ export default function ChatClient() {
 
     const handleSend = async (e?: React.FormEvent) => {
         if (e) e.preventDefault()
-        if (!inputValue.trim()) return
+        if (!inputValue.trim() || !currentSessionId) return
 
         const userMsg: Message = { id: Date.now().toString(), role: 'user', content: inputValue }
-        setMessages(prev => [...prev, userMsg])
-        setInputValue('')
+        const currentRefMessages = [...messages]
 
+        // Update user message first
+        setSessions(prev =>
+            prev.map(s => {
+                if (s.id === currentSessionId) {
+                    const newMessages = [...s.messages, userMsg];
+                    // Update title if it's the very first user message
+                    const title = s.messages.length === 1 ? inputValue.slice(0, 25) + (inputValue.length > 25 ? '...' : '') : s.title;
+                    return { ...s, messages: newMessages, title, updatedAt: Date.now() }
+                }
+                return s
+            }).sort((a, b) => b.updatedAt - a.updatedAt)
+        )
+
+        setInputValue('')
         setIsTyping(true)
 
         try {
-            const chatHistory = [...messages, userMsg]
-                .filter(m => m.id !== 'welcome')
+            const chatHistory = [...currentRefMessages, userMsg]
+                .filter(m => m.id !== 'welcome' && !m.content.includes('AIサーバー接続エラー'))
                 .map(m => ({
                     role: m.role === 'ai' ? 'model' : 'user',
                     parts: [{ text: m.content }]
@@ -69,18 +144,33 @@ export default function ChatClient() {
 
             const data = await res.json()
 
-            setMessages(prev => [...prev, {
-                id: Date.now().toString(),
-                role: 'ai',
-                content: data.reply || '申し訳ありませんが、このメッセージを処理できません。'
-            }])
+            // Update AI reply
+            setSessions(prev =>
+                prev.map(s => {
+                    if (s.id === currentSessionId) {
+                        return {
+                            ...s,
+                            messages: [...s.messages, { id: Date.now().toString(), role: 'ai', content: data.reply || '申し訳ありませんが、このメッセージを処理できません。' }],
+                            updatedAt: Date.now()
+                        }
+                    }
+                    return s
+                })
+            )
         } catch (error) {
             console.error('Chat error:', error)
-            setMessages(prev => [...prev, {
-                id: Date.now().toString(),
-                role: 'ai',
-                content: 'AIサーバー接続エラー（またはGEMINI_API_KEY未設定）が発生しました。設定を確認して再試行してください！'
-            }])
+            setSessions(prev =>
+                prev.map(s => {
+                    if (s.id === currentSessionId) {
+                        return {
+                            ...s,
+                            messages: [...s.messages, { id: Date.now().toString(), role: 'ai', content: 'AIサーバー接続エラー（またはGEMINI_API_KEY未設定）が発生しました。設定を確認して再試行してください！' }],
+                            updatedAt: Date.now()
+                        }
+                    }
+                    return s
+                })
+            )
         } finally {
             setIsTyping(false)
         }
@@ -93,17 +183,50 @@ export default function ChatClient() {
         }
     };
 
-    const clearChat = () => {
-        if (confirm('チャット履歴を削除しますか？')) {
-            setMessages([
-                {
-                    id: Date.now().toString(),
-                    role: 'ai',
-                    content: 'チャット履歴を削除しました。こんにちは！KikanCloudのAIアシスタントです。本日はどのようなご用件でしょうか？'
-                }
-            ])
+    const clearCurrentChat = () => {
+        if (confirm('現在のチャット履歴を削除しますか？')) {
+            setSessions(prev =>
+                prev.map(s => {
+                    if (s.id === currentSessionId) {
+                        return {
+                            ...s,
+                            messages: [{
+                                id: Date.now().toString(),
+                                role: 'ai',
+                                content: 'チャット履歴を削除しました。こんにちは！KikanCloudのAIアシスタントです。本日はどのようなご用件でしょうか？'
+                            }],
+                            updatedAt: Date.now()
+                        }
+                    }
+                    return s
+                })
+            )
         }
     }
+
+    const deleteSession = (e: React.MouseEvent, id: string) => {
+        e.stopPropagation()
+        if (confirm('このチャットを完全に削除しますか？')) {
+            setSessions(prev => {
+                const nextSessions = prev.filter(s => s.id !== id)
+                if (nextSessions.length === 0) {
+                    setTimeout(() => createNewSession(), 0)
+                } else if (currentSessionId === id && nextSessions.length > 0) {
+                    setCurrentSessionId(nextSessions[0].id)
+                }
+                return nextSessions
+            })
+        }
+    }
+
+    const filteredSessions = sessions.filter(s => s.title.toLowerCase().includes(searchQuery.toLowerCase()))
+
+    const formatDate = (ms: number) => {
+        const date = new Date(ms);
+        return date.toLocaleDateString('ja-JP', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+    }
+
+    if (!isClient) return null // handle hydration
 
     return (
         <main className="flex-1 flex overflow-hidden bg-white">
@@ -114,39 +237,78 @@ export default function ChatClient() {
                         <MessageSquarePlus size={18} className="text-[#24b47e]" />
                         チャット履歴
                     </h2>
+                    <button
+                        onClick={createNewSession}
+                        className="p-1.5 bg-[#24b47e]/10 text-[#24b47e] hover:bg-[#24b47e]/20 rounded-md transition-colors"
+                        title="新しいチャット"
+                    >
+                        <Plus size={18} />
+                    </button>
                 </div>
                 <div className="p-3">
+                    <button
+                        onClick={createNewSession}
+                        className="w-full flex items-center justify-center gap-2 py-2.5 bg-white border border-[#24b47e] text-[#24b47e] font-medium text-sm rounded-lg hover:bg-[#e8f5f0] transition-colors shadow-sm mb-3"
+                    >
+                        <Plus size={16} /> 新しいチャット
+                    </button>
                     <div className="relative">
                         <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#878787]" />
                         <input
                             type="text"
                             placeholder="検索..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
                             className="w-full pl-9 pr-3 py-2 bg-white border border-[#e5e7eb] rounded-lg text-sm focus:border-[#24b47e] focus:ring-1 focus:ring-[#24b47e] outline-none transition-shadow text-[#1f1f1f] placeholder:text-[#878787]"
                         />
                     </div>
                 </div>
                 <div className="flex-1 overflow-y-auto p-2 space-y-1">
-                    <button className="w-full text-left p-3 rounded-lg bg-[#e8f5f0] border border-[#24b47e]/30 transition-colors">
-                        <div className="flex items-center justify-between mb-1">
-                            <span className="text-sm font-semibold text-[#1f1f1f] truncate">現在のセッション</span>
-                            <span className="text-[10px] text-[#24b47e] shrink-0 font-medium">Now</span>
+                    {filteredSessions.map(session => (
+                        <button
+                            key={session.id}
+                            onClick={() => setCurrentSessionId(session.id)}
+                            className={`w-full text-left p-3 rounded-lg transition-colors border group relative
+                                ${currentSessionId === session.id
+                                    ? 'bg-[#e8f5f0] border-[#24b47e]/30'
+                                    : 'hover:bg-gray-100 border-transparent'}
+                            `}
+                        >
+                            <div className="flex items-center justify-between mb-1 pr-6">
+                                <span className={`text-sm ${currentSessionId === session.id ? 'font-semibold text-[#1f1f1f]' : 'font-medium text-[#1f1f1f]'} truncate`}>
+                                    {session.title}
+                                </span>
+                                <span className={`text-[10px] shrink-0 ${currentSessionId === session.id ? 'text-[#24b47e] font-medium' : 'text-[#878787]'}`}>
+                                    {formatDate(session.updatedAt)}
+                                </span>
+                            </div>
+                            <p className="text-xs text-[#878787] truncate pr-6">
+                                {session.messages[session.messages.length - 1].content.replace(/\n/g, ' ')}
+                            </p>
+                            {/* Delete specific session button */}
+                            <div
+                                onClick={(e) => deleteSession(e, session.id)}
+                                className={`absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-red-500 hover:bg-white rounded-md transition-all
+                                    ${currentSessionId === session.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}
+                                `}
+                                title="このチャットを削除"
+                            >
+                                <Trash2 size={14} />
+                            </div>
+                        </button>
+                    ))}
+                    {filteredSessions.length === 0 && (
+                        <div className="text-center p-4 text-xs text-gray-400">
+                            履歴が見つかりません
                         </div>
-                        <p className="text-xs text-[#878787] truncate">KikanCloud AIとのチャット</p>
-                    </button>
-                    {/* Fake old histories */}
-                    <button className="w-full text-left p-3 rounded-lg hover:bg-gray-100 transition-colors border border-transparent">
-                        <div className="flex items-center justify-between mb-1">
-                            <span className="text-sm font-medium text-[#1f1f1f] truncate">ビザ更新についての相談</span>
-                            <span className="text-[10px] text-[#878787] shrink-0">昨日</span>
-                        </div>
-                        <p className="text-xs text-[#878787] truncate">AI: 更新手続きには以下の書類が...</p>
-                    </button>
+                    )}
                 </div>
                 <div className="p-4 border-t border-[#e5e7eb] mt-auto">
                     <button className="w-full flex items-center gap-2 text-sm text-[#878787] hover:text-[#1f1f1f] transition-colors p-2 rounded-lg hover:bg-gray-100">
                         <Settings size={18} />
                         AI 設定
                     </button>
+                    <p className="text-[10px] text-gray-400 text-center mt-2">※ 履歴は30日間保存されます</p>
                 </div>
             </div>
 
@@ -159,7 +321,9 @@ export default function ChatClient() {
                             <Sparkles size={18} className="text-white" />
                         </div>
                         <div>
-                            <h3 className="text-base font-bold text-[#1f1f1f] leading-none mb-1">KikanCloud AI</h3>
+                            <h3 className="text-base font-bold text-[#1f1f1f] leading-none mb-1">
+                                {currentSession?.title || 'KikanCloud AI'}
+                            </h3>
                             <div className="flex items-center gap-1.5">
                                 <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
                                 <span className="text-xs text-gray-500">オンライン</span>
@@ -167,10 +331,10 @@ export default function ChatClient() {
                         </div>
                     </div>
                     <button
-                        onClick={clearChat}
+                        onClick={clearCurrentChat}
                         className="px-3 py-1.5 text-red-500 bg-red-50 hover:bg-red-100 rounded-lg transition-colors flex items-center gap-1.5 text-sm font-medium border border-red-100"
                     >
-                        <Trash2 size={16} />
+                        <Trash2 size={14} />
                         クリア
                     </button>
                 </div>

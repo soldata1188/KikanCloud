@@ -29,7 +29,7 @@ export function AIAssistantWidget() {
         {
             id: 'welcome',
             role: 'ai',
-            content: 'Xin chào! Tôi là trợ lý KikanCloud. Tôi có thể giúp gì cho bạn hôm nay?'
+            content: 'こんにちは！KikanCloudのAIアシスタントです。本日はどのようなご用件でしょうか？'
         }
     ])
 
@@ -40,7 +40,7 @@ export function AIAssistantWidget() {
             {
                 id: Date.now().toString(),
                 role: 'ai',
-                content: 'Đã xóa lịch sử trò chuyện. Xin chào! Tôi là trợ lý KikanCloud. Tôi có thể giúp gì cho bạn hôm nay?'
+                content: 'チャット履歴を削除しました。こんにちは！KikanCloudのAIアシスタントです。本日はどのようなご用件でしょうか？'
             }
         ])
     }
@@ -80,14 +80,14 @@ export function AIAssistantWidget() {
             setMessages(prev => [...prev, {
                 id: Date.now().toString(),
                 role: 'ai',
-                content: data.reply || 'Xin lỗi, tôi không thể xử lý lời nhắn này.'
+                content: data.reply || '申し訳ありませんが、このメッセージを処理できません。'
             }])
         } catch (error) {
             console.error('Chat error:', error)
             setMessages(prev => [...prev, {
                 id: Date.now().toString(),
                 role: 'ai',
-                content: 'Đã có lỗi nối kết đến máy chủ AI (Hoặc thiếu cấu hình GEMINI_API_KEY). Vui lòng cấu hình và thử lại!'
+                content: 'AIサーバー接続エラー（またはGEMINI_API_KEY未設定）が発生しました。設定を確認して再試行してください！'
             }])
         } finally {
             // Tắt hiệu ứng đánh máy
@@ -121,14 +121,14 @@ export function AIAssistantWidget() {
                     <div className="flex items-center gap-1">
                         <button
                             onClick={clearChat}
-                            title="Xóa cuộc gọi"
+                            title="履歴を削除"
                             className="p-1.5 hover:bg-white/20 rounded-lg transition-colors text-indigo-100 hover:text-white"
                         >
                             <Trash2 size={16} />
                         </button>
                         <button
                             onClick={toggleChat}
-                            title="Thu nhỏ"
+                            title="最小化"
                             className="p-1.5 hover:bg-white/20 rounded-lg transition-colors text-indigo-100 hover:text-white"
                         >
                             <X size={20} />

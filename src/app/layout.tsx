@@ -3,7 +3,6 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { FilledInputBackground } from "@/components/FilledInputBackground";
 import { FloatingChatDrawer } from "@/components/FloatingChatDrawer";
-import { AIAssistantWidget } from "@/components/AIAssistantWidget";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,7 +18,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         {children}
         <FilledInputBackground />
         <FloatingChatDrawer />
-        <AIAssistantWidget />
       </body>
     </html>
   );

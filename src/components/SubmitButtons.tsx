@@ -62,3 +62,12 @@ export function ProcedureDeleteButton() {
         </button>
     )
 }
+
+export function BadgeUpdateButton() {
+    const { pending } = useFormStatus()
+    return (
+        <button type="submit" disabled={pending} className="text-[11px] text-white bg-[#24b47e] hover:bg-[#1e9a6a] px-4 py-1.5 rounded-full font-bold transition-colors disabled:opacity-50 inline-flex items-center justify-center">
+            {pending ? '更新中...' : '更 新'}
+        </button>
+    )
+}

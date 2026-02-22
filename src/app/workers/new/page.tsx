@@ -70,28 +70,28 @@ export default async function NewWorkerPage() {
                                             氏名（ローマ字）
                                             <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-red-50 text-red-600 border border-red-100">必須</span>
                                         </label>
-                                        <input name="full_name_romaji" type="text" required placeholder="例：NGUYEN VAN A" className="w-full bg-white focus:bg-white border border-[#878787] focus:border-[#1f1f1f] rounded-md px-3 py-2.5 text-sm outline-none uppercase text-[#1f1f1f] transition-all" />
+                                        <input name="full_name_romaji" type="text" required placeholder="例：NGUYEN VAN A" className="w-full bg-white focus:bg-white border border-gray-300 focus:border-[#1f1f1f] rounded-xl px-3 py-2.5 text-sm outline-none uppercase text-[#1f1f1f] transition-all" />
                                     </div>
                                     <div>
                                         <label className="flex items-center gap-2 text-sm font-medium text-[#1f1f1f] mb-2">
                                             氏名（カナ）
                                             <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-red-50 text-red-600 border border-red-100">必須</span>
                                         </label>
-                                        <input name="full_name_kana" type="text" required placeholder="例：グエン ヴァン ア" className="w-full bg-white focus:bg-white border border-[#878787] focus:border-[#1f1f1f] rounded-md px-3 py-2.5 text-sm outline-none text-[#1f1f1f] transition-all" />
+                                        <input name="full_name_kana" type="text" required placeholder="例：グエン ヴァン ア" className="w-full bg-white focus:bg-white border border-gray-300 focus:border-[#1f1f1f] rounded-xl px-3 py-2.5 text-sm outline-none text-[#1f1f1f] transition-all" />
                                     </div>
                                     <div>
                                         <label className="flex items-center gap-2 text-sm font-medium text-[#1f1f1f] mb-2">
                                             生年月日
                                             <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-red-50 text-red-600 border border-red-100">必須</span>
                                         </label>
-                                        <input name="dob" type="date" required className="w-full bg-white focus:bg-white border border-[#878787] focus:border-[#1f1f1f] rounded-md px-3 py-2.5 text-sm outline-none text-[#1f1f1f] transition-all" />
+                                        <input name="dob" type="date" required className="w-full bg-white focus:bg-white border border-gray-300 focus:border-[#1f1f1f] rounded-xl px-3 py-2.5 text-sm outline-none text-[#1f1f1f] transition-all" />
                                     </div>
                                     <div>
                                         <label className="flex items-center gap-2 text-sm font-medium text-[#1f1f1f] mb-2">
                                             国籍
                                             <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-red-50 text-red-600 border border-red-100">必須</span>
                                         </label>
-                                        <select name="nationality" required defaultValue="ベトナム" className="w-full bg-white focus:bg-white border border-[#878787] focus:border-[#1f1f1f] rounded-md px-3 py-2.5 text-sm outline-none appearance-none text-[#1f1f1f] transition-all">
+                                        <select name="nationality" required defaultValue="ベトナム" className="w-full bg-white focus:bg-white border border-gray-300 focus:border-[#1f1f1f] rounded-xl px-3 py-2.5 text-sm outline-none appearance-none text-[#1f1f1f] transition-all">
                                             <option value="ベトナム">ベトナム</option>
                                             <option value="インドネシア">インドネシア</option>
                                             <option value="フィリピン">フィリピン</option>
@@ -103,7 +103,7 @@ export default async function NewWorkerPage() {
                                             現住所
                                             <span className="text-[10px] font-bold px-1.5 py-0.5 rounded border border-gray-200 text-[#878787] bg-white">任意</span>
                                         </label>
-                                        <input name="address" type="text" placeholder="例：東京都新宿区..." className="w-full bg-white focus:bg-white border border-[#878787] focus:border-[#1f1f1f] rounded-md px-3 py-2.5 text-sm outline-none text-[#1f1f1f] transition-all" />
+                                        <input name="address" type="text" placeholder="例：東京都新宿区..." className="w-full bg-white focus:bg-white border border-gray-300 focus:border-[#1f1f1f] rounded-xl px-3 py-2.5 text-sm outline-none text-[#1f1f1f] transition-all" />
                                     </div>
                                 </div>
                             </div>
@@ -124,7 +124,7 @@ export default async function NewWorkerPage() {
                                             制度区分
                                             <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-red-50 text-red-600 border border-red-100">必須</span>
                                         </label>
-                                        <select name="system_type" required defaultValue="ikusei_shuro" className="w-full bg-white focus:bg-white border border-[#878787] focus:border-[#1f1f1f] rounded-md px-3 py-2.5 text-sm outline-none appearance-none text-[#1f1f1f] transition-all">
+                                        <select name="system_type" required defaultValue="ikusei_shuro" className="w-full bg-white focus:bg-white border border-gray-300 focus:border-[#1f1f1f] rounded-xl px-3 py-2.5 text-sm outline-none appearance-none text-[#1f1f1f] transition-all">
                                             <option value="ikusei_shuro">育成就労</option>
                                             <option value="tokuteigino">特定技能</option>
                                             <option value="ginou_jisshu">技能実習</option>
@@ -135,7 +135,7 @@ export default async function NewWorkerPage() {
                                             ステータス
                                             <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-red-50 text-red-600 border border-red-100">必須</span>
                                         </label>
-                                        <select name="status" required defaultValue="working" className="w-full bg-white focus:bg-white border border-[#878787] focus:border-[#1f1f1f] rounded-md px-3 py-2.5 text-sm outline-none appearance-none text-[#1f1f1f] transition-all">
+                                        <select name="status" required defaultValue="working" className="w-full bg-white focus:bg-white border border-gray-300 focus:border-[#1f1f1f] rounded-xl px-3 py-2.5 text-sm outline-none appearance-none text-[#1f1f1f] transition-all">
                                             <option value="waiting">入国待ち</option>
                                             <option value="standby">待機中</option>
                                             <option value="working">就業中</option>
@@ -148,7 +148,7 @@ export default async function NewWorkerPage() {
                                             配属先企業
                                             <span className="text-[10px] font-bold px-1.5 py-0.5 rounded border border-gray-200 text-[#878787] bg-white">任意</span>
                                         </label>
-                                        <select name="company_id" defaultValue="" className="w-full bg-white focus:bg-white border border-[#878787] focus:border-[#1f1f1f] rounded-md px-3 py-2.5 text-sm outline-none appearance-none text-[#1f1f1f] transition-all">
+                                        <select name="company_id" defaultValue="" className="w-full bg-white focus:bg-white border border-gray-300 focus:border-[#1f1f1f] rounded-xl px-3 py-2.5 text-sm outline-none appearance-none text-[#1f1f1f] transition-all">
                                             <option value="">未配属</option>
                                             {companies?.map(c => <option key={c.id} value={c.id}>{c.name_jp}</option>)}
                                         </select>
@@ -158,28 +158,28 @@ export default async function NewWorkerPage() {
                                             職種 (Job Category)
                                             <span className="text-[10px] font-bold px-1.5 py-0.5 rounded border border-gray-200 text-[#878787] bg-white">任意</span>
                                         </label>
-                                        <input name="industry_field" type="text" placeholder="例：機械加工、溶接、建設など" className="w-full bg-white focus:bg-white border border-[#878787] focus:border-[#1f1f1f] rounded-md px-3 py-2.5 text-sm outline-none text-[#1f1f1f] transition-all" />
+                                        <input name="industry_field" type="text" placeholder="例：機械加工、溶接、建設など" className="w-full bg-white focus:bg-white border border-gray-300 focus:border-[#1f1f1f] rounded-xl px-3 py-2.5 text-sm outline-none text-[#1f1f1f] transition-all" />
                                     </div>
                                     <div>
                                         <label className="flex items-center gap-2 text-sm font-medium text-[#1f1f1f] mb-2">
                                             送出機関
                                             <span className="text-[10px] font-bold px-1.5 py-0.5 rounded border border-gray-200 text-[#878787] bg-white">任意</span>
                                         </label>
-                                        <input name="sending_org" type="text" placeholder="例：VINAJAPAN JSC" className="w-full bg-white focus:bg-white border border-[#878787] focus:border-[#1f1f1f] rounded-md px-3 py-2.5 text-sm outline-none text-[#1f1f1f] transition-all" />
+                                        <input name="sending_org" type="text" placeholder="例：VINAJAPAN JSC" className="w-full bg-white focus:bg-white border border-gray-300 focus:border-[#1f1f1f] rounded-xl px-3 py-2.5 text-sm outline-none text-[#1f1f1f] transition-all" />
                                     </div>
                                     <div>
                                         <label className="flex items-center gap-2 text-sm font-medium text-[#1f1f1f] mb-2">
                                             入国期生
                                             <span className="text-[10px] font-bold px-1.5 py-0.5 rounded border border-gray-200 text-[#878787] bg-white">任意</span>
                                         </label>
-                                        <input name="entry_batch" type="text" placeholder="例：第15期生" className="w-full bg-white focus:bg-white border border-[#878787] focus:border-[#1f1f1f] rounded-md px-3 py-2.5 text-sm outline-none text-[#1f1f1f] transition-all" />
+                                        <input name="entry_batch" type="text" placeholder="例：第15期生" className="w-full bg-white focus:bg-white border border-gray-300 focus:border-[#1f1f1f] rounded-xl px-3 py-2.5 text-sm outline-none text-[#1f1f1f] transition-all" />
                                     </div>
                                     <div>
                                         <label className="flex items-center gap-2 text-sm font-medium text-[#1f1f1f] mb-2">
                                             入国日
                                             <span className="text-[10px] font-bold px-1.5 py-0.5 rounded border border-gray-200 text-[#878787] bg-white">任意</span>
                                         </label>
-                                        <input name="entry_date" type="date" className="w-full bg-white focus:bg-white border border-[#878787] focus:border-[#1f1f1f] rounded-md px-3 py-2.5 text-sm outline-none text-[#1f1f1f] transition-all" />
+                                        <input name="entry_date" type="date" className="w-full bg-white focus:bg-white border border-gray-300 focus:border-[#1f1f1f] rounded-xl px-3 py-2.5 text-sm outline-none text-[#1f1f1f] transition-all" />
                                     </div>
                                 </div>
                             </div>
@@ -200,56 +200,56 @@ export default async function NewWorkerPage() {
                                             在留資格 (Visa Status)
                                             <span className="text-[10px] font-bold px-1.5 py-0.5 rounded border border-gray-200 text-[#878787] bg-white">任意</span>
                                         </label>
-                                        <input name="visa_status" type="text" placeholder="例：技能実習第1号イ" className="w-full bg-white focus:bg-white border border-[#878787] focus:border-[#1f1f1f] rounded-md px-3 py-2.5 text-sm outline-none text-[#1f1f1f] transition-all" />
+                                        <input name="visa_status" type="text" placeholder="例：技能実習第1号イ" className="w-full bg-white focus:bg-white border border-gray-300 focus:border-[#1f1f1f] rounded-xl px-3 py-2.5 text-sm outline-none text-[#1f1f1f] transition-all" />
                                     </div>
                                     <div>
                                         <label className="flex items-center gap-2 text-sm font-medium text-[#1f1f1f] mb-2">
                                             在留カード番号
                                             <span className="text-[10px] font-bold px-1.5 py-0.5 rounded border border-gray-200 text-[#878787] bg-white">任意</span>
                                         </label>
-                                        <input name="zairyu_no" type="text" placeholder="例：AB12345678CD" maxLength={12} className="w-full bg-white focus:bg-white border border-[#878787] focus:border-[#1f1f1f] rounded-md px-3 py-2.5 text-sm outline-none uppercase text-[#1f1f1f] transition-all" />
+                                        <input name="zairyu_no" type="text" placeholder="例：AB12345678CD" maxLength={12} className="w-full bg-white focus:bg-white border border-gray-300 focus:border-[#1f1f1f] rounded-xl px-3 py-2.5 text-sm outline-none uppercase text-[#1f1f1f] transition-all" />
                                     </div>
                                     <div>
                                         <label className="flex items-center gap-2 text-sm font-medium text-[#1f1f1f] mb-2">
                                             在留期限
                                             <span className="text-[10px] font-bold px-1.5 py-0.5 rounded border border-gray-200 text-[#878787] bg-white">任意</span>
                                         </label>
-                                        <input name="zairyu_exp" type="date" className="w-full bg-white focus:bg-white border border-[#878787] focus:border-[#1f1f1f] rounded-md px-3 py-2.5 text-sm outline-none text-[#1f1f1f] transition-all" />
+                                        <input name="zairyu_exp" type="date" className="w-full bg-white focus:bg-white border border-gray-300 focus:border-[#1f1f1f] rounded-xl px-3 py-2.5 text-sm outline-none text-[#1f1f1f] transition-all" />
                                     </div>
                                     <div>
                                         <label className="flex items-center gap-2 text-sm font-medium text-[#1f1f1f] mb-2">
                                             パスポート番号
                                             <span className="text-[10px] font-bold px-1.5 py-0.5 rounded border border-gray-200 text-[#878787] bg-white">任意</span>
                                         </label>
-                                        <input name="passport_no" type="text" placeholder="例：C1234567" className="w-full bg-white focus:bg-white border border-[#878787] focus:border-[#1f1f1f] rounded-md px-3 py-2.5 text-sm outline-none uppercase text-[#1f1f1f] transition-all" />
+                                        <input name="passport_no" type="text" placeholder="例：C1234567" className="w-full bg-white focus:bg-white border border-gray-300 focus:border-[#1f1f1f] rounded-xl px-3 py-2.5 text-sm outline-none uppercase text-[#1f1f1f] transition-all" />
                                     </div>
                                     <div>
                                         <label className="flex items-center gap-2 text-sm font-medium text-[#1f1f1f] mb-2">
                                             パスポート期限
                                             <span className="text-[10px] font-bold px-1.5 py-0.5 rounded border border-gray-200 text-[#878787] bg-white">任意</span>
                                         </label>
-                                        <input name="passport_exp" type="date" className="w-full bg-white focus:bg-white border border-[#878787] focus:border-[#1f1f1f] rounded-md px-3 py-2.5 text-sm outline-none text-[#1f1f1f] transition-all" />
+                                        <input name="passport_exp" type="date" className="w-full bg-white focus:bg-white border border-gray-300 focus:border-[#1f1f1f] rounded-xl px-3 py-2.5 text-sm outline-none text-[#1f1f1f] transition-all" />
                                     </div>
                                     <div>
                                         <label className="flex items-center gap-2 text-sm font-medium text-[#1f1f1f] mb-2">
                                             認定開始日
                                             <span className="text-[10px] font-bold px-1.5 py-0.5 rounded border border-gray-200 text-[#878787] bg-white">任意</span>
                                         </label>
-                                        <input name="cert_start_date" type="date" className="w-full bg-white focus:bg-white border border-[#878787] focus:border-[#1f1f1f] rounded-md px-3 py-2.5 text-sm outline-none text-[#1f1f1f] transition-all" />
+                                        <input name="cert_start_date" type="date" className="w-full bg-white focus:bg-white border border-gray-300 focus:border-[#1f1f1f] rounded-xl px-3 py-2.5 text-sm outline-none text-[#1f1f1f] transition-all" />
                                     </div>
                                     <div>
                                         <label className="flex items-center gap-2 text-sm font-medium text-[#1f1f1f] mb-2">
                                             認定修了日
                                             <span className="text-[10px] font-bold px-1.5 py-0.5 rounded border border-gray-200 text-[#878787] bg-white">任意</span>
                                         </label>
-                                        <input name="cert_end_date" type="date" className="w-full bg-white focus:bg-white border border-[#878787] focus:border-[#1f1f1f] rounded-md px-3 py-2.5 text-sm outline-none text-[#1f1f1f] transition-all" />
+                                        <input name="cert_end_date" type="date" className="w-full bg-white focus:bg-white border border-gray-300 focus:border-[#1f1f1f] rounded-xl px-3 py-2.5 text-sm outline-none text-[#1f1f1f] transition-all" />
                                     </div>
                                     <div>
                                         <label className="flex items-center gap-2 text-sm font-medium text-[#1f1f1f] mb-2">
                                             保険期限
                                             <span className="text-[10px] font-bold px-1.5 py-0.5 rounded border border-gray-200 text-[#878787] bg-white">任意</span>
                                         </label>
-                                        <input name="insurance_exp" type="date" className="w-full bg-white focus:bg-white border border-[#878787] focus:border-[#1f1f1f] rounded-md px-3 py-2.5 text-sm outline-none text-[#1f1f1f] transition-all" />
+                                        <input name="insurance_exp" type="date" className="w-full bg-white focus:bg-white border border-gray-300 focus:border-[#1f1f1f] rounded-xl px-3 py-2.5 text-sm outline-none text-[#1f1f1f] transition-all" />
                                     </div>
                                 </div>
                             </div>

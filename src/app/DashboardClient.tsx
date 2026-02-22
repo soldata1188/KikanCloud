@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect, useTransition, useRef } from 'react'
-import { Sparkles, Send, Loader2, ArrowRight, Users, Building2, AlertTriangle, CheckCircle2, User, Clock, RotateCcw } from 'lucide-react'
+import { Sparkles, Loader2, ArrowRight, Users, Building2, AlertTriangle, CheckCircle2, User, Clock } from 'lucide-react'
 import { getDashboardAIBriefing, chatWithOmniAI } from './actions/dashboardAi'
 import Link from 'next/link'
 import { AnimatedLogo } from '@/components/AnimatedLogo'

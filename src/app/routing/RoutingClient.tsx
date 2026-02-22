@@ -1,7 +1,7 @@
 'use client'
 import { useState, useTransition, useEffect } from 'react'
-import { APIProvider, Map, AdvancedMarker, useMap, useMapsLibrary } from '@vis.gl/react-google-maps'
-import { Sparkles, MapPin, Building2, User, Loader2, Navigation, Clock, CheckCircle2, Coffee } from 'lucide-react'
+import { APIProvider, Map, AdvancedMarker, useMap, useMapsLibrary, InfoWindow } from '@vis.gl/react-google-maps'
+import { Sparkles, MapPin, Building2, User, Loader2, Navigation, Clock, CheckCircle2, Coffee, CheckSquare, Square, Trash2 } from 'lucide-react'
 import { optimizeRouteWithAI } from '../actions/routeAi'
 
 // Component vẽ đường đi (Directions)
@@ -32,7 +32,13 @@ function DirectionsRendererComponent({ itinerary, locations }: { itinerary: any[
         // Các điểm ở giữa
         const waypoints = sortedLocs.slice(1, -1).map(loc => ({ location: { lat: loc.latitude, lng: loc.longitude }, stopover: true }));
 
-        directionsService.route({ origin, destination, waypoints, travelMode: google.maps.TravelMode.DRIVING })
+        // Tùy chọn vẽ route có kẹt xe (yêu cầu departureTime là lúc này hoặc tương lai)
+        const drivingOptions = {
+            departureTime: new Date(Date.now() + 1000 * 60 * 5), // 5p sau
+            trafficModel: google.maps.TrafficModel.BEST_GUESS
+        };
+
+        directionsService.route({ origin, destination, waypoints, travelMode: google.maps.TravelMode.DRIVING, drivingOptions })
             .then(response => directionsRenderer.setDirections(response))
             .catch(e => console.error('Directions request failed', e));
     }, [directionsService, directionsRenderer, itinerary, locations]);
@@ -44,6 +50,8 @@ export default function RoutingClient({ initialLocations, googleMapsKey }: { ini
     const [selectedIds, setSelectedIds] = useState<string[]>(initialLocations.map(l => l.id)); // Default chọn tất
     const [aiData, setAiData] = useState<any>(null);
     const [isPending, startTransition] = useTransition();
+    // Info window state
+    const [activeMarkerId, setActiveMarkerId] = useState<string | null>(null);
 
     const handleOptimize = () => {
         const locsToVisit = initialLocations.filter(l => selectedIds.includes(l.id));
@@ -51,7 +59,10 @@ export default function RoutingClient({ initialLocations, googleMapsKey }: { ini
 
         startTransition(async () => {
             const res = await optimizeRouteWithAI(locsToVisit);
-            if (res.success && res.data) setAiData(res.data);
+            if (res.success && res.data) {
+                setAiData(res.data);
+                setActiveMarkerId(null); // Đóng Info window khi vẽ route
+            }
             else alert('AI Error: ' + res.error);
         });
     };
@@ -60,6 +71,14 @@ export default function RoutingClient({ initialLocations, googleMapsKey }: { ini
         if (selectedIds.includes(id)) setSelectedIds(prev => prev.filter(i => i !== id));
         else setSelectedIds(prev => [...prev, id]);
     }
+
+    const selectAll = () => setSelectedIds(initialLocations.map(l => l.id));
+    const deselectAll = () => setSelectedIds([]);
+
+    const removeLocation = (id: string) => {
+        setSelectedIds(prev => prev.filter(i => i !== id));
+        setActiveMarkerId(null);
+    };
 
     if (!googleMapsKey) {
         return (
@@ -89,11 +108,17 @@ export default function RoutingClient({ initialLocations, googleMapsKey }: { ini
                 <div className="flex-1 overflow-y-auto p-6 space-y-6">
                     {!aiData ? (
                         <div className="animate-in fade-in duration-300 h-full flex flex-col">
-                            <h3 className="text-[11px] font-bold text-[#878787] uppercase tracking-widest mb-3 flex items-center justify-between">
-                                訪問先を選択
-                                <span className="text-[10px] bg-[#24b47e]/10 text-[#24b47e] px-2 py-0.5 rounded">{selectedIds.length} Selected</span>
-                            </h3>
-                            <div className="space-y-2 flex-1 overflow-y-auto pr-2 mb-4">
+                            <div className="flex items-center justify-between mb-3 shrink-0">
+                                <h3 className="text-[11px] font-bold text-[#878787] uppercase tracking-widest flex items-center">
+                                    訪問先を選択
+                                    <span className="text-[10px] bg-[#24b47e]/10 text-[#24b47e] px-2 py-0.5 rounded ml-2">{selectedIds.length} Selected</span>
+                                </h3>
+                                <div className="flex items-center gap-2">
+                                    <button onClick={selectAll} className="text-[11px] font-bold text-[#878787] hover:text-[#24b47e] flex items-center gap-1 transition-colors"><CheckSquare size={12} /> 全て</button>
+                                    <button onClick={deselectAll} className="text-[11px] font-bold text-[#878787] hover:text-red-500 flex items-center gap-1 transition-colors"><Square size={12} /> 解除</button>
+                                </div>
+                            </div>
+                            <div className="space-y-2 flex-1 overflow-y-auto pr-2 mb-4 custom-scrollbar">
                                 {initialLocations.map(loc => (
                                     <label key={loc.id} className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${selectedIds.includes(loc.id) ? 'bg-[#fbfcfd] border-[#24b47e]/50 shadow-sm' : 'bg-white border-[#ededed] hover:border-[#878787]'}`}>
                                         <input type="checkbox" checked={selectedIds.includes(loc.id)} onChange={() => toggleSelection(loc.id)} className="mt-1 accent-[#24b47e]" />
@@ -140,7 +165,9 @@ export default function RoutingClient({ initialLocations, googleMapsKey }: { ini
                             </div>
 
                             <div className="mt-8 pt-4 border-t border-[#ededed]">
-                                <button onClick={() => setAiData(null)} className="w-full text-center text-[12px] font-bold text-[#878787] hover:text-[#1f1f1f] py-2 transition-colors">← 再設定 (Reset Planner)</button>
+                                <button onClick={() => setAiData(null)} className="w-full text-center text-[12px] font-bold text-red-500 hover:text-red-700 hover:bg-red-50 py-2 rounded-lg transition-colors flex items-center justify-center gap-2">
+                                    <Trash2 size={14} /> AI結果をリセット (Reset Info)
+                                </button>
                             </div>
                         </div>
                     )}
@@ -158,16 +185,38 @@ export default function RoutingClient({ initialLocations, googleMapsKey }: { ini
                             const itinIndex = aiData ? aiData.itinerary.filter((i: any) => i.type !== 'break').findIndex((i: any) => i.id === loc.id) : index;
                             const badgeNum = itinIndex !== -1 ? itinIndex + 1 : index + 1;
                             const isCompany = loc.type === 'company' || loc.type === 'office';
+                            const isActive = activeMarkerId === loc.id;
 
                             return (
-                                <AdvancedMarker key={loc.id} position={{ lat: loc.latitude, lng: loc.longitude }}>
-                                    <div className={`relative flex items-center justify-center w-8 h-8 rounded-full shadow-lg border-2 border-white text-white font-bold text-xs cursor-pointer transform hover:scale-110 transition-transform ${isCompany ? 'bg-[#1f1f1f]' : 'bg-[#24b47e]'}`}>
+                                <AdvancedMarker key={loc.id} position={{ lat: loc.latitude, lng: loc.longitude }} onClick={() => setActiveMarkerId(loc.id)}>
+                                    <div className={`relative flex items-center justify-center w-8 h-8 rounded-full shadow-lg border-2 border-white text-white font-bold text-xs cursor-pointer transform hover:scale-110 transition-transform ${isCompany ? 'bg-[#1f1f1f]' : 'bg-[#24b47e]'} ${isActive ? 'ring-4 ring-[#24b47e]/30 scale-110' : ''}`}>
                                         {badgeNum}
                                         <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 rotate-45 border-r-2 border-b-2 border-white" style={{ backgroundColor: isCompany ? '#1f1f1f' : '#24b47e' }}></div>
                                     </div>
                                 </AdvancedMarker>
                             )
                         })}
+
+                        {/* Info Window */}
+                        {activeMarkerId && (() => {
+                            const loc = initialLocations.find(l => l.id === activeMarkerId);
+                            if (!loc) return null;
+                            const isCompany = loc.type === 'company' || loc.type === 'office';
+                            return (
+                                <InfoWindow position={{ lat: loc.latitude, lng: loc.longitude }} onCloseClick={() => setActiveMarkerId(null)} headerDisabled>
+                                    <div className="p-1 min-w-[200px]">
+                                        <div className="flex items-center gap-2 mb-2 pb-2 border-b border-[#ededed]">
+                                            {isCompany ? <Building2 size={16} className="text-[#1f1f1f]" /> : <User size={16} className="text-[#24b47e]" />}
+                                            <h3 className="font-bold text-[13px] text-[#1f1f1f]">{loc.name}</h3>
+                                        </div>
+                                        <p className="text-[11px] text-[#666666] mb-3 leading-relaxed">{loc.address}</p>
+                                        <button onClick={() => removeLocation(loc.id)} className="w-full py-1.5 text-[11px] font-bold text-red-500 bg-red-50 hover:bg-red-100 rounded transition-colors flex items-center justify-center gap-1.5">
+                                            <Trash2 size={12} /> ルートから外す (Remove)
+                                        </button>
+                                    </div>
+                                </InfoWindow>
+                            );
+                        })()}
 
                         {/* Khi AI trả về lộ trình, gọi Directions API vẽ đường Polyline */}
                         {aiData && <DirectionsRendererComponent itinerary={aiData.itinerary.filter((i: any) => i.type !== 'break')} locations={initialLocations} />}

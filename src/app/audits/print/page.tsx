@@ -50,29 +50,29 @@ export default async function AuditPrintPage({ searchParams }: { searchParams: P
     }) || [];
 
     return (
-        <div className="bg-white min-h-screen text-black p-4 max-w-[800px] mx-auto font-sans">
+        <div className="bg-white min-h-screen text-black p-4 max-w-[800px] mx-auto font-sans print-container">
             <PrintButton />
 
-            <div className="text-center mb-6 relative">
-                <h1 className="text-xl font-bold border-b border-black inline-block pb-1">
+            <div className="text-center mb-6 relative print-header">
+                <h1 className="text-2xl font-black border-b-2 border-black inline-block pb-1 tracking-tight">
                     {filterMonth.replace('-', '年')}月分 監査・訪問計画表
                 </h1>
-                <div className="absolute right-0 bottom-0 text-xs">
+                <div className="absolute right-0 bottom-0 text-[11px] font-mono text-gray-500">
                     {new Date().toLocaleDateString('ja-JP')} 印刷
                 </div>
             </div>
 
-            <table className="w-full border-collapse border border-gray-400 text-[11px] leading-tight">
+            <table className="w-full border-collapse border-2 border-gray-800 text-[11px] leading-tight print-table">
                 <thead>
-                    <tr className="bg-gray-100">
-                        <th className="border border-gray-400 px-1 py-1 w-[4%] text-center font-semibold tracking-tighter">No</th>
-                        <th className="border border-gray-400 px-1.5 py-1 w-[22%] text-left font-semibold tracking-tighter">受入企業名</th>
-                        <th className="border border-gray-400 px-1.5 py-1 w-[13%] text-left font-semibold tracking-tighter">在籍人数</th>
-                        <th className="border border-gray-400 px-1.5 py-1 w-[10%] text-center font-semibold tracking-tighter">種別</th>
-                        <th className="border border-gray-400 px-1.5 py-1 w-[14%] text-center font-semibold tracking-tighter">前回実績</th>
-                        <th className="border border-gray-400 px-1.5 py-1 w-[13%] text-center font-semibold tracking-tighter">実施日</th>
-                        <th className="border border-gray-400 px-1.5 py-1 w-[9%] text-center font-semibold tracking-tighter">担当</th>
-                        <th className="border border-gray-400 px-1.5 py-1 w-[15%] text-left font-semibold tracking-tighter">メモ</th>
+                    <tr className="bg-gray-100/80">
+                        <th className="border border-gray-400 border-t-2 border-b-2 border-gray-800 px-1 py-1.5 w-[4%] text-center font-bold tracking-tighter text-gray-800">No</th>
+                        <th className="border border-gray-400 border-t-2 border-b-2 border-gray-800 px-2 py-1.5 w-[22%] text-left font-bold tracking-tighter text-gray-800">受入企業名</th>
+                        <th className="border border-gray-400 border-t-2 border-b-2 border-gray-800 px-1.5 py-1.5 w-[13%] text-left font-bold tracking-tighter text-gray-800">在籍人数</th>
+                        <th className="border border-gray-400 border-t-2 border-b-2 border-gray-800 px-1.5 py-1.5 w-[10%] text-center font-bold tracking-tighter text-gray-800">種別</th>
+                        <th className="border border-gray-400 border-t-2 border-b-2 border-gray-800 px-1.5 py-1.5 w-[14%] text-center font-bold tracking-tighter text-gray-800">前回実績</th>
+                        <th className="border border-gray-400 border-t-2 border-b-2 border-gray-800 px-1.5 py-1.5 w-[13%] text-center font-bold tracking-tighter text-gray-800">実施日</th>
+                        <th className="border border-gray-400 border-t-2 border-b-2 border-gray-800 px-1.5 py-1.5 w-[9%] text-center font-bold tracking-tighter text-gray-800">担当</th>
+                        <th className="border border-gray-400 border-t-2 border-b-2 border-gray-800 px-2 py-1.5 w-[15%] text-left font-bold tracking-tighter text-gray-800">メモ</th>
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-300">
@@ -93,22 +93,22 @@ export default async function AuditPrintPage({ searchParams }: { searchParams: P
                             : (audit?.scheduled_date ? audit.scheduled_date.replace(/-/g, '/').slice(2) + ' (予)' : '-');
 
                         return (
-                            <tr key={row.company.id}>
-                                <td className="border border-gray-400 px-1 py-1 text-center align-top">{i + 1}</td>
-                                <td className="border border-gray-400 px-1.5 py-1 font-bold align-top leading-tight">{row.company.name_jp}</td>
-                                <td className="border border-gray-400 px-1.5 py-1 align-top text-[10px]">
-                                    <div className="font-semibold text-[11px]">{row.workerCounts.total}名</div>
+                            <tr key={row.company.id} className="print-row">
+                                <td className="border border-gray-300 px-1 py-1.5 text-center align-top text-gray-600">{i + 1}</td>
+                                <td className="border border-gray-300 px-2 py-1.5 font-bold align-top leading-tight text-gray-900">{row.company.name_jp}</td>
+                                <td className="border border-gray-300 px-1.5 py-1.5 align-top text-[10px]">
+                                    <div className="font-bold text-[11px] text-gray-900">{row.workerCounts.total}名</div>
                                     {row.workerCounts.total > 0 && (
-                                        <div className="text-gray-600 tracking-tighter mt-0.5">
+                                        <div className="text-gray-500 tracking-tighter mt-0.5 font-medium">
                                             育{row.workerCounts.ikusei} / 特{row.workerCounts.tokutei} / 技{row.workerCounts.ginou}
                                         </div>
                                     )}
                                 </td>
-                                <td className="border border-gray-400 px-1.5 py-1 text-center align-top whitespace-nowrap tracking-tighter">{typeLabel}</td>
-                                <td className="border border-gray-400 px-1.5 py-1 text-center align-top text-[10px] whitespace-nowrap tracking-tighter">{lastAuditStr}</td>
-                                <td className="border border-gray-400 px-1.5 py-1 text-center align-top text-[10px] font-medium whitespace-nowrap tracking-tighter">{dateStr}</td>
-                                <td className="border border-gray-400 px-1.5 py-1 text-center align-top whitespace-nowrap tracking-tighter">{audit?.pic_name || '-'}</td>
-                                <td className="border border-gray-400 px-1.5 py-1 text-[10px] text-gray-700 align-top leading-tight whitespace-pre-wrap break-all">{audit?.notes || '-'}</td>
+                                <td className="border border-gray-300 px-1.5 py-1.5 text-center align-top whitespace-nowrap tracking-tighter font-medium">{typeLabel}</td>
+                                <td className="border border-gray-300 px-1.5 py-1.5 text-center align-top text-[10px] whitespace-nowrap tracking-tighter text-gray-600 font-mono">{lastAuditStr}</td>
+                                <td className="border border-gray-300 px-1.5 py-1.5 text-center align-top text-[11px] font-bold whitespace-nowrap tracking-tighter text-gray-900">{dateStr}</td>
+                                <td className="border border-gray-300 px-1.5 py-1.5 text-center align-top whitespace-nowrap tracking-tighter text-gray-800">{audit?.pic_name || '-'}</td>
+                                <td className="border border-gray-300 px-2 py-1.5 text-[10px] text-gray-600 align-top leading-relaxed whitespace-pre-wrap break-all">{audit?.notes || '-'}</td>
                             </tr>
                         );
                     })}
@@ -118,9 +118,27 @@ export default async function AuditPrintPage({ searchParams }: { searchParams: P
             <style dangerouslySetInnerHTML={{
                 __html: `
                 @media print {
-                    @page { size: A4 portrait; margin: 8mm; }
-                    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background-color: white !important; }
+                    @page { 
+                        size: A4 portrait; 
+                        margin: 10mm 15mm; /* Lề in chuẩn */
+                    }
+                    body { 
+                        -webkit-print-color-adjust: exact; 
+                        print-color-adjust: exact; 
+                        background-color: white !important; 
+                        color: black !important;
+                    }
                     .no-print { display: none !important; }
+                    /* Chống gãy hàng bảng biểu giữa 2 trang in */
+                    .print-row {
+                        page-break-inside: avoid;
+                    }
+                    /* Border rõ nét khi in A4 */
+                    table { border-collapse: collapse; width: 100%; border: 2px solid #000; }
+                    th { background-color: #f3f4f6 !important; border: 1px solid #000 !important; border-top: 2px solid #000 !important; border-bottom: 2px solid #000 !important; }
+                    td { border: 1px solid #444 !important; }
+                    /* Phủ định css Tailwind conflict với print */
+                    .print-container { max-width: 100% !important; padding: 0 !important; }
                 }
             `}} />
         </div>

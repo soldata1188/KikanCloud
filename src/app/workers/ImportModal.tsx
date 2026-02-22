@@ -93,8 +93,11 @@ export function ImportModal() {
 
     return (
         <>
-            <button onClick={() => setIsOpen(true)} className="h-[32px] px-3 bg-white border border-gray-200 text-[#1f1f1f] rounded-md text-[13px] font-medium hover:bg-gray-50 transition-colors flex items-center gap-1.5 shadow-sm">
-                <Upload size={14} /> 一括入力
+            <button onClick={() => setIsOpen(true)} className="group relative h-[32px] w-[32px] flex items-center justify-center bg-white border border-gray-200 text-[#1f1f1f] rounded-md transition-colors shadow-sm shrink-0 hover:bg-gray-50">
+                <Upload size={16} />
+                <div className="absolute top-full mt-2 px-2 py-1 bg-[#1f1f1f] text-white text-[11px] font-medium rounded-sm opacity-0 invisible translate-y-[-5px] group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all duration-200 whitespace-nowrap z-[60] pointer-events-none">
+                    一括入力
+                </div>
             </button>
 
             {isOpen && (

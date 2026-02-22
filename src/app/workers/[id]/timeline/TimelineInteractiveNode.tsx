@@ -48,7 +48,7 @@ export function TimelineInteractiveNode({ event, workerId, companyId, existingPr
             </div>
 
             <div className="relative z-10 flex flex-col items-center shrink-0">
-                <div className={`w-8 h-8 rounded-full border-4 border-[#f0f4f9] shadow-sm flex items-center justify-center transition-all duration-300 
+                <div className={`w-8 h-8 rounded-full border-4 border-[#f0f4f9] flex items-center justify-center transition-all duration-300 
           ${currentStatus === 'completed' || isPast ? 'bg-green-500' : currentStatus === 'issue' ? 'bg-red-500' : isCurrent ? 'bg-[#24b47e] scale-125' : currentStatus !== 'none' ? 'bg-blue-300' : 'bg-gray-200'}`}>
                     {(currentStatus === 'completed' || isPast) && <CheckCircle2 size={12} className="text-white" strokeWidth={3} />}
                     {currentStatus === 'issue' && <AlertCircle size={12} className="text-white" strokeWidth={3} />}
@@ -57,7 +57,7 @@ export function TimelineInteractiveNode({ event, workerId, companyId, existingPr
             </div>
 
             <div className={`flex-1 py-3 px-4 sm:px-5 rounded-md transition-all duration-300 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border
-        ${isCurrent ? 'bg-white/50 border-blue-200 shadow-sm ml-1 sm:ml-2' : currentStatus !== 'none' ? 'bg-white border-gray-200 shadow-sm' : 'border-transparent opacity-80 hover:opacity-100 hover:bg-white'}`}>
+        ${isCurrent ? 'bg-white/50 border-blue-300 ml-1 sm:ml-2' : currentStatus !== 'none' ? 'bg-white border-gray-300' : 'border-transparent opacity-80 hover:opacity-100 hover:bg-white border-gray-200'}`}>
                 <div>
                     <div className="flex items-center gap-2 mb-1">
                         <h4 className={`text-base font-bold ${currentStatus === 'completed' ? 'text-[#878787] line-through' : currentStatus === 'issue' ? 'text-red-600' : isCurrent ? 'text-[#24b47e]' : 'text-[#1f1f1f]'}`}>{event.title}</h4>

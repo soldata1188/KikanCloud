@@ -31,7 +31,7 @@ export function TopNav({ title, role }: { title: string, role?: string }) {
 
     return (
         <>
-            <header className="h-14 bg-[#fbfcfd] border-b border-[#ededed] flex items-center justify-between px-4 sm:px-6 sticky top-0 z-40 shrink-0 w-full">
+            <header className="h-14 bg-[#fbfcfd] border-b border-gray-200 flex items-center justify-between px-4 sm:px-6 sticky top-0 z-40 shrink-0 w-full">
                 <div className="flex items-center gap-2 text-[13px] font-sans pl-1">
                     <span className="font-medium text-[#1f1f1f]">KikanCloud</span>
                     <span className="text-[#878787] ml-1">/</span>
@@ -58,7 +58,7 @@ export function TopNav({ title, role }: { title: string, role?: string }) {
                     </div>
 
                     <div className="relative">
-                        <div onClick={() => setIsAvatarOpen(!isAvatarOpen)} className="w-8 h-8 rounded-full bg-[#fbfcfd] border border-[#ededed] text-[#878787] flex items-center justify-center text-xs font-bold cursor-pointer hover:bg-gray-50 hover:text-[#1f1f1f] transition-colors shadow-sm"><User size={14} /></div>
+                        <div onClick={() => setIsAvatarOpen(!isAvatarOpen)} className="w-8 h-8 rounded-full bg-[#fbfcfd] border border-gray-200 text-[#878787] flex items-center justify-center text-xs font-bold cursor-pointer hover:border-[#24b47e] hover:text-[#1f1f1f] transition-colors shadow-none"><User size={14} /></div>
                         {isAvatarOpen && (
                             <>
                                 <div className="fixed inset-0 z-40" onClick={() => setIsAvatarOpen(false)}></div>

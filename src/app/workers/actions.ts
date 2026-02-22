@@ -128,6 +128,11 @@ export async function importWorkers(workersData: ImportWorkerPayload[]) {
     if (!user) throw new Error('Unauthorized')
     const { data: userData } = await supabase.from('users').select('tenant_id, role').eq('id', user.id).single()
     if (userData?.role !== 'admin') throw new Error('管理者権限が必要です。(Admin only)')
+    if (!userData?.tenant_id) throw new Error('Tenant ID not found')
+
+    // TODO: Defense-in-depth (Multi-tenant)
+    // Nên chain thêm `.eq('tenant_id', userData.tenant_id)` ở tầng Server Actions ngay cả khi 
+    // RLS đã kích hoạt, để tránh rủi ro rò rỉ dữ liệu chéo nếu policy RLS bị cấu hình sai trong tương lai.
 
     // 1. 全受入企業を取得し、企業名からIDを自動マッピング
     const { data: companies } = await supabase.from('companies').select('id, name_jp').eq('is_deleted', false)

@@ -1,63 +1,84 @@
 import Link from 'next/link'
-import { Home, Users, Building2, Landmark, Clock, ShieldAlert, LogOut, Settings, Calendar, Map, Navigation } from 'lucide-react'
+import { LayoutDashboard, Users, Building2, ShieldCheck, GitMerge, Map, Settings, LogOut } from 'lucide-react'
 import { SidebarLogo } from './SidebarLogo'
 import { createClient } from '@/lib/supabase/server'
 import { logout } from '@/app/login/actions'
+
+const NAV_ITEMS = [
+    { id: "dashboard", name: "ダッシュボード", href: "/", icon: LayoutDashboard },
+    { id: "workers", name: "外国人材管理", href: "/workers", icon: Users },
+    { id: "companies", name: "受入企業管理", href: "/companies", icon: Building2 },
+    { id: "audits", name: "監査・訪問・面談", href: "/audits", icon: ShieldCheck },
+    { id: "workflows", name: "業務フロー", href: "/workflows", icon: GitMerge },
+    { id: "routing", name: "ルート最適化", href: "/routing", icon: Map },
+    { id: "settings", name: "設定", href: "/settings", icon: Settings },
+];
 
 export async function Sidebar({ active }: { active: string }) {
     const supabase = await createClient(); const { data: { user } } = await supabase.auth.getUser();
     let userRole = 'staff'; if (user) { const { data } = await supabase.from('users').select('role').eq('id', user.id).single(); userRole = data?.role || 'staff'; }
 
-    const navItems = [
-        { id: 'dashboard', icon: Home, href: '/', title: 'ダッシュボード' },
-        { id: 'workers', icon: Users, href: '/workers', title: '外国人材管理' },
-        { id: 'companies', icon: Building2, href: '/companies', title: '受入企業管理' },
-        { id: 'procedures', icon: Landmark, href: '/procedures', title: '行政手続 (入管・機構)' },
-        { id: 'audits', icon: Clock, href: '/audits', title: '監査・訪問・面談' },
-        { id: 'workflows', icon: Map, href: '/workflows', title: '業務フロー' },
-        { id: 'routing', icon: Navigation, href: '/routing', title: 'ルート最適化' },
-        { id: 'organization', icon: Building2, href: '/organization', title: '機関情報' },
-    ]
-
     return (
-        <aside className="group w-14 hover:w-64 h-screen bg-[#f2f5f8] border-r border-[#ededed] flex flex-col py-4 shrink-0 z-50 transition-all duration-300 ease-in-out absolute md:relative overflow-hidden">
-            <SidebarLogo />
+        <aside className="group shrink-0 h-screen w-16 md:hover:w-64 transition-all duration-300 ease-in-out bg-[#fbfcfd] border-r border-gray-200 flex flex-col py-6 z-50 overflow-hidden relative">
+            <div className="w-full flex justify-center mt-[-8px] transition-all duration-300">
+                <SidebarLogo />
+            </div>
 
-            <nav className="flex-1 w-full flex flex-col gap-2 px-2 mt-4">
-                {navItems.map(item => (
-                    <Link key={item.id} href={item.href} className={`flex items-center gap-3 px-2 h-10 rounded-md transition-all whitespace-nowrap overflow-hidden ${active === item.id ? 'bg-white text-[#1f1f1f] shadow-sm border border-[#ededed]' : 'text-[#444746] hover:bg-white hover:text-[#1f1f1f] hover:shadow-sm'}`}>
-                        <div className="flex items-center justify-center min-w-[24px]">
-                            <item.icon size={18} strokeWidth={active === item.id ? 2 : 1.5} />
-                        </div>
-                        <span className="text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-75">{item.title}</span>
-                    </Link>
-                ))}
-                {userRole === 'admin' && (
-                    <>
-                        <div className="w-full h-px bg-[#ededed] my-2"></div>
-                        <Link href="/accounts" className={`flex items-center gap-3 px-2 h-10 rounded-md transition-all whitespace-nowrap overflow-hidden ${active === 'accounts' ? 'bg-white text-[#1f1f1f] shadow-sm border border-[#ededed]' : 'text-[#444746] hover:bg-white hover:text-[#1f1f1f] hover:shadow-sm'}`}>
-                            <div className="flex items-center justify-center min-w-[24px]">
-                                <ShieldAlert size={18} strokeWidth={active === 'accounts' ? 2 : 1.5} />
+            {/* Navigation Menu */}
+            <nav className="flex flex-col gap-4 w-full">
+                {NAV_ITEMS.map((item) => {
+                    const isActive = active === item.id;
+                    const Icon = item.icon;
+
+                    return (
+                        <Link
+                            key={item.href}
+                            href={item.href}
+                            className="relative flex items-center justify-start w-full h-12 px-3 hover:bg-gray-50 transition-colors"
+                        >
+                            {/* Left-Border Accent cho Active State */}
+                            {isActive && (
+                                <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#24b47e]" />
+                            )}
+
+                            {/* Icon Container */}
+                            <div className={`flex items-center justify-center shrink-0 w-10 transition-colors duration-200 ${isActive ? "text-[#24b47e]" : "text-[#878787]"}`}>
+                                <Icon strokeWidth={isActive ? 2 : 1.5} className="w-6 h-6" />
                             </div>
-                            <span className="text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-75">アカウント管理</span>
+
+                            {/* Menu Text */}
+                            <span className={`ml-2 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-75 pointer-events-none text-sm font-medium ${isActive ? 'text-[#1f1f1f]' : 'text-[#878787]'}`}>
+                                {item.name}
+                            </span>
                         </Link>
-                    </>
+                    );
+                })}
+
+                {userRole === 'admin' && (
+                    <Link
+                        href="/accounts"
+                        className="relative flex items-center justify-start w-full h-12 px-3 hover:bg-gray-50 transition-colors"
+                    >
+                        {active === 'accounts' && <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#24b47e]" />}
+                        <div className={`flex items-center justify-center shrink-0 w-10 transition-colors duration-200 ${active === 'accounts' ? "text-[#24b47e]" : "text-[#878787]"}`}>
+                            <ShieldCheck strokeWidth={active === 'accounts' ? 2 : 1.5} className="w-6 h-6" />
+                        </div>
+                        <span className={`ml-2 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-75 pointer-events-none text-sm font-medium ${active === 'accounts' ? 'text-[#1f1f1f]' : 'text-[#878787]'}`}>
+                            アカウント管理
+                        </span>
+                    </Link>
                 )}
             </nav>
 
-            <div className="w-full flex flex-col gap-2 px-2 pt-4 mt-auto">
-                <button className="flex items-center gap-3 px-2 h-10 rounded-md text-[#444746] hover:bg-white hover:text-[#1f1f1f] hover:shadow-sm transition-all whitespace-nowrap overflow-hidden">
-                    <div className="flex items-center justify-center min-w-[24px]">
-                        <Settings size={18} strokeWidth={1.5} />
-                    </div>
-                    <span className="text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-75">設定</span>
-                </button>
+            <div className="w-full flex flex-col gap-2 pt-4 mt-auto">
                 <form action={logout} className="w-full">
-                    <button type="submit" className="w-full flex items-center gap-3 px-2 h-10 rounded-md text-[#444746] hover:bg-[#fce8e6] hover:text-[#d93025] transition-colors whitespace-nowrap overflow-hidden">
-                        <div className="flex items-center justify-center min-w-[24px]">
-                            <LogOut size={18} strokeWidth={1.5} className="ml-0.5" />
+                    <button type="submit" className="relative flex items-center justify-start w-full h-12 px-3 hover:bg-[#fce8e6] transition-colors group/btn">
+                        <div className="flex items-center justify-center shrink-0 w-10 transition-colors duration-200 text-[#878787] group-hover/btn:text-[#d93025]">
+                            <LogOut strokeWidth={1.5} className="w-6 h-6" />
                         </div>
-                        <span className="text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-75">ログアウト</span>
+                        <span className="ml-2 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-75 pointer-events-none text-sm font-medium text-[#878787] group-hover/btn:text-[#d93025]">
+                            ログアウト
+                        </span>
                     </button>
                 </form>
             </div>

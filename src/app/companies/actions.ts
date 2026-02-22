@@ -17,7 +17,9 @@ export async function createCompany(formData: FormData) {
         postal_code: formData.get('postal_code') as string || null,
         address: formData.get('address') as string || null,
         phone: formData.get('phone') as string || null,
+        email: formData.get('email') as string || null,
         industry: formData.get('industry') as string || null,
+        accepted_occupations: formData.get('accepted_occupations') as string || null,
         representative: formData.get('representative') as string || null,
         representative_romaji: formData.get('representative_romaji') as string || null,
         manager_name: formData.get('manager_name') as string || null,
@@ -47,6 +49,7 @@ export async function updateCompany(formData: FormData) {
         address: formData.get('address') as string || null,
         phone: formData.get('phone') as string || null,
         industry: formData.get('industry') as string || null,
+        accepted_occupations: formData.get('accepted_occupations') as string || null,
         representative: formData.get('representative') as string || null,
         representative_romaji: formData.get('representative_romaji') as string || null,
         manager_name: formData.get('manager_name') as string || null,
@@ -83,6 +86,11 @@ export async function importCompanies(companiesData: any[]) {
     if (!user) throw new Error('Unauthorized')
     const { data: userData } = await supabase.from('users').select('tenant_id, role').eq('id', user.id).single()
     if (userData?.role !== 'admin') throw new Error('管理者権限が必要です。(Admin only)')
+    if (!userData?.tenant_id) throw new Error('Tenant ID not found')
+
+    // TODO: Defense-in-depth (Multi-tenant)
+    // Nên chain thêm `.eq('tenant_id', userData.tenant_id)` ở tầng Server Actions ngay cả khi 
+    // RLS đã kích hoạt, để tránh rủi ro rò rỉ dữ liệu chéo nếu policy RLS bị cấu hình sai trong tương lai.
 
     // 挿入前のデータ正規化
     const payload = companiesData.map(c => ({
@@ -93,7 +101,9 @@ export async function importCompanies(companiesData: any[]) {
         postal_code: c.postal_code || null,
         address: c.address || null,
         phone: c.phone || null,
+        email: c.email || null,
         industry: c.industry || null,
+        accepted_occupations: c.accepted_occupations || null,
         representative: c.representative || null,
         representative_romaji: c.representative_romaji || null,
         manager_name: c.manager_name || null,

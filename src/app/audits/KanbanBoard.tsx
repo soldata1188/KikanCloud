@@ -26,10 +26,10 @@ export function KanbanBoard({ audits }: { audits: any[] }) {
     return (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
             {columns.map(col => (
-                <div key={col.id} className={`${col.bg} rounded-md p-4 min-h-[500px] border-t-4 ${col.border} shadow-sm border-x border-b border-[#e1e5ea] flex flex-col`}>
+                <div key={col.id} className={`${col.bg} rounded-md p-4 min-h-[500px] border-t-4 ${col.border} border-x border-b border-[#e1e5ea] flex flex-col`}>
                     <div className="flex items-center justify-between mb-4 px-2">
                         <h3 className="font-medium text-[#1f1f1f] flex items-center gap-2">{col.icon} {col.title}</h3>
- <span className="bg-white/60 text-[#1f1f1f] text-xs font-bold px-2 py-1 rounded-md">{audits.filter(a => a.status === col.id).length}</span> 
+                        <span className="bg-white/60 text-[#1f1f1f] text-xs font-bold px-2 py-1 rounded-md">{audits.filter(a => a.status === col.id).length}</span>
                     </div>
 
                     <div className="space-y-4 flex-1">
@@ -38,12 +38,12 @@ export function KanbanBoard({ audits }: { audits: any[] }) {
                             const typeInfo = getTypeStyle(audit.audit_type);
 
                             return (
-                                <div key={audit.id} className={`bg-white p-5 rounded-[24px]  hover:shadow-sm transition-all group relative`}>
+                                <div key={audit.id} className={`bg-white p-5 rounded-[24px] border border-gray-300 transition-colors duration-200 hover:border-[#24b47e] group relative`}>
                                     <div className="flex justify-between items-start mb-3">
                                         <span className={`text-[10px] px-2 py-1 rounded-md font-medium ${typeInfo.style}`}>{typeInfo.label}</span>
                                         <div className="flex items-center gap-2">
- {isOverdue && <span className="flex items-center gap-1 text-[10px] text-red-600 font-bold bg-red-50 px-2 py-1 rounded-md animate-pulse"><AlertCircle size={12} /> 期限超過</span>}
- <Link href={`/audits/${audit.id}/edit`} className="opacity-0 group-hover:opacity-100 p-1.5 rounded-md text-[#1f1f1f] hover:text-[#24b47e] hover:bg-gray-50 transition-colors" title="編集"><Edit2 size={14} /></Link>
+                                            {isOverdue && <span className="flex items-center gap-1 text-[10px] text-red-600 font-bold bg-red-50 px-2 py-1 rounded-md animate-pulse"><AlertCircle size={12} /> 期限超過</span>}
+                                            <Link href={`/audits/${audit.id}/edit`} className="opacity-0 group-hover:opacity-100 p-1.5 rounded-md text-[#1f1f1f] hover:text-[#24b47e] hover:bg-gray-50 transition-colors" title="編集"><Edit2 size={14} /></Link>
                                         </div>
                                     </div>
 
@@ -59,14 +59,14 @@ export function KanbanBoard({ audits }: { audits: any[] }) {
                                     </div>
 
                                     {/* 1-Click Actions */}
-                                    <div className="pt-3 border-t border-gray-200">
+                                    <div className="pt-3 border-t border-gray-300">
                                         {audit.status === 'planned' && (
- <button onClick={() => handleStatusChange(audit.id, 'in_progress')} disabled={isPending} className="w-full flex items-center justify-center gap-2 bg-white hover:bg-[#e1e5ea] text-[#1f1f1f] text-xs font-medium py-2.5 rounded-md transition-colors disabled:opacity-50">
+                                            <button onClick={() => handleStatusChange(audit.id, 'in_progress')} disabled={isPending} className="w-full flex items-center justify-center gap-2 bg-white hover:bg-[#e1e5ea] text-[#1f1f1f] text-xs font-medium py-2.5 rounded-md transition-colors disabled:opacity-50">
                                                 訪問完了（報告書作成へ） <ArrowRight size={14} />
                                             </button>
                                         )}
                                         {audit.status === 'in_progress' && (
- <button onClick={() => handleStatusChange(audit.id, 'completed')} disabled={isPending} className="w-full flex items-center justify-center gap-2 bg-[#e6f4ea] hover:bg-[#ceead6] text-[#137333] text-xs font-medium py-2.5 rounded-md transition-colors disabled:opacity-50">
+                                            <button onClick={() => handleStatusChange(audit.id, 'completed')} disabled={isPending} className="w-full flex items-center justify-center gap-2 bg-[#e6f4ea] hover:bg-[#ceead6] text-[#137333] text-xs font-medium py-2.5 rounded-md transition-colors disabled:opacity-50">
                                                 提出完了にする <CheckCircle2 size={14} />
                                             </button>
                                         )}

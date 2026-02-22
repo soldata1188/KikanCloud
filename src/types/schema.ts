@@ -10,7 +10,9 @@ export interface Company {
     postal_code?: string;
     address?: string;
     phone?: string;
+    email?: string;
     industry?: string;
+    accepted_occupations?: string;
     representative?: string;
     representative_romaji?: string;
     manager_name?: string;
@@ -38,6 +40,8 @@ export interface Worker {
     passport_no?: string;
     passport_exp?: string;
     zairyu_no?: string;
+    zairyu_exp?: string;
+    visa_status?: string;
     cert_start_date?: string;
     cert_end_date?: string;
     entry_date?: string;

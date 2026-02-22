@@ -1,6 +1,6 @@
 'use client'
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { Search, MoreVertical, Paperclip, Send, FileText, Download, Folder, Image as ImageIcon, File, Info, ChevronDown } from 'lucide-react'
+import { Search, MoreVertical, Paperclip, Send, FileText, Download, Folder, Image as ImageIcon, File as FileIconLucide, Info, ChevronDown } from 'lucide-react'
 
 // --- Types ---
 type Company = { id: string; name: string; avatar: string; lastMessage: string; unread: number; time: string; }
@@ -66,7 +66,7 @@ const FileIcon = ({ type, className = "" }: { type: string, className?: string }
         case 'word': return <div className={`p-2 bg-blue-100 text-blue-600 rounded-lg ${className}`}><FileText size={20} /></div>
         case 'excel': return <div className={`p-2 bg-green-100 text-green-600 rounded-lg ${className}`}><FileText size={20} /></div>
         case 'image': return <div className={`p-2 bg-purple-100 text-purple-600 rounded-lg ${className}`}><ImageIcon size={20} /></div>
-        default: return <div className={`p-2 bg-gray-100 text-gray-600 rounded-lg ${className}`}><File size={20} /></div>
+        default: return <div className={`p-2 bg-gray-100 text-gray-600 rounded-lg ${className}`}><FileIconLucide size={20} /></div>
     }
 }
 
@@ -143,22 +143,81 @@ export default function B2BChatClient() {
         }
     }
 
-    const handleFilesAttached = (files: FileList | File[]) => {
+    const compressImage = async (file: File): Promise<File> => {
+        if (!file.type.startsWith('image/')) return file;
+
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (event) => {
+                const img = new Image();
+                img.src = event.target?.result as string;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+
+                    const MAX_SIZE = 800;
+                    if (width > height && width > MAX_SIZE) {
+                        height *= MAX_SIZE / width;
+                        width = MAX_SIZE;
+                    } else if (height > MAX_SIZE) {
+                        width *= MAX_SIZE / height;
+                        height = MAX_SIZE;
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx?.drawImage(img, 0, 0, width, height);
+
+                    let quality = 0.8;
+                    const reduceQuality = () => {
+                        canvas.toBlob((blob) => {
+                            if (!blob) {
+                                resolve(file);
+                                return;
+                            }
+                            if (blob.size > 200 * 1024 && quality > 0.1) {
+                                quality -= 0.1;
+                                reduceQuality();
+                            } else {
+                                const compressedFile = new File([blob], file.name, {
+                                    type: 'image/jpeg',
+                                    lastModified: Date.now(),
+                                });
+                                resolve(compressedFile);
+                            }
+                        }, 'image/jpeg', quality);
+                    };
+
+                    reduceQuality();
+                };
+                img.onerror = () => resolve(file);
+            };
+            reader.onerror = () => resolve(file);
+        });
+    };
+
+    const handleFilesAttached = async (files: FileList | File[]) => {
         const timeStr = getCurrentTimeStr()
+        const currentCompanyId = selectedCompanyId
         const newMessages: Message[] = []
         const newSharedFiles: FileData[] = []
 
-        Array.from(files).forEach((file, idx) => {
+        const processedFiles = await Promise.all(Array.from(files).map(f => compressImage(f as File)));
+
+        processedFiles.forEach((file, idx) => {
             const fileData: FileData = {
-                id: `f-$Date.now()}-$idx}`,
+                id: `f-${Date.now()}-${idx}`,
                 name: file.name,
-                size: formatBytes(file.size),
+                size: formatBytes(file.size), // Displays compressed size
                 type: getFileType(file.name),
-                date: `今日 $timeStr}`
+                date: `今日 ${timeStr}`
             }
             newSharedFiles.push(fileData)
             newMessages.push({
-                id: `msg-$Date.now()}-$idx}`,
+                id: `msg-${Date.now()}-${idx}`,
                 sender: 'me',
                 type: 'file',
                 file: fileData,
@@ -169,15 +228,15 @@ export default function B2BChatClient() {
         if (newMessages.length > 0) {
             setMessagesMap(prev => ({
                 ...prev,
-                [selectedCompanyId]: [...(prev[selectedCompanyId] || []), ...newMessages]
+                [currentCompanyId]: [...(prev[currentCompanyId] || []), ...newMessages]
             }))
 
             setFilesMap(prev => ({
                 ...prev,
-                [selectedCompanyId]: [...newSharedFiles, ...(prev[selectedCompanyId] || [])]
+                [currentCompanyId]: [...newSharedFiles, ...(prev[currentCompanyId] || [])]
             }))
 
-            updateCompanyStatus(selectedCompanyId, `$newMessages.length} 個のファイルを送信しました`, timeStr)
+            updateCompanyStatus(currentCompanyId, `${newMessages.length} 個のファイルを送信しました`, timeStr)
         }
     }
 

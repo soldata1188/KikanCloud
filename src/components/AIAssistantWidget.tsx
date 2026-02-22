@@ -45,7 +45,7 @@ export function AIAssistantWidget() {
         ])
     }
 
-    const handleSend = (e: React.FormEvent) => {
+    const handleSend = async (e: React.FormEvent) => {
         e.preventDefault()
         if (!inputValue.trim()) return
 
@@ -53,16 +53,46 @@ export function AIAssistantWidget() {
         setMessages(prev => [...prev, userMsg])
         setInputValue('')
 
-        // Simulate API typing effect
+        // Bật trạng thái AI đang gõ
         setIsTyping(true)
-        setTimeout(() => {
-            setIsTyping(false)
+
+        try {
+            // Định dạng lại lịch sử chat để gửi cho API (Loại bỏ câu chào mặc định ban đầu)
+            const chatHistory = [...messages, userMsg]
+                .filter(m => m.id !== 'welcome')
+                .map(m => ({
+                    role: m.role === 'ai' ? 'model' : 'user',
+                    parts: [{ text: m.content }]
+                }))
+
+            // Gọi API Backend (Internal Route)
+            const res = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ messages: chatHistory })
+            })
+
+            if (!res.ok) throw new Error('API Error')
+
+            const data = await res.json()
+
+            // Nhận kết quả và chèn tin nhắn của AI vào giao diện
             setMessages(prev => [...prev, {
                 id: Date.now().toString(),
                 role: 'ai',
-                content: 'Tôi đang trong quá trình thử nghiệm. Chức năng AI thực tế sẽ sớm được tích hợp qua API!'
+                content: data.reply || 'Xin lỗi, tôi không thể xử lý lời nhắn này.'
             }])
-        }, 1500)
+        } catch (error) {
+            console.error('Chat error:', error)
+            setMessages(prev => [...prev, {
+                id: Date.now().toString(),
+                role: 'ai',
+                content: 'Đã có lỗi nối kết đến máy chủ AI (Hoặc thiếu cấu hình GEMINI_API_KEY). Vui lòng cấu hình và thử lại!'
+            }])
+        } finally {
+            // Tắt hiệu ứng đánh máy
+            setIsTyping(false)
+        }
     }
 
     return (

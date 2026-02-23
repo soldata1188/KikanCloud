@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import NextTopLoader from 'nextjs-toploader';
 import { FilledInputBackground } from "@/components/FilledInputBackground";
 import { TestDataFiller } from "@/components/TestDataFiller";
 
@@ -15,6 +16,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     return (
         <html lang="ja">
             <body className={inter.className} suppressHydrationWarning>
+                <NextTopLoader color="#24b47e" initialPosition={0.08} crawlSpeed={200} height={3} crawl={true} showSpinner={false} easing="ease" speed={200} shadow="0 0 10px #24b47e,0 0 5px #24b47e" zIndex={1600} />
                 {children}
                 <FilledInputBackground />
                 <TestDataFiller />

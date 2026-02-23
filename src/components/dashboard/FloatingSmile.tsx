@@ -46,7 +46,7 @@ export default function FloatingSmile() {
                     <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-2.5 h-2.5 bg-white border-b border-r border-gray-300 rotate-45" />
                 </div>
             )}
-            <span className="text-[150px] text-yellow-400 shadow-none select-none leading-none">
+            <span className="text-[75px] text-yellow-400 shadow-none select-none leading-none">
                 🙂
             </span>
         </div>

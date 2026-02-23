@@ -11,7 +11,7 @@ export default function GlobalLoading() {
             </div>
             <div className="flex items-center gap-2 text-[#878787] font-medium text-[12px] uppercase tracking-widest">
                 <Loader2 size={16} className="animate-spin text-[#24b47e]" />
-                Loading Workspace...
+                ワークスペースを読み込み中...
             </div>
         </div>
     )

@@ -67,7 +67,7 @@ export function GlobalSearch() {
                                 <div className="space-y-4 p-2">
                                     {results.workers.length > 0 && (
                                         <div>
-                                            <div className="px-3 py-1.5 text-[10px] font-bold text-[#878787] uppercase tracking-widest flex items-center gap-1.5"><Users size={12} /> Thực tập sinh ({results.workers.length})</div>
+                                            <div className="px-3 py-1.5 text-[10px] font-bold text-[#878787] uppercase tracking-widest flex items-center gap-1.5"><Users size={12} /> 実習生 ({results.workers.length})</div>
                                             {results.workers.map(w => (
                                                 <Link key={w.id} href={`/workers/${w.id}`} onClick={() => setIsOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white hover: border border-gray-350 hover:border-[#ededed] group transition-all">
                                                     <div className="flex-1"><div className="text-[13px] font-bold text-[#1f1f1f] group-hover:text-[#24b47e] transition-colors">{w.full_name_romaji}</div><div className="text-[11px] text-[#878787] font-mono mt-0.5">{w.residence_card_number || 'N/A'}</div></div>
@@ -78,7 +78,7 @@ export function GlobalSearch() {
                                     )}
                                     {results.companies.length > 0 && (
                                         <div>
-                                            <div className="px-3 py-1.5 text-[10px] font-bold text-[#878787] uppercase tracking-widest flex items-center gap-1.5"><Building2 size={12} /> Xí nghiệp ({results.companies.length})</div>
+                                            <div className="px-3 py-1.5 text-[10px] font-bold text-[#878787] uppercase tracking-widest flex items-center gap-1.5"><Building2 size={12} /> 受入企業 ({results.companies.length})</div>
                                             {results.companies.map(c => (
                                                 <Link key={c.id} href={`/companies/${c.id}`} onClick={() => setIsOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white hover: border border-gray-350 hover:border-[#ededed] group transition-all">
                                                     <div className="flex-1"><div className="text-[13px] font-bold text-[#1f1f1f] group-hover:text-[#24b47e] transition-colors">{c.name_jp}</div></div>

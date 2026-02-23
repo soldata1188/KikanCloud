@@ -13,7 +13,7 @@ export const useSupabaseUpload = (bucketName: string): UseSupabaseUploadResult =
  const [error, setError] = useState<Error | null>(null);
  const [isUploading, setIsUploading] = useState<boolean>(false);
 
- // Khởi tạo Supabase client
+ // Initialize Supabase client
  const supabase = createClient();
 
  const uploadFile = async (file: File): Promise<string | null> => {

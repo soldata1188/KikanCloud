@@ -41,7 +41,7 @@ export default async function DashboardPage() {
             <div className="flex-1 flex flex-col relative min-w-0 bg-white">
                 <main className="flex-1 overflow-y-auto relative p-6 md:p-8">
                     <div className="max-w-7xl mx-auto space-y-10">
-                        {/* Mái chào hỏi thân thiện & Thời tiết */}
+                        {/* Friendly greeting banner & Weather */}
                         <GreetingBanner displayName={displayName} />
 
                         {/* Quick Access Menu - Basecamp Style */}
@@ -60,9 +60,9 @@ export default async function DashboardPage() {
                             </div>
                         </div>
 
-                        {/* Hàng 4: Chia 2 cột */}
+                        {/* Row 4: Two columns */}
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                            {/* Cột trái 2/3: Bảng Cảnh báo */}
+                            {/* Left column 2/3: Alert Table */}
                             <div className="lg:col-span-2 p-5 md:p-6 border-l-[6px] border-[#24b47e]">
                                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
                                     <h2 className="text-xl font-bold text-gray-900 tracking-tight">要対応アラート</h2>
@@ -112,7 +112,7 @@ export default async function DashboardPage() {
                                 </div>
                             </div>
 
-                            {/* Cột phải 1/3 */}
+                            {/* Right column 1/3 */}
                             <div className="lg:col-span-1 flex flex-col gap-6">
                                 {/* Recent Chats */}
                                 <div className="flex-1 min-h-[400px] h-full">
@@ -121,7 +121,7 @@ export default async function DashboardPage() {
                             </div>
                         </div>
 
-                        {/* Hàng 3: Removed Nationality Ratio per user request */}
+                        {/* Row 3: Removed Nationality Ratio per user request */}
                     </div>
                 </main>
             </div>

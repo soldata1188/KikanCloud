@@ -13,7 +13,7 @@ export async function createProcedure(formData: FormData) {
  const worker_id = formData.get('worker_id') as string || null
  let company_id = formData.get('company_id') as string || null
 
- // Auto-fill company_id nếu người dùng chỉ chọn worker
+ // Auto-fill company_id if the user only selects a worker.
  if (worker_id && !company_id) {
  const { data: worker } = await supabase.from('workers').select('company_id').eq('id', worker_id).single()
  if (worker?.company_id) company_id = worker.company_id;
@@ -76,7 +76,7 @@ export async function quickToggleProcedureStatus(procId: string) {
  if (!proc) return
 
  let newStatus = 'preparing'
- const todayStr = new Date(new Date().getTime() + (9 * 60 * 60 * 1000)).toISOString().split('T')[0] // Giờ JST
+ const todayStr = new Date(new Date().getTime() + (9 * 60 * 60 * 1000)).toISOString().split('T')[0] // JST time
  const updateData: any = {}
 
  if (proc.status === 'preparing' || proc.status === 'issue') {

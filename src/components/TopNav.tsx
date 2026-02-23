@@ -33,7 +33,7 @@ export function TopNav({ title, role }: { title: string, role?: string }) {
     }
 
     if (pathname !== '/' && pathname !== '/dashboard') {
-        return null; // Ẩn TopNav trên tất cả các trang ngoại trừ Home (/ hoặc /dashboard)
+        return null; // Hide TopNav on all pages except Home (/ or /dashboard)
     }
 
     return (

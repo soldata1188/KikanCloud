@@ -65,7 +65,7 @@ const defaultColumns: ColumnData[] = [
             { id: "3-2", title: "特定技能 1号", duration: "最大5年間", desc: "同一分野内であれば、自由に会社を転籍(転職)することが可能。在留期間は「4ヶ月、6ヶ月、1年」ごとの更新。この段階では家族の帯同は原則不可。", type: "highlight", hasArrowAfter: true },
             { id: "3-3", title: "【試験】特定技能 2号評価試験", duration: "1号修了前", desc: "特定技能2号へ移行するための超難関試験。「特定技能2号評価試験（高度な専門知識・実技）」を受験。分野によっては実務経験（班長・管理者経験等）の証明も必要。", type: "warning", hasArrowAfter: true },
             { id: "3-4", title: "特定技能 2号へ移行", duration: "5年経過後等", desc: "在留期間の上限が撤廃（「6ヶ月、1年、3年」ごとの更新）。配偶者や子などの【家族の帯同】が認められる。", type: "target", hasArrowAfter: true },
-            { id: "3-5", title: "永住権 (Vĩnh trú) の申請", duration: "通算10年以上", desc: "原則として日本に10年以上在留し、うち5年以上を就労資格（特定技能等）で過ごした場合、日本の永住権申請の要件を満たす。", type: "target", hasArrowAfter: false }
+            { id: "3-5", title: "永住権の申請", duration: "通算10年以上", desc: "原則として日本に10年以上在留し、うち5年以上を就労資格（特定技能等）で過ごした場合、日本の永住権申請の要件を満たす。", type: "target", hasArrowAfter: false }
         ]
     }
 ];
@@ -267,7 +267,8 @@ export default function RoadmapClient() {
         setColumns(newCols);
     };
 
-    if (!mounted) return null; // Avoid hydration mismatch
+    // Avoid hydration mismatch
+    if (!mounted) return null; 
 
     const getIcon = (idx: number) => {
         if (idx === 0) return <GraduationCap size={20} />;

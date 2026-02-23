@@ -9,7 +9,7 @@ export default async function PortalDashboard() {
 
     const { data: userProfile } = await supabase.from('users').select('company_id, companies(name_jp)').eq('id', user?.id).single()
 
-    // Truy vấn dữ liệu CHỈ THUỘC VỀ XÍ NGHIỆP NÀY (Bảo vệ 2 lớp: RLS + Query)
+    // Query data BELONGING ONLY TO THIS COMPANY (2-layer protection: RLS + Query)
     const [workersRes, auditsRes, workersListRes] = await Promise.all([
         supabase.from('workers').select('id', { count: 'exact', head: true }).eq('company_id', userProfile?.company_id),
         supabase.from('audits').select('scheduled_date, status').eq('company_id', userProfile?.company_id).eq('status', 'Pending').order('scheduled_date', { ascending: true }).limit(1),
@@ -22,12 +22,12 @@ export default async function PortalDashboard() {
 
     return (
         <div className="max-w-[1000px] mx-auto space-y-8 animate-in fade-in duration-700">
-            {/* LỜI CHÀO SANG TRỌNG (TRUST BLUE) */}
+            {/* ELEGANT GREETING (TRUST BLUE) */}
             <section className="bg-white border border-[#ededed] rounded-[24px] p-8 md:p-10 shadow-sm relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-[#1a73e8]/5 to-transparent rounded-bl-full pointer-events-none"></div>
                 <div className="relative z-10">
                     <h1 className="text-2xl md:text-[28px] font-black text-[#1f1f1f] leading-tight tracking-tight mb-2">
-                        いつもお世話になっております、<span className="text-[#1a73e8]">{(userProfile as any)?.companies?.name_jp || '企業'}</span>様。
+                        いつもお世話になっております、<span className="text-[#1a73e8]">{(userProfile as any)?.companies?.name_jp || '受入企業'}</span>様。
                     </h1>
                     <p className="text-[14px] text-[#666666] font-medium mb-6">
                         本ポータルでは、貴社に配属された実習生の状況や、次回の監査予定、必要書類のダウンロードが可能です。
@@ -35,7 +35,7 @@ export default async function PortalDashboard() {
                 </div>
             </section>
 
-            {/* CHỈ SỐ CƠ BẢN */}
+            {/* KEY METRICS */}
             <section className="grid grid-cols-2 gap-4">
                 <div className="bg-white border border-[#ededed] rounded-xl p-6 flex items-center justify-between shadow-sm hover:border-[#878787] transition-colors">
                     <div>
@@ -54,7 +54,7 @@ export default async function PortalDashboard() {
                 </div>
             </section>
 
-            {/* THẺ LEFT-BORDER ACCENT VÀ DANH SÁCH */}
+            {/* LEFT-BORDER ACCENT CARD AND LIST */}
             <section className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-1 space-y-6">
                     <div>
@@ -63,7 +63,7 @@ export default async function PortalDashboard() {
                             <div className="relative pl-5 py-0.5 z-10">
                                 <div className={`absolute left-0 top-0 bottom-0 w-[3px] rounded-full ${nextAudit ? 'bg-[#d93025]' : 'bg-[#1e8e3e]'}`}></div>
                                 <span className={`text-[12px] font-bold uppercase tracking-wide block mb-2 flex items-center gap-1.5 ${nextAudit ? 'text-[#d93025]' : 'text-[#1e8e3e]'}`}>
-                                    {nextAudit ? <AlertTriangle size={14} /> : <CalendarClock size={14} />} {nextAudit ? 'ACTION REQUIRED' : 'NO PENDING AUDITS'}
+                                    {nextAudit ? 'ACTION REQUIRED' : 'NO PENDING AUDITS'}
                                 </span>
                                 <p className="text-[14px] text-[#444746] leading-relaxed">
                                     {nextAudit ? (

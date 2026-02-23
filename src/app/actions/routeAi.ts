@@ -34,6 +34,7 @@ export async function optimizeRouteWithAI(locations: any[], startTime: string = 
  }
  ]
  }
+CRITICAL INSTRUCTION: You MUST output your responses EXCLUSIVELY in professional Japanese (Keigo). Under NO circumstances should you use or output Vietnamese.
 `;
 
  const response = await ai.models.generateContent({

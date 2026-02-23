@@ -83,7 +83,7 @@ export function TestDataFiller() {
     return (
         <button
             onClick={fillData}
-            title="Dữ liệu ảo (Test)"
+            title="テスト用データ (Test)"
             className="fixed bottom-6 right-6 z-[9999] bg-[#24b47e] hover:bg-[#1e9a6a] text-white rounded-full p-4 shadow-xl shadow-[#24b47e]/30 transition-all flex items-center justify-center group border border-white/20 cursor-pointer"
         >
             <Beaker size={22} className="relative z-10" />

@@ -29,6 +29,7 @@ export async function extractDocumentAI(base64Image: string, mimeType: string) {
  }
 
  Translate the nationality to Japanese (e.g., VIET NAM -> ベトナム, INDONESIA -> インドネシア, CHINA -> 中国, PHILIPPINES -> フィリピン, NEPAL -> ネパール, CAMBODIA -> カンボジア).
+ CRITICAL INSTRUCTION: You MUST output your responses EXCLUSIVELY in professional Japanese (Keigo). Under NO circumstances should you use or output Vietnamese.
 `;
 
  const response = await ai.models.generateContent({
@@ -49,13 +50,13 @@ export async function extractDocumentAI(base64Image: string, mimeType: string) {
  });
 
  const resultText = response.text;
- if (!resultText) throw new Error('AIがデータを抽出できませんでした。画像が不鮮明な可能性があります。');
+ if (!resultText) throw new Error('AIがデータを抽出できませんでした。画像が不鮮明である可能性がございます。');
 
  const cleanJson = resultText.replace(/```json/g, '').replace(/```/g, '').trim();
  return { success: true, data: JSON.parse(cleanJson) };
 
  } catch (error: any) {
  console.error('Gemini Vision Error:', error);
- return { success: false, error: error.message || '画像のデータ抽出に失敗しました。もう一度お試しください。' };
+ return { success: false, error: error.message || '画像のデータ抽出に失敗いたしました。恐れ入りますが、再度お試しください。' };
  }
 }

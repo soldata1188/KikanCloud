@@ -11,12 +11,12 @@ export default async function PortalLayout({ children }: { children: React.React
 
     const { data: userProfile } = await supabase.from('users').select('role, full_name, company_id, companies(name_jp)').eq('id', user.id).single()
 
-    // Chặn nhân viên nghiệp đoàn vào portal (Họ dùng dashboard chính)
+    // Block union staff from accessing the portal (They use the main dashboard)
     if (userProfile?.role === 'admin' || userProfile?.role === 'staff') redirect('/')
 
     return (
         <div className="flex h-screen bg-[#fbfcfd] font-sans text-[#1f1f1f] overflow-hidden selection:bg-[#1a73e8]/20">
-            {/* SIDEBAR TỐI GIẢN CHO KHÁCH HÀNG (Trust Blue Accent) */}
+            {/* MINIMALIST SIDEBAR FOR CLIENTS (Trust Blue Accent) */}
             <aside className="w-[68px] md:w-[240px] bg-white border-r border-[#ededed] flex flex-col h-full shrink-0 z-20">
                 <div className="h-14 flex items-center justify-center md:justify-start md:px-6 border-b border-[#ededed]">
                     <div className="w-6 h-6 bg-[#1a73e8] rounded flex items-center justify-center text-white"><Hexagon size={14} /></div>

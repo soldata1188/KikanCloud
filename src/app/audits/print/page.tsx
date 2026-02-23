@@ -118,20 +118,20 @@ export default async function AuditPrintPage({ searchParams }: { searchParams: P
  <style dangerouslySetInnerHTML={{
  __html:`
  @media print {
- @page { size: A4 portrait; margin: 10mm 15mm; /* Lề in chuẩn */
+ @page { size: A4 portrait; margin: 10mm 15mm; /* Standard print margins */
  }
  body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background-color: white !important; color: black !important;
  }
  .no-print { display: none !important; }
- /* Chống gãy hàng bảng biểu giữa 2 trang in */
+ /* Prevent table rows from breaking across print pages */
  .print-row {
  page-break-inside: avoid;
  }
- /* Border rõ nét khi in A4 */
+ /* Clear borders for A4 print */
  table { border-collapse: collapse; width: 100%; border: 2px solid #000; }
  th { background-color: #f3f4f6 !important; border: 1px solid #000 !important; border-top: 2px solid #000 !important; border-bottom: 2px solid #000 !important; }
  td { border: 1px solid #444 !important; }
- /* Phủ định css Tailwind conflict với print */
+ /* Override Tailwind CSS conflicts with print styles */
  .print-container { max-width: 100% !important; padding: 0 !important; }
  }
 `}} />

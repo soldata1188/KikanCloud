@@ -14,7 +14,7 @@ export function useSupabaseChat(companyId: string | null) {
         });
     }, [supabase.auth]);
 
-    // Load tin nhắn ban đầu khi chọn 1 công ty
+    // Load initial messages when a company is selected.
     useEffect(() => {
         if (!companyId) {
             setMessages([]);
@@ -26,7 +26,7 @@ export function useSupabaseChat(companyId: string | null) {
                 .from('messages')
                 .select('*')
                 .eq('company_id', companyId)
-                .order('created_at', { ascending: true }); // Cổ nhất xếp trên cùng để scroll xuống dưới cùng thấy tin mới nhất
+                .order('created_at', { ascending: true }); // Oldest messages at the top to allow scrolling to the newest messages at the bottom.
 
             if (!error && data) {
                 setMessages(data);
@@ -36,7 +36,7 @@ export function useSupabaseChat(companyId: string | null) {
         fetchInitialMessages();
     }, [companyId]);
 
-    // Thiết lập Realtime Channel để chớp lấy tin nhắn mới thêm vào
+    // Set up Realtime Channel to capture newly added messages.
     useEffect(() => {
         if (!companyId) return;
 
@@ -53,13 +53,13 @@ export function useSupabaseChat(companyId: string | null) {
                     filter: `company_id=eq.${companyId}`
                 },
                 (payload) => {
-                    // Bắt được payload tin nhắn mới, nhúng vào list hiện tại
+                    // Upon receiving a new message payload, append it to the current list.
                     setMessages((prev) => [...prev, payload.new]);
                 }
             )
             .subscribe();
 
-        // Cleanup: hủy đăng ký channel khi component unmount hoặc companyId đổi
+        // Cleanup: unsubscribe from the channel when the component unmounts or companyId changes.
         return () => {
             if (channel) {
                 supabase.removeChannel(channel);
@@ -67,12 +67,12 @@ export function useSupabaseChat(companyId: string | null) {
         };
     }, [companyId]);
 
-    // Hàm helper để Send Message
+    // Helper function to send a message.
     const sendMessage = async (payload: { company_id: string, content: string, sender_name: string, sender_role: string, file_data?: any }) => {
-        if (!payload.content && !payload.file_data) return { error: new Error("Empty message") };
+        if (!payload.content && !payload.file_data) return { error: new Error("メッセージが空でございます") };
 
         const { data: userData } = await supabase.auth.getUser();
-        if (!userData.user) return { error: new Error("Unauthorized") };
+        if (!userData.user) return { error: new Error("認証されておりません") };
 
         const { data: userProfile } = await supabase.from('users').select('tenant_id').eq('id', userData.user.id).single();
 
@@ -83,7 +83,7 @@ export function useSupabaseChat(companyId: string | null) {
             sender_name: payload.sender_name,
             sender_role: payload.sender_role,
             content: payload.content,
-            // (Nếu db messages của ta có cột file_data/file_url thì ta gắn vào đây)
+            // (If our messages database has a file_data/file_url column, we would attach it here)
             // file_url: payload.file_data?.url || null
         };
 

@@ -40,17 +40,17 @@ const initialWorkerData: WorkerData = {
 };
 
 const DOC_TYPES = [
-    { id: 'avatar', label: '顔写真 (Ảnh thẻ)', ai: false },
-    { id: 'zairyu_card', label: '在留カード (Thẻ ngoại kiều)', ai: true },
-    { id: 'passport', label: 'パスポート (Hộ chiếu)', ai: true },
-    { id: 'resume', label: '履歴書 (CV)', ai: false },
-    { id: 'cert_notice', label: '認定通知 (Giấy chứng nhận)', ai: false },
-    { id: 'insurance', label: '総合保険 (Bảo hiểm)', ai: false },
-    { id: 'my_number', label: '個人番号 (My Number)', ai: false },
-    { id: 'pension', label: '年金番号 (Số Nenkin)', ai: false },
-    { id: 'bank', label: '銀行口座 (Tài khoản NH)', ai: false },
-    { id: 'health_check', label: '健康診断 (Khám KQ)', ai: false },
-    { id: 'skill_test', label: '検定合格 (Đỗ kỳ thi)', ai: false },
+    { id: 'avatar', label: '顔写真', ai: false },
+    { id: 'zairyu_card', label: '在留カード', ai: true },
+    { id: 'passport', label: 'パスポート', ai: true },
+    { id: 'resume', label: '履歴書', ai: false },
+    { id: 'cert_notice', label: '認定通知', ai: false },
+    { id: 'insurance', label: '総合保険', ai: false },
+    { id: 'my_number', label: '個人番号', ai: false },
+    { id: 'pension', label: '年金番号', ai: false },
+    { id: 'bank', label: '銀行口座', ai: false },
+    { id: 'health_check', label: '健康診断', ai: false },
+    { id: 'skill_test', label: '検定合格', ai: false },
     { id: 'ccus', label: 'CCUSカード', ai: false }
 ];
 
@@ -210,7 +210,7 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
             };
         } catch (e: any) {
             console.error(e);
-            alert(`AIスキャンに失敗しました: ${e.message}`);
+            alert(`AIスキャンに失敗いたしました: ${e.message}`);
         } finally {
             setIsScanning(null);
         }
@@ -240,12 +240,12 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
             if (result.success) {
                 window.location.href = `/workers/${result.workerId}`;
             } else {
-                throw new Error(result.error || "保存システムエラーが発生しました");
+                throw new Error(result.error || "保存システムエラーが発生いたしました。");
             }
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
             console.error(error);
-            setToastError(`保存に失敗しました: ${error.message}`);
+            setToastError(`保存に失敗いたしました: ${error.message}`);
             setTimeout(() => setToastError(null), 5000); // clear after 5s
         } finally {
             setIsSubmitting(false);
@@ -278,7 +278,7 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
                         <ArrowLeft size={24} strokeWidth={1.5} />
                     </Link>
                     <h2 className="text-[24px] font-medium tracking-tight text-[#1f1f1f] flex items-center gap-2">
-                        外国人材 新規追加
+                        外国人材新規追加
                         <span className="text-xs bg-[#24b47e]/10 text-[#24b47e] px-2 py-1 rounded-none border border-[#24b47e]/20 flex items-center gap-1 font-bold">
                             <Sparkles size={12} /> AI Workspace
                         </span>
@@ -321,14 +321,14 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
                                 </FormRow>
                                 <FormRow label="性別">
                                     <select name="gender" value={formData.gender} onChange={handleInputChange} className={getInputClass("gender") + " appearance-none"}>
-                                        <option value="">選択 (性別)</option>
+                                        <option value="">選択してください</option>
                                         <option value="male">男性</option>
                                         <option value="female">女性</option>
                                     </select>
                                 </FormRow>
                                 <FormRow label="血液型">
                                     <select name="blood_type" value={formData.blood_type} onChange={handleInputChange} className={getInputClass("blood_type") + " appearance-none"}>
-                                        <option value="">選択 (血液型)</option>
+                                        <option value="">選択してください</option>
                                         <option value="A">A</option><option value="B">B</option><option value="O">O</option><option value="AB">AB</option>
                                     </select>
                                 </FormRow>
@@ -369,7 +369,7 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
                                 </FormRow>
                                 <FormRow label="ステータス">
                                     <select name="status" value={formData.status} onChange={handleInputChange} className={getInputClass("status") + " appearance-none"}>
-                                        <option value="waiting">入国待</option>
+                                        <option value="waiting">入国待ち</option>
                                         <option value="standby">対応中</option>
                                         <option value="working">就業中</option>
                                         <option value="missing">失踪</option>
@@ -430,7 +430,7 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
                             </div>
                             <div className="flex flex-col">
                                 <FormRow label="備考" isLast>
-                                    <textarea name="remarks" value={formData.remarks} onChange={handleInputChange} rows={5} placeholder="実習生に関する特記事項やメモを自由に入力してください..." className="w-full bg-transparent focus:bg-gray-50/80 border-none rounded-none px-3 py-2 text-sm outline-none text-[#1f1f1f] transition-all duration-300 shadow-none ring-0 focus:ring-0 resize-y min-h-[100px]" />
+                                    <textarea name="remarks" value={formData.remarks} onChange={handleInputChange} rows={5} placeholder="実習生に関する特記事項やメモを自由にご入力ください。" className="w-full bg-transparent focus:bg-gray-50/80 border-none rounded-none px-3 py-2 text-sm outline-none text-[#1f1f1f] transition-all duration-300 shadow-none ring-0 focus:ring-0 resize-y min-h-[100px]" />
                                 </FormRow>
                             </div>
                         </div>
@@ -486,10 +486,10 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
                                         onChange={e => setStagedTargetDoc(e.target.value)}
                                         className="w-full bg-gray-50 border border-gray-300 focus:border-[#24b47e] focus:bg-white focus:ring-1 focus:ring-[#24b47e] focus:outline-none rounded-none pl-2.5 pr-8 py-2 text-xs mb-3 font-medium transition-colors cursor-pointer appearance-none"
                                     >
-                                        <option value="">-- 書類の種類を選択 --</option>
+                                        <option value="">-- 書類の種類を選択してください --</option>
                                         {allDocTypes.map(doc => (
                                             <option key={doc.id} value={doc.id}>
-                                                {doc.label} {files[doc.id] && files[doc.id].length > 0 ? `(${files[doc.id].length}件 追加済み)` : ''}
+                                                {doc.label} {files[doc.id] && files[doc.id].length > 0 ? `(${files[doc.id].length}件追加済み)` : ''}
                                             </option>
                                         ))}
                                         <option value="new_custom" className="font-bold text-[#24b47e]">➕ 新規カテゴリーを追加</option>
@@ -498,7 +498,7 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
                                     {stagedTargetDoc === 'new_custom' && (
                                         <input
                                             type="text"
-                                            placeholder="カテゴリー名を入力..."
+                                            placeholder="カテゴリー名をご入力ください..."
                                             value={newCustomCategory}
                                             onChange={e => setNewCustomCategory(e.target.value)}
                                             className="w-full bg-white border border-gray-300 focus:border-[#24b47e] focus:ring-1 focus:ring-[#24b47e] focus:outline-none rounded-none pl-2.5 pr-2 py-2 text-xs mb-3 font-medium transition-colors"
@@ -532,7 +532,7 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
                                 {Object.keys(files).length === 0 && !isScanning && (
                                     <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
                                         <FileText size={24} className="text-gray-300 mb-2" />
-                                        <span className="text-[11px] text-gray-400 font-medium italic">空のストレージです。<br />ここにファイルを分類してください。</span>
+                                        <span className="text-[11px] text-gray-400 font-medium italic">ストレージは空です。<br />ここにファイルを分類してください。</span>
                                     </div>
                                 )}
 

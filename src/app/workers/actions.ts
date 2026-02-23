@@ -51,7 +51,7 @@ export async function createWorker(formData: FormData) {
 
     await supabase.from('workers').insert(newWorker)
 
-    // RPA: Auto-Schedule routine audits for the new worker
+    // RPA: Automatically schedule routine audits for the new worker
     await autoScheduleAuditsForWorkers([newWorker as Partial<Worker>])
 
     revalidatePath('/workers')
@@ -131,10 +131,10 @@ export async function importWorkers(workersData: ImportWorkerPayload[]) {
     if (userData?.role !== 'admin') throw new Error('管理者権限が必要です。(Admin only)')
     if (!userData?.tenant_id) throw new Error('Tenant ID not found')
 
-    // 1. 全受入企業を取得し、企業名からIDを自動マッピング
+    // 1. Retrieve all host companies and automatically map company names to IDs
     const { data: companies } = await supabase.from('companies').select('id, name_jp').eq('is_deleted', false)
 
-    // データ処理用ヘルパー関数
+    // Helper function for data processing
     const parseDate = (dateStr?: string | null) => {
         if (!dateStr || String(dateStr).trim() === '') return null;
         const cleanStr = String(dateStr).replace(/\//g, '-');
@@ -154,7 +154,7 @@ export async function importWorkers(workersData: ImportWorkerPayload[]) {
         if (t.includes('待機') || t.includes('入国待')) return 'waiting'
         if (t.includes('失踪')) return 'missing'
         if (t.includes('帰国')) return 'returned'
-        return 'working' // Default là Đang làm việc
+        return 'working' // Default is Working
     }
 
     const mapNationality = (text?: string | null) => {
@@ -165,9 +165,9 @@ export async function importWorkers(workersData: ImportWorkerPayload[]) {
         return t.trim() || 'ベトナム'
     }
 
-    // 2. データの正規化と型変換
+    // 2. Normalize data and convert types
     const payload = workersData.map(w => {
-        // Excelに企業名が入力されている場合、Company IDを検索
+        // If a company name is entered in Excel, search for the Company ID
         let cId = null;
         if (w.company_name) {
             const found = companies?.find(c => c.name_jp === String(w.company_name).trim())
@@ -178,7 +178,7 @@ export async function importWorkers(workersData: ImportWorkerPayload[]) {
             tenant_id: userData?.tenant_id,
             full_name_romaji: w.full_name_romaji ? String(w.full_name_romaji).toUpperCase().trim() : 'UNKNOWN',
             full_name_kana: w.full_name_kana ? String(w.full_name_kana).trim() : '-',
-            dob: parseDate(w.dob) || '2000-01-01', // 生年月日は必須
+            dob: parseDate(w.dob) || '2000-01-01', // Date of birth is mandatory
             company_id: cId,
             system_type: mapSystemType(w.system_type),
             status: mapStatus(w.status),
@@ -195,14 +195,14 @@ export async function importWorkers(workersData: ImportWorkerPayload[]) {
         }
     })
 
-    // 3. バルクインサート (配列を一度にDBへ保存)
+    // 3. Bulk insert (save array to DB at once)
     const { error } = await supabase.from('workers').insert(payload)
     if (error) {
         console.error('Worker Import Error:', error)
         throw new Error('インポートに失敗しました。日付の形式（YYYY/MM/DD）等を確認してください。')
     }
 
-    // RPA: Auto-Schedule routine audits for the inserted workers
+    // RPA: Automatically schedule routine audits for the inserted workers
     await autoScheduleAuditsForWorkers(payload as Partial<Worker>[])
 
     revalidatePath('/workers')

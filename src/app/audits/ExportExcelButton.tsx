@@ -35,7 +35,7 @@ export function ExportExcelButton({ data, month }: { data: any[], month: string 
  }
  });
 
- // 2. Khởi tạo Worksheet
+ // 2. Initialize Worksheet
  const ws = XLSX.utils.json_to_sheet(exportData);
 
  // 3. 各列の幅を自動調整 (開いた際の見栄えを良くするため)
@@ -50,7 +50,7 @@ export function ExportExcelButton({ data, month }: { data: any[], month: string 
  { wch: 50 }, // メモ
  ];
 
- // 4. Khởi tạo Workbook và Gắn Sheet vào
+ // 4. Initialize Workbook and append Sheet
  const wb = XLSX.utils.book_new();
  XLSX.utils.book_append_sheet(wb, ws,`${month.replace('-', '年')}月 訪問スケジュール`);
 

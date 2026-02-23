@@ -75,7 +75,7 @@ export async function quickToggleAuditStatus(auditId: string) {
  if (audit.status === 'planned' || audit.status === 'in_progress') {
  newStatus = 'completed' // 直接完了へ変更
  const d = new Date()
- actualDate = new Date(d.getTime() + (9 * 60 * 60 * 1000)).toISOString().split('T')[0] // Giờ JST
+ actualDate = new Date(d.getTime() + (9 * 60 * 60 * 1000)).toISOString().split('T')[0] // JST time
  } else {
  return // 完了済みの場合は何もしない
  }

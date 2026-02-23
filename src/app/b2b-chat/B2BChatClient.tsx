@@ -219,7 +219,7 @@ export default function B2BChatClient() {
         uploadFile,
     } = useSupabaseUpload("b2b_chat_files");
 
-    // Hook Realtime
+    // Realtime Hook
     const { messages: realtimeMessages, sendMessage, currentUserId } = useSupabaseChat(selectedCompanyId);
 
     // Derived values
@@ -229,7 +229,7 @@ export default function B2BChatClient() {
         c.name.toLowerCase().includes(searchQuery.toLowerCase()),
     );
 
-    // Map db messages
+    // Map database messages
     const mappedRealtimeMessages: Message[] = realtimeMessages.map((msg: any) => ({
         id: msg.id,
         sender: msg.sender_id === currentUserId ? "me" : "them",
@@ -238,7 +238,7 @@ export default function B2BChatClient() {
         time: msg.created_at ? new Date(msg.created_at).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' }) : "送信中",
     }));
 
-    // Combine with local file messages (since files aren't in DB yet)
+    // Combine with local file messages (since files are not yet in the database)
     const currentMessages = [...mappedRealtimeMessages, ...(localFilesMessages[selectedCompanyId] || [])].sort((a, b) => {
         // Simple sort logic to keep them roughly ordered, could be improved
         return a.time.localeCompare(b.time);
@@ -246,7 +246,7 @@ export default function B2BChatClient() {
 
     const currentFiles = filesMap[selectedCompanyId] || [];
 
-    // Read messages when company selected
+    // Read messages when a company is selected
     useEffect(() => {
         setCompanies((prev) =>
             prev.map((c) => (c.id === selectedCompanyId ? { ...c, unread: 0 } : c)),
@@ -376,7 +376,7 @@ export default function B2BChatClient() {
             try {
                 fileUrl = (await uploadFile(file)) || "";
             } catch (err) {
-                console.error("Lỗi khi tải file:", err);
+                console.error("Error uploading file:", err);
             }
 
             const fileData: FileData = {
@@ -652,7 +652,7 @@ export default function B2BChatClient() {
                                             </div>
                                         ) : (
                                             <div className="flex items-center gap-2">
-                                                <FileIcon type={msg.file.type} />
+                                                <FileIcon type={msg.file.type} className="" />
                                                 <div className="flex flex-col">
                                                     <a
                                                         href={msg.file.url || "#"}

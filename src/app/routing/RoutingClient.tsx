@@ -4,7 +4,7 @@ import { APIProvider, Map, AdvancedMarker, useMap, useMapsLibrary, InfoWindow } 
 import { Sparkles, MapPin, Building2, User, Loader2, Navigation, Clock, CheckCircle2, Coffee, CheckSquare, Square, Trash2 } from 'lucide-react'
 import { optimizeRouteWithAI } from '../actions/routeAi'
 
-// Component vẽ đường đi (Directions)
+// Directions Renderer Component
 function DirectionsRendererComponent({ itinerary, locations }: { itinerary: any[], locations: any[] }) {
  const map = useMap();
  const routesLibrary = useMapsLibrary('routes');
@@ -22,19 +22,19 @@ function DirectionsRendererComponent({ itinerary, locations }: { itinerary: any[
  useEffect(() => {
  if (!directionsService || !directionsRenderer || itinerary.length < 2) return;
 
- // Lọc ra các điểm dừng hợp lệ có trong locations (Bỏ qua điểm nghỉ trưa nếu ID không map)
+ // Filter valid stops present in locations (Ignore lunch breaks if ID does not map)
  const sortedLocs = itinerary.map(item => locations.find(l => l.id === item.id)).filter(Boolean);
  if (sortedLocs.length < 2) return;
 
  const origin = { lat: sortedLocs[0].latitude, lng: sortedLocs[0].longitude };
  const destination = { lat: sortedLocs[sortedLocs.length - 1].latitude, lng: sortedLocs[sortedLocs.length - 1].longitude };
 
- // Các điểm ở giữa
+ // Intermediate waypoints
  const waypoints = sortedLocs.slice(1, -1).map(loc => ({ location: { lat: loc.latitude, lng: loc.longitude }, stopover: true }));
 
- // Tùy chọn vẽ route có kẹt xe (yêu cầu departureTime là lúc này hoặc tương lai)
+ // Options for drawing routes with traffic (requires departureTime to be now or in the future)
  const drivingOptions = {
- departureTime: new Date(Date.now() + 1000 * 60 * 5), // 5p sau
+ departureTime: new Date(Date.now() + 1000 * 60 * 5), // 5 minutes later
  trafficModel: google.maps.TrafficModel.BEST_GUESS
  };
 
@@ -47,7 +47,7 @@ function DirectionsRendererComponent({ itinerary, locations }: { itinerary: any[
 }
 
 export default function RoutingClient({ initialLocations, googleMapsKey }: { initialLocations: any[], googleMapsKey: string }) {
- const [selectedIds, setSelectedIds] = useState<string[]>(initialLocations.map(l => l.id)); // Default chọn tất
+ const [selectedIds, setSelectedIds] = useState<string[]>(initialLocations.map(l => l.id)); // Default: select all
  const [aiData, setAiData] = useState<any>(null);
  const [isPending, startTransition] = useTransition();
  // Info window state
@@ -55,13 +55,13 @@ export default function RoutingClient({ initialLocations, googleMapsKey }: { ini
 
  const handleOptimize = () => {
  const locsToVisit = initialLocations.filter(l => selectedIds.includes(l.id));
- if (locsToVisit.length < 2) return alert('ルートを作成するには、少なくとも2つの場所を選択してください。(Select at least 2 locations)');
+ if (locsToVisit.length < 2) return alert('ルートを作成するには、少なくとも2つの場所を選択してください。');
 
  startTransition(async () => {
  const res = await optimizeRouteWithAI(locsToVisit);
  if (res.success && res.data) {
  setAiData(res.data);
- setActiveMarkerId(null); // Đóng Info window khi vẽ route
+ setActiveMarkerId(null); // Close Info window when drawing route
  }
  else alert('AI Error: ' + res.error);
  });
@@ -93,15 +93,15 @@ export default function RoutingClient({ initialLocations, googleMapsKey }: { ini
  )
  }
 
- // Tọa độ trung tâm (Sakai, Osaka)
+ // Center coordinates (Sakai, Osaka)
  const center = initialLocations[0] ? { lat: initialLocations[0].latitude, lng: initialLocations[0].longitude } : { lat: 34.5733, lng: 135.4814 };
 
  return (
  <div className="flex flex-col md:flex-row h-[calc(100vh-56px)] w-full overflow-hidden">
- {/* KHỐI TRÁI: AI ROUTE PLANNER */}
+ {/* LEFT BLOCK: AI ROUTE PLANNER */}
  <div className="w-full md:w-[400px] bg-white border-r border-[#ededed] flex flex-col h-[50vh] md:h-full 4px_0_24px_rgba(0,0,0,0.02)] z-10 shrink-0">
  <div className="p-6 border-b border-[#ededed] bg-[#fbfcfd] shrink-0">
- <h2 className="text-[18px] font-black text-[#1f1f1f] flex items-center gap-2 tracking-tight mb-2"><Sparkles size={18} className="text-[#24b47e]"/> 巡回ルート最適化 (Route Planner)</h2>
+ <h2 className="text-[18px] font-black text-[#1f1f1f] flex items-center gap-2 tracking-tight mb-2"><Sparkles size={18} className="text-[#24b47e]"/> 巡回ルート最適化</h2>
  <p className="text-[12px] text-[#878787]">AIが訪問先を分析し、最も効率的な監査ルートとスケジュールを自動生成します。</p>
  </div>
 
@@ -133,7 +133,7 @@ export default function RoutingClient({ initialLocations, googleMapsKey }: { ini
  </div>
 
  <button onClick={handleOptimize} disabled={isPending || selectedIds.length < 2} className="w-full flex justify-center items-center gap-2 py-3 bg-[#1f1f1f] hover:bg-[#333] disabled:opacity-50 text-white rounded-md text-[13px] font-bold transition-all shrink-0">
- {isPending ? <Loader2 size={16} className="animate-spin"/> : <Navigation size={16} />} {isPending ? 'AIが計算中...' : '最適化スタート (Optimize Route)'}
+ {isPending ? <Loader2 size={16} className="animate-spin"/> : <Navigation size={16} />} {isPending ? 'AIが計算中...' : '最適化スタート'}
  </button>
  </div>
  ) : (
@@ -166,7 +166,7 @@ export default function RoutingClient({ initialLocations, googleMapsKey }: { ini
 
  <div className="mt-8 pt-4 border-t border-[#ededed]">
  <button onClick={() => setAiData(null)} className="w-full text-center text-[12px] font-bold text-red-500 hover:text-red-700 hover:bg-red-50 py-2 rounded-lg transition-colors flex items-center justify-center gap-2">
- <Trash2 size={14} /> AI結果をリセット (Reset Info)
+ <Trash2 size={14} /> AI結果をリセット
  </button>
  </div>
  </div>
@@ -174,14 +174,14 @@ export default function RoutingClient({ initialLocations, googleMapsKey }: { ini
  </div>
  </div>
 
- {/* KHỐI PHẢI: GOOGLE MAPS & POLYLINE */}
+ {/* RIGHT BLOCK: GOOGLE MAPS & POLYLINE */}
  <div className="flex-1 h-[50vh] md:h-full relative bg-[#e5e3df]">
  <APIProvider apiKey={googleMapsKey}>
  <Map mapId="KIKANCLOUD_MAP"defaultCenter={center} defaultZoom={12} gestureHandling={'greedy'} disableDefaultUI={true} className="w-full h-full">
 
- {/* Vẽ các Pin lên bản đồ */}
+ {/* Draw Pins on the map */}
  {initialLocations.filter(l => selectedIds.includes(l.id)).map((loc, index) => {
- // Lấy số thứ tự hiển thị từ AI nếu có (bỏ qua break)
+ // Get display order from AI if available (skip breaks)
  const itinIndex = aiData ? aiData.itinerary.filter((i: any) => i.type !== 'break').findIndex((i: any) => i.id === loc.id) : index;
  const badgeNum = itinIndex !== -1 ? itinIndex + 1 : index + 1;
  const isCompany = loc.type === 'company' || loc.type === 'office';
@@ -211,14 +211,14 @@ export default function RoutingClient({ initialLocations, googleMapsKey }: { ini
  </div>
  <p className="text-[11px] text-[#666666] mb-3 leading-relaxed">{loc.address}</p>
  <button onClick={() => removeLocation(loc.id)} className="w-full py-1.5 text-[11px] font-bold text-red-500 bg-red-50 hover:bg-red-100 rounded transition-colors flex items-center justify-center gap-1.5">
- <Trash2 size={12} /> ルートから外す (Remove)
+ <Trash2 size={12} /> ルートから外す
  </button>
  </div>
  </InfoWindow>
  );
  })()}
 
- {/* Khi AI trả về lộ trình, gọi Directions API vẽ đường Polyline */}
+ {/* When AI returns a route, call Directions API to draw Polyline */}
  {aiData && <DirectionsRendererComponent itinerary={aiData.itinerary.filter((i: any) => i.type !== 'break')} locations={initialLocations} />}
  </Map>
  </APIProvider>
@@ -228,5 +228,5 @@ export default function RoutingClient({ initialLocations, googleMapsKey }: { ini
  </div>
  </div>
  </div>
- )
+)
 }

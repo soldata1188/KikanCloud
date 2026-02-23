@@ -13,11 +13,11 @@ export default async function RoutingPage() {
 
  const { data: userProfile } = await supabase.from('users').select('role, tenant_id').eq('id', user.id).single()
 
- // Lấy dữ liệu Xí nghiệp và TTS có tọa độ (nếu có)
+ // Retrieve company and worker data with coordinates (if available).
  const { data: companies } = await supabase.from('companies').select('id, name_jp, address, latitude, longitude').eq('tenant_id', userProfile?.tenant_id).eq('is_deleted', false)
  const { data: workers } = await supabase.from('workers').select('id, full_name_romaji, address, latitude, longitude').eq('tenant_id', userProfile?.tenant_id)
 
- // MOCK DATA KHU VỰC SAKAI, OSAKA (NẾU DB CHƯA CÓ TỌA ĐỘ) ĐỂ DEMO TÍNH NĂNG
+ // MOCK DATA FOR SAKAI, OSAKA AREA (IF DB LACKS COORDINATES) FOR FEATURE DEMONSTRATION.
  const mockLocations = [
  { id: '1', name: 'Arata-Biz 本社', type: 'office', address: '大阪府堺市堺区南瓦町3-1', latitude: 34.5733, longitude: 135.4814 },
  { id: '2', name: 'トヨタ下請工場', type: 'company', address: '大阪府堺市西区鳳東町7', latitude: 34.5422, longitude: 135.4544 },
@@ -26,7 +26,7 @@ export default async function RoutingPage() {
  ];
 
  let initialLocations = [];
- // Nếu database có data thật có tọa độ thì dùng, không thì dùng mock data
+ // If the database contains actual data with coordinates, use it; otherwise, use mock data.
  if (companies && companies.some(c => c.latitude)) {
  initialLocations = [
  ...companies.filter(c => c.latitude).map(c => ({ id: c.id, name: c.name_jp, type: 'company', address: c.address, latitude: c.latitude, longitude: c.longitude })),

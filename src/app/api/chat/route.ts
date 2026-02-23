@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 
-// Khởi tạo SDK bằng API Key từ Environment (.env)
+// Initialize the SDK using the API Key from the Environment (.env)
 const apiKey = process.env.GEMINI_API_KEY || ''
 const genAI = new GoogleGenerativeAI(apiKey)
 
@@ -9,7 +9,7 @@ export async function POST(req: Request) {
  try {
  if (!apiKey) {
  return NextResponse.json(
- { error: 'Chưa cấu hình GEMINI_API_KEY trong hệ thống' },
+ { error: 'システムにGEMINI_API_KEYが設定されておりません' },
  { status: 500 }
  )
  }
@@ -18,26 +18,26 @@ export async function POST(req: Request) {
  const { messages } = body
 
  if (!messages || !Array.isArray(messages) || messages.length === 0) {
- return NextResponse.json({ error: 'Mảng rỗng hoặc thiếu param messages' }, { status: 400 })
+ return NextResponse.json({ error: 'メッセージ配列が空であるか、messagesパラメータが不足しております' }, { status: 400 })
  }
 
- // Chọn Model phù hợp (gemini-2.5-flash là model tốc độ nhanh, thông minh, hợp với chatbot)
+ // Select an appropriate model (gemini-2.5-flash is a fast, intelligent model suitable for chatbots)
  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' })
 
- // Extract tin nhắn cuối cùng để làm Input mới cho AI
+ // Extract the last message to use as new input for the AI
  const currentMessage = messages[messages.length - 1].parts[0].text
- // Các tin nhắn còn lại sẽ được đẩy vào History Context của Chat Session
+ // The remaining messages will be pushed into the Chat Session's History Context
  const history = messages.slice(0, -1)
 
- // Bắt đầu một luồng chat mang theo ngữ cảnh (lịch sử)
+ // Start a chat stream with context (history)
  const chat = model.startChat({ history })
 
- // 🚀 Gọi Gemini API để sinh nội dung
+ // 🚀 Call Gemini API to generate content
  const result = await chat.sendMessage(currentMessage)
  const response = await result.response
  const text = response.text()
 
- // Trả kết quả thành công về Frontend
+ // Return successful results to the Frontend
  return NextResponse.json({ reply: text })
 
  } catch (error) {

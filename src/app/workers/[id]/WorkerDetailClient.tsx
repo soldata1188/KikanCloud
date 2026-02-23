@@ -12,17 +12,17 @@ interface DocumentFile {
 }
 
 const DOC_TYPES: Record<string, string> = {
-    'avatar': '顔写真 (Ảnh thẻ)',
-    'zairyu_card': '在留カード (Thẻ ngoại kiều)',
-    'passport': 'パスポート (Hộ chiếu)',
-    'resume': '履歴書 (CV)',
-    'cert_notice': '認定通知 (Giấy chứng nhận)',
-    'insurance': '総合保険 (Bảo hiểm)',
-    'my_number': '個人番号 (My Number)',
-    'pension': '年金番号 (Số Nenkin)',
-    'bank': '銀行口座 (Tài khoản NH)',
-    'health_check': '健康診断 (Khám KQ)',
-    'skill_test': '検定合格 (Đỗ kỳ thi)',
+    'avatar': '顔写真',
+    'zairyu_card': '在留カード',
+    'passport': 'パスポート',
+    'resume': '履歴書',
+    'cert_notice': '認定通知',
+    'insurance': '総合保険',
+    'my_number': '個人番号',
+    'pension': '年金番号',
+    'bank': '銀行口座',
+    'health_check': '健康診断',
+    'skill_test': '検定合格',
     'ccus': 'CCUSカード'
 };
 
@@ -85,14 +85,14 @@ export default function WorkerDetailClient({ worker, documents }: { worker: any,
                     </Link>
                     <div>
                         <h2 className="text-[20px] font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 leading-tight">
-                            {worker.full_name_romaji || '名前なし'}
+                            {worker.full_name_romaji || '氏名未登録'}
                         </h2>
                         {worker.full_name_kana && <p className="text-xs text-gray-400 font-medium">{worker.full_name_kana}</p>}
                     </div>
                 </div>
                 <div className="flex items-center gap-3">
                     <form action={deleteWorker} onSubmit={(e) => {
-                        if (!window.confirm('本当に削除しますか？\n(Are you sure you want to delete this worker?)')) {
+                        if (!window.confirm('本当に削除いたしますか？')) {
                             e.preventDefault();
                         }
                     }}>
@@ -141,7 +141,7 @@ export default function WorkerDetailClient({ worker, documents }: { worker: any,
                                     <h3 className="text-xl font-bold text-[#1f1f1f]">{worker.full_name_romaji}</h3>
                                     {worker.companies?.name_jp && (
                                         <p className="text-sm font-bold text-[#24b47e] mt-1 flex items-center justify-center md:justify-start gap-1">
-                                            <Briefcase size={14} /> 配属先企業: {worker.companies.name_jp}
+                                            <Briefcase size={14} /> 配属先企業：{worker.companies.name_jp}
                                         </p>
                                     )}
                                 </div>
@@ -211,7 +211,7 @@ export default function WorkerDetailClient({ worker, documents }: { worker: any,
                                 </h3>
                             </div>
                             <div className="px-5 py-4 text-sm text-[#1f1f1f] whitespace-pre-wrap">
-                                {(worker as any).remarks || <span className="text-gray-400">（特記事項なし）</span>}
+                                {(worker as any).remarks || <span className="text-gray-400">（特記事項はございません）</span>}
                             </div>
                         </div>
 
@@ -226,10 +226,10 @@ export default function WorkerDetailClient({ worker, documents }: { worker: any,
                             <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-blue-600">
                                 <FileBadge2 size={16} />
                             </div>
-                            <h3 className="text-[15px] font-bold">関連書類 </h3>
+                            <h3 className="text-[15px] font-bold">関連書類</h3>
                         </div>
                         <span className="bg-gray-100/80 border border-gray-350 text-gray-600 px-2.5 py-1 rounded-full text-xs font-bold">
-                            {documents.length} 件
+                            {documents.length}件
                         </span>
                     </div>
 
@@ -237,7 +237,7 @@ export default function WorkerDetailClient({ worker, documents }: { worker: any,
                         {documents.length === 0 ? (
                             <div className="h-40 flex flex-col items-center justify-center text-center p-6 border-2 border-dashed border-gray-350 rounded-[12px] bg-gray-50/50">
                                 <DownloadCloud size={28} className="text-gray-300 mb-3" />
-                                <span className="text-sm font-medium text-gray-500">書類が存在しません</span>
+                                <span className="text-sm font-medium text-gray-500">書類は存在いたしません。</span>
                             </div>
                         ) : (
                             <div className="grid gap-2.5">

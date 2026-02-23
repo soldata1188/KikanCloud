@@ -1,4 +1,4 @@
-﻿'use server'
+'use server'
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
@@ -6,7 +6,7 @@ import { revalidatePath } from 'next/cache'
 export async function getOperationsData() {
     const supabase = await createClient()
 
-    // Lấy thông tin người dùng để kiểm tra quyền / tenant
+    // Get user information to check permissions / tenant
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) {
         throw new Error('未認証のユーザーです。(Unauthorized)')
@@ -17,7 +17,7 @@ export async function getOperationsData() {
         throw new Error('テナントIDが見つかりません。(Tenant ID not found)')
     }
 
-    // Câu query cơ bản
+    // Basic query statement
     const query = supabase
         .from('workers')
         .select(`
@@ -33,8 +33,8 @@ export async function getOperationsData() {
         .eq('is_deleted', false)
         .order('created_at', { ascending: false })
 
-    // RLS sẽ tự động xử lý việc filter theo tenant_id và user_role theo migration 00023.
-    // Thực thi query
+    // RLS will automatically handle filtering by tenant_id and user_role according to migration 00023.
+    // Execute query
     const { data: workers, error } = await query
 
     if (error) {
@@ -42,7 +42,7 @@ export async function getOperationsData() {
         throw new Error('データの取得に失敗しました。(Failed to fetch data)')
     }
 
-    // Nếu công ty cần danh sách để dropdown lúc tạo mới:
+    // If companies need a list for dropdown during new creation:
     const companiesQuery = supabase.from('companies').select('id, name_jp').eq('is_deleted', false).order('name_jp')
     const { data: companies, error: companiesError } = await companiesQuery
 
@@ -70,10 +70,10 @@ export async function addWorker(formData: FormData) {
         tenant_id: userData.tenant_id,
         company_id: companyId ? companyId : null,
         full_name_romaji: fullNameRomaji,
-        full_name_kana: '', // Thể hiện ý định, sẽ fill sau
-        dob: '2000-01-01', // Dummy data, cần UI nhập sau
-        system_type: 'ikusei_shuro', // Mặc định
-        status: 'waiting', // Mặc định là 入国待ち
+        full_name_kana: '', // Indicates intention, will be filled later
+        dob: '2000-01-01', // Dummy data, UI input required later
+        system_type: 'ikusei_shuro', // Default
+        status: 'waiting', // Default is 入国待ち (waiting for entry)
     }
 
     const { data, error } = await supabase
@@ -94,12 +94,12 @@ export async function addWorker(formData: FormData) {
 export async function updateWorkerStatus(workerId: string, column: string, value: string) {
     const supabase = await createClient()
 
-    // Ánh xạ cột từ UI sang Database (tuỳ thuộc schema)
-    // Hiện tại schema workers có cột status ('waiting', 'working', 'missing', 'returned')
-    // Nếu các cột kenteiStatus, v.v không có trong DB thì phải tạo thêm hoặc dùng JSON, ở đây tạm mapping 
-    // sang một struct cơ bản. Nếu DB chưa hỗ trợ kentei_status, kikou_status... ta update status chính trước.
+    // Map column from UI to Database (depending on schema)
+    // Currently, the workers schema has a 'status' column ('waiting', 'working', 'missing', 'returned')
+    // If columns like kenteiStatus, etc., are not in the DB, they must be created or JSON used; here, we temporarily map
+    // to a basic struct. If the DB does not yet support kentei_status, kikou_status... we update the main status first.
 
-    // Chuyển đổi trạng thái tiếng Nhật sang ENUM nếu update cột `status`
+    // Convert Japanese status to ENUM if updating the `status` column
     const dbColumn = column;
     let dbValue = value;
 

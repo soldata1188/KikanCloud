@@ -33,17 +33,17 @@ interface WorkerData {
 }
 
 const DOC_TYPES = [
-    { id: 'avatar', label: '顔写真 (Ảnh thẻ)', ai: false },
-    { id: 'zairyu_card', label: '在留カード (Thẻ ngoại kiều)', ai: true },
-    { id: 'passport', label: 'パスポート (Hộ chiếu)', ai: true },
-    { id: 'resume', label: '履歴書 (CV)', ai: false },
-    { id: 'cert_notice', label: '認定通知 (Giấy chứng nhận)', ai: false },
-    { id: 'insurance', label: '総合保険 (Bảo hiểm)', ai: false },
-    { id: 'my_number', label: '個人番号 (My Number)', ai: false },
-    { id: 'pension', label: '年金番号 (Số Nenkin)', ai: false },
-    { id: 'bank', label: '銀行口座 (Tài khoản NH)', ai: false },
-    { id: 'health_check', label: '健康診断 (Khám KQ)', ai: false },
-    { id: 'skill_test', label: '検定合格 (Đỗ kỳ thi)', ai: false },
+    { id: 'avatar', label: '顔写真', ai: false },
+    { id: 'zairyu_card', label: '在留カード', ai: true },
+    { id: 'passport', label: 'パスポート', ai: true },
+    { id: 'resume', label: '履歴書', ai: false },
+    { id: 'cert_notice', label: '認定通知', ai: false },
+    { id: 'insurance', label: '総合保険', ai: false },
+    { id: 'my_number', label: '個人番号', ai: false },
+    { id: 'pension', label: '年金番号', ai: false },
+    { id: 'bank', label: '銀行口座', ai: false },
+    { id: 'health_check', label: '健康診断', ai: false },
+    { id: 'skill_test', label: '検定合格', ai: false },
     { id: 'ccus', label: 'CCUSカード', ai: false }
 ];
 
@@ -60,6 +60,7 @@ const FormRow = ({ label, children, isLast = false }: { label: React.ReactNode, 
     </div>
 );
 
+// This component handles client-side logic for editing worker information.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function EditWorkerClient({ companies, worker }: { companies: any[], worker: any }) {
     const router = useRouter();
@@ -339,14 +340,14 @@ export default function EditWorkerClient({ companies, worker }: { companies: any
                                 </FormRow>
                                 <FormRow label="性別">
                                     <select name="gender" value={formData.gender} onChange={handleInputChange} className={getInputClass("gender") + " appearance-none"}>
-                                        <option value="">選択 (性別)</option>
+                                        <option value="">選択</option>
                                         <option value="male">男性</option>
                                         <option value="female">女性</option>
                                     </select>
                                 </FormRow>
                                 <FormRow label="血液型">
                                     <select name="blood_type" value={formData.blood_type} onChange={handleInputChange} className={getInputClass("blood_type") + " appearance-none"}>
-                                        <option value="">選択 (血液型)</option>
+                                        <option value="">選択</option>
                                         <option value="A">A</option><option value="B">B</option><option value="O">O</option><option value="AB">AB</option>
                                     </select>
                                 </FormRow>
@@ -441,7 +442,7 @@ export default function EditWorkerClient({ companies, worker }: { companies: any
                             </div>
                         </div>
 
-                        {/* SECTION: 備考・特記事項 */}
+                        {/* SECTION: Remarks/Special Notes */}
                         <div className="bg-white rounded-none border border-[#c4c8cf] overflow-hidden mb-6">
                             <div className="px-6 py-4 border-b border-[#c4c8cf] bg-[#f8fcfd]/10">
                                 <h3 className="text-base font-bold text-[#1f1f1f] flex items-center gap-2">備考・特記事項</h3>
@@ -460,7 +461,7 @@ export default function EditWorkerClient({ companies, worker }: { companies: any
                     <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white z-10">
                         <div className="flex items-center gap-1.5">
                             <UploadCloud size={18} className="text-[#1f1f1f]" />
-                            <h3 className="text-[15px] font-bold text-[#1f1f1f]">書類関係 (AI Kanban)</h3>
+                            <h3 className="text-[15px] font-bold text-[#1f1f1f]">書類関係</h3>
                         </div>
                     </div>
                     <div className="flex-1 overflow-y-auto p-4 no-scrollbar pb-24 space-y-6">

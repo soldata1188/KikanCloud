@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 
-export default function FloatingCloud() {
+export default function FloatingSmile() {
     const [position, setPosition] = useState({ left: 50, bottom: 15 });
     const [showMessage, setShowMessage] = useState(false);
     const [mounted, setMounted] = useState(false);
@@ -42,12 +42,12 @@ export default function FloatingCloud() {
         >
             {showMessage && (
                 <div className="absolute -top-12 whitespace-nowrap bg-white border border-gray-300 px-3 py-1.5 rounded-lg text-xs font-bold text-gray-700 shadow-none animate-in fade-in zoom-in duration-200">
-                    お疲れ様です！☁️✨
+                    お疲れ様です！✨
                     <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-2.5 h-2.5 bg-white border-b border-r border-gray-300 rotate-45" />
                 </div>
             )}
-            <span className="text-[150px] text-primary-400 drop-shadow-sm select-none leading-none">
-                ☁️
+            <span className="text-[150px] text-yellow-400 shadow-none select-none leading-none">
+                🙂
             </span>
         </div>
     );

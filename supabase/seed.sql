@@ -1,9 +1,10 @@
 -- Xóa dữ liệu cũ để tránh lỗi trùng lặp khi reset (Cascade sẽ tự động xóa các bảng con)
-TRUNCATE TABLE public.job_transfers, public.exams, public.visas, public.workers, public.companies, public.users, public.tenants CASCADE;
+TRUNCATE TABLE public.job_transfers, public.exams, public.visas, public.workers, public.companies, public.audits, public.procedures, public.worker_documents, public.client_documents, public.messages, public.notifications CASCADE;
 
 -- 1. Tạo 1 Nghiệp đoàn (Tenant)
 INSERT INTO public.tenants (id, name, org_type, domain, status) 
-VALUES ('11111111-1111-1111-1111-111111111111', 'Mirai Union (Demo)', 'kanri_dantai', 'mirai-demo', 'active');
+VALUES ('11111111-1111-1111-1111-111111111111', 'Mirai Union (Demo)', 'kanri_dantai', 'mirai-demo', 'active')
+ON CONFLICT (id) DO NOTHING;
 
 -- 2. Tạo 2 Xí nghiệp (Company)
 INSERT INTO public.companies (id, tenant_id, name_jp, corporate_number, address, representative) 

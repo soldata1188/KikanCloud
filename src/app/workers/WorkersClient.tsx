@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import Link from 'next/link'
 import { useState, useMemo } from 'react'
@@ -80,7 +80,7 @@ export function WorkersClient({ workers, userRole }: { workers: Worker[], userRo
                     >
                         <option value="all">すべてのステータス</option>
                         <option value="working">就業中</option>
-                        <option value="standby">待機中</option>
+                        <option value="standby">対応中</option>
                         <option value="waiting">入国待ち</option>
                         <option value="missing">失踪</option>
                         <option value="returned">帰国</option>
@@ -135,7 +135,7 @@ export function WorkersClient({ workers, userRole }: { workers: Worker[], userRo
             <div className="bg-white/80 rounded-md overflow-hidden p-2">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left text-sm text-[#1f1f1f]">
-                        <thead className="bg-transparent text-[12px] font-semibold text-[#1f1f1f]/60 border-b border-gray-200/50 uppercase tracking-widest whitespace-nowrap">
+                        <thead className="bg-transparent text-[12px] font-semibold text-[#1f1f1f]/60 border-b border-gray-350/50 uppercase tracking-widest whitespace-nowrap">
                             <tr>
                                 <th className="px-4 py-2 font-medium">氏名 / 基本情報</th>
                                 <th className="px-4 py-2 font-medium">受入企業 / 期生</th>
@@ -171,7 +171,7 @@ export function WorkersClient({ workers, userRole }: { workers: Worker[], userRo
                                                     <Link href={`/workers/${w.id}/edit`} className="block group-hover:text-[#24b47e] transition-colors" title="クリックして編集">
                                                         <div className="font-semibold text-[#1f1f1f] text-[15px] group-hover:text-[#24b47e] flex items-center gap-2 leading-tight mb-1">
                                                             {w.full_name_romaji}
-                                                            {w.nationality && <span className="text-[10px] px-1.5 py-0.5 bg-gray-100 text-[#878787] rounded border border-gray-200 uppercase tracking-wide">{w.nationality}</span>}
+                                                            {w.nationality && <span className="text-[10px] px-1.5 py-0.5 bg-gray-100 text-[#878787] rounded border border-gray-350 uppercase tracking-wide">{w.nationality}</span>}
                                                         </div>
                                                         <div className="text-[13px] text-[#878787] flex items-center gap-2">
                                                             <span>{w.full_name_kana || 'カナ未設定'}</span>
@@ -192,7 +192,7 @@ export function WorkersClient({ workers, userRole }: { workers: Worker[], userRo
                                                 </div>
                                                 {w.entry_batch && (
                                                     <div className="text-[12px] text-[#878787] font-medium inline-flex items-center gap-1">
-                                                        <span className="px-2 py-0.5 bg-white rounded-md border border-gray-200 block w-fit">📍 {w.entry_batch}</span>
+                                                        <span className="px-2 py-0.5 bg-white rounded-md border border-gray-350 block w-fit">📍 {w.entry_batch}</span>
                                                     </div>
                                                 )}
                                             </div>
@@ -205,9 +205,9 @@ export function WorkersClient({ workers, userRole }: { workers: Worker[], userRo
                                                     {w.system_type === 'ikusei_shuro' ? '育成就労' : w.system_type === 'tokuteigino' ? '特定技能' : '技能実習'}
                                                 </span>
 
-                                                <div className={`text-[12px] font-medium flex items-center gap-1.5 ${w.status === 'working' ? 'text-green-600' : w.status === 'missing' ? 'text-red-500' : w.status === 'returned' ? 'text-[#878787]' : 'text-orange-500'}`}>
-                                                    <span className={`w-1.5 h-1.5 rounded-md shadow-sm ${w.status === 'working' ? 'bg-green-500' : w.status === 'missing' ? 'bg-red-500' : w.status === 'returned' ? 'bg-gray-400' : 'bg-orange-500'}`}></span>
-                                                    {w.status === 'working' ? '就業中' : w.status === 'standby' ? '待機中' : w.status === 'missing' ? '失踪' : w.status === 'returned' ? '帰国' : '入国待ち'}
+                                                <div className={`text-[12px] font-medium flex items-center gap-1.5 ${w.status === 'working' ? 'text-primary-600' : w.status === 'missing' ? 'text-red-500' : w.status === 'returned' ? 'text-[#878787]' : 'text-orange-500'}`}>
+                                                    <span className={`w-1.5 h-1.5 rounded-md ${w.status === 'working' ? 'bg-primary-500' : w.status === 'missing' ? 'bg-red-500' : w.status === 'returned' ? 'bg-gray-400' : 'bg-orange-500'}`}></span>
+                                                    {w.status === 'working' ? '就業中' : w.status === 'standby' ? '対応中' : w.status === 'missing' ? '失踪' : w.status === 'returned' ? '帰国' : '入国待ち'}
                                                 </div>
                                             </div>
                                         </td>
@@ -233,10 +233,10 @@ export function WorkersClient({ workers, userRole }: { workers: Worker[], userRo
                                         {/* 5. Actions */}
                                         <td className="px-4 py-2 text-right">
                                             <div className="flex items-center justify-end gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
-                                                <Link href={`/workers/${w.id}`} className="px-3 py-1.5 flex items-center gap-1.5 rounded-md text-xs font-medium text-[#1f1f1f] hover:text-white hover:bg-[#24b47e] transition-colors border border-transparent hover:border-[#24b47e]" title="詳細">
+                                                <Link href={`/workers/${w.id}`} className="px-3 py-1.5 flex items-center gap-1.5 rounded-md text-xs font-medium text-[#1f1f1f] hover:text-white hover:bg-[#24b47e] transition-colors border border-gray-350 hover:border-[#24b47e]" title="詳細">
                                                     <FileSearch size={14} strokeWidth={2} /> 詳細
                                                 </Link>
-                                                <Link href={`/workers/${w.id}/edit`} className="px-3 py-1.5 flex items-center gap-1.5 rounded-md text-xs font-medium text-[#1f1f1f] hover:text-[#24b47e] hover:bg-gray-50 transition-colors border border-transparent" title="編集">
+                                                <Link href={`/workers/${w.id}/edit`} className="px-3 py-1.5 flex items-center gap-1.5 rounded-md text-xs font-medium text-[#1f1f1f] hover:text-[#24b47e] hover:bg-gray-50 transition-colors border border-gray-350" title="編集">
                                                     <Edit2 size={14} strokeWidth={2} /> 編集
                                                 </Link>
                                             </div>

@@ -1,15 +1,18 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { User, Bell, LogOut, Clock, Hexagon, Settings } from 'lucide-react'
+import { User, Bell, LogOut, Clock, Hexagon, Settings, Sparkles } from 'lucide-react'
 import { GlobalSearch } from './GlobalSearch'
 import { createClient } from '@/lib/supabase/client'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
+import AIChatSidebar from '@/components/ai/AIChatSidebar'
 
 export function TopNav({ title, role }: { title: string, role?: string }) {
     const [isAvatarOpen, setIsAvatarOpen] = useState(false)
+    const [isAIChatOpen, setIsAIChatOpen] = useState(false)
     const [timeStr, setTimeStr] = useState('')
     const [dateStr, setDateStr] = useState('')
     const router = useRouter()
+    const pathname = usePathname()
 
     useEffect(() => {
         const updateTime = () => {
@@ -29,9 +32,13 @@ export function TopNav({ title, role }: { title: string, role?: string }) {
         router.push('/login')
     }
 
+    if (pathname !== '/' && pathname !== '/dashboard') {
+        return null; // Ẩn TopNav trên tất cả các trang ngoại trừ Home (/ hoặc /dashboard)
+    }
+
     return (
         <>
-            <header className="h-14 bg-[#fbfcfd] border-b border-gray-200 flex items-center justify-between px-4 sm:px-6 sticky top-0 z-40 shrink-0 w-full">
+            <header className="h-14 bg-[#fbfcfd] border-b border-gray-350 flex items-center justify-between px-4 sm:px-6 sticky top-0 z-40 shrink-0 w-full">
                 <div className="flex items-center gap-2 text-[13px] font-sans pl-1">
                     <span className="font-medium text-[#1f1f1f]">KikanCloud</span>
                     <span className="text-[#878787] ml-1">/</span>
@@ -52,13 +59,21 @@ export function TopNav({ title, role }: { title: string, role?: string }) {
 
                     <GlobalSearch />
 
-                    <div className="relative cursor-pointer hover:bg-gray-50 p-1.5 rounded-full transition-colors">
+                    <button
+                        onClick={() => setIsAIChatOpen(true)}
+                        className="relative cursor-pointer hover:bg-[#e8f5f0] p-1.5 rounded-md transition-colors border border-gray-350 bg-white"
+                        title="AIアシスタント"
+                    >
+                        <Sparkles size={16} className="text-[#24b47e]" />
+                    </button>
+
+                    <div className="relative cursor-pointer hover:bg-gray-50 p-1.5 rounded-md transition-colors border border-transparent">
                         <Bell size={16} className="text-[#878787]" />
-                        <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-[#d93025] rounded-full border border-white"></span>
+                        <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-[#d93025] rounded-md border border-white"></span>
                     </div>
 
                     <div className="relative">
-                        <div onClick={() => setIsAvatarOpen(!isAvatarOpen)} className="w-8 h-8 rounded-full bg-[#fbfcfd] border border-gray-200 text-[#878787] flex items-center justify-center text-xs font-bold cursor-pointer hover:border-[#24b47e] hover:text-[#1f1f1f] transition-colors shadow-none"><User size={14} /></div>
+                        <div onClick={() => setIsAvatarOpen(!isAvatarOpen)} className="w-8 h-8 rounded-md bg-[#fbfcfd] border border-gray-350 text-[#878787] flex items-center justify-center text-xs font-bold cursor-pointer hover:border-[#24b47e] hover:text-[#1f1f1f] transition-colors"><User size={14} /></div>
                         {isAvatarOpen && (
                             <>
                                 <div className="fixed inset-0 z-40" onClick={() => setIsAvatarOpen(false)}></div>
@@ -79,6 +94,8 @@ export function TopNav({ title, role }: { title: string, role?: string }) {
                     </div>
                 </div>
             </header>
+
+            <AIChatSidebar isOpen={isAIChatOpen} onClose={() => setIsAIChatOpen(false)} />
         </>
     )
 }

@@ -12,6 +12,7 @@ export async function createCompany(formData: FormData) {
     const newCompany = {
         tenant_id: userData?.tenant_id,
         name_jp: formData.get('name_jp') as string,
+        name_kana: formData.get('name_kana') as string || null,
         name_romaji: formData.get('name_romaji') as string || null,
         corporate_number: formData.get('corporate_number') as string || null,
         postal_code: formData.get('postal_code') as string || null,
@@ -28,6 +29,15 @@ export async function createCompany(formData: FormData) {
         guidance_manager: formData.get('guidance_manager') as string || null,
         life_advisor: formData.get('life_advisor') as string || null,
         tech_advisor: formData.get('tech_advisor') as string || null,
+        employee_count: formData.get('employee_count') ? parseInt(formData.get('employee_count') as string) : null,
+        labor_insurance_number: formData.get('labor_insurance_number') as string || null,
+        employment_insurance_number: formData.get('employment_insurance_number') as string || null,
+        acceptance_notification_number: formData.get('acceptance_notification_number') as string || null,
+        acceptance_notification_date: formData.get('acceptance_notification_date') as string || null,
+        general_supervision_fee: formData.get('general_supervision_fee') ? parseFloat(formData.get('general_supervision_fee') as string) : null,
+        category_3_supervision_fee: formData.get('category_3_supervision_fee') ? parseFloat(formData.get('category_3_supervision_fee') as string) : null,
+        support_fee: formData.get('support_fee') ? parseFloat(formData.get('support_fee') as string) : null,
+        remarks: formData.get('remarks') as string || null,
     }
 
     await supabase.from('companies').insert(newCompany)
@@ -43,6 +53,7 @@ export async function updateCompany(formData: FormData) {
 
     const updatedData = {
         name_jp: formData.get('name_jp') as string,
+        name_kana: formData.get('name_kana') as string || null,
         name_romaji: formData.get('name_romaji') as string || null,
         corporate_number: formData.get('corporate_number') as string || null,
         postal_code: formData.get('postal_code') as string || null,
@@ -58,6 +69,15 @@ export async function updateCompany(formData: FormData) {
         guidance_manager: formData.get('guidance_manager') as string || null,
         life_advisor: formData.get('life_advisor') as string || null,
         tech_advisor: formData.get('tech_advisor') as string || null,
+        employee_count: formData.get('employee_count') ? parseInt(formData.get('employee_count') as string) : null,
+        labor_insurance_number: formData.get('labor_insurance_number') as string || null,
+        employment_insurance_number: formData.get('employment_insurance_number') as string || null,
+        acceptance_notification_number: formData.get('acceptance_notification_number') as string || null,
+        acceptance_notification_date: formData.get('acceptance_notification_date') as string || null,
+        general_supervision_fee: formData.get('general_supervision_fee') ? parseFloat(formData.get('general_supervision_fee') as string) : null,
+        category_3_supervision_fee: formData.get('category_3_supervision_fee') ? parseFloat(formData.get('category_3_supervision_fee') as string) : null,
+        support_fee: formData.get('support_fee') ? parseFloat(formData.get('support_fee') as string) : null,
+        remarks: formData.get('remarks') as string || null,
     }
 
     await supabase.from('companies').update(updatedData).eq('id', id)
@@ -78,6 +98,7 @@ export async function deleteCompany(formData: FormData) {
     revalidatePath('/companies')
     revalidatePath('/workers')
     revalidatePath('/')
+    redirect('/companies')
 }
 
 export async function importCompanies(companiesData: any[]) {
@@ -87,10 +108,6 @@ export async function importCompanies(companiesData: any[]) {
     const { data: userData } = await supabase.from('users').select('tenant_id, role').eq('id', user.id).single()
     if (userData?.role !== 'admin') throw new Error('管理者権限が必要です。(Admin only)')
     if (!userData?.tenant_id) throw new Error('Tenant ID not found')
-
-    // TODO: Defense-in-depth (Multi-tenant)
-    // Nên chain thêm `.eq('tenant_id', userData.tenant_id)` ở tầng Server Actions ngay cả khi 
-    // RLS đã kích hoạt, để tránh rủi ro rò rỉ dữ liệu chéo nếu policy RLS bị cấu hình sai trong tương lai.
 
     // 挿入前のデータ正規化
     const payload = companiesData.map(c => ({

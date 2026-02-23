@@ -23,6 +23,12 @@ export async function bulkUpdateWorkerStatus(ids: string[], status: string) {
     revalidatePath('/workers')
 }
 
+export async function bulkUpdateWorkerField(ids: string[], field: string, value: any) {
+    const supabase = await createClient()
+    await supabase.from('workers').update({ [field]: value }).in('id', ids)
+    revalidatePath('/workers')
+}
+
 export async function bulkDeleteWorkers(ids: string[]) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()

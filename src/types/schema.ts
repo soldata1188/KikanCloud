@@ -5,6 +5,7 @@ export interface Company {
     id: string;
     tenant_id: string;
     name_jp: string;
+    name_kana?: string;
     name_romaji?: string;
     corporate_number?: string;
     postal_code?: string;
@@ -21,8 +22,16 @@ export interface Company {
     guidance_manager?: string;
     life_advisor?: string;
     tech_advisor?: string;
+    employee_count?: number;
+    labor_insurance_number?: string;
+    employment_insurance_number?: string;
+    acceptance_notification_number?: string;
+    acceptance_notification_date?: string;
+    general_supervision_fee?: number;
+    category_3_supervision_fee?: number;
+    support_fee?: number;
+    remarks?: string;
     is_deleted?: boolean;
-    created_at?: string;
     updated_at?: string;
 }
 

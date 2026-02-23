@@ -82,7 +82,7 @@ export default async function AuditsPage({ searchParams }: { searchParams: Promi
     });
 
     return (
-        <div className="flex h-screen bg-[#f8fcfd] font-sans text-[#1f1f1f] overflow-hidden selection:bg-[#24b47e]/20">
+        <div className="flex h-screen bg-white font-sans text-[#1f1f1f] overflow-hidden selection:bg-[#24b47e]/20">
             <Sidebar active="audits" />
             <div className="flex-1 flex flex-col relative min-w-0">
                 <TopNav title="監査・訪問指導" role={userProfile?.role} />

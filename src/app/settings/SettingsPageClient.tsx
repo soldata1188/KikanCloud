@@ -13,7 +13,7 @@ import {
     Building2,
     UserPlus,
 } from "lucide-react";
-import { createAccount, deleteAccount } from "./actions";
+import { createAccount, deleteAccount, updateProfile } from "./actions";
 import { SaveButton, DeleteButton } from "@/components/SubmitButtons";
 import { InviteStaffForm } from "@/components/InviteStaffForm";
 
@@ -102,16 +102,18 @@ export default function SettingsPageClient({
                 </p>
             </div>
 
-            <div className="space-y-4 max-w-xl">
+            <form action={updateProfile} className="space-y-4 max-w-xl">
                 <div>
                     <label className="block text-sm font-medium text-gray-700">
                         氏名
                     </label>
                     <input
                         type="text"
+                        name="fullName"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        className="mt-1 block w-full rounded-md border border-gray-350 px-3 py-2 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+                        required
+                        className="mt-1 block w-full rounded-md border border-gray-350 px-3 py-2 bg-white text-gray-900 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
                     />
                 </div>
                 <div>
@@ -122,8 +124,7 @@ export default function SettingsPageClient({
                         type="email"
                         value={email}
                         disabled
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="mt-1 block w-full rounded-md border border-gray-350 bg-gray-50 px-3 py-2 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+                        className="mt-1 block w-full rounded-md border border-gray-350 bg-gray-50 px-3 py-2 text-gray-500 cursor-not-allowed"
                     />
                 </div>
                 <div>
@@ -132,17 +133,17 @@ export default function SettingsPageClient({
                     </label>
                     <input
                         type="password"
-                        placeholder="••••••••"
-                        className="mt-1 block w-full rounded-md border border-gray-350 px-3 py-2 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+                        name="password"
+                        placeholder="変更する場合のみ入力してください"
+                        minLength={6}
+                        className="mt-1 block w-full rounded-md border border-gray-350 px-3 py-2 bg-white text-gray-900 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
                     />
                 </div>
 
-                <div className="pt-4">
-                    <button className="flex items-center justify-center gap-2 bg-[#24b47e] text-white px-4 py-2 rounded-md hover:bg-[#1e9668] transition-colors font-medium">
-                        <Save size={18} /> 変更を保存
-                    </button>
+                <div className="pt-4 flex justify-start">
+                    <SaveButton />
                 </div>
-            </div>
+            </form>
         </div>
     );
 

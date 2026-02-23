@@ -1,77 +1,83 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import Link from 'next/link'
 import { Sidebar } from '@/components/Sidebar'
-import GreetingBanner from '@/components/dashboard/GreetingBannerUpdated'
-import GlobalOmniSearch from '@/components/dashboard/GlobalOmniSearch'
-import RecentChats from '@/components/dashboard/RecentChats'
-import { getDashboardStats, getExpiringDocuments } from '@/app/dashboard/actions'
-import { Users, Building2, AlertTriangle, MessageSquare, ClipboardList, ShieldCheck, Map, Workflow, Bot, Route } from 'lucide-react'
+import { TopNav } from '@/components/TopNav'
+import DashboardClient from './DashboardClient'
 
 export const dynamic = 'force-dynamic';
 
 export default async function DashboardPage() {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
+    if (!user) redirect('/login')
 
-    if (!user) {
-        redirect('/login')
+    const { data: userProfile } = await supabase.from('users').select('full_name, role, tenant_id').eq('id', user.id).single()
+    if (userProfile?.role === 'company_admin') redirect('/portal')
+
+    const tenantId = userProfile?.tenant_id
+
+    // Fetch Stats (Dùng Promise.all tăng tốc)
+    const [workersRes, companiesRes, workersDataRes] = await Promise.all([
+        supabase.from('workers').select('id', { count: 'exact', head: true }).eq('tenant_id', tenantId),
+        supabase.from('companies').select('id', { count: 'exact', head: true }).eq('tenant_id', tenantId).eq('is_deleted', false),
+        supabase.from('workers').select('id, full_name_romaji, nationality, status, residence_card_exp_date, passport_exp_date, companies(name_jp)').eq('tenant_id', tenantId)
+    ])
+
+    const workers = workersDataRes.data || []
+
+    // Calculate Statuses
+    const totalWorkers = workersRes.count || 0
+    const totalCompanies = companiesRes.count || 0
+    const enteringWorkers = workers.filter(w => w.status === 'entering' || w.status === 'pending').length
+    const missingWorkers = workers.filter(w => w.status === 'missing' || w.status === 'returned').length
+
+    // Calculate Nationalities
+    const natCounts: Record<string, number> = {}
+    workers.forEach(w => {
+        const nat = w.nationality || '未登録'
+        natCounts[nat] = (natCounts[nat] || 0) + 1
+    })
+    const nationalities = Object.entries(natCounts)
+        .map(([name, count]) => ({ name, count, percentage: Math.round((count / (totalWorkers || 1)) * 100) }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 4)
+
+    // Calculate Expiring Alerts (Next 90 days)
+    const today = new Date()
+    const alerts: any[] = []
+
+    workers.forEach(w => {
+        if (w.residence_card_exp_date) {
+            const exp = new Date(w.residence_card_exp_date)
+            const diffDays = Math.ceil((exp.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+            if (diffDays >= 0 && diffDays <= 90) {
+                alerts.push({ id: w.id + '_z', name: w.full_name_romaji, company: (w.companies as any)?.name_jp, type: '在留カード', expDate: w.residence_card_exp_date, daysLeft: diffDays })
+            }
+        }
+        if (w.passport_exp_date) {
+            const exp = new Date(w.passport_exp_date)
+            const diffDays = Math.ceil((exp.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+            if (diffDays >= 0 && diffDays <= 90) {
+                alerts.push({ id: w.id + '_p', name: w.full_name_romaji, company: (w.companies as any)?.name_jp, type: 'パスポート', expDate: w.passport_exp_date, daysLeft: diffDays })
+            }
+        }
+    })
+    alerts.sort((a, b) => a.daysLeft - b.daysLeft)
+
+    const dashboardData = {
+        stats: { totalWorkers, totalCompanies, enteringWorkers, missingWorkers },
+        nationalities,
+        alerts
     }
-
-    // Get user profile and role
-    const { data: userProfile } = await supabase
-        .from('users')
-        .select('full_name, role, tenant_id')
-        .eq('id', user.id)
-        .single()
-
-    if (userProfile?.role === 'company_admin' || userProfile?.role === 'company_user') {
-        redirect('/portal')
-    }
-
-    const role = userProfile?.role
-    const displayName = userProfile?.full_name || user?.email?.split('@')[0] || 'User'
-
-    const stats = await getDashboardStats()
-    const documents = await getExpiringDocuments()
 
     return (
-        <div className="flex h-screen bg-white font-sans text-gray-900 overflow-hidden selection:bg-[#24b47e]/20">
+        <div className="flex h-screen bg-[#fbfcfd] font-sans text-[#1f1f1f] overflow-hidden selection:bg-[#24b47e]/20">
             <Sidebar active="dashboard" />
-
-            <div className="flex-1 flex flex-col relative min-w-0 bg-white">
-                <main className="flex-1 overflow-y-auto relative p-6 md:p-8">
-                    <div className="max-w-7xl mx-auto pt-[100px] space-y-10">
-                        {/* Friendly greeting banner & Weather */}
-                        <GreetingBanner displayName={displayName} />
-
-                        {/* Global Omni Search */}
-                        <GlobalOmniSearch />
-
-                        {/* Quick Access Menu - Removed per user request */}
-
-                        {/* Row: Recent Chats */}
-                        <div className="w-full min-h-[400px] mt-24">
-                            <RecentChats tenantId={userProfile?.tenant_id} />
-                        </div>
-
-                        {/* Row 3: Removed Nationality Ratio per user request */}
-                    </div>
+            <div className="flex-1 flex flex-col relative min-w-0">
+                <TopNav title="ホーム" role={userProfile?.role} />
+                <main className="flex-1 overflow-y-auto p-6 md:p-8">
+                    <DashboardClient userName={userProfile?.full_name || 'スタッフ'} dashboardData={dashboardData} />
                 </main>
-            </div>
-        </div>
-    )
-}
-
-function KpiCard({ title, value, icon, iconBg, iconColor }: { title: string, value: number, icon: React.ReactNode, iconBg: string, iconColor: string }) {
-    return (
-        <div className="p-6 md:p-8 flex items-center justify-between group hover:-translate-y-1 transition-all cursor-default">
-            <div className="space-y-2">
-                <div className="text-xs font-bold text-gray-400 uppercase tracking-widest">{title}</div>
-                <div className="text-4xl lg:text-5xl font-extrabold text-gray-900 tracking-tight">{value}</div>
-            </div>
-            <div className={`w-14 h-14 flex justify-center items-center rounded-2xl transition-transform duration-300 group-hover:scale-110 ${iconBg} ${iconColor}`}>
-                {icon}
             </div>
         </div>
     )

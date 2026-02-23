@@ -46,65 +46,9 @@ export default async function DashboardPage() {
 
                         {/* Quick Access Menu - Removed per user request */}
 
-                        {/* Row 4: Two columns */}
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                            {/* Left column 2/3: Alert Table */}
-                            <div className="lg:col-span-2 p-5 md:p-6 border-l-[6px] border-[#24b47e]">
-                                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
-                                    <h2 className="text-xl font-bold text-gray-900 tracking-tight">要対応アラート</h2>
-                                    <div className="flex items-center gap-1.5 font-bold px-3 py-1.5 bg-red-50 text-red-600 rounded-full text-sm border border-red-100">
-                                        <AlertTriangle size={16} />
-                                        <span>期限90日以内</span>
-                                    </div>
-                                </div>
-                                <div className="overflow-x-auto">
-                                    <table className="w-full text-sm text-left whitespace-nowrap bg-white">
-                                        <thead className="text-xs text-gray-500 uppercase bg-white">
-                                            <tr>
-                                                <th className="border-b border-gray-200 px-4 py-3 font-bold tracking-widest">氏名</th>
-                                                <th className="border-b border-gray-200 px-4 py-3 font-bold tracking-widest">企業</th>
-                                                <th className="border-b border-gray-200 px-4 py-3 font-bold tracking-widest">種類</th>
-                                                <th className="border-b border-gray-200 px-4 py-3 font-bold tracking-widest">期限</th>
-                                                <th className="border-b border-gray-200 px-4 py-3 font-bold tracking-widest text-right">残り</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {documents.length === 0 ? (
-                                                <tr><td colSpan={5} className="border-b border-gray-200 px-4 py-12 text-center text-gray-400 font-bold">直近で期限切れになる書類はありません</td></tr>
-                                            ) : documents.map((doc: { full_name_romaji: string, company_name: string, doc_type: string, exp_date: string, days_left: number }, i: number) => {
-                                                const isCritical = doc.days_left <= 30;
-                                                const rowClass = isCritical
-                                                    ? 'bg-white text-red-600'
-                                                    : 'bg-white text-gray-800';
-
-                                                return (
-                                                    <tr key={i} className={rowClass}>
-                                                        <td className="border-b border-gray-200 px-4 py-3 font-bold">{doc.full_name_romaji}</td>
-                                                        <td className="border-b border-gray-200 px-4 py-3">{doc.company_name}</td>
-                                                        <td className="border-b border-gray-200 px-4 py-3 font-medium"><span className="px-2.5 py-1 bg-white border border-gray-200 rounded-lg text-xs font-bold text-gray-600">{doc.doc_type}</span></td>
-                                                        <td className="border-b border-gray-200 px-4 py-3 font-medium tracking-wide">{doc.exp_date}</td>
-                                                        <td className="border-b border-gray-200 px-4 py-3 font-bold text-right text-base">
-                                                            {doc.days_left < 0 ? (
-                                                                <span className="text-red-600 bg-white px-2.5 py-1 rounded-lg border border-red-200">超過 {Math.abs(doc.days_left)}日</span>
-                                                            ) : (
-                                                                <span>あと {doc.days_left}日</span>
-                                                            )}
-                                                        </td>
-                                                    </tr>
-                                                )
-                                            })}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-
-                            {/* Right column 1/3 */}
-                            <div className="lg:col-span-1 flex flex-col gap-6">
-                                {/* Recent Chats */}
-                                <div className="flex-1 min-h-[400px] h-full">
-                                    <RecentChats tenantId={userProfile?.tenant_id} />
-                                </div>
-                            </div>
+                        {/* Row: Recent Chats */}
+                        <div className="w-full min-h-[400px] mt-24">
+                            <RecentChats tenantId={userProfile?.tenant_id} />
                         </div>
 
                         {/* Row 3: Removed Nationality Ratio per user request */}

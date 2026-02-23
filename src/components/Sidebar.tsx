@@ -17,11 +17,8 @@ import {
 import { SidebarLogo } from "./SidebarLogo";
 import { SidebarAvatar } from "./SidebarAvatar";
 import { createClient } from "@/lib/supabase/server";
-import { logout } from "@/app/login/actions";
-
 const NAV_ITEMS = [
     { id: "dashboard", name: "ホーム", href: "/", icon: LayoutDashboard },
-    { id: "b2b-chat", name: "企業連絡", href: "/b2b-chat", icon: MessageSquare },
     { id: "operations", name: "業務管理", href: "/operations", icon: ClipboardList },
     { id: "workers", name: "実習生一覧", href: "/workers", icon: Users },
     {
@@ -41,6 +38,7 @@ const NAV_ITEMS = [
     { id: "roadmap", name: "制度ロードマップ", href: "/roadmap", icon: Route },
     // { id: "organization", name: "機関情報", href: "/organization", icon: Landmark },
     { id: "chat", name: "AIチャット", href: "/chat", icon: Sparkles },
+    { id: "b2b-chat", name: "企業連絡", href: "/b2b-chat", icon: MessageSquare },
     // { id: "settings", name: "設定", href: "/settings", icon: Settings },
 ];
 
@@ -128,34 +126,8 @@ export async function Sidebar({ active }: { active: string }) {
             </nav>
 
             {/* Bottom section */}
-            <div className="w-full flex flex-col items-center md:items-start gap-2 pt-4 mt-auto px-0 md:px-3">
-                <div className="w-full flex justify-center md:justify-start md:px-4 mb-2 shrink-0">
-                    <SidebarLogo />
-                </div>
-
-                <form action={logout} className="w-full">
-                    <button
-                        type="submit"
-                        className="group relative flex items-center justify-center md:justify-start w-full md:px-3 h-12 md:h-11 md:rounded-[8px] md:hover:bg-[#fce8e6] hover:bg-gray-50 transition-colors"
-                    >
-                        <div className="flex items-center justify-center shrink-0 transition-colors duration-200 text-[#737373] group-hover:text-[#d93025]">
-                            <LogOut strokeWidth={1.75} className="w-[22px] h-[22px]" />
-                        </div>
-
-                        {/* Label Text (Desktop only) */}
-                        <span className="hidden md:block ml-3.5 text-[13px] font-bold text-[#5e5e5e] group-hover:text-[#d93025] transition-colors duration-200">
-                            ログアウト
-                        </span>
-
-                        {/* Tooltip Text (Mobile only) */}
-                        <span
-                            className="md:hidden absolute left-full ml-2 px-2 py-1.5 bg-[#d93025] text-white text-xs font-medium rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-50 shadow-none pointer-events-none flex items-center"
-                        >
-                            <span className="absolute -left-1 w-2 h-2 bg-[#d93025] rotate-45 rounded-sm"></span>
-                            <span className="relative z-10">ログアウト</span>
-                        </span>
-                    </button>
-                </form>
+            <div className="w-full shrink-0 mt-auto pb-4 px-2">
+                <SidebarLogo />
             </div>
         </aside>
     );

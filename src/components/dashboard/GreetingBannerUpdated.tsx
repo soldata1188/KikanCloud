@@ -3,40 +3,6 @@
 import React, { useState, useEffect } from "react";
 import { Cloud } from "lucide-react";
 
-const AnimatedSmile = () => (
-    <svg viewBox="0 0 100 100" className="w-20 h-20 text-yellow-400 drop-shadow-sm transition-transform hover:scale-110 duration-300">
-        <style dangerouslySetInnerHTML={{
-            __html: `
-            @keyframes wink {
-                0%, 90%, 100% { transform: scaleY(1); }
-                95% { transform: scaleY(0.1); }
-            }
-            @keyframes float {
-                0%, 100% { transform: translateY(0); }
-                50% { transform: translateY(-4px); }
-            }
-            .animate-wink {
-                animation: wink 4s infinite;
-                transform-origin: 35px 40px;
-            }
-            .animate-wink-right {
-                animation: wink 4s infinite;
-                transform-origin: 65px 40px;
-            }
-            .animate-float {
-                animation: float 3s ease-in-out infinite;
-            }
-        `}} />
-        <g className="animate-float">
-            <circle cx="50" cy="50" r="45" fill="currentColor" />
-            <circle cx="35" cy="40" r="7" fill="#1f2937" className="animate-wink" />
-            <circle cx="65" cy="40" r="7" fill="#1f2937" className="animate-wink-right" />
-            <path d="M 30 58 Q 50 80 70 58" fill="none" stroke="#1f2937" strokeWidth="7" strokeLinecap="round" />
-            <circle cx="23" cy="52" r="7" fill="#ef4444" opacity="0.3" className="animate-wink" />
-            <circle cx="77" cy="52" r="7" fill="#ef4444" opacity="0.3" className="animate-wink-right" />
-        </g>
-    </svg>
-);
 
 export default function GreetingBanner({ displayName }: { displayName: string }) {
     const [currentTime, setCurrentTime] = useState<Date | null>(null);
@@ -94,15 +60,12 @@ export default function GreetingBanner({ displayName }: { displayName: string })
 
     if (!currentTime) return (
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 py-2 opacity-50">
-            <div className="flex items-center gap-4">
-                <div className="flex items-center justify-center shrink-0 w-24 h-24 opacity-50">
-                    <AnimatedSmile />
-                </div>
+            <div className="flex items-start gap-4">
                 <div>
-                    <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight">
+                    <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">
                         こんにちは、{displayName}さん！
                     </h1>
-                    <div className="h-4 w-48 bg-gray-200 rounded-full mt-2 animate-pulse"></div>
+                    <div className="h-5 w-64 bg-gray-200 rounded-full mt-3 animate-pulse"></div>
                 </div>
             </div>
         </div>
@@ -115,18 +78,15 @@ export default function GreetingBanner({ displayName }: { displayName: string })
     return (
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 py-2">
             {/* Left Box: AI Greeting */}
-            <div className="flex items-center gap-4">
-                <div className="flex items-center justify-center shrink-0 w-24 h-24 transition-transform group cursor-default">
-                    <AnimatedSmile />
-                </div>
+            <div className="flex items-start gap-4">
                 <div>
-                    <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight">
+                    <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">
                         こんにちは、{displayName}さん！
                     </h1>
                     {loadingBriefing ? (
-                        <div className="h-4 w-64 bg-gray-200 rounded-full mt-2 animate-pulse"></div>
+                        <div className="h-5 w-72 bg-gray-200 rounded-full mt-3 animate-pulse"></div>
                     ) : (
-                        <p className="text-gray-500 font-medium mt-1 leading-relaxed text-sm max-w-2xl">{briefing}</p>
+                        <p className="text-gray-600 font-medium mt-2 leading-relaxed text-lg max-w-3xl">{briefing}</p>
                     )}
                 </div>
             </div>

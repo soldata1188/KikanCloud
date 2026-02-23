@@ -48,6 +48,15 @@ export function SidebarAvatar({ userProfile }: { userProfile: any }) {
                                 <Landmark size={15} className="text-[#878787]" /> 機関・企業情報
                             </Link>
                         )}
+                        <div className="h-px bg-gray-200 my-0.5" />
+                        <form action={logout} className="w-full">
+                            <button
+                                type="submit"
+                                className="flex items-center gap-2.5 w-full px-3 py-2 text-[13px] font-medium text-[#d93025] hover:bg-red-50 rounded-md transition-colors text-left"
+                            >
+                                <LogOut size={15} /> ログアウト
+                            </button>
+                        </form>
                     </div>
                 </div>
             )}

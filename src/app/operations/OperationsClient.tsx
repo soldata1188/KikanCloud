@@ -200,13 +200,6 @@ export default function OperationsClient({ initialWorkers, companies }: { initia
                                     <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform duration-300 shadow-sm ${isActive ? 'translate-x-[16px]' : 'translate-x-[3px]'}`} />
                                 </div>
                             </div>
-
-                            <div className="flex items-baseline gap-1.5">
-                                <span className={`text-3xl font-black font-sans tracking-tight transition-colors ${isActive ? 'text-[#13734e]' : 'text-gray-700 group-hover:text-gray-900'}`}>
-                                    {count}
-                                </span>
-                                <span className={`text-sm font-medium transition-colors ${isActive ? 'text-[#24b47e]' : 'text-gray-400 group-hover:text-gray-500'}`}>名</span>
-                            </div>
                         </div>
                     );
                 })}

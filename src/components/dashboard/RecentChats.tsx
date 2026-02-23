@@ -120,7 +120,7 @@ export default function RecentChats({ tenantId }: { tenantId?: string }) {
 
     if (loading) {
         return (
-            <div className="p-5 md:p-6 border-l-[6px] border-[#24b47e] flex flex-col h-full animate-pulse">
+            <div className="p-5 md:p-6 flex flex-col h-full animate-pulse">
                 <div className="h-6 w-32 bg-gray-200 rounded mb-4"></div>
                 <div className="space-y-4 flex-1">
                     {[1, 2, 3, 4, 5].map(i => (
@@ -135,7 +135,7 @@ export default function RecentChats({ tenantId }: { tenantId?: string }) {
     }
 
     return (
-        <div className="p-5 md:p-6 border-l-[6px] border-[#24b47e] flex flex-col h-full">
+        <div className="p-5 md:p-6 flex flex-col h-full">
             <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-2">
                     <MessageSquare size={20} className="text-blue-500" />

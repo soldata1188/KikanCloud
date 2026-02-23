@@ -6,7 +6,6 @@ import GreetingBanner from '@/components/dashboard/GreetingBannerUpdated'
 import RecentChats from '@/components/dashboard/RecentChats'
 import { getDashboardStats, getExpiringDocuments } from '@/app/dashboard/actions'
 import { Users, Building2, AlertTriangle, MessageSquare, ClipboardList, ShieldCheck, Map, Workflow, Bot, Route } from 'lucide-react'
-import FloatingSmile from '@/components/dashboard/FloatingSmile'
 
 export const dynamic = 'force-dynamic';
 
@@ -112,7 +111,6 @@ export default async function DashboardPage() {
                     </div>
                 </main>
             </div>
-            <FloatingSmile />
         </div>
     )
 }

@@ -77,7 +77,10 @@ export async function Sidebar({ active }: { active: string }) {
                         <Link
                             key={item.href}
                             href={item.href}
-                            className="group relative flex items-center justify-center w-full h-12 hover:bg-gray-50 transition-colors"
+                            className={`group relative items-center justify-center w-full h-12 hover:bg-gray-50 transition-colors ${['dashboard', 'b2b-chat', 'chat'].includes(item.id)
+                                    ? 'flex'
+                                    : 'hidden md:flex'
+                                }`}
                         >
                             {/* Left-Border Accent for Active State */}
                             {isActive && (

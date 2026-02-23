@@ -36,6 +36,30 @@ export async function proxy(request: NextRequest) {
 
     const { data: { user } } = await supabase.auth.getUser()
 
+    const userAgent = request.headers.get('user-agent') || '';
+    const isMobile = /Mobile|Android|iP(hone|od)|IEMobile|BlackBerry|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)/i.test(userAgent);
+
+    // Protect desktop-only complex operational routes
+    const DESKTOP_ONLY_ROUTES = [
+        '/workers',
+        '/operations',
+        '/companies',
+        '/audits',
+        '/procedures',
+        '/routing',
+        '/roadmap',
+        '/workflows',
+        '/portal/workers',
+        '/accounts'
+    ];
+
+    const isDesktopOnly = DESKTOP_ONLY_ROUTES.some(route => request.nextUrl.pathname.startsWith(route));
+    if (user && isMobile && isDesktopOnly) {
+        const url = request.nextUrl.clone();
+        url.pathname = '/desktop-only';
+        return NextResponse.redirect(url);
+    }
+
     if (
         !user &&
         !request.nextUrl.pathname.startsWith('/login') &&

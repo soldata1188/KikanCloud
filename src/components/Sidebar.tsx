@@ -62,13 +62,25 @@ export async function Sidebar({ active }: { active: string }) {
     }
 
     return (
-        <aside className="shrink-0 h-screen w-16 md:w-[68px] bg-[#fbfcfd] border-r border-gray-350 flex flex-col py-6 z-50 relative">
-            <div className="w-full flex justify-center mt-[-8px] transition-all duration-300">
-                <SidebarAvatar userProfile={userProfile} />
+        <aside className="shrink-0 h-screen w-16 md:w-[240px] bg-[#fbfcfd] border-r border-gray-350 flex flex-col py-6 z-50 relative transition-all duration-300">
+            {/* Top section with Avatar Workspace */}
+            <div className="w-full flex items-center justify-center md:justify-start md:px-5 mt-[-8px] mb-4 transition-all duration-300 gap-3">
+                <div className="shrink-0 flex items-center justify-center w-full md:w-auto">
+                    <SidebarAvatar userProfile={userProfile} />
+                </div>
+                {/* Desktop-only Username Display */}
+                <div className="hidden md:flex flex-col flex-1 min-w-0 pr-2 pb-5">
+                    <span className="text-[14px] font-bold text-[#1f1f1f] truncate leading-tight">
+                        {userProfile?.full_name || 'Hồ sơ người dùng'}
+                    </span>
+                    <span className="text-[12px] text-[#878787] font-mono uppercase truncate mt-0.5">
+                        {userRole === 'staff' ? 'QUẢN LÝ' : userRole}
+                    </span>
+                </div>
             </div>
 
             {/* Navigation Menu */}
-            <nav className="flex flex-col gap-4 w-full">
+            <nav className="flex flex-col gap-2 w-full px-0 md:px-3">
                 {NAV_ITEMS.map((item) => {
                     const isActive = active === item.id;
                     const Icon = item.icon;
@@ -77,26 +89,35 @@ export async function Sidebar({ active }: { active: string }) {
                         <Link
                             key={item.href}
                             href={item.href}
-                            className={`group relative items-center justify-center w-full h-12 hover:bg-gray-50 transition-colors ${['dashboard', 'b2b-chat', 'chat'].includes(item.id)
+                            className={`group relative items-center justify-center md:justify-start w-full md:px-3 h-12 md:h-11 md:rounded-[8px] hover:bg-gray-100 transition-colors ${['dashboard', 'b2b-chat', 'chat'].includes(item.id)
                                     ? 'flex'
                                     : 'hidden md:flex'
-                                }`}
+                                } ${isActive && 'md:bg-primary-50 md:hover:bg-primary-50'}`}
                         >
-                            {/* Left-Border Accent for Active State */}
+                            {/* Left-Border Accent for Active State (Mobile only) */}
                             {isActive && (
-                                <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#24b47e]" />
+                                <div className="md:hidden absolute left-0 top-0 bottom-0 w-[4px] bg-[#24b47e]" />
                             )}
 
                             {/* Icon Container */}
                             <div
-                                className={`flex items-center justify-center shrink-0 transition-colors duration-200 ${isActive ? "text-[#24b47e]" : "text-[#878787]"}`}
+                                className={`flex items-center justify-center shrink-0 transition-colors duration-200 ${isActive ? "text-[#24b47e]" : "text-[#737373] group-hover:text-[#1f1f1f]"
+                                    }`}
                             >
-                                <Icon strokeWidth={isActive ? 2 : 1.5} className="w-6 h-6" />
+                                <Icon strokeWidth={isActive ? 2 : 1.75} className="w-[22px] h-[22px]" />
                             </div>
 
-                            {/* Tooltip Text */}
+                            {/* Label Text (Desktop only) */}
                             <span
-                                className="absolute left-full ml-2 px-2 py-1.5 bg-[#24b47e] text-white text-xs font-medium rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-50 shadow-none pointer-events-none flex items-center"
+                                className={`hidden md:block ml-3.5 text-[13px] font-bold transition-colors duration-200 ${isActive ? "text-[#1a8b60]" : "text-[#5e5e5e] group-hover:text-[#1f1f1f]"
+                                    } flex-1 truncate`}
+                            >
+                                {item.name}
+                            </span>
+
+                            {/* Tooltip Text (Mobile only) */}
+                            <span
+                                className="md:hidden absolute left-full ml-2 px-2 py-1.5 bg-[#24b47e] text-white text-xs font-medium rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-50 shadow-none pointer-events-none flex items-center"
                             >
                                 <span className="absolute -left-1 w-2 h-2 bg-[#24b47e] rotate-45 rounded-sm"></span>
                                 <span className="relative z-10">{item.name}</span>
@@ -106,23 +127,31 @@ export async function Sidebar({ active }: { active: string }) {
                 })}
             </nav>
 
-            <div className="w-full flex flex-col items-center gap-2 pt-4 mt-auto">
-                <div className="w-full flex justify-center mb-2">
+            {/* Bottom section */}
+            <div className="w-full flex flex-col items-center md:items-start gap-2 pt-4 mt-auto px-0 md:px-3">
+                <div className="w-full flex justify-center md:justify-start md:px-4 mb-2 shrink-0">
                     <SidebarLogo />
                 </div>
+
                 <form action={logout} className="w-full">
                     <button
                         type="submit"
-                        className="group relative flex items-center justify-center w-full h-12 hover:bg-[#fce8e6] transition-colors"
+                        className="group relative flex items-center justify-center md:justify-start w-full md:px-3 h-12 md:h-11 md:rounded-[8px] md:hover:bg-[#fce8e6] hover:bg-gray-50 transition-colors"
                     >
-                        <div className="flex items-center justify-center shrink-0 transition-colors duration-200 text-[#878787] group-hover:text-[#d93025]">
-                            <LogOut strokeWidth={1.5} className="w-6 h-6" />
+                        <div className="flex items-center justify-center shrink-0 transition-colors duration-200 text-[#737373] group-hover:text-[#d93025]">
+                            <LogOut strokeWidth={1.75} className="w-[22px] h-[22px]" />
                         </div>
-                        {/* Tooltip Text */}
+
+                        {/* Label Text (Desktop only) */}
+                        <span className="hidden md:block ml-3.5 text-[13px] font-bold text-[#5e5e5e] group-hover:text-[#d93025] transition-colors duration-200">
+                            ログアウト
+                        </span>
+
+                        {/* Tooltip Text (Mobile only) */}
                         <span
-                            className="absolute left-full ml-2 px-2 py-1.5 bg-[#24b47e] text-white text-xs font-medium rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-50 shadow-none pointer-events-none flex items-center"
+                            className="md:hidden absolute left-full ml-2 px-2 py-1.5 bg-[#d93025] text-white text-xs font-medium rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-50 shadow-none pointer-events-none flex items-center"
                         >
-                            <span className="absolute -left-1 w-2 h-2 bg-[#24b47e] rotate-45 rounded-sm"></span>
+                            <span className="absolute -left-1 w-2 h-2 bg-[#d93025] rotate-45 rounded-sm"></span>
                             <span className="relative z-10">ログアウト</span>
                         </span>
                     </button>

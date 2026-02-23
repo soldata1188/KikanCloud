@@ -7,26 +7,37 @@ import { ChatBox } from '@/components/ChatBox'
 export const dynamic = 'force-dynamic';
 
 export default async function ClientChatPage() {
- const supabase = await createClient()
- const { data: { user } } = await supabase.auth.getUser()
- if (!user) redirect('/login')
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) redirect('/login')
 
- const { data: userProfile } = await supabase.from('users').select('company_id, role').eq('id', user.id).single()
- if (!userProfile?.company_id) redirect('/')
+    const { data: userProfile } = await supabase.from('users').select('company_id, role').eq('id', user.id).single()
+    if (!userProfile?.company_id) redirect('/')
 
- const { data: messages } = await supabase.from('messages').select('*').eq('company_id', userProfile.company_id).order('created_at', { ascending: true })
+    const { data: messages } = await supabase.from('messages').select('*').eq('company_id', userProfile.company_id).order('created_at', { ascending: true })
 
- return (
- <div className="flex h-screen bg-white font-sans text-[#1f1f1f] overflow-hidden">
- <ClientSidebar active="chat"/>
- <main className="flex-1 flex flex-col relative overflow-y-auto no-scrollbar px-4 pb-12 w-full max-w-[800px] mx-auto mt-4 md:mt-8">
- <h2 className="text-[32px] font-bold tracking-tight text-primary-800 mb-6 flex items-center gap-3"><MessageCircle size={32} /> 連絡チャット</h2>
- {userProfile.role === 'company_admin' ? (
- <ChatBox companyId={userProfile.company_id} currentUserId={user.id} messages={messages || []} sourcePath="/portal/chat"isClient={true} />
- ) : (
- <div className="flex-1 flex flex-col items-center justify-center p-8 text-center text-[#878787] bg-white/50 rounded-lg m-4 border border-gray-350"><p className="font-bold text-[#1f1f1f] text-base">閲覧専用アカウントです</p><p className="text-sm mt-1">メッセージの送信権限がありません。</p></div>
- )}
- </main>
- </div>
- )
+    return (
+        <div className="w-full max-w-[1000px] mx-auto h-[calc(100vh-140px)] flex flex-col bg-white border border-[#ededed] rounded-2xl shadow-sm overflow-hidden animate-in fade-in duration-700">
+            <div className="p-4 md:p-6 border-b border-[#ededed] bg-[#fbfcfd] shrink-0">
+                <h2 className="text-xl md:text-2xl font-bold tracking-tight text-[#1f1f1f] flex items-center gap-3">
+                    <MessageCircle className="text-[#1a73e8]" size={24} /> 監理団体とのメッセージ (Chat)
+                </h2>
+                <p className="text-[13px] text-[#878787] font-medium mt-1 ml-9">
+                    監理団体の担当者と直接メッセージのやり取りができます。
+                </p>
+            </div>
+            <div className="flex-1 flex flex-col bg-[#fbfcfd] relative overflow-hidden">
+                {userProfile.role === 'company_admin' || userProfile.role === 'company_client' ? (
+                    <div className="flex-1 absolute inset-0 overflow-y-auto w-full h-full p-0 flex flex-col pt-0">
+                        <ChatBox companyId={userProfile.company_id} currentUserId={user.id} messages={messages || []} sourcePath="/portal/chat" isClient={true} />
+                    </div>
+                ) : (
+                    <div className="flex-1 flex flex-col items-center justify-center p-8 text-center text-[#878787] bg-white/50 m-4 border border-[#ededed] rounded-2xl">
+                        <p className="font-bold text-[#1f1f1f] text-base">閲覧専用アカウントです</p>
+                        <p className="text-sm mt-1">メッセージの送信権限がありません。</p>
+                    </div>
+                )}
+            </div>
+        </div>
+    )
 }

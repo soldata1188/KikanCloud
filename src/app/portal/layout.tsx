@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { Building2, Users, FileText, Hexagon } from 'lucide-react'
+import { Building2, Users, FileText, Hexagon, MessageSquare } from 'lucide-react'
 import PortalHeaderClient from './PortalHeaderClient'
 
 export default async function PortalLayout({ children }: { children: React.ReactNode }) {
@@ -26,6 +26,10 @@ export default async function PortalLayout({ children }: { children: React.React
                     <Link href="/portal" className="flex items-center gap-3 px-3 py-2 bg-[#fbfcfd] border border-[#ededed] text-[#1f1f1f] rounded-md shadow-sm group">
                         <Building2 size={16} className="text-[#1a73e8]" />
                         <span className="text-[13px] font-bold hidden md:block">マイページ (Home)</span>
+                    </Link>
+                    <Link href="/portal/chat" className="flex items-center gap-3 px-3 py-2 text-[#878787] hover:bg-[#fbfcfd] hover:text-[#1a73e8] rounded-md transition-colors group">
+                        <MessageSquare size={16} className="group-hover:text-[#1a73e8]" />
+                        <span className="text-[13px] font-medium hidden md:block">メッセージ (Chat)</span>
                     </Link>
                     <div className="flex items-center gap-3 px-3 py-2 text-[#878787] hover:bg-[#fbfcfd] hover:text-[#1f1f1f] rounded-md transition-colors cursor-not-allowed opacity-60">
                         <Users size={16} />

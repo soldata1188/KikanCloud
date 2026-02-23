@@ -44,22 +44,7 @@ export default async function DashboardPage() {
                         {/* Friendly greeting banner & Weather */}
                         <GreetingBanner displayName={displayName} />
 
-                        {/* Quick Access Menu - Basecamp Style */}
-                        <div className="mt-10">
-                            {/* MENU span - visually hidden per user request */}
-                            <h2 className="hidden text-xl font-bold text-gray-900 mb-4 px-2 tracking-tight">MENU</h2>
-                            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
-                                <QuickAccessCard href="/b2b-chat" title="企業連絡" icon={<MessageSquare size={32} />} bgClass="bg-[#fce8e6]" textClass="text-[#d93025]" hoverClass="hover:border-[#d93025]" />
-                                <QuickAccessCard href="/operations" title="業務管理" icon={<ClipboardList size={32} />} bgClass="bg-[#fef7e0]" textClass="text-[#e37400]" hoverClass="hover:border-[#e37400]" />
-                                <QuickAccessCard href="/workers" title="実習生一覧" icon={<Users size={32} />} bgClass="bg-[#e8f0fe]" textClass="text-[#1a73e8]" hoverClass="hover:border-[#1a73e8]" />
-                                <QuickAccessCard href="/companies" title="受入企業" icon={<Building2 size={32} />} bgClass="bg-[#e6f4ea]" textClass="text-[#1e8e3e]" hoverClass="hover:border-[#1e8e3e]" />
-                                <QuickAccessCard href="/audits" title="監査・訪問" icon={<ShieldCheck size={32} />} bgClass="bg-[#f3e8fd]" textClass="text-[#9334e6]" hoverClass="hover:border-[#9334e6]" />
-                                <QuickAccessCard href="/routing" title="ルート最適化" icon={<Map size={32} />} bgClass="bg-[#e4f7fb]" textClass="text-[#12b5cb]" hoverClass="hover:border-[#12b5cb]" />
-                                <QuickAccessCard href="/workflows" title="業務フロー" icon={<Workflow size={32} />} bgClass="bg-[#fce4ec]" textClass="text-[#c2185b]" hoverClass="hover:border-[#c2185b]" />
-                                <QuickAccessCard href="/ai-chat" title="AIチャット" icon={<Bot size={32} />} bgClass="bg-[#e8eaed]" textClass="text-[#3c4043]" hoverClass="hover:border-[#3c4043]" />
-                                <QuickAccessCard href="/roadmap" title="ロードマップ" icon={<Route size={32} />} bgClass="bg-[#fff3e0]" textClass="text-[#f57c00]" hoverClass="hover:border-[#f57c00]" />
-                            </div>
-                        </div>
+                        {/* Quick Access Menu - Removed per user request */}
 
                         {/* Row 4: Two columns */}
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -141,16 +126,5 @@ function KpiCard({ title, value, icon, iconBg, iconColor }: { title: string, val
                 {icon}
             </div>
         </div>
-    )
-}
-
-function QuickAccessCard({ href, title, icon, bgClass, textClass, hoverClass }: { href: string, title: string, icon: React.ReactNode, bgClass: string, textClass: string, hoverClass: string }) {
-    return (
-        <Link href={href} className="flex flex-col items-center justify-center p-4 group hover:-translate-y-2 transition-all cursor-pointer">
-            <div className={`mb-4 w-20 h-20 flex items-center justify-center rounded-[10px] ${bgClass} ${textClass} group-hover:scale-110 transition-all duration-300`}>
-                {icon}
-            </div>
-            <span className="text-base font-bold text-gray-700 tracking-wide group-hover:text-gray-900 transition-colors">{title}</span>
-        </Link>
     )
 }

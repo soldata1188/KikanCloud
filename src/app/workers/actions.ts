@@ -28,7 +28,7 @@ export async function createWorker(formData: FormData) {
         tenant_id: userData?.tenant_id,
         full_name_romaji: (formData.get('full_name_romaji') as string).toUpperCase(),
         full_name_kana: formData.get('full_name_kana') as string,
-        dob: formData.get('dob') as string,
+        dob: formData.get('dob') as string || '2000-01-01',
         company_id: companyId ? companyId : null,
         system_type: formData.get('system_type') as string,
         status: formData.get('status') as string,
@@ -81,7 +81,7 @@ export async function updateWorker(formData: FormData) {
     const updatedData = {
         full_name_romaji: (formData.get('full_name_romaji') as string).toUpperCase(),
         full_name_kana: formData.get('full_name_kana') as string,
-        dob: formData.get('dob') as string,
+        dob: formData.get('dob') as string || '2000-01-01',
         company_id: companyId ? companyId : null,
         system_type: formData.get('system_type') as string,
         status: formData.get('status') as string,

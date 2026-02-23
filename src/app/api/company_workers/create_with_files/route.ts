@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
             tenant_id,
             full_name_romaji: getStr('full_name_romaji'),
             full_name_kana: getStr('full_name_kana'),
-            dob: getStr('dob'),
+            dob: getStr('dob') || '2000-01-01',
             gender: getStr('gender'),
             blood_type: getStr('blood_type'),
             nationality: getStr('nationality'),

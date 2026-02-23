@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { Sidebar } from '@/components/Sidebar'
 import GreetingBanner from '@/components/dashboard/GreetingBannerUpdated'
+import GlobalOmniSearch from '@/components/dashboard/GlobalOmniSearch'
 import RecentChats from '@/components/dashboard/RecentChats'
 import { getDashboardStats, getExpiringDocuments } from '@/app/dashboard/actions'
 import { Users, Building2, AlertTriangle, MessageSquare, ClipboardList, ShieldCheck, Map, Workflow, Bot, Route } from 'lucide-react'
@@ -40,9 +41,12 @@ export default async function DashboardPage() {
 
             <div className="flex-1 flex flex-col relative min-w-0 bg-white">
                 <main className="flex-1 overflow-y-auto relative p-6 md:p-8">
-                    <div className="max-w-7xl mx-auto space-y-10">
+                    <div className="max-w-7xl mx-auto pt-[100px] space-y-10">
                         {/* Friendly greeting banner & Weather */}
                         <GreetingBanner displayName={displayName} />
+
+                        {/* Global Omni Search */}
+                        <GlobalOmniSearch />
 
                         {/* Quick Access Menu - Removed per user request */}
 

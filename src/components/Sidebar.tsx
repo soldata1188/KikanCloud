@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { SidebarLogo } from "./SidebarLogo";
 import { SidebarAvatar } from "./SidebarAvatar";
+import GlobalOmniSearch from "./dashboard/GlobalOmniSearch";
 import { createClient } from "@/lib/supabase/server";
 const NAV_ITEMS = [
     { id: "dashboard", name: "ホーム", href: "/", icon: LayoutDashboard },
@@ -127,6 +128,9 @@ export async function Sidebar({ active }: { active: string }) {
 
             {/* Bottom section */}
             <div className="w-full shrink-0 mt-auto pb-4 px-2">
+                <div className="hidden md:block mb-4 px-1">
+                    <GlobalOmniSearch compact={true} />
+                </div>
                 <SidebarLogo />
             </div>
         </aside>

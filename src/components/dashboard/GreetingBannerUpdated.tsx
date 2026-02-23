@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Cloud } from "lucide-react";
 
 
 export default function GreetingBanner({ displayName }: { displayName: string }) {
@@ -86,20 +85,13 @@ export default function GreetingBanner({ displayName }: { displayName: string })
                     {loadingBriefing ? (
                         <div className="h-5 w-72 bg-gray-200 rounded-full mt-3 animate-pulse"></div>
                     ) : (
-                        <p className="text-gray-600 font-medium mt-2 leading-relaxed text-lg max-w-3xl">{briefing}</p>
+                        <p className="text-gray-600 font-medium mt-2 leading-relaxed text-sm max-w-3xl">{briefing}</p>
                     )}
                 </div>
             </div>
 
-            {/* Right Box: Weather and Date */}
+            {/* Right Box: Date */}
             <div className="flex flex-row md:flex-col items-center justify-end gap-4 md:gap-1 text-right shrink-0">
-                <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-2xl border border-gray-100">
-                    <Cloud className="text-blue-500" size={20} />
-                    <div className="text-left">
-                        <div className="text-xs text-gray-500 font-bold uppercase tracking-wider">大阪府堺市</div>
-                        <div className="font-extrabold text-lg text-gray-900 leading-none">12°C <span className="text-sm text-gray-400 font-medium">晴れ</span></div>
-                    </div>
-                </div>
 
                 <div className="px-4 py-2 flex flex-col items-end justify-center rounded-2xl">
                     <div className="text-3xl font-extrabold text-gray-900 tracking-tighter tabular-nums leading-none">

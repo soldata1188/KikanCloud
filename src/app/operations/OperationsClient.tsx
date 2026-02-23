@@ -1,9 +1,8 @@
 ﻿'use client'
 
 import React, { useState } from 'react'
-import { FileText } from 'lucide-react'
 
-import { addWorker, updateWorkerStatus } from './actions'
+import { updateWorkerStatus } from './actions'
 
 // Helper function to calculate duration from entry date
 const calculateDuration = (entryDate: string) => {

@@ -66,7 +66,7 @@ export async function chatWithOmniAI(history: any[], newMessage: string, userNam
 `;
 
  // Dựng mảng hội thoại
- let contents = [...history, { role: 'user', parts: [{ text: newMessage }] }];
+ const contents = [...history, { role: 'user', parts: [{ text: newMessage }] }];
 
  // LẦN GỌI 1: AI suy nghĩ xem có cần gọi Tool không
  let response = await ai.models.generateContent({

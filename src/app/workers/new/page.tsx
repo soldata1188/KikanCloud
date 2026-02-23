@@ -1,7 +1,6 @@
 ﻿import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { Sidebar } from '@/components/Sidebar'
-import { UserMenu } from '@/components/UserMenu'
 import NewWorkerClient from './NewWorkerClient'
 
 export default async function NewWorkerPage() {

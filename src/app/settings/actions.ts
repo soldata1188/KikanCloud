@@ -61,13 +61,23 @@ export async function updateProfile(formData: FormData) {
     const fullName = formData.get('fullName') as string
     const password = formData.get('password') as string
 
+    const adminClient = getAdminClient()
+
     if (fullName) {
-        await localSupabase.from('users').update({ full_name: fullName }).eq('id', user.id)
+        const { error } = await adminClient.from('users').update({ full_name: fullName }).eq('id', user.id)
+        if (error) {
+            console.error("Failed to update full_name in users table:", error)
+            throw new Error('名前の更新に失敗しました')
+        }
+        await adminClient.auth.admin.updateUserById(user.id, { user_metadata: { full_name: fullName } })
     }
 
     if (password && password.length >= 6) {
-        const adminClient = getAdminClient()
-        await adminClient.auth.admin.updateUserById(user.id, { password })
+        const { error } = await adminClient.auth.admin.updateUserById(user.id, { password })
+        if (error) {
+            console.error("Failed to update password:", error)
+            throw new Error('パスワードの更新に失敗しました')
+        }
     }
 
     revalidatePath('/settings')

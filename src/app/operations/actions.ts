@@ -18,7 +18,7 @@ export async function getOperationsData() {
     }
 
     // Câu query cơ bản
-    let query = supabase
+    const query = supabase
         .from('workers')
         .select(`
             *,
@@ -43,7 +43,7 @@ export async function getOperationsData() {
     }
 
     // Nếu công ty cần danh sách để dropdown lúc tạo mới:
-    let companiesQuery = supabase.from('companies').select('id, name_jp').eq('is_deleted', false).order('name_jp')
+    const companiesQuery = supabase.from('companies').select('id, name_jp').eq('is_deleted', false).order('name_jp')
     const { data: companies, error: companiesError } = await companiesQuery
 
     if (companiesError) {
@@ -100,7 +100,7 @@ export async function updateWorkerStatus(workerId: string, column: string, value
     // sang một struct cơ bản. Nếu DB chưa hỗ trợ kentei_status, kikou_status... ta update status chính trước.
 
     // Chuyển đổi trạng thái tiếng Nhật sang ENUM nếu update cột `status`
-    let dbColumn = column;
+    const dbColumn = column;
     let dbValue = value;
 
     if (column === 'status') {

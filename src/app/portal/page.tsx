@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
-import { Users, FileText, AlertTriangle, CalendarClock, ChevronRight } from 'lucide-react'
+import { Users, FileText, AlertTriangle, CalendarClock } from 'lucide-react'
 
 export const dynamic = 'force-dynamic';
 

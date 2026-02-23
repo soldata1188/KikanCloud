@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { updateCompany } from '../../actions'
-import { ArrowLeft, Building2, MapPin, Users, Save } from 'lucide-react'
+import { ArrowLeft, Building2, MapPin, Users } from 'lucide-react'
 import { Sidebar } from '@/components/Sidebar'
 import { redirect } from 'next/navigation'
 import { CompanyDocumentKanban } from '../../new/CompanyDocumentKanban'

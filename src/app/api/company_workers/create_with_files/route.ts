@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
         // 1. Insert Worker Data
         const getStr = (key: string) => (formData.get(key) as string) || null;
 
-        let workerData: any = {
+        const workerData: any = {
             tenant_id,
             full_name_romaji: getStr('full_name_romaji'),
             full_name_kana: getStr('full_name_kana'),

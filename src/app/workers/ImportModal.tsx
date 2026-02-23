@@ -1,10 +1,9 @@
 ﻿'use client'
 import { useState, useRef, useTransition } from 'react'
 import Papa from 'papaparse'
-import { Upload, X, FileText, CheckCircle2, AlertCircle, Download } from 'lucide-react'
+import { Upload, X, CheckCircle2, AlertCircle } from 'lucide-react'
 import { ImportWorkerPayload, importWorkers } from './actions'
 import { useRouter } from 'next/navigation'
-import { Worker } from '@/types/schema'
 
 export function ImportModal() {
  const router = useRouter()

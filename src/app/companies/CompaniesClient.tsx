@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect, useTransition } from 'react'
 import Link from 'next/link'
-import { Building2, Search, Trash2, MapPin, Grid, List, CheckSquare, Square, Loader2, Play, FileText, Edit3 } from 'lucide-react'
-import { deleteCompany } from './actions'
+import { Building2, Search } from 'lucide-react'
 import { DataTableToolbar } from '@/components/DataTableToolbar'
 
 export function CompaniesClient({ companies, userRole }: { companies: any[], userRole?: string }) {

@@ -1,7 +1,7 @@
 ﻿'use client'
 import { useState, useRef, useTransition } from 'react'
 import Papa from 'papaparse'
-import { Upload, X, FileText, CheckCircle2, AlertCircle, Download } from 'lucide-react'
+import { Upload, X, CheckCircle2, AlertCircle } from 'lucide-react'
 import { importCompanies } from './actions'
 import { useRouter } from 'next/navigation'
 

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Building2, Search, Calendar, AlertCircle, CheckCircle2, CalendarCheck, Edit2, Play, Grid, List, Plus, Printer, FileSpreadsheet } from 'lucide-react'
+import { Building2, Search, AlertCircle, CheckCircle2, CalendarCheck, Edit2, Printer } from 'lucide-react'
 import { DataTableToolbar } from '@/components/DataTableToolbar'
 import { SmartActionCell } from './SmartActionCell'
 import { MonthFilter } from './MonthFilter'

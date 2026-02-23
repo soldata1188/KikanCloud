@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
-import { updateProcedure, deleteProcedure } from '@/app/procedures/actions'
+import { updateProcedure } from '@/app/procedures/actions'
 import { ArrowLeft, Landmark } from 'lucide-react'
 import { Sidebar } from '@/components/Sidebar'
 import { UpdateButton, ProcedureDeleteButton } from '@/components/SubmitButtons'

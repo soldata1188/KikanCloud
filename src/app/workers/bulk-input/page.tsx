@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
-import { ArrowLeft, Sparkles, Users } from 'lucide-react'
+import { ArrowLeft, Users } from 'lucide-react'
 import { Sidebar } from '@/components/Sidebar'
 import { redirect } from 'next/navigation'
 import { BulkInputClient } from './BulkInputClient'

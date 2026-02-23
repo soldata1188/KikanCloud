@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
         const body = await req.json();
         const { base64str, mimeType } = body;
 
-        console.log(`[AI Extract] Received base64str length: ${base64str?.length}`);
+
 
         if (!base64str || !mimeType) {
             return NextResponse.json(

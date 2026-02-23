@@ -1,6 +1,6 @@
 'use client'
 import React, { useState, useRef } from 'react'
-import { UploadCloud, FileText, X, ArrowLeft, Loader2, Image as ImageIcon } from 'lucide-react'
+import { UploadCloud, FileText, X, ArrowLeft, Image as ImageIcon } from 'lucide-react'
 
 // Defined Document Types for Company
 const COMPANY_DOC_TYPES = [

@@ -1,5 +1,5 @@
 'use client'
-import { Bell, LogOut, User } from 'lucide-react'
+import { Bell, LogOut } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 

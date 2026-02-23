@@ -21,7 +21,7 @@ interface DataTableToolbarProps<T> {
 export function DataTableToolbar<T>({ data, filename, searchPlaceholder, onSearch, type, role, addLink, importNode, filterNode, layout, onLayoutChange }: DataTableToolbarProps<T>) {
  const [searchTerm, setSearchTerm] = useState('')
  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => { const term = e.target.value; setSearchTerm(term); onSearch(term); }
- const handleExport = () => { try { let exportData = data.map((d, i) => ({ 'No': i + 1, 'Data': JSON.stringify(d) })); const ws = XLSX.utils.json_to_sheet(exportData); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws,"Data"); XLSX.writeFile(wb,`${filename}.xlsx`); } catch (e) { } }
+ const handleExport = () => { try { const exportData = data.map((d, i) => ({ 'No': i + 1, 'Data': JSON.stringify(d) })); const ws = XLSX.utils.json_to_sheet(exportData); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws,"Data"); XLSX.writeFile(wb,`${filename}.xlsx`); } catch (e) { } }
 
  return (
  <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between mb-4 gap-4 w-full">

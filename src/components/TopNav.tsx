@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { User, Bell, LogOut, Clock, Hexagon, Settings, Sparkles } from 'lucide-react'
+import { User, Bell, LogOut, Clock, Settings, Sparkles } from 'lucide-react'
 import { GlobalSearch } from './GlobalSearch'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter, usePathname } from 'next/navigation'

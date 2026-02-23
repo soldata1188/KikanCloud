@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react';
-import { ArrowLeft, Building2, FileText, Expand, X, ExternalLink, Calendar, Users, Activity, Briefcase, DownloadCloud, Phone, Mail, MapPin, Trash2, Pencil } from 'lucide-react';
+import { ArrowLeft, Building2, FileText, X, ExternalLink, Users, Briefcase, DownloadCloud, Phone, Mail, Trash2, Pencil } from 'lucide-react';
 import Link from 'next/link';
 import { deleteCompany } from '@/app/companies/actions';
 

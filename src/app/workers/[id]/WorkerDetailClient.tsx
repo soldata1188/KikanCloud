@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react';
-import { ArrowLeft, User, FileText, Expand, X, ExternalLink, Calendar, IdCard, Activity, Briefcase, FileBadge2, DownloadCloud, Trash2, Pencil } from 'lucide-react';
+import { ArrowLeft, User, FileText, X, ExternalLink, IdCard, Briefcase, FileBadge2, DownloadCloud, Trash2, Pencil } from 'lucide-react';
 import Link from 'next/link';
 import { deleteWorker } from '@/app/workers/actions';
 

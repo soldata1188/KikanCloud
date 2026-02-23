@@ -28,27 +28,12 @@ VALUES
 
 -- Bật extension mã hóa mật khẩu
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
-
--- Vô hiệu hóa trigger tạo user tự động (để tránh xung đột với dữ liệu tĩnh)
-DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
-
 -- Xóa tài khoản cũ nếu có để tránh lỗi trùng lặp khi reset
 DELETE FROM auth.users WHERE email = 'admin@mirai.com';
-
 -- Tiêm tài khoản Auth (Mật khẩu: password123)
-INSERT INTO auth.users (instance_id, id, aud, role, email, encrypted_password, email_confirmed_at, raw_user_meta_data, created_at, updated_at)
-VALUES ('00000000-0000-0000-0000-000000000000', '99999999-9999-9999-9999-999999999999', 'authenticated', 'authenticated', 'admin@mirai.com', crypt('password123', gen_salt('bf')), now(), '{"full_name":"Admin Mirai"}'::jsonb, now(), now());
-
--- Thêm Identity bắt buộc cho Supabase Auth (Để được phép đăng nhập Password)
-INSERT INTO auth.identities (id, provider_id, user_id, identity_data, provider, last_sign_in_at, created_at, updated_at)
-VALUES (gen_random_uuid(), '99999999-9999-9999-9999-999999999999', '99999999-9999-9999-9999-999999999999', format('{"sub":"%s","email":"%s"}', '99999999-9999-9999-9999-999999999999', 'admin@mirai.com')::jsonb, 'email', now(), now(), now()) ON CONFLICT DO NOTHING;
-
+INSERT INTO auth.users (instance_id, id, aud, role, email, encrypted_password, email_confirmed_at, created_at, updated_at)
+VALUES ('00000000-0000-0000-0000-000000000000', '99999999-9999-9999-9999-999999999999', 'authenticated', 'authenticated', 'admin@mirai.com', crypt('password123', gen_salt('bf')), now(), now(), now());
 -- Map tài khoản đó vào bảng users của SaaS (Gắn với Nghiệp đoàn Demo 11111111-1111-1111-1111-111111111111)
 INSERT INTO public.users (id, tenant_id, full_name, role)
 VALUES ('99999999-9999-9999-9999-999999999999', '11111111-1111-1111-1111-111111111111', 'Admin Mirai', 'admin')
-ON CONFLICT (id) DO UPDATE SET tenant_id = '11111111-1111-1111-1111-111111111111';
-
--- Bật lại trigger tạo user tự động
-CREATE TRIGGER on_auth_user_created
-  AFTER INSERT ON auth.users
-  FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
+ON CONFLICT DO NOTHING;

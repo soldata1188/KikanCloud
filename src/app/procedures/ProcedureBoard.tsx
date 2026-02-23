@@ -1,10 +1,9 @@
 'use client'
 import { useState, useTransition, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { quickToggleProcedureStatus, deleteProcedure } from './actions'
+import { quickToggleProcedureStatus } from './actions'
 import { Clock, CheckCircle2, AlertCircle, Building2, UserCircle2, Edit2, FileText, Send, Landmark, GraduationCap } from 'lucide-react'
 import Link from 'next/link'
-import { ProcedureDeleteButton } from '@/components/SubmitButtons'
 
 export function ProcedureBoard({ procedures }: { procedures: any[] }) {
  const router = useRouter()

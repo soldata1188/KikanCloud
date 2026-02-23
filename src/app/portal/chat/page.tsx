@@ -1,6 +1,5 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { ClientSidebar } from '@/components/ClientSidebar'
 import { MessageCircle } from 'lucide-react'
 import { ChatBox } from '@/components/ChatBox'
 

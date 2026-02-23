@@ -1,8 +1,7 @@
 ﻿'use client'
 import { useState, useTransition } from 'react'
-import { Plus, Trash2, CheckCircle2, Save } from 'lucide-react'
+import { Plus, Trash2, Save } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { importWorkers } from '../actions'
 
 type RowData = {
  id: string;

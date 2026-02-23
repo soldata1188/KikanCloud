@@ -5,7 +5,7 @@ import { Sidebar } from '@/components/Sidebar'
 import GreetingBanner from '@/components/dashboard/GreetingBannerUpdated'
 import RecentChats from '@/components/dashboard/RecentChats'
 import { getDashboardStats, getExpiringDocuments } from '@/app/dashboard/actions'
-import { Users, Building2, Plane, UserMinus, AlertTriangle, MessageSquare, ClipboardList, ShieldCheck, Map, Workflow, Bot } from 'lucide-react'
+import { Users, Building2, AlertTriangle, MessageSquare, ClipboardList, ShieldCheck, Map, Workflow, Bot } from 'lucide-react'
 
 export const dynamic = 'force-dynamic';
 

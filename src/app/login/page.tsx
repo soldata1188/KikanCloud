@@ -38,11 +38,13 @@ export default function LoginPage() {
             <div className="w-full max-w-[400px] bg-white rounded-md border border-gray-350 overflow-hidden shadow-none">
                 <div className="p-8 md:p-10">
                     <div className="flex justify-center mb-6">
-                        <div className="w-16 h-16 bg-white border border-gray-350 rounded-[20px] flex items-center justify-center">
-                            <Logo className="w-10 h-10" />
+                        <div className="w-20 h-20 bg-white border border-gray-350 rounded-[24px] flex items-center justify-center">
+                            <Logo className="w-14 h-14" />
                         </div>
                     </div>
-                    <h1 className="text-2xl font-bold text-center text-gray-900 tracking-tight mb-8">KikanCloud</h1>
+                    <h1 className="text-2xl font-bold text-center text-gray-900 tracking-tight mb-8">
+                        Kikan<span className="text-[#24b47e]">Cloud</span>
+                    </h1>
 
                     {error && (
                         <div className="mb-4 text-sm font-medium text-red-600 bg-red-50 border border-red-200 p-3 rounded-md">

@@ -29,7 +29,7 @@ export async function extractDocumentAI(base64Image: string, mimeType: string) {
  }
 
  Translate the nationality to Japanese (e.g., VIET NAM -> ベトナム, INDONESIA -> インドネシア, CHINA -> 中国, PHILIPPINES -> フィリピン, NEPAL -> ネパール, CAMBODIA -> カンボジア).
- CRITICAL INSTRUCTION: You MUST output your responses EXCLUSIVELY in professional Japanese (Keigo). Under NO circumstances should you use or output Vietnamese.
+ CRITICAL RULE: Return ONLY a raw JSON object. Do NOT include markdown code blocks like \`\`\`json. Do NOT output any conversational text or explanations. Output values in Japanese where applicable.
 `;
 
  const response = await ai.models.generateContent({

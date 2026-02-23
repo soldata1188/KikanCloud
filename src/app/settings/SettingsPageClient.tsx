@@ -29,15 +29,15 @@ const TabContentAccount = ({
 }: {
     name: string, setName: (v: string) => void, email: string, updateProfile: any
 }) => (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-        <div>
+    <div className="max-w-3xl mx-auto py-6 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="text-center">
             <h3 className="text-lg font-medium text-gray-900">アカウント情報</h3>
             <p className="mt-1 text-sm text-gray-500">
                 個人情報とメールアドレスを更新します。
             </p>
         </div>
 
-        <form action={updateProfile} className="space-y-4 max-w-xl">
+        <form action={updateProfile} className="space-y-6 max-w-md mx-auto">
             <div>
                 <label className="block text-sm font-medium text-gray-700">
                     氏名
@@ -75,7 +75,7 @@ const TabContentAccount = ({
                 />
             </div>
 
-            <div className="pt-4 flex justify-start">
+            <div className="pt-8 flex justify-center">
                 <SaveButton />
             </div>
         </form>
@@ -88,15 +88,15 @@ const TabContentNotifications = ({
     emailAlerts: boolean, setEmailAlerts: (v: boolean) => void,
     pushAlerts: boolean, setPushAlerts: (v: boolean) => void
 }) => (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-        <div>
+    <div className="max-w-3xl mx-auto py-6 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="text-center">
             <h3 className="text-lg font-medium text-gray-900">通知</h3>
             <p className="mt-1 text-sm text-gray-500">
                 システムからの通知の受け取り方法を管理します。
             </p>
         </div>
 
-        <div className="space-y-4 max-w-xl">
+        <div className="space-y-4 max-w-lg mx-auto">
             <div className="flex items-center justify-between p-4 border border-gray-350 rounded-lg bg-gray-50">
                 <div>
                     <p className="font-medium text-gray-900">メール通知</p>
@@ -141,8 +141,8 @@ const TabContentTeam = ({
 }) => {
     if (userRole !== "admin") return null;
     return (
-        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div>
+        <div className="max-w-5xl mx-auto py-6 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="text-center">
                 <h3 className="text-lg font-medium text-gray-900">
                     システム権限管理
                 </h3>
@@ -229,15 +229,15 @@ const TabContentAI = ({
     aiModel: string, setAiModel: (v: string) => void,
     aiTone: string, setAiTone: (v: string) => void
 }) => (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-        <div>
+    <div className="max-w-3xl mx-auto py-6 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="text-center">
             <h3 className="text-lg font-medium text-gray-900">AI設定 (Gemini)</h3>
             <p className="mt-1 text-sm text-gray-500">
                 KikanCloud AI アシスタントの動作とモデルをカスタマイズします。
             </p>
         </div>
 
-        <div className="space-y-4 max-w-xl">
+        <div className="space-y-6 max-w-md mx-auto">
             <div>
                 <label className="block text-sm font-medium text-gray-700">
                     AI モデル
@@ -282,8 +282,8 @@ const TabContentAI = ({
                 />
             </div>
 
-            <div className="pt-4">
-                <button className="flex items-center justify-center gap-2 bg-[#24b47e] text-white px-4 py-2 rounded-md hover:bg-[#1e9668] transition-colors font-medium">
+            <div className="pt-8 flex justify-center">
+                <button className="flex items-center justify-center gap-2 w-full md:w-[350px] bg-[#24b47e] text-white px-6 py-3 rounded-md hover:bg-[#1e9668] transition-all font-semibold shadow-sm">
                     <Save size={18} /> AI設定を更新
                 </button>
             </div>

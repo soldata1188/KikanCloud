@@ -15,6 +15,7 @@ import {
     Landmark,
 } from "lucide-react";
 import { SidebarLogo } from "./SidebarLogo";
+import { SidebarAvatar } from "./SidebarAvatar";
 import { createClient } from "@/lib/supabase/server";
 import { logout } from "@/app/login/actions";
 
@@ -38,9 +39,9 @@ const NAV_ITEMS = [
     { id: "workflows", name: "業務フロー", href: "/workflows", icon: GitMerge },
     { id: "routing", name: "ルート最適化", href: "/routing", icon: Map },
     { id: "roadmap", name: "制度ロードマップ", href: "/roadmap", icon: Route },
-    { id: "organization", name: "機関情報", href: "/organization", icon: Landmark },
+    // { id: "organization", name: "機関情報", href: "/organization", icon: Landmark },
     { id: "chat", name: "AIチャット", href: "/chat", icon: Sparkles },
-    { id: "settings", name: "設定", href: "/settings", icon: Settings },
+    // { id: "settings", name: "設定", href: "/settings", icon: Settings },
 ];
 
 export async function Sidebar({ active }: { active: string }) {
@@ -49,19 +50,21 @@ export async function Sidebar({ active }: { active: string }) {
         data: { user },
     } = await supabase.auth.getUser();
     let userRole = "staff";
+    let userProfile = null;
     if (user) {
         const { data } = await supabase
             .from("users")
-            .select("role")
+            .select("full_name, role")
             .eq("id", user.id)
             .single();
         userRole = data?.role || "staff";
+        userProfile = data;
     }
 
     return (
         <aside className="shrink-0 h-screen w-16 md:w-[68px] bg-[#fbfcfd] border-r border-gray-350 flex flex-col py-6 z-50 relative">
             <div className="w-full flex justify-center mt-[-8px] transition-all duration-300">
-                <SidebarLogo />
+                <SidebarAvatar userProfile={userProfile} />
             </div>
 
             {/* Navigation Menu */}
@@ -100,7 +103,10 @@ export async function Sidebar({ active }: { active: string }) {
                 })}
             </nav>
 
-            <div className="w-full flex flex-col gap-2 pt-4 mt-auto">
+            <div className="w-full flex flex-col items-center gap-2 pt-4 mt-auto">
+                <div className="w-full flex justify-center mb-2">
+                    <SidebarLogo />
+                </div>
                 <form action={logout} className="w-full">
                     <button
                         type="submit"

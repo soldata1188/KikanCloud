@@ -5,7 +5,7 @@ import { Sidebar } from '@/components/Sidebar'
 import GreetingBanner from '@/components/dashboard/GreetingBannerUpdated'
 import RecentChats from '@/components/dashboard/RecentChats'
 import { getDashboardStats, getExpiringDocuments } from '@/app/dashboard/actions'
-import { Users, Building2, AlertTriangle, MessageSquare, ClipboardList, ShieldCheck, Map, Workflow, Bot } from 'lucide-react'
+import { Users, Building2, AlertTriangle, MessageSquare, ClipboardList, ShieldCheck, Map, Workflow, Bot, Route } from 'lucide-react'
 
 export const dynamic = 'force-dynamic';
 
@@ -57,6 +57,7 @@ export default async function DashboardPage() {
                                 <QuickAccessCard href="/routing" title="ルート最適化" icon={<Map size={32} />} bgClass="bg-[#e4f7fb]" textClass="text-[#12b5cb]" hoverClass="hover:border-[#12b5cb]" />
                                 <QuickAccessCard href="/workflows" title="業務フロー" icon={<Workflow size={32} />} bgClass="bg-[#fce4ec]" textClass="text-[#c2185b]" hoverClass="hover:border-[#c2185b]" />
                                 <QuickAccessCard href="/ai-chat" title="AIチャット" icon={<Bot size={32} />} bgClass="bg-[#e8eaed]" textClass="text-[#3c4043]" hoverClass="hover:border-[#3c4043]" />
+                                <QuickAccessCard href="/roadmap" title="ロードマップ" icon={<Route size={32} />} bgClass="bg-[#fff3e0]" textClass="text-[#f57c00]" hoverClass="hover:border-[#f57c00]" />
                             </div>
                         </div>
 

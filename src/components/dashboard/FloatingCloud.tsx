@@ -46,7 +46,7 @@ export default function FloatingCloud() {
                     <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-2.5 h-2.5 bg-white border-b border-r border-gray-300 rotate-45" />
                 </div>
             )}
-            <span className="text-5xl text-primary-400 drop-shadow-sm select-none">
+            <span className="text-[150px] text-primary-400 drop-shadow-sm select-none leading-none">
                 ☁️
             </span>
         </div>

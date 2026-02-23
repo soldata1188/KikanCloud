@@ -12,6 +12,7 @@ import {
     MessageSquare,
     ClipboardList,
     Route,
+    Landmark,
 } from "lucide-react";
 import { SidebarLogo } from "./SidebarLogo";
 import { createClient } from "@/lib/supabase/server";
@@ -37,6 +38,7 @@ const NAV_ITEMS = [
     { id: "workflows", name: "業務フロー", href: "/workflows", icon: GitMerge },
     { id: "routing", name: "ルート最適化", href: "/routing", icon: Map },
     { id: "roadmap", name: "制度ロードマップ", href: "/roadmap", icon: Route },
+    { id: "organization", name: "機関情報", href: "/organization", icon: Landmark },
     { id: "chat", name: "AIチャット", href: "/chat", icon: Sparkles },
     { id: "settings", name: "設定", href: "/settings", icon: Settings },
 ];

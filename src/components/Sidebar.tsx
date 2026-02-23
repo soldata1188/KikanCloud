@@ -62,9 +62,9 @@ export async function Sidebar({ active }: { active: string }) {
     }
 
     return (
-        <aside className="shrink-0 h-screen w-16 md:w-[240px] bg-[#fbfcfd] border-r border-gray-350 flex flex-col py-6 z-50 relative transition-all duration-300">
+        <aside className="shrink-0 h-screen w-16 md:w-[180px] bg-[#fbfcfd] border-r border-gray-350 flex flex-col py-6 z-50 relative transition-all duration-300">
             {/* Top section with Avatar Workspace */}
-            <div className="w-full flex items-center justify-center md:justify-start md:px-5 mt-[-8px] mb-4 transition-all duration-300 gap-3">
+            <div className="w-full flex items-center justify-center md:justify-start md:px-4 mt-[-8px] mb-4 transition-all duration-300 gap-3">
                 <div className="shrink-0 flex items-center justify-center w-full md:w-auto">
                     <SidebarAvatar userProfile={userProfile} />
                 </div>
@@ -90,8 +90,8 @@ export async function Sidebar({ active }: { active: string }) {
                             key={item.href}
                             href={item.href}
                             className={`group relative items-center justify-center md:justify-start w-full md:px-3 h-12 md:h-11 md:rounded-[8px] hover:bg-gray-100 transition-colors ${['dashboard', 'b2b-chat', 'chat'].includes(item.id)
-                                    ? 'flex'
-                                    : 'hidden md:flex'
+                                ? 'flex'
+                                : 'hidden md:flex'
                                 } ${isActive && 'md:bg-primary-50 md:hover:bg-primary-50'}`}
                         >
                             {/* Left-Border Accent for Active State (Mobile only) */}

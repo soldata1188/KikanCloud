@@ -35,10 +35,10 @@ export default async function DashboardPage() {
     const documents = await getExpiringDocuments()
 
     return (
-        <div className="flex h-screen bg-[#fbfcfd] font-sans text-gray-900 overflow-hidden selection:bg-[#24b47e]/20">
+        <div className="flex h-screen bg-white font-sans text-gray-900 overflow-hidden selection:bg-[#24b47e]/20">
             <Sidebar active="dashboard" />
 
-            <div className="flex-1 flex flex-col relative min-w-0 bg-[#fbfcfd]">
+            <div className="flex-1 flex flex-col relative min-w-0 bg-white">
                 <main className="flex-1 overflow-y-auto relative p-6 md:p-8">
                     <div className="max-w-7xl mx-auto space-y-10">
                         {/* Mái chào hỏi thân thiện & Thời tiết */}

@@ -28,7 +28,7 @@ const KIKOU_OPTIONS = ['---', '認定申請', '転籍申請', '軽微変更', '�
 const NYUKAN_OPTIONS = ['---', '在留資格', '資格変更', '期間更新', '特定活動', '特定変更', '特定更新', '届出等', '完了'];
 const STAFF_OPTIONS = ['---', 'Yamada', 'Suzuki', 'Nguyen', 'Tran', 'Sato'];
 
-type WorkerField = 'status';
+type WorkerField = 'status' | 'kentei_status' | 'kikou_status' | 'nyukan_status';
 
 export default function OperationsClient({ initialWorkers, companies }: { initialWorkers: any[], companies: any[] }) {
     // Map initial data into our UI shape because the DB schema differs slightly 
@@ -55,7 +55,10 @@ export default function OperationsClient({ initialWorkers, companies }: { initia
             entryDate: w.entry_date || '',
             certEndDate: w.cert_end_date || '---',
             applicationDate: '',
-            status: reverseStatusMap[w.status] || '入国待ち'
+            status: reverseStatusMap[w.status] || '入国待ち',
+            kenteiStatus: w.kentei_status || '---',
+            kikouStatus: w.kikou_status || '---',
+            nyukanStatus: w.nyukan_status || '---'
         };
     });
 
@@ -300,6 +303,9 @@ export default function OperationsClient({ initialWorkers, companies }: { initia
                             </th>
                             <th className="border border-gray-350 px-4 py-3 font-semibold whitespace-nowrap min-w-[200px]">外国人材 / 受入企業</th>
                             <th className="border border-gray-350 px-4 py-3 font-semibold whitespace-nowrap w-[160px] min-w-[160px] max-w-[160px]">在留情報</th>
+                            <th className="border border-gray-350 px-4 py-3 font-semibold whitespace-nowrap w-[120px] min-w-[120px]">検定業務</th>
+                            <th className="border border-gray-350 px-4 py-3 font-semibold whitespace-nowrap w-[120px] min-w-[120px]">機構業務</th>
+                            <th className="border border-gray-350 px-4 py-3 font-semibold whitespace-nowrap w-[120px] min-w-[120px]">入管業務</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -362,6 +368,45 @@ export default function OperationsClient({ initialWorkers, companies }: { initia
                                             終了: <span className="text-gray-900 font-medium">{worker.certEndDate}</span>
                                         </div>
                                     </div>
+                                </td>
+
+                                {/* 検定業務 (Kentei Ops) */}
+                                <td className="border border-gray-350 px-4 py-3 text-center align-top pt-5">
+                                    <select
+                                        value={worker.kenteiStatus}
+                                        onChange={(e) => handleChange(worker.id, 'kentei_status', e.target.value)}
+                                        className={`text-xs p-1.5 border rounded outline-none w-full text-center cursor-pointer transition-colors ${worker.kenteiStatus === '完了' ? 'bg-green-50 border-green-200 text-green-700 font-medium' :
+                                            worker.kenteiStatus !== '---' ? 'bg-blue-50 border-blue-200 text-blue-700 font-medium' : 'bg-gray-50 border-gray-200 text-gray-500'
+                                            }`}
+                                    >
+                                        {KENTEI_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                    </select>
+                                </td>
+
+                                {/* 機構業務 (Kikou Ops) */}
+                                <td className="border border-gray-350 px-4 py-3 text-center align-top pt-5">
+                                    <select
+                                        value={worker.kikouStatus}
+                                        onChange={(e) => handleChange(worker.id, 'kikou_status', e.target.value)}
+                                        className={`text-xs p-1.5 border rounded outline-none w-full text-center cursor-pointer transition-colors ${worker.kikouStatus === '完了' ? 'bg-green-50 border-green-200 text-green-700 font-medium' :
+                                            worker.kikouStatus !== '---' ? 'bg-purple-50 border-purple-200 text-purple-700 font-medium' : 'bg-gray-50 border-gray-200 text-gray-500'
+                                            }`}
+                                    >
+                                        {KIKOU_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                    </select>
+                                </td>
+
+                                {/* 入管業務 (Nyukan Ops) */}
+                                <td className="border border-gray-350 px-4 py-3 text-center align-top pt-5">
+                                    <select
+                                        value={worker.nyukanStatus}
+                                        onChange={(e) => handleChange(worker.id, 'nyukan_status', e.target.value)}
+                                        className={`text-xs p-1.5 border rounded outline-none w-full text-center cursor-pointer transition-colors ${worker.nyukanStatus === '完了' ? 'bg-green-50 border-green-200 text-green-700 font-medium' :
+                                            worker.nyukanStatus !== '---' ? 'bg-orange-50 border-orange-200 text-orange-700 font-medium' : 'bg-gray-50 border-gray-200 text-gray-500'
+                                            }`}
+                                    >
+                                        {NYUKAN_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                    </select>
                                 </td>
 
                             </tr>

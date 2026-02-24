@@ -66,6 +66,7 @@ export default function OperationsClient({ initialWorkers, companies }: { initia
             certStartDate: w.cert_start_date || '---',
             certEndDate: w.cert_end_date || '---',
             applicationDate: '',
+            remarks: w.remarks || '',
             status: reverseStatusMap[w.status] || '入国待ち',
             kenteiStatus: (typeof w.kentei_status === 'object' && w.kentei_status ? w.kentei_status : { type: '---', progress: '未着手', assignee: '---', note: '' }) as OperationData,
             kikouStatus: (typeof w.kikou_status === 'object' && w.kikou_status ? w.kikou_status : { type: '---', progress: '未着手', assignee: '---', note: '' }) as OperationData,
@@ -179,6 +180,17 @@ export default function OperationsClient({ initialWorkers, companies }: { initia
         } catch (error) {
             console.error(error);
             alert("更新エラーが発生しました"); // Quick fallback
+        }
+    };
+
+    const handleRemarksBlur = async (id: string) => {
+        const worker = workers.find(w => w.id === id);
+        if (!worker) return;
+        try {
+            await updateWorkerStatus(id, 'remarks', worker.remarks);
+        } catch (error) {
+            console.error(error);
+            alert("備考の更新に失敗しました");
         }
     };
 
@@ -337,6 +349,7 @@ export default function OperationsClient({ initialWorkers, companies }: { initia
                             <th className="border border-gray-350 px-4 py-3 font-semibold whitespace-nowrap w-[120px] min-w-[120px]">検定業務</th>
                             <th className="border border-gray-350 px-4 py-3 font-semibold whitespace-nowrap w-[120px] min-w-[120px]">機構業務</th>
                             <th className="border border-gray-350 px-4 py-3 font-semibold whitespace-nowrap w-[120px] min-w-[120px]">入管業務</th>
+                            <th className="border border-gray-350 px-4 py-3 font-semibold whitespace-nowrap min-w-[250px]">備考 (MEMO)</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -432,10 +445,9 @@ export default function OperationsClient({ initialWorkers, companies }: { initia
                                                 {STAFF_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                                             </select>
                                         </div>
-                                        <select value={worker.kenteiStatus.progress} onChange={e => handleOperationChange(worker.id, 'kentei_status', 'progress', e.target.value)} className={`text-xs p-1 rounded font-medium outline-none w-full text-center cursor-pointer transition-colors ${worker.kenteiStatus.progress === '完了' ? 'bg-green-100 text-green-700' : worker.kenteiStatus.progress === '進行中' ? 'bg-blue-100 text-blue-700' : 'bg-gray-200 text-gray-700'}`}>
+                                        <select value={worker.kenteiStatus.progress} onChange={e => handleOperationChange(worker.id, 'kentei_status', 'progress', e.target.value)} className={`text-xs p-1 rounded font-medium outline-none w-full text-center cursor-pointer transition-colors mt-auto ${worker.kenteiStatus.progress === '完了' ? 'bg-green-100 text-green-700' : worker.kenteiStatus.progress === '進行中' ? 'bg-blue-100 text-blue-700' : 'bg-gray-200 text-gray-700'}`}>
                                             {PROGRESS_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                                         </select>
-                                        <input type="text" placeholder="メモを追加..." value={worker.kenteiStatus.note} onChange={e => handleOperationChange(worker.id, 'kentei_status', 'note', e.target.value)} className="text-[11px] p-1.5 border border-gray-200 rounded outline-none w-full focus:border-primary-500 hover:border-gray-300 transition-colors bg-white mt-auto" />
                                     </div>
                                 </td>
 
@@ -450,10 +462,9 @@ export default function OperationsClient({ initialWorkers, companies }: { initia
                                                 {STAFF_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                                             </select>
                                         </div>
-                                        <select value={worker.kikouStatus.progress} onChange={e => handleOperationChange(worker.id, 'kikou_status', 'progress', e.target.value)} className={`text-xs p-1 rounded font-medium outline-none w-full text-center cursor-pointer transition-colors ${worker.kikouStatus.progress === '完了' ? 'bg-green-100 text-green-700' : worker.kikouStatus.progress === '進行中' ? 'bg-purple-100 text-purple-700' : 'bg-gray-200 text-gray-700'}`}>
+                                        <select value={worker.kikouStatus.progress} onChange={e => handleOperationChange(worker.id, 'kikou_status', 'progress', e.target.value)} className={`text-xs p-1 rounded font-medium outline-none w-full text-center cursor-pointer transition-colors mt-auto ${worker.kikouStatus.progress === '完了' ? 'bg-green-100 text-green-700' : worker.kikouStatus.progress === '進行中' ? 'bg-purple-100 text-purple-700' : 'bg-gray-200 text-gray-700'}`}>
                                             {PROGRESS_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                                         </select>
-                                        <input type="text" placeholder="メモを追加..." value={worker.kikouStatus.note} onChange={e => handleOperationChange(worker.id, 'kikou_status', 'note', e.target.value)} className="text-[11px] p-1.5 border border-gray-200 rounded outline-none w-full focus:border-primary-500 hover:border-gray-300 transition-colors bg-white mt-auto" />
                                     </div>
                                 </td>
 
@@ -468,11 +479,21 @@ export default function OperationsClient({ initialWorkers, companies }: { initia
                                                 {STAFF_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                                             </select>
                                         </div>
-                                        <select value={worker.nyukanStatus.progress} onChange={e => handleOperationChange(worker.id, 'nyukan_status', 'progress', e.target.value)} className={`text-xs p-1 rounded font-medium outline-none w-full text-center cursor-pointer transition-colors ${worker.nyukanStatus.progress === '完了' ? 'bg-green-100 text-green-700' : worker.nyukanStatus.progress === '進行中' ? 'bg-orange-100 text-orange-700' : 'bg-gray-200 text-gray-700'}`}>
+                                        <select value={worker.nyukanStatus.progress} onChange={e => handleOperationChange(worker.id, 'nyukan_status', 'progress', e.target.value)} className={`text-xs p-1 rounded font-medium outline-none w-full text-center cursor-pointer transition-colors mt-auto ${worker.nyukanStatus.progress === '完了' ? 'bg-green-100 text-green-700' : worker.nyukanStatus.progress === '進行中' ? 'bg-orange-100 text-orange-700' : 'bg-gray-200 text-gray-700'}`}>
                                             {PROGRESS_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                                         </select>
-                                        <input type="text" placeholder="メモを追加..." value={worker.nyukanStatus.note} onChange={e => handleOperationChange(worker.id, 'nyukan_status', 'note', e.target.value)} className="text-[11px] p-1.5 border border-gray-200 rounded outline-none w-full focus:border-primary-500 hover:border-gray-300 transition-colors bg-white mt-auto" />
                                     </div>
+                                </td>
+
+                                {/* 備考 (MEMO) */}
+                                <td className="border border-gray-350 p-2 align-top">
+                                    <textarea
+                                        value={worker.remarks}
+                                        onChange={(e) => setWorkers(prev => prev.map(w => w.id === worker.id ? { ...w, remarks: e.target.value } : w))}
+                                        onBlur={() => handleRemarksBlur(worker.id)}
+                                        placeholder="特記事項やメモを入力..."
+                                        className="w-full h-[76px] text-xs p-2 border border-gray-200 rounded outline-none focus:border-primary-500 hover:border-gray-300 transition-colors resize-y bg-white/50 focus:bg-white"
+                                    />
                                 </td>
 
                             </tr>

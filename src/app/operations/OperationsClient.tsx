@@ -367,32 +367,32 @@ export default function OperationsClient({ initialWorkers, companies }: { initia
                     <tbody>
                         {processedWorkers.map((worker) => (
                             <tr key={worker.id} className={`hover:bg-gray-50 transition-colors ${selectedIds.includes(worker.id) ? 'bg-green-50/50' : ''}`}>
-                                <td className="border border-gray-350 px-4 py-3 text-center align-top pt-5 w-[40px] shrink-0">
+                                <td className="border border-gray-350 p-1 bg-gray-50 text-center align-top pt-2 w-8 shrink-0">
                                     <input
                                         type="checkbox"
                                         checked={selectedIds.includes(worker.id)}
                                         onChange={() => toggleSelect(worker.id)}
-                                        className="w-4 h-4 text-primary-600 rounded border-gray-300 cursor-pointer"
+                                        className="w-3.5 h-3.5 text-primary-600 rounded border-gray-300 cursor-pointer"
                                     />
                                 </td>
                                 {/* Worker Info (Avatar, Name, ID) & Company */}
-                                <td className="border border-gray-350 px-4 py-3 align-top">
-                                    <div className="flex flex-col gap-2">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-9 h-9 shrink-0 rounded-md bg-primary-100 text-primary-700 font-bold flex items-center justify-center text-lg">
+                                <td className="border border-gray-350 p-1.5 align-top">
+                                    <div className="flex flex-col gap-1">
+                                        <div className="flex items-center gap-1.5">
+                                            <div className="w-6 h-6 shrink-0 rounded bg-primary-100 text-primary-700 font-bold flex items-center justify-center text-xs">
                                                 {worker.avatar}
                                             </div>
                                             <div className="flex-1 min-w-0">
-                                                <div className="font-semibold text-gray-900 truncate" title={worker.name}>{worker.name}</div>
-                                                <div className="text-[11px] text-gray-400 mt-0.5 truncate" title={worker.furigana}>{worker.furigana}</div>
+                                                <div className="font-semibold text-gray-900 truncate text-[11px] leading-tight" title={worker.name}>{worker.name}</div>
+                                                <div className="text-[9px] text-gray-400 mt-0 truncate leading-tight" title={worker.furigana}>{worker.furigana}</div>
                                             </div>
                                         </div>
-                                        <div className="flex flex-col gap-1.5 border-t border-gray-100 pt-2 mt-1">
+                                        <div className="flex flex-col gap-0.5 border-t border-gray-100 pt-0.5 mt-0.5">
                                             <div className="flex items-center">
                                                 <select
                                                     value={worker.status}
                                                     onChange={(e) => handleChange(worker.id, 'status', e.target.value)}
-                                                    className={`text-[10px] font-medium px-1.5 py-0.5 rounded outline-none cursor-pointer hover:opacity-80 transition-opacity ${worker.status === '就業中' ? 'bg-green-50 text-green-700' :
+                                                    className={`text-[9px] font-medium px-1 py-px rounded outline-none cursor-pointer hover:opacity-80 transition-opacity ${worker.status === '就業中' ? 'bg-green-50 text-green-700' :
                                                         worker.status === '帰国' ? 'bg-gray-100 text-gray-600' :
                                                             worker.status === '失踪' ? 'bg-red-50 text-red-700' :
                                                                 'bg-orange-50 text-orange-700'
@@ -401,7 +401,7 @@ export default function OperationsClient({ initialWorkers, companies }: { initia
                                                     {STATUS_CARDS.filter(s => s !== 'すべて').map(s => <option key={s} value={s}>{s}</option>)}
                                                 </select>
                                             </div>
-                                            <div className="text-[11px] font-medium text-gray-600 truncate mt-0.5" title={worker.company}>
+                                            <div className="text-[10px] font-medium text-gray-600 truncate mt-0 leading-tight" title={worker.company}>
                                                 🏢 {worker.company}
                                             </div>
                                         </div>
@@ -409,45 +409,45 @@ export default function OperationsClient({ initialWorkers, companies }: { initia
                                 </td>
 
                                 {/* Certification Info */}
-                                <td className="border border-gray-350 px-4 py-3">
-                                    <div className="flex flex-col gap-1 inline-flex w-full">
-                                        <div className="text-xs text-gray-500 whitespace-nowrap">
+                                <td className="border border-gray-350 px-1.5 py-1">
+                                    <div className="flex flex-col gap-0.5 inline-flex w-full">
+                                        <div className="text-[10px] text-gray-500 whitespace-nowrap leading-tight">
                                             制度: <span className="text-gray-900 font-medium">{worker.systemCategory}</span>
                                         </div>
-                                        <div className="flex items-center justify-between mt-0.5 gap-2">
-                                            <span className="text-xs text-gray-500 whitespace-nowrap">職種: <span className="text-gray-900 font-medium">{worker.occupation}</span></span>
+                                        <div className="flex items-center justify-between mt-0 gap-1">
+                                            <span className="text-[10px] text-gray-500 whitespace-nowrap leading-tight">職種: <span className="text-gray-900 font-medium">{worker.occupation}</span></span>
                                         </div>
-                                        <div className="border-t border-gray-100 my-1"></div>
-                                        <div className="text-xs text-gray-500 whitespace-nowrap">
+                                        <div className="border-t border-gray-100 my-0.5"></div>
+                                        <div className="text-[10px] text-gray-500 whitespace-nowrap leading-tight">
                                             開始: <span className="text-gray-900 font-medium">{worker.certStartDate}</span>
                                         </div>
-                                        <div className="text-xs text-gray-500 whitespace-nowrap">
+                                        <div className="text-[10px] text-gray-500 whitespace-nowrap leading-tight">
                                             終了: <span className="text-gray-900 font-medium">{worker.certEndDate}</span>
                                         </div>
                                     </div>
                                 </td>
 
                                 {/* Residence Info (Status, Expiry, Duration) */}
-                                <td className="border border-gray-350 px-4 py-3">
-                                    <div className="flex flex-col gap-1 inline-flex w-full">
-                                        <div className="text-xs text-gray-500 whitespace-nowrap">
+                                <td className="border border-gray-350 px-1.5 py-1">
+                                    <div className="flex flex-col gap-0.5 inline-flex w-full">
+                                        <div className="text-[10px] text-gray-500 whitespace-nowrap leading-tight">
                                             資格: <span className="text-gray-900 font-medium">{worker.visaStatus}</span>
                                         </div>
-                                        <div className="flex items-center justify-between mt-0.5 gap-2">
-                                            <span className="text-xs text-gray-500 whitespace-nowrap">期限: <span className="text-gray-900 font-medium">{worker.visaExpiry}</span></span>
+                                        <div className="flex items-center justify-between mt-0 gap-1">
+                                            <span className="text-[10px] text-gray-500 whitespace-nowrap leading-tight">期限: <span className="text-gray-900 font-medium">{worker.visaExpiry}</span></span>
                                         </div>
-                                        <div className="border-t border-gray-100 my-1"></div>
-                                        <div className="text-xs text-gray-500 whitespace-nowrap">
+                                        <div className="border-t border-gray-100 my-0.5"></div>
+                                        <div className="text-[10px] text-gray-500 whitespace-nowrap leading-tight">
                                             入国: <span className="text-gray-900 font-medium">{worker.entryDate || '---'}</span>
                                         </div>
-                                        <div className="text-xs text-gray-500 whitespace-nowrap">
+                                        <div className="text-[10px] text-gray-500 whitespace-nowrap leading-tight">
                                             期生: <span className="text-gray-900 font-medium">{getBatchString(worker.entryDate)}</span>
                                         </div>
                                     </div>
                                 </td>
 
                                 {/* 検定業務 (Kentei Ops) */}
-                                <td className="border border-gray-350 px-3 py-2 align-top w-[200px] min-w-[200px]">
+                                <td className="border border-gray-350 p-1 align-top w-[200px] min-w-[200px]">
                                     <div className="flex flex-col gap-1.5 h-full relative">
                                         <div className="flex justify-between gap-1">
                                             <select value={worker.kenteiStatus.type} onChange={e => handleOperationChange(worker.id, 'kentei_status', 'type', e.target.value)} className="text-xs p-1 outline-none w-1/2 cursor-pointer bg-transparent text-gray-700 font-medium">
@@ -480,7 +480,7 @@ export default function OperationsClient({ initialWorkers, companies }: { initia
                                 </td>
 
                                 {/* 機構業務/建設特定 (Kikou Ops) */}
-                                <td className="border border-gray-350 px-3 py-2 align-top w-[200px] min-w-[200px]">
+                                <td className="border border-gray-350 p-1 align-top w-[200px] min-w-[200px]">
                                     <div className="flex flex-col gap-1.5 h-full relative">
                                         <div className="flex justify-between gap-1">
                                             <select value={worker.kikouStatus.type} onChange={e => handleOperationChange(worker.id, 'kikou_status', 'type', e.target.value)} className="text-xs p-1 outline-none w-1/2 cursor-pointer bg-transparent text-gray-700 font-medium">
@@ -518,7 +518,7 @@ export default function OperationsClient({ initialWorkers, companies }: { initia
                                 </td>
 
                                 {/* 入管業務 (Nyukan Ops) */}
-                                <td className="border border-gray-350 px-3 py-2 align-top w-[200px] min-w-[200px]">
+                                <td className="border border-gray-350 p-1 align-top w-[200px] min-w-[200px]">
                                     <div className="flex flex-col gap-1.5 h-full relative">
                                         <div className="flex justify-between gap-1">
                                             <select value={worker.nyukanStatus.type} onChange={e => handleOperationChange(worker.id, 'nyukan_status', 'type', e.target.value)} className="text-xs p-1 outline-none w-1/2 cursor-pointer bg-transparent text-gray-700 font-medium">

@@ -17,5 +17,6 @@ jobs:
           version: latest
       - name: Push DB Migrations
         run: |
-          supabase link --project-ref $SUPABASE_PROJECT_ID --password $SUPABASE_DB_PASSWORD
-          supabase db push
+          supabase link --project-ref "$SUPABASE_PROJECT_ID" --password "$SUPABASE_DB_PASSWORD"
+          supabase db push --password "$SUPABASE_DB_PASSWORD"
+

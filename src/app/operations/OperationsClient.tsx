@@ -357,7 +357,7 @@ export default function OperationsClient({ initialWorkers, companies }: { initia
                                 <td className="border border-gray-350 px-4 py-3">
                                     <div className="flex flex-col gap-1 inline-flex w-full">
                                         <div className="text-xs text-gray-500 whitespace-nowrap">
-                                            在留資格: <span className="text-gray-900 font-medium">{worker.visaStatus}</span>
+                                            資格: <span className="text-gray-900 font-medium">{worker.visaStatus}</span>
                                         </div>
                                         <div className="flex items-center justify-between mt-0.5 gap-2">
                                             <span className="text-xs text-gray-500 whitespace-nowrap">期限: <span className="text-gray-900 font-medium">{worker.visaExpiry}</span></span>

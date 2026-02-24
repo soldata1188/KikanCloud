@@ -17,6 +17,9 @@ export interface OperationData {
     application_date?: string;
     receipt_number?: string;
     agent?: string;
+    // Kikou / Construction Sub-fields
+    construction_type?: string;
+    construction_assignee?: string;
 }
 
 const PROGRESS_OPTIONS = ['未着手', '進行中', '完了'];
@@ -42,6 +45,7 @@ const calculateDuration = (entryDate: string) => {
 
 const KENTEI_OPTIONS = ['---', '初級', '専門級', '日本語N4', '完了'];
 const KIKOU_OPTIONS = ['---', '認定申請', '転籍申請', '軽微変更', '困難届出', '完了'];
+const CONSTRUCTION_OPTIONS = ['---', 'オンライン申請', '変更届出等'];
 const NYUKAN_OPTIONS = ['---', '在留資格', '資格変更', '期間更新', '特定活動', '特定変更', '特定更新', '届出等', '完了'];
 const STAFF_OPTIONS = ['---', 'Yamada', 'Suzuki', 'Nguyen', 'Tran', 'Sato'];
 
@@ -77,7 +81,7 @@ export default function OperationsClient({ initialWorkers, companies }: { initia
             remarks: w.remarks || '',
             status: reverseStatusMap[w.status] || '入国待ち',
             kenteiStatus: (typeof w.kentei_status === 'object' && w.kentei_status ? w.kentei_status : { type: '---', progress: '未着手', assignee: '---', exam_date_written: '', exam_date_practical: '', exam_location: '' }) as OperationData,
-            kikouStatus: (typeof w.kikou_status === 'object' && w.kikou_status ? w.kikou_status : { type: '---', progress: '未着手', assignee: '---' }) as OperationData,
+            kikouStatus: (typeof w.kikou_status === 'object' && w.kikou_status ? w.kikou_status : { type: '---', progress: '未着手', assignee: '---', construction_type: '---', construction_assignee: '---' }) as OperationData,
             nyukanStatus: (typeof w.nyukan_status === 'object' && w.nyukan_status ? w.nyukan_status : { type: '---', progress: '未着手', assignee: '---', application_date: '', receipt_number: '', agent: '' }) as OperationData
         };
     });
@@ -355,7 +359,7 @@ export default function OperationsClient({ initialWorkers, companies }: { initia
                             <th className="border border-gray-350 px-4 py-3 font-semibold whitespace-nowrap w-[160px] min-w-[160px] max-w-[160px]">認定情報</th>
                             <th className="border border-gray-350 px-4 py-3 font-semibold whitespace-nowrap w-[160px] min-w-[160px] max-w-[160px]">在留情報</th>
                             <th className="border border-gray-350 px-4 py-3 font-semibold whitespace-nowrap w-[200px] min-w-[200px]">検定業務</th>
-                            <th className="border border-gray-350 px-4 py-3 font-semibold whitespace-nowrap w-[200px] min-w-[200px]">機構業務</th>
+                            <th className="border border-gray-350 px-4 py-3 font-semibold whitespace-nowrap w-[200px] min-w-[200px]">機構業務/建設特定</th>
                             <th className="border border-gray-350 px-4 py-3 font-semibold whitespace-nowrap w-[200px] min-w-[200px]">入管業務</th>
                             <th className="border border-gray-350 px-4 py-3 font-semibold whitespace-nowrap min-w-[250px]">備考 (MEMO)</th>
                         </tr>
@@ -475,9 +479,9 @@ export default function OperationsClient({ initialWorkers, companies }: { initia
                                     </div>
                                 </td>
 
-                                {/* 機構業務 (Kikou Ops) */}
+                                {/* 機構業務/建設特定 (Kikou Ops) */}
                                 <td className="border border-gray-350 px-3 py-2 align-top w-[200px] min-w-[200px]">
-                                    <div className="flex flex-col gap-1.5 h-full">
+                                    <div className="flex flex-col gap-1.5 h-full relative">
                                         <div className="flex justify-between gap-1">
                                             <select value={worker.kikouStatus.type} onChange={e => handleOperationChange(worker.id, 'kikou_status', 'type', e.target.value)} className="text-xs p-1 outline-none w-1/2 cursor-pointer bg-transparent text-gray-700 font-medium">
                                                 {KIKOU_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
@@ -485,6 +489,18 @@ export default function OperationsClient({ initialWorkers, companies }: { initia
                                             <select value={worker.kikouStatus.assignee} onChange={e => handleOperationChange(worker.id, 'kikou_status', 'assignee', e.target.value)} className="text-xs p-1 outline-none w-1/2 cursor-pointer bg-transparent text-gray-700 text-right">
                                                 {STAFF_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                                             </select>
+                                        </div>
+                                        <div className="flex justify-between gap-1 border-t border-gray-100 pt-1.5 mt-0.5 mb-1">
+                                            <div className="flex flex-col gap-1 text-[10px] w-full">
+                                                <div className="flex items-center justify-between gap-1 w-full relative">
+                                                    <select value={worker.kikouStatus.construction_type || '---'} onChange={e => handleOperationChange(worker.id, 'kikou_status', 'construction_type', e.target.value)} className="w-[105px] bg-transparent outline-none text-gray-500 cursor-pointer">
+                                                        {CONSTRUCTION_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                                    </select>
+                                                    <select value={worker.kikouStatus.construction_assignee || '---'} onChange={e => handleOperationChange(worker.id, 'kikou_status', 'construction_assignee', e.target.value)} className="w-[70px] bg-transparent outline-none text-gray-400 text-right cursor-pointer absolute right-0">
+                                                        {STAFF_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                                    </select>
+                                                </div>
+                                            </div>
                                         </div>
                                         <select value={worker.kikouStatus.progress} onChange={e => handleOperationChange(worker.id, 'kikou_status', 'progress', e.target.value)} className={`text-xs p-1 rounded font-medium outline-none w-full text-center cursor-pointer transition-colors mt-auto ${worker.kikouStatus.progress === '完了' ? 'bg-green-100 text-green-700' : worker.kikouStatus.progress === '進行中' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-500'}`}>
                                             {PROGRESS_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}

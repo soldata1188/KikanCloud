@@ -51,7 +51,20 @@ export async function getOperationsData() {
         console.error('Error fetching companies:', companiesError)
     }
 
-    return { workers: workers || [], companies: companies || [] }
+    // Separate queries for Tabs Data
+    const [{ data: visas }, { data: exams }, { data: transfers }] = await Promise.all([
+        supabase.from('visas').select('*, worker:worker_id(full_name_romaji, system_type, companies(name_jp))').eq('is_deleted', false).order('expiration_date', { ascending: true }),
+        supabase.from('exams').select('*, worker:worker_id(full_name_romaji, companies(name_jp))').eq('is_deleted', false).order('deadline_date', { ascending: true }),
+        supabase.from('job_transfers').select('*, worker:worker_id(full_name_romaji, companies(name_jp)), from_company:from_company_id(name_jp), to_company:to_company_id(name_jp)').eq('is_deleted', false).order('transfer_date', { ascending: true })
+    ])
+
+    return {
+        workers: workers || [],
+        companies: companies || [],
+        visas: visas || [],
+        exams: exams || [],
+        transfers: transfers || []
+    }
 }
 
 export async function addWorker(formData: FormData) {

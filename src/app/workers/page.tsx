@@ -20,7 +20,7 @@ export default async function WorkersPage() {
             <div className="flex-1 flex flex-col relative min-w-0">
                 <TopNav title="実習生一覧" role={userProfile?.role} />
                 <main className="flex-1 overflow-y-auto p-6 md:p-10">
-                    <div className="w-full max-w-[1800px] mx-auto">
+                    <div className="w-full max-w-[1200px] mx-auto">
 
                         <WorkersListClient initialWorkers={workers || []} role={userProfile?.role || 'staff'} next90DaysStr={''} />
                     </div>

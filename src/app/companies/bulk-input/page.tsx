@@ -19,7 +19,7 @@ export default async function BulkInputCompaniesPage() {
             <div className="flex-1 flex flex-col relative min-w-0">
                 <TopNav title="受入企業管理" role={userProfile?.role} />
                 <main className="flex-1 flex flex-col relative overflow-y-auto no-scrollbar">
-                    <div className="flex-1 flex flex-col px-4 pb-12 w-full max-w-[1400px] mx-auto mt-4 md:mt-8">
+                    <div className="flex-1 flex flex-col px-4 pb-12 w-full max-w-[1200px] mx-auto mt-4 md:mt-8">
                         {/* Top Menu Sticky Header */}
                         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 pl-2 sticky top-0 bg-white z-20 py-4 -mx-4 px-4 sm:mx-0 sm:px-0">
                             <div className="flex items-center gap-4">

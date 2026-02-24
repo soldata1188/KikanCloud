@@ -6,7 +6,7 @@ export async function proxy(request: NextRequest) {
         request: {
             headers: request.headers,
         },
-    })
+    });
 
     // EMERGENCY FIX: If already on login page, don't do anything to prevent loop
     if (request.nextUrl.pathname.startsWith('/login')) {
@@ -22,13 +22,17 @@ export async function proxy(request: NextRequest) {
                     return request.cookies.getAll()
                 },
                 setAll(cookiesToSet) {
-                    cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value))
+                    cookiesToSet.forEach(({ name, value }) =>
+                        request.cookies.set(name, value)
+                    );
                     response = NextResponse.next({
-                        request,
-                    })
+                        request: {
+                            headers: request.headers,
+                        },
+                    });
                     cookiesToSet.forEach(({ name, value, options }) =>
                         response.cookies.set(name, value, options)
-                    )
+                    );
                 },
             },
         }

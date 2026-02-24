@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Lock, ArrowRight, ShieldCheck, CheckCircle } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
@@ -13,6 +13,32 @@ export default function UpdatePasswordPage() {
     const [success, setSuccess] = useState(false)
     const router = useRouter()
     const supabase = createClient()
+
+    useEffect(() => {
+        const handleSession = async () => {
+            const url = new URL(window.location.href)
+            const code = url.searchParams.get('code')
+
+            if (code) {
+                // PKCE flow code exchange
+                const { error: sessionError } = await supabase.auth.exchangeCodeForSession(code)
+                if (sessionError) {
+                    setError('認証エラー: ' + sessionError.message)
+                } else {
+                    url.searchParams.delete('code')
+                    window.history.replaceState({}, document.title, url.pathname + url.search)
+                }
+            } else {
+                // Check hash for specific errors (e.g., token expired)
+                const hashParams = new URLSearchParams(window.location.hash.substring(1))
+                const hashError = hashParams.get('error_description') || hashParams.get('error')
+                if (hashError) {
+                    setError('リンクが無効または期限切れです: ' + decodeURIComponent(hashError.replace(/\+/g, ' ')))
+                }
+            }
+        }
+        handleSession()
+    }, [supabase.auth])
 
     const handleUpdatePassword = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -45,7 +71,12 @@ export default function UpdatePasswordPage() {
             }, 2000)
 
         } catch (err: any) {
-            setError(err.message || 'パスワードの更新に失敗しました。')
+            console.error('Update password error:', err)
+            if (err.message && err.message.toLowerCase().includes('session missing')) {
+                setError('認証セッションが見つかりません。リンクが期限切れか、すでに使用されています。')
+            } else {
+                setError(`エラー: ${err.message || 'パスワードの更新に失敗しました。'}`)
+            }
         } finally {
             setLoading(false)
         }

@@ -34,7 +34,7 @@ export default async function OrganizationPage({ searchParams }: { searchParams:
             <div className="flex-1 flex flex-col relative min-w-0">
                 <TopNav title="機関情報" role={userProfile.role} />
                 <main className="flex-1 overflow-y-auto p-6 md:p-10">
-                    <div className="max-w-[1000px] mx-auto">
+                    <div className="max-w-[1200px] mx-auto">
                         <div className="mb-8">
 
                             <p className="text-[13px] text-[#878787] mt-1">基本情報とスタッフ名簿を管理します。</p>

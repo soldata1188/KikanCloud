@@ -129,6 +129,15 @@ export async function importCompanies(companiesData: any[]) {
         guidance_manager: c.guidance_manager || null,
         life_advisor: c.life_advisor || null,
         tech_advisor: c.tech_advisor || null,
+        employee_count: c.employee_count ? parseInt(c.employee_count as string) : null,
+        labor_insurance_number: c.labor_insurance_number || null,
+        employment_insurance_number: c.employment_insurance_number || null,
+        acceptance_notification_number: c.acceptance_notification_number || null,
+        acceptance_notification_date: c.acceptance_notification_date || null,
+        general_supervision_fee: c.general_supervision_fee ? parseFloat(c.general_supervision_fee as string) : null,
+        category_3_supervision_fee: c.category_3_supervision_fee ? parseFloat(c.category_3_supervision_fee as string) : null,
+        support_fee: c.support_fee ? parseFloat(c.support_fee as string) : null,
+        remarks: c.remarks || null,
     }))
 
     const { error } = await supabase.from('companies').insert(payload)

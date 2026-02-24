@@ -88,7 +88,7 @@ export default async function AuditsPage({ searchParams }: { searchParams: Promi
                 <TopNav title="監査・訪問指導" role={userProfile?.role} />
                 <main className="flex-1 overflow-y-auto p-6 md:p-10">
                     <div className="max-w-[1200px] mx-auto">
-                        <h1 className="text-[28px] font-normal tracking-tight text-[#1f1f1f] mb-8">監査・訪問指導 一覧</h1>
+
                         <AuditsClient matrixData={matrixData} filterMonth={filterMonth} userRole={userProfile?.role} />
                     </div>
                 </main>

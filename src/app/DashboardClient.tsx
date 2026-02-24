@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect, useTransition, useRef } from 'react'
-import { Sparkles, Send, Loader2, Plus, MapPin, User, Users, Building2, PlaneLanding, UserMinus } from 'lucide-react'
+import { Sparkles, ArrowUp, Loader2, Plus, MapPin, User, Users, Building2, PlaneLanding, UserMinus } from 'lucide-react'
 import { chatWithOmniAI } from './actions/dashboardAi'
 import Link from 'next/link'
 
@@ -42,9 +42,9 @@ export default function DashboardClient({ userName, dashboardData }: { userName:
 
     const getHeroGreeting = (date: Date) => {
         const h = date.getHours()
-        if (h >= 5 && h < 11) return 'おはようございます！今日も一日頑張りましょう。'
-        if (h >= 11 && h < 17) return 'お疲れ様です！午後の業務も順調ですか？'
-        return 'こんばんは！夜遅くまで本当にお疲れ様です。'
+        if (h >= 5 && h < 11) return `${userName}さん、おはようございます！今日も一日頑張りましょう。`
+        if (h >= 11 && h < 17) return `${userName}さん、お疲れ様です！午後の業務も順調ですか？`
+        return `${userName}さん、こんばんは！夜遅くまで本当にお疲れ様です。`
     }
 
     const handleMoodClick = (moodLabel: string) => {
@@ -91,7 +91,7 @@ export default function DashboardClient({ userName, dashboardData }: { userName:
             <div className="bg-white border border-[#ededed] rounded flex flex-col md:flex-row overflow-hidden">
                 <div className="p-8 border-b md:border-b-0 md:border-r border-[#ededed] flex flex-col items-center justify-center bg-white min-w-[280px]">
                     <p className="text-lg text-[#878787] font-medium mb-1 tracking-wide">{formatDate(currentTime)}</p>
-                    <h2 className="text-7xl font-black text-[#1f1f1f] tracking-tighter tabular-nums">{formatTime(currentTime)}</h2>
+                    <h2 className="text-5xl font-black text-[#1f1f1f] tracking-tight tabular-nums">{formatTime(currentTime)}</h2>
                     <p className="text-sm text-[#878787] mt-3 flex items-center gap-1.5 font-medium">
                         <MapPin size={14} className="text-[#24b47e]" /> 大阪府堺市 (Sakai, Osaka)
                     </p>
@@ -105,7 +105,7 @@ export default function DashboardClient({ userName, dashboardData }: { userName:
                         <div>
                             <h2 className="text-xl font-bold text-[#1f1f1f] mb-2">{getHeroGreeting(currentTime)}</h2>
                             <p className="text-[#444746] leading-relaxed mb-4 text-[14px]">
-                                {userName}さん、日々の業務本当にお疲れ様です。<br />
+                                日々の業務本当にお疲れ様です。<br />
                                 急ぎの更新書類が <span className="text-[#d93025] font-bold">{dashboardData.alerts.length}件</span> ありますが、焦らず一つずつ片付けていきましょう。KikanCloud AIが全力でサポートします！
                             </p>
 
@@ -188,9 +188,9 @@ export default function DashboardClient({ userName, dashboardData }: { userName:
             </div>
 
             {/* 5. OMNI-CHANNEL AI CHATBOT (GIỮ NGUYÊN) */}
-            <div className="mt-8 bg-white border border-[#ededed] rounded shadow-sm relative overflow-hidden flex flex-col h-[400px]">
+            <div className="mt-8 bg-white border border-[#ededed] rounded relative overflow-hidden flex flex-col h-[400px]">
                 <div className="px-6 py-4 border-b border-[#ededed] bg-[#fbfcfd] flex items-center gap-2">
-                    <div className="w-6 h-6 rounded bg-[#24b47e]/10 flex items-center justify-center text-[#24b47e]"><Sparkles size={14} /></div>
+                    <div className="w-6 h-6 rounded-[32px] bg-[#24b47e]/10 flex items-center justify-center text-[#24b47e]"><Sparkles size={14} /></div>
                     <h3 className="font-bold text-[#1f1f1f] text-[14px]">KikanCloud AI アシスタント</h3>
                 </div>
                 <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4 bg-white/50">
@@ -202,19 +202,19 @@ export default function DashboardClient({ userName, dashboardData }: { userName:
                     )}
                     {messages.map((msg) => (
                         <div key={msg.id} className={`flex gap-4 ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-in slide-in-from-bottom-2`}>
-                            {msg.role === 'model' && <div className="w-8 h-8 rounded bg-[#24b47e] flex items-center justify-center shrink-0 mt-0.5"><Sparkles size={14} className="text-white" /></div>}
-                            <div className={`max-w-[80%] rounded px-5 py-3.5 text-[14px] leading-relaxed shadow-sm ${msg.role === 'user' ? 'bg-[#1f1f1f] text-white rounded-tr-none' : 'bg-[#fbfcfd] border border-[#ededed] text-[#1f1f1f] rounded-tl-none'}`}>
+                            {msg.role === 'model' && <div className="w-8 h-8 rounded-[32px] bg-[#24b47e] flex items-center justify-center shrink-0 mt-0.5"><Sparkles size={14} className="text-white" /></div>}
+                            <div className={`max-w-[80%] rounded-[32px] px-5 py-3.5 text-[14px] leading-relaxed shadow-sm ${msg.role === 'user' ? 'bg-blue-50 text-blue-900 rounded-tr-none' : 'bg-[#fbfcfd] border border-[#ededed] text-[#1f1f1f] rounded-tl-none'}`}>
                                 {msg.isTyping ? <Loader2 size={16} className="animate-spin text-[#24b47e]" /> : <div className="whitespace-pre-wrap">{msg.text}</div>}
                             </div>
-                            {msg.role === 'user' && <div className="w-8 h-8 rounded bg-white border border-[#ededed] flex items-center justify-center shrink-0 shadow-sm mt-0.5"><User size={14} className="text-[#878787]" /></div>}
+                            {msg.role === 'user' && <div className="w-8 h-8 rounded-[32px] bg-white border border-[#ededed] flex items-center justify-center shrink-0 shadow-sm mt-0.5"><User size={14} className="text-[#878787]" /></div>}
                         </div>
                     ))}
                     <div ref={messagesEndRef} />
                 </div>
                 <div className="p-4 border-t border-[#ededed] bg-white">
                     <form onSubmit={handleChat} className="relative flex items-center">
-                        <textarea ref={chatInputRef} value={userInput} onChange={e => setUserInput(e.target.value)} onKeyDown={handleKeyDown} disabled={isPendingChat} placeholder="AIに質問・指示を入力... (Shift+Enterで改行)" className="w-full bg-[#fbfcfd] border border-[#ededed] focus:border-[#24b47e] rounded pl-4 pr-12 py-3 text-[14px] outline-none resize-none h-[46px] transition-colors" rows={1} />
-                        <button type="submit" disabled={isPendingChat || !userInput.trim()} className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-[#1f1f1f] hover:bg-[#24b47e] text-white rounded transition-colors disabled:opacity-50"><Send size={14} /></button>
+                        <textarea ref={chatInputRef} value={userInput} onChange={e => setUserInput(e.target.value)} onKeyDown={handleKeyDown} disabled={isPendingChat} placeholder="AIに質問・指示を入力... (Shift+Enterで改行)" className="w-full bg-[#fbfcfd] border border-[#ededed] focus:border-[#24b47e] rounded-[32px] pl-4 pr-12 py-3 text-[14px] outline-none resize-none h-[46px] overflow-hidden transition-colors" rows={1} />
+                        <button type="submit" disabled={isPendingChat || !userInput.trim()} className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-[#1f1f1f] hover:bg-[#24b47e] text-white rounded-[32px] transition-colors disabled:opacity-50"><ArrowUp size={16} strokeWidth={2.5} /></button>
                     </form>
                 </div>
             </div>

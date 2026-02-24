@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { X, Send, Sparkles } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 const AnimatedSmile = () => (
     <svg viewBox="0 0 100 100" className="w-16 h-16 text-yellow-400 drop-shadow-sm transition-transform hover:scale-110 duration-300">
@@ -42,6 +43,7 @@ export function QuickChatBot() {
     const [input, setInput] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
+    const pathname = usePathname();
 
     // Auto-scroll to bottom of messages
     useEffect(() => {
@@ -87,6 +89,8 @@ export function QuickChatBot() {
             handleSend();
         }
     };
+
+    if (pathname === '/') return null;
 
     return (
         <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end pointer-events-none">

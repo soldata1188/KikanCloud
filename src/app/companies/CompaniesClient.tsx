@@ -4,6 +4,7 @@ import React, { useState, useEffect, useTransition } from 'react'
 import Link from 'next/link'
 import { Building2, Search } from 'lucide-react'
 import { DataTableToolbar } from '@/components/DataTableToolbar'
+import { ImportModal } from './ImportModal'
 
 export function CompaniesClient({ companies, userRole }: { companies: any[], userRole?: string }) {
     const [filtered, setFiltered] = useState(companies)
@@ -140,6 +141,13 @@ export function CompaniesClient({ companies, userRole }: { companies: any[], use
                 type="companies"
                 role={userRole || 'admin'}
                 addLink="/companies/new"
+                importNode={
+                    (userRole === 'admin' || userRole === 'staff') && (
+                        <div className="ml-2">
+                            <ImportModal />
+                        </div>
+                    )
+                }
                 filterNode={advancedFilters}
                 layout={layout}
                 onLayoutChange={setLayout}

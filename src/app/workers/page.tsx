@@ -21,7 +21,7 @@ export default async function WorkersPage() {
                 <TopNav title="実習生一覧" role={userProfile?.role} />
                 <main className="flex-1 overflow-y-auto p-6 md:p-10">
                     <div className="w-full max-w-[1800px] mx-auto">
-                        <h1 className="text-[28px] font-normal tracking-tight text-[#1f1f1f] mb-8">外国人材 一覧</h1>
+
                         <WorkersListClient initialWorkers={workers || []} role={userProfile?.role || 'staff'} next90DaysStr={''} />
                     </div>
                 </main>

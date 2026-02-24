@@ -20,7 +20,7 @@ export default async function AccountsPage() {
                 <TopNav title="アカウント設定 (Account Settings)" role={userProfile?.role} />
                 <main className="flex-1 overflow-y-auto p-6 md:p-10">
                     <div className="max-w-3xl mx-auto space-y-6">
-                        <h1 className="text-2xl font-black text-[#1f1f1f] tracking-tight mb-6">プロフィール設定</h1>
+
                         <div className="bg-white border border-[#ededed] rounded-2xl p-8 shadow-sm relative overflow-hidden">
                             <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#24b47e]"></div>
                             <div className="flex items-center gap-4 mb-8 pb-8 border-b border-[#ededed]">

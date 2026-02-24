@@ -24,7 +24,7 @@ export default async function OperationsPage() {
                 <TopNav title="業務管理 (Operations)" role={userProfile?.role} />
                 <main className="flex-1 overflow-y-auto p-6 md:p-10">
                     <div className="w-full max-w-[1800px] mx-auto">
-                        <h1 className="text-[28px] font-normal tracking-tight text-gray-900 mb-8">業務管理 (Operations)</h1>
+
                         <OperationsClient initialWorkers={workers} companies={companies} />
                     </div>
                 </main>

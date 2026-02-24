@@ -23,7 +23,7 @@ export default async function CompaniesPage() {
                 <TopNav title="受入企業一覧" role={userProfile?.role} />
                 <main className="flex-1 overflow-y-auto p-6 md:p-10">
                     <div className="max-w-[1800px] mx-auto">
-                        <h1 className="text-[28px] font-normal tracking-tight text-[#1f1f1f] mb-8">受入企業 一覧</h1>
+
                         <CompaniesClient companies={companies || []} userRole={userProfile?.role || 'staff'} />
                     </div>
                 </main>

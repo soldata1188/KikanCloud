@@ -1,17 +1,14 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { User, Bell, LogOut, Clock, Settings, Sparkles } from 'lucide-react'
+import { Bell, Sparkles, Clock } from 'lucide-react'
 import { GlobalSearch } from './GlobalSearch'
-import { createClient } from '@/lib/supabase/client'
-import { useRouter, usePathname } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import AIChatSidebar from '@/components/ai/AIChatSidebar'
 
 export function TopNav({ title, role }: { title: string, role?: string }) {
-    const [isAvatarOpen, setIsAvatarOpen] = useState(false)
     const [isAIChatOpen, setIsAIChatOpen] = useState(false)
     const [timeStr, setTimeStr] = useState('')
     const [dateStr, setDateStr] = useState('')
-    const router = useRouter()
     const pathname = usePathname()
 
     useEffect(() => {
@@ -26,15 +23,7 @@ export function TopNav({ title, role }: { title: string, role?: string }) {
         return () => clearInterval(timer)
     }, [])
 
-    const handleLogout = async () => {
-        const supabase = createClient()
-        await supabase.auth.signOut()
-        router.push('/login')
-    }
 
-    if (pathname !== '/' && pathname !== '/dashboard') {
-        return null; // Hide TopNav on all pages except Home (/ or /dashboard)
-    }
 
     return (
         <>
@@ -59,39 +48,22 @@ export function TopNav({ title, role }: { title: string, role?: string }) {
 
                     <GlobalSearch />
 
-                    <button
-                        onClick={() => setIsAIChatOpen(true)}
-                        className="relative cursor-pointer hover:bg-[#e8f5f0] p-1.5 rounded-md transition-colors border border-gray-350 bg-white"
-                        title="AIアシスタント"
-                    >
-                        <Sparkles size={16} className="text-[#24b47e]" />
-                    </button>
+                    {pathname !== '/' && (
+                        <button
+                            onClick={() => setIsAIChatOpen(true)}
+                            className="relative cursor-pointer hover:bg-[#e8f5f0] p-1.5 rounded-md transition-colors border border-gray-350 bg-white"
+                            title="AIアシスタント"
+                        >
+                            <Sparkles size={16} className="text-[#24b47e]" />
+                        </button>
+                    )}
 
                     <div className="relative cursor-pointer hover:bg-gray-50 p-1.5 rounded-md transition-colors border border-transparent">
                         <Bell size={16} className="text-[#878787]" />
                         <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-[#d93025] rounded-md border border-white"></span>
                     </div>
 
-                    <div className="relative">
-                        <div onClick={() => setIsAvatarOpen(!isAvatarOpen)} className="w-8 h-8 rounded-md bg-[#fbfcfd] border border-gray-350 text-[#878787] flex items-center justify-center text-xs font-bold cursor-pointer hover:border-[#24b47e] hover:text-[#1f1f1f] transition-colors"><User size={14} /></div>
-                        {isAvatarOpen && (
-                            <>
-                                <div className="fixed inset-0 z-40" onClick={() => setIsAvatarOpen(false)}></div>
-                                <div className="absolute right-0 top-10 w-48 bg-white border border-[#ededed] rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.08)] z-50 py-1 animate-in fade-in slide-in-from-top-2 duration-200">
-                                    <div className="px-4 py-2 border-b border-[#ededed] mb-1 bg-[#fbfcfd]">
-                                        <p className="text-[10px] font-bold text-[#878787] uppercase tracking-widest">Signed in as</p>
-                                        <p className="text-[12px] font-bold text-[#1f1f1f] truncate capitalize">{role?.replace('_', ' ') || 'User'}</p>
-                                    </div>
-                                    <button onClick={() => { setIsAvatarOpen(false); router.push('/accounts') }} className="w-full text-left px-4 py-2 text-[13px] font-medium text-[#444746] hover:bg-[#fbfcfd] hover:text-[#1f1f1f] flex items-center gap-2 transition-colors">
-                                        <Settings size={14} /> Account Settings
-                                    </button>
-                                    <button onClick={handleLogout} className="w-full text-left px-4 py-2 text-[13px] font-medium text-red-600 hover:bg-red-50 flex items-center gap-2 transition-colors border-t border-[#ededed] mt-1 pt-2">
-                                        <LogOut size={14} /> サインアウト (Sign Out)
-                                    </button>
-                                </div>
-                            </>
-                        )}
-                    </div>
+
                 </div>
             </header>
 

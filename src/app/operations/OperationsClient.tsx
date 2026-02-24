@@ -357,16 +357,17 @@ export default function OperationsClient({ initialWorkers, companies }: { initia
                                 <td className="border border-gray-350 px-4 py-3">
                                     <div className="flex flex-col gap-1 inline-flex w-full">
                                         <div className="text-xs text-gray-500 whitespace-nowrap">
-                                            資格: <span className="text-gray-900 font-medium">{worker.visaStatus}</span>
+                                            在留資格: <span className="text-gray-900 font-medium">{worker.visaStatus}</span>
                                         </div>
                                         <div className="flex items-center justify-between mt-0.5 gap-2">
-                                            <span className="text-xs text-gray-500 whitespace-nowrap">期限: <span className="text-gray-900 font-medium">{worker.visaExpiry}</span></span>
+                                            <span className="text-xs text-gray-500 whitespace-nowrap">在留期限: <span className="text-gray-900 font-medium">{worker.visaExpiry}</span></span>
+                                        </div>
+                                        <div className="border-t border-gray-100 my-1"></div>
+                                        <div className="text-xs text-gray-500 whitespace-nowrap">
+                                            入国日: <span className="text-gray-900 font-medium">{worker.entryDate || '---'}</span>
                                         </div>
                                         <div className="text-xs text-gray-500 whitespace-nowrap">
-                                            在留: <span className="text-primary-700 font-medium">{calculateDuration(worker.entryDate)}</span>
-                                        </div>
-                                        <div className="text-xs text-gray-500 whitespace-nowrap">
-                                            終了: <span className="text-gray-900 font-medium">{worker.certEndDate}</span>
+                                            入国期生: <span className="text-gray-900 font-medium">{getBatchString(worker.entryDate)}</span>
                                         </div>
                                     </div>
                                 </td>

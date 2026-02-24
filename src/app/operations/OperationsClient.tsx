@@ -436,16 +436,16 @@ export default function OperationsClient({ initialWorkers, companies }: { initia
 
                                 {/* 検定業務 (Kentei Ops) */}
                                 <td className="border border-gray-350 px-2 py-2 align-top w-[200px] min-w-[200px]">
-                                    <div className="flex flex-col gap-1.5 p-2 bg-gray-50/50 rounded border border-gray-100 shadow-sm transition-all hover:bg-white hover:shadow-md h-full">
+                                    <div className="flex flex-col gap-1.5 h-full">
                                         <div className="flex justify-between gap-1.5">
-                                            <select value={worker.kenteiStatus.type} onChange={e => handleOperationChange(worker.id, 'kentei_status', 'type', e.target.value)} className="text-xs p-1 border rounded outline-none w-1/2 cursor-pointer bg-white text-gray-700">
+                                            <select value={worker.kenteiStatus.type} onChange={e => handleOperationChange(worker.id, 'kentei_status', 'type', e.target.value)} className="text-xs p-1 outline-none w-1/2 cursor-pointer bg-transparent text-gray-700">
                                                 {KENTEI_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                                             </select>
-                                            <select value={worker.kenteiStatus.assignee} onChange={e => handleOperationChange(worker.id, 'kentei_status', 'assignee', e.target.value)} className="text-xs p-1 border rounded outline-none w-1/2 cursor-pointer bg-white text-gray-700">
+                                            <select value={worker.kenteiStatus.assignee} onChange={e => handleOperationChange(worker.id, 'kentei_status', 'assignee', e.target.value)} className="text-xs p-1 outline-none w-1/2 cursor-pointer bg-transparent text-gray-700 text-right">
                                                 {STAFF_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                                             </select>
                                         </div>
-                                        <select value={worker.kenteiStatus.progress} onChange={e => handleOperationChange(worker.id, 'kentei_status', 'progress', e.target.value)} className={`text-xs p-1 rounded font-medium outline-none w-full text-center cursor-pointer transition-colors mt-auto ${worker.kenteiStatus.progress === '完了' ? 'bg-green-100 text-green-700' : worker.kenteiStatus.progress === '進行中' ? 'bg-blue-100 text-blue-700' : 'bg-gray-200 text-gray-700'}`}>
+                                        <select value={worker.kenteiStatus.progress} onChange={e => handleOperationChange(worker.id, 'kentei_status', 'progress', e.target.value)} className={`text-xs p-1 rounded font-medium outline-none w-full text-center cursor-pointer transition-colors mt-auto ${worker.kenteiStatus.progress === '完了' ? 'bg-green-100 text-green-700' : worker.kenteiStatus.progress === '進行中' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'}`}>
                                             {PROGRESS_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                                         </select>
                                     </div>
@@ -453,16 +453,16 @@ export default function OperationsClient({ initialWorkers, companies }: { initia
 
                                 {/* 機構業務 (Kikou Ops) */}
                                 <td className="border border-gray-350 px-2 py-2 align-top w-[200px] min-w-[200px]">
-                                    <div className="flex flex-col gap-1.5 p-2 bg-gray-50/50 rounded border border-gray-100 shadow-sm transition-all hover:bg-white hover:shadow-md h-full">
+                                    <div className="flex flex-col gap-1.5 h-full">
                                         <div className="flex justify-between gap-1.5">
-                                            <select value={worker.kikouStatus.type} onChange={e => handleOperationChange(worker.id, 'kikou_status', 'type', e.target.value)} className="text-xs p-1 border rounded outline-none w-1/2 cursor-pointer bg-white text-gray-700">
+                                            <select value={worker.kikouStatus.type} onChange={e => handleOperationChange(worker.id, 'kikou_status', 'type', e.target.value)} className="text-xs p-1 outline-none w-1/2 cursor-pointer bg-transparent text-gray-700">
                                                 {KIKOU_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                                             </select>
-                                            <select value={worker.kikouStatus.assignee} onChange={e => handleOperationChange(worker.id, 'kikou_status', 'assignee', e.target.value)} className="text-xs p-1 border rounded outline-none w-1/2 cursor-pointer bg-white text-gray-700">
+                                            <select value={worker.kikouStatus.assignee} onChange={e => handleOperationChange(worker.id, 'kikou_status', 'assignee', e.target.value)} className="text-xs p-1 outline-none w-1/2 cursor-pointer bg-transparent text-gray-700 text-right">
                                                 {STAFF_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                                             </select>
                                         </div>
-                                        <select value={worker.kikouStatus.progress} onChange={e => handleOperationChange(worker.id, 'kikou_status', 'progress', e.target.value)} className={`text-xs p-1 rounded font-medium outline-none w-full text-center cursor-pointer transition-colors mt-auto ${worker.kikouStatus.progress === '完了' ? 'bg-green-100 text-green-700' : worker.kikouStatus.progress === '進行中' ? 'bg-purple-100 text-purple-700' : 'bg-gray-200 text-gray-700'}`}>
+                                        <select value={worker.kikouStatus.progress} onChange={e => handleOperationChange(worker.id, 'kikou_status', 'progress', e.target.value)} className={`text-xs p-1 rounded font-medium outline-none w-full text-center cursor-pointer transition-colors mt-auto ${worker.kikouStatus.progress === '完了' ? 'bg-green-100 text-green-700' : worker.kikouStatus.progress === '進行中' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-700'}`}>
                                             {PROGRESS_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                                         </select>
                                     </div>
@@ -470,16 +470,16 @@ export default function OperationsClient({ initialWorkers, companies }: { initia
 
                                 {/* 入管業務 (Nyukan Ops) */}
                                 <td className="border border-gray-350 px-2 py-2 align-top w-[200px] min-w-[200px]">
-                                    <div className="flex flex-col gap-1.5 p-2 bg-gray-50/50 rounded border border-gray-100 shadow-sm transition-all hover:bg-white hover:shadow-md h-full">
+                                    <div className="flex flex-col gap-1.5 h-full">
                                         <div className="flex justify-between gap-1.5">
-                                            <select value={worker.nyukanStatus.type} onChange={e => handleOperationChange(worker.id, 'nyukan_status', 'type', e.target.value)} className="text-xs p-1 border rounded outline-none w-1/2 cursor-pointer bg-white text-gray-700">
+                                            <select value={worker.nyukanStatus.type} onChange={e => handleOperationChange(worker.id, 'nyukan_status', 'type', e.target.value)} className="text-xs p-1 outline-none w-1/2 cursor-pointer bg-transparent text-gray-700">
                                                 {NYUKAN_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                                             </select>
-                                            <select value={worker.nyukanStatus.assignee} onChange={e => handleOperationChange(worker.id, 'nyukan_status', 'assignee', e.target.value)} className="text-xs p-1 border rounded outline-none w-1/2 cursor-pointer bg-white text-gray-700">
+                                            <select value={worker.nyukanStatus.assignee} onChange={e => handleOperationChange(worker.id, 'nyukan_status', 'assignee', e.target.value)} className="text-xs p-1 outline-none w-1/2 cursor-pointer bg-transparent text-gray-700 text-right">
                                                 {STAFF_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                                             </select>
                                         </div>
-                                        <select value={worker.nyukanStatus.progress} onChange={e => handleOperationChange(worker.id, 'nyukan_status', 'progress', e.target.value)} className={`text-xs p-1 rounded font-medium outline-none w-full text-center cursor-pointer transition-colors mt-auto ${worker.nyukanStatus.progress === '完了' ? 'bg-green-100 text-green-700' : worker.nyukanStatus.progress === '進行中' ? 'bg-orange-100 text-orange-700' : 'bg-gray-200 text-gray-700'}`}>
+                                        <select value={worker.nyukanStatus.progress} onChange={e => handleOperationChange(worker.id, 'nyukan_status', 'progress', e.target.value)} className={`text-xs p-1 rounded font-medium outline-none w-full text-center cursor-pointer transition-colors mt-auto ${worker.nyukanStatus.progress === '完了' ? 'bg-green-100 text-green-700' : worker.nyukanStatus.progress === '進行中' ? 'bg-orange-100 text-orange-700' : 'bg-gray-100 text-gray-700'}`}>
                                             {PROGRESS_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                                         </select>
                                     </div>

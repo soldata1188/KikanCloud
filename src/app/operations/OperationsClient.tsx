@@ -551,13 +551,13 @@ export default function OperationsClient({ initialWorkers, companies }: { initia
                                 </td>
 
                                 {/* 備考 (MEMO) */}
-                                <td className="border border-gray-350 p-2 align-top">
+                                <td className="border border-gray-350 p-2 align-top h-full">
                                     <textarea
                                         value={worker.remarks}
                                         onChange={(e) => setWorkers(prev => prev.map(w => w.id === worker.id ? { ...w, remarks: e.target.value } : w))}
                                         onBlur={() => handleRemarksBlur(worker.id)}
                                         placeholder="特記事項やメモを入力..."
-                                        className="w-full h-[76px] text-xs p-2 border border-gray-200 rounded outline-none focus:border-primary-500 hover:border-gray-300 transition-colors resize-y bg-white/50 focus:bg-white"
+                                        className="w-full h-full min-h-[141px] text-xs p-2 border border-gray-200 rounded outline-none focus:border-primary-500 hover:border-gray-300 transition-colors resize-y bg-white/50 focus:bg-white"
                                     />
                                 </td>
 

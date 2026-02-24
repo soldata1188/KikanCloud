@@ -453,18 +453,20 @@ export default function OperationsClient({ initialWorkers, companies }: { initia
                                                 {STAFF_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                                             </select>
                                         </div>
-                                        <div className="flex flex-col gap-1 my-1 border-t border-gray-100 pt-1.5">
-                                            <div className="flex items-center justify-between text-[11px] gap-2">
-                                                <span className="text-gray-500 whitespace-nowrap font-medium">学科</span>
-                                                <input type="date" value={worker.kenteiStatus.exam_date_written || ''} onChange={e => handleOperationChange(worker.id, 'kentei_status', 'exam_date_written', e.target.value)} className="w-[105px] bg-transparent outline-none text-gray-700 text-right cursor-pointer" />
-                                            </div>
-                                            <div className="flex items-center justify-between text-[11px] gap-2">
-                                                <span className="text-gray-500 whitespace-nowrap font-medium">実技</span>
-                                                <input type="date" value={worker.kenteiStatus.exam_date_practical || ''} onChange={e => handleOperationChange(worker.id, 'kentei_status', 'exam_date_practical', e.target.value)} className="w-[105px] bg-transparent outline-none text-gray-700 text-right cursor-pointer" />
-                                            </div>
-                                            <div className="flex items-center justify-between text-[11px] gap-2">
-                                                <span className="text-gray-500 whitespace-nowrap font-medium">会場</span>
-                                                <input type="text" placeholder="---" value={worker.kenteiStatus.exam_location || ''} onChange={e => handleOperationChange(worker.id, 'kentei_status', 'exam_location', e.target.value)} className="w-[105px] bg-transparent outline-none text-gray-700 text-right placeholder-gray-300" />
+                                        <div className="flex justify-between gap-1 border-t border-gray-100 pt-1.5 mt-0.5 mb-1">
+                                            <div className="flex flex-col gap-1 text-[10px]">
+                                                <div className="flex items-center gap-1">
+                                                    <span className="text-gray-400 w-10">学科</span>
+                                                    <input type="date" value={worker.kenteiStatus.exam_date_written || ''} onChange={e => handleOperationChange(worker.id, 'kentei_status', 'exam_date_written', e.target.value)} className="w-[85px] bg-transparent outline-none text-gray-700 cursor-pointer" />
+                                                </div>
+                                                <div className="flex items-center gap-1">
+                                                    <span className="text-gray-400 w-10">実技</span>
+                                                    <input type="date" value={worker.kenteiStatus.exam_date_practical || ''} onChange={e => handleOperationChange(worker.id, 'kentei_status', 'exam_date_practical', e.target.value)} className="w-[85px] bg-transparent outline-none text-gray-700 cursor-pointer" />
+                                                </div>
+                                                <div className="flex items-center gap-1">
+                                                    <span className="text-gray-400 w-10">会場</span>
+                                                    <input type="text" placeholder="---" value={worker.kenteiStatus.exam_location || ''} onChange={e => handleOperationChange(worker.id, 'kentei_status', 'exam_location', e.target.value)} className="w-[85px] bg-transparent outline-none text-gray-700 placeholder-gray-300" />
+                                                </div>
                                             </div>
                                         </div>
                                         <select value={worker.kenteiStatus.progress} onChange={e => handleOperationChange(worker.id, 'kentei_status', 'progress', e.target.value)} className={`text-xs p-1 rounded font-medium outline-none w-full text-center cursor-pointer transition-colors mt-auto ${worker.kenteiStatus.progress === '完了' ? 'bg-green-100 text-green-700' : worker.kenteiStatus.progress === '進行中' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500'}`}>
@@ -501,18 +503,20 @@ export default function OperationsClient({ initialWorkers, companies }: { initia
                                                 {STAFF_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                                             </select>
                                         </div>
-                                        <div className="flex flex-col gap-1 my-1 border-t border-gray-100 pt-1.5">
-                                            <div className="flex items-center justify-between text-[11px] gap-2">
-                                                <span className="text-gray-500 whitespace-nowrap font-medium">申請日</span>
-                                                <input type="date" value={worker.nyukanStatus.application_date || ''} onChange={e => handleOperationChange(worker.id, 'nyukan_status', 'application_date', e.target.value)} className="w-[105px] bg-transparent outline-none text-gray-700 text-right cursor-pointer" />
-                                            </div>
-                                            <div className="flex items-center justify-between text-[11px] gap-2">
-                                                <span className="text-gray-500 whitespace-nowrap font-medium">受理番号</span>
-                                                <input type="text" placeholder="---" value={worker.nyukanStatus.receipt_number || ''} onChange={e => handleOperationChange(worker.id, 'nyukan_status', 'receipt_number', e.target.value)} className="w-[105px] bg-transparent outline-none text-gray-700 text-right placeholder-gray-300" />
-                                            </div>
-                                            <div className="flex items-center justify-between text-[11px] gap-2">
-                                                <span className="text-gray-500 whitespace-nowrap font-medium">取次者</span>
-                                                <input type="text" placeholder="---" value={worker.nyukanStatus.agent || ''} onChange={e => handleOperationChange(worker.id, 'nyukan_status', 'agent', e.target.value)} className="w-[105px] bg-transparent outline-none text-gray-700 text-right placeholder-gray-300" />
+                                        <div className="flex justify-between gap-1 border-t border-gray-100 pt-1.5 mt-0.5 mb-1">
+                                            <div className="flex flex-col gap-1 text-[10px]">
+                                                <div className="flex items-center gap-1">
+                                                    <span className="text-gray-400 w-10">申請日</span>
+                                                    <input type="date" value={worker.nyukanStatus.application_date || ''} onChange={e => handleOperationChange(worker.id, 'nyukan_status', 'application_date', e.target.value)} className="w-[85px] bg-transparent outline-none text-gray-700 cursor-pointer" />
+                                                </div>
+                                                <div className="flex items-center gap-1">
+                                                    <span className="text-gray-400 w-10">受理号</span>
+                                                    <input type="text" placeholder="---" value={worker.nyukanStatus.receipt_number || ''} onChange={e => handleOperationChange(worker.id, 'nyukan_status', 'receipt_number', e.target.value)} className="w-[85px] bg-transparent outline-none text-gray-700 placeholder-gray-300" />
+                                                </div>
+                                                <div className="flex items-center gap-1">
+                                                    <span className="text-gray-400 w-10">取次者</span>
+                                                    <input type="text" placeholder="---" value={worker.nyukanStatus.agent || ''} onChange={e => handleOperationChange(worker.id, 'nyukan_status', 'agent', e.target.value)} className="w-[85px] bg-transparent outline-none text-gray-700 placeholder-gray-300" />
+                                                </div>
                                             </div>
                                         </div>
                                         <select value={worker.nyukanStatus.progress} onChange={e => handleOperationChange(worker.id, 'nyukan_status', 'progress', e.target.value)} className={`text-xs p-1 rounded font-medium outline-none w-full text-center cursor-pointer transition-colors mt-auto ${worker.nyukanStatus.progress === '完了' ? 'bg-green-100 text-green-700' : worker.nyukanStatus.progress === '進行中' ? 'bg-orange-100 text-orange-700' : 'bg-gray-100 text-gray-500'}`}>

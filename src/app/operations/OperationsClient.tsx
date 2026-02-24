@@ -328,7 +328,7 @@ export default function OperationsClient({ initialWorkers, companies }: { initia
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <div className="font-semibold text-gray-900 truncate" title={worker.name}>{worker.name}</div>
-                                                <div className="text-[11px] text-gray-400 mt-0.5 truncate" title={worker.company}>🏢 {worker.company}</div>
+                                                <div className="text-[11px] text-gray-400 mt-0.5 truncate" title={worker.company}>{worker.company}</div>
                                             </div>
                                         </div>
                                         <div className="flex flex-col gap-1.5 border-t border-gray-100 pt-2 mt-1">
@@ -346,7 +346,7 @@ export default function OperationsClient({ initialWorkers, companies }: { initia
                                                 </select>
                                             </div>
                                             <div className="text-xs font-medium text-gray-600 truncate" title={worker.address}>
-                                                🏠 {worker.address}
+                                                {worker.address}
                                             </div>
                                         </div>
                                     </div>

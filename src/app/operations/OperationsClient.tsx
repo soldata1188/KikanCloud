@@ -54,6 +54,7 @@ export default function OperationsClient({ initialWorkers, companies }: { initia
             visaStatus: w.visa_status || '---',
             visaExpiry: w.visas?.[0]?.expiration_date || '---',
             entryDate: w.entry_date || '',
+            certStartDate: w.cert_start_date || '---',
             certEndDate: w.cert_end_date || '---',
             applicationDate: '',
             status: reverseStatusMap[w.status] || '入国待ち',
@@ -303,6 +304,7 @@ export default function OperationsClient({ initialWorkers, companies }: { initia
                                 />
                             </th>
                             <th className="border border-gray-350 px-4 py-3 font-semibold whitespace-nowrap min-w-[200px]">外国人材 / 受入企業</th>
+                            <th className="border border-gray-350 px-4 py-3 font-semibold whitespace-nowrap w-[160px] min-w-[160px] max-w-[160px]">認定情報</th>
                             <th className="border border-gray-350 px-4 py-3 font-semibold whitespace-nowrap w-[160px] min-w-[160px] max-w-[160px]">在留情報</th>
                             <th className="border border-gray-350 px-4 py-3 font-semibold whitespace-nowrap w-[120px] min-w-[120px]">検定業務</th>
                             <th className="border border-gray-350 px-4 py-3 font-semibold whitespace-nowrap w-[120px] min-w-[120px]">機構業務</th>
@@ -349,6 +351,25 @@ export default function OperationsClient({ initialWorkers, companies }: { initia
                                             <div className="text-[11px] font-medium text-gray-600 truncate mt-0.5" title={worker.company}>
                                                 🏢 {worker.company}
                                             </div>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                {/* Certification Info */}
+                                <td className="border border-gray-350 px-4 py-3">
+                                    <div className="flex flex-col gap-1 inline-flex w-full">
+                                        <div className="text-xs text-gray-500 whitespace-nowrap">
+                                            制度: <span className="text-gray-900 font-medium">{worker.systemCategory}</span>
+                                        </div>
+                                        <div className="flex items-center justify-between mt-0.5 gap-2">
+                                            <span className="text-xs text-gray-500 whitespace-nowrap">職種: <span className="text-gray-900 font-medium">{worker.occupation}</span></span>
+                                        </div>
+                                        <div className="border-t border-gray-100 my-1"></div>
+                                        <div className="text-xs text-gray-500 whitespace-nowrap">
+                                            開始: <span className="text-gray-900 font-medium">{worker.certStartDate}</span>
+                                        </div>
+                                        <div className="text-xs text-gray-500 whitespace-nowrap">
+                                            終了: <span className="text-gray-900 font-medium">{worker.certEndDate}</span>
                                         </div>
                                     </div>
                                 </td>

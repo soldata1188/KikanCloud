@@ -1,0 +1,3 @@
+ALTER TABLE public.workers 
+ADD COLUMN IF NOT EXISTS has_spouse BOOLEAN DEFAULT false,
+ADD COLUMN IF NOT EXISTS birthplace TEXT;

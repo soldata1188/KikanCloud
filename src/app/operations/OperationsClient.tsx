@@ -457,19 +457,19 @@ export default function OperationsClient({ initialWorkers, companies }: { initia
                                                 {STAFF_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                                             </select>
                                         </div>
-                                        <div className="flex justify-between gap-1 border-t border-gray-100 pt-1.5 mt-0.5 mb-1">
-                                            <div className="flex flex-col gap-1 text-[10px]">
+                                        <div className="flex justify-between gap-1 border-t border-gray-100 pt-1.5 mt-0.5 mb-1 flex-1">
+                                            <div className="flex flex-col gap-1 text-[10px] w-full">
                                                 <div className="flex items-center gap-1">
-                                                    <span className="text-gray-400 w-10">学科</span>
-                                                    <input type="date" value={worker.kenteiStatus.exam_date_written || ''} onChange={e => handleOperationChange(worker.id, 'kentei_status', 'exam_date_written', e.target.value)} className="w-[85px] bg-transparent outline-none text-gray-700 cursor-pointer" />
+                                                    <span className="text-gray-400 w-10 shrink-0">学科</span>
+                                                    <input type="date" value={worker.kenteiStatus.exam_date_written || ''} onChange={e => handleOperationChange(worker.id, 'kentei_status', 'exam_date_written', e.target.value)} className="flex-1 w-full bg-transparent outline-none text-gray-700 cursor-pointer" />
                                                 </div>
                                                 <div className="flex items-center gap-1">
-                                                    <span className="text-gray-400 w-10">実技</span>
-                                                    <input type="date" value={worker.kenteiStatus.exam_date_practical || ''} onChange={e => handleOperationChange(worker.id, 'kentei_status', 'exam_date_practical', e.target.value)} className="w-[85px] bg-transparent outline-none text-gray-700 cursor-pointer" />
+                                                    <span className="text-gray-400 w-10 shrink-0">実技</span>
+                                                    <input type="date" value={worker.kenteiStatus.exam_date_practical || ''} onChange={e => handleOperationChange(worker.id, 'kentei_status', 'exam_date_practical', e.target.value)} className="flex-1 w-full bg-transparent outline-none text-gray-700 cursor-pointer" />
                                                 </div>
                                                 <div className="flex items-center gap-1">
-                                                    <span className="text-gray-400 w-10">会場</span>
-                                                    <input type="text" placeholder="---" value={worker.kenteiStatus.exam_location || ''} onChange={e => handleOperationChange(worker.id, 'kentei_status', 'exam_location', e.target.value)} className="w-[85px] bg-transparent outline-none text-gray-700 placeholder-gray-300" />
+                                                    <span className="text-gray-400 w-10 shrink-0">会場</span>
+                                                    <input type="text" placeholder="---" value={worker.kenteiStatus.exam_location || ''} onChange={e => handleOperationChange(worker.id, 'kentei_status', 'exam_location', e.target.value)} className="flex-1 w-full bg-transparent outline-none text-gray-700 placeholder-gray-300" />
                                                 </div>
                                             </div>
                                         </div>
@@ -490,15 +490,24 @@ export default function OperationsClient({ initialWorkers, companies }: { initia
                                                 {STAFF_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                                             </select>
                                         </div>
-                                        <div className="flex justify-between gap-1 border-t border-gray-100 pt-1.5 mt-0.5 mb-1">
+                                        <div className="flex justify-between gap-1 border-t border-gray-100 pt-1.5 mt-0.5 mb-1 flex-1">
                                             <div className="flex flex-col gap-1 text-[10px] w-full">
-                                                <div className="flex items-center justify-between gap-1 w-full relative">
-                                                    <select value={worker.kikouStatus.construction_type || '---'} onChange={e => handleOperationChange(worker.id, 'kikou_status', 'construction_type', e.target.value)} className="w-[105px] bg-transparent outline-none text-gray-500 cursor-pointer">
+                                                <div className="flex items-center gap-1">
+                                                    <span className="text-gray-400 w-10 shrink-0">業務</span>
+                                                    <select value={worker.kikouStatus.construction_type || '---'} onChange={e => handleOperationChange(worker.id, 'kikou_status', 'construction_type', e.target.value)} className="flex-1 w-full bg-transparent outline-none text-gray-700 cursor-pointer truncate">
                                                         {CONSTRUCTION_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                                                     </select>
-                                                    <select value={worker.kikouStatus.construction_assignee || '---'} onChange={e => handleOperationChange(worker.id, 'kikou_status', 'construction_assignee', e.target.value)} className="w-[70px] bg-transparent outline-none text-gray-400 text-right cursor-pointer absolute right-0">
+                                                </div>
+                                                <div className="flex items-center gap-1">
+                                                    <span className="text-gray-400 w-10 shrink-0">担当</span>
+                                                    <select value={worker.kikouStatus.construction_assignee || '---'} onChange={e => handleOperationChange(worker.id, 'kikou_status', 'construction_assignee', e.target.value)} className="flex-1 w-full bg-transparent outline-none text-gray-700 cursor-pointer">
                                                         {STAFF_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                                                     </select>
+                                                </div>
+                                                {/* Consistent height dummy row */}
+                                                <div className="flex items-center gap-1 opacity-0 pointer-events-none">
+                                                    <span className="w-10">...</span>
+                                                    <input type="text" className="flex-1" />
                                                 </div>
                                             </div>
                                         </div>
@@ -519,19 +528,19 @@ export default function OperationsClient({ initialWorkers, companies }: { initia
                                                 {STAFF_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                                             </select>
                                         </div>
-                                        <div className="flex justify-between gap-1 border-t border-gray-100 pt-1.5 mt-0.5 mb-1">
-                                            <div className="flex flex-col gap-1 text-[10px]">
+                                        <div className="flex justify-between gap-1 border-t border-gray-100 pt-1.5 mt-0.5 mb-1 flex-1">
+                                            <div className="flex flex-col gap-1 text-[10px] w-full">
                                                 <div className="flex items-center gap-1">
-                                                    <span className="text-gray-400 w-10">申請日</span>
-                                                    <input type="date" value={worker.nyukanStatus.application_date || ''} onChange={e => handleOperationChange(worker.id, 'nyukan_status', 'application_date', e.target.value)} className="w-[85px] bg-transparent outline-none text-gray-700 cursor-pointer" />
+                                                    <span className="text-gray-400 w-10 shrink-0">申請日</span>
+                                                    <input type="date" value={worker.nyukanStatus.application_date || ''} onChange={e => handleOperationChange(worker.id, 'nyukan_status', 'application_date', e.target.value)} className="flex-1 w-full bg-transparent outline-none text-gray-700 cursor-pointer" />
                                                 </div>
                                                 <div className="flex items-center gap-1">
-                                                    <span className="text-gray-400 w-10">受理号</span>
-                                                    <input type="text" placeholder="---" value={worker.nyukanStatus.receipt_number || ''} onChange={e => handleOperationChange(worker.id, 'nyukan_status', 'receipt_number', e.target.value)} className="w-[85px] bg-transparent outline-none text-gray-700 placeholder-gray-300" />
+                                                    <span className="text-gray-400 w-10 shrink-0">受理号</span>
+                                                    <input type="text" placeholder="---" value={worker.nyukanStatus.receipt_number || ''} onChange={e => handleOperationChange(worker.id, 'nyukan_status', 'receipt_number', e.target.value)} className="flex-1 w-full bg-transparent outline-none text-gray-700 placeholder-gray-300" />
                                                 </div>
                                                 <div className="flex items-center gap-1">
-                                                    <span className="text-gray-400 w-10">取次者</span>
-                                                    <input type="text" placeholder="---" value={worker.nyukanStatus.agent || ''} onChange={e => handleOperationChange(worker.id, 'nyukan_status', 'agent', e.target.value)} className="w-[85px] bg-transparent outline-none text-gray-700 placeholder-gray-300" />
+                                                    <span className="text-gray-400 w-10 shrink-0">取次者</span>
+                                                    <input type="text" placeholder="---" value={worker.nyukanStatus.agent || ''} onChange={e => handleOperationChange(worker.id, 'nyukan_status', 'agent', e.target.value)} className="flex-1 w-full bg-transparent outline-none text-gray-700 placeholder-gray-300" />
                                                 </div>
                                             </div>
                                         </div>

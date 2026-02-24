@@ -355,9 +355,9 @@ export default function OperationsClient({ initialWorkers, companies }: { initia
                                     className="w-4 h-4 text-primary-600 rounded border-gray-300 cursor-pointer"
                                 />
                             </th>
-                            <th className="border border-gray-350 px-4 py-3 font-semibold whitespace-nowrap min-w-[200px]">外国人材 / 受入企業</th>
-                            <th className="border border-gray-350 px-4 py-3 font-semibold whitespace-nowrap w-[160px] min-w-[160px] max-w-[160px]">認定情報</th>
-                            <th className="border border-gray-350 px-4 py-3 font-semibold whitespace-nowrap w-[160px] min-w-[160px] max-w-[160px]">在留情報</th>
+                            <th className="border border-gray-350 px-4 py-3 font-semibold whitespace-nowrap min-w-[220px]">外国人材 / 受入企業</th>
+                            <th className="border border-gray-350 px-4 py-3 font-semibold whitespace-nowrap w-[180px] min-w-[180px] max-w-[180px]">認定情報</th>
+                            <th className="border border-gray-350 px-4 py-3 font-semibold whitespace-nowrap w-[180px] min-w-[180px] max-w-[180px]">在留情報</th>
                             <th className="border border-gray-350 px-4 py-3 font-semibold whitespace-nowrap w-[200px] min-w-[200px]">検定業務</th>
                             <th className="border border-gray-350 px-4 py-3 font-semibold whitespace-nowrap w-[200px] min-w-[200px]">機構業務/建設特定</th>
                             <th className="border border-gray-350 px-4 py-3 font-semibold whitespace-nowrap w-[200px] min-w-[200px]">入管業務</th>
@@ -376,23 +376,23 @@ export default function OperationsClient({ initialWorkers, companies }: { initia
                                     />
                                 </td>
                                 {/* Worker Info (Avatar, Name, ID) & Company */}
-                                <td className="border border-gray-350 p-1.5 align-top">
-                                    <div className="flex flex-col gap-1">
-                                        <div className="flex items-center gap-1.5">
-                                            <div className="w-6 h-6 shrink-0 rounded bg-primary-100 text-primary-700 font-bold flex items-center justify-center text-xs">
+                                <td className="border border-gray-350 p-2 align-top">
+                                    <div className="flex flex-col gap-1.5">
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-8 h-8 shrink-0 rounded bg-primary-100 text-primary-700 font-bold flex items-center justify-center text-sm">
                                                 {worker.avatar}
                                             </div>
                                             <div className="flex-1 min-w-0">
-                                                <div className="font-semibold text-gray-900 truncate text-[11px] leading-tight" title={worker.name}>{worker.name}</div>
-                                                <div className="text-[9px] text-gray-400 mt-0 truncate leading-tight" title={worker.furigana}>{worker.furigana}</div>
+                                                <div className="font-semibold text-gray-900 truncate text-sm leading-tight" title={worker.name}>{worker.name}</div>
+                                                <div className="text-[10px] text-gray-400 mt-0.5 truncate leading-tight" title={worker.furigana}>{worker.furigana}</div>
                                             </div>
                                         </div>
-                                        <div className="flex flex-col gap-0.5 border-t border-gray-100 pt-0.5 mt-0.5">
+                                        <div className="flex flex-col gap-1 border-t border-gray-100 pt-1 mt-0.5">
                                             <div className="flex items-center">
                                                 <select
                                                     value={worker.status}
                                                     onChange={(e) => handleChange(worker.id, 'status', e.target.value)}
-                                                    className={`text-[9px] font-medium px-1 py-px rounded outline-none cursor-pointer hover:opacity-80 transition-opacity ${worker.status === '就業中' ? 'bg-green-50 text-green-700' :
+                                                    className={`text-xs font-medium px-1.5 py-0.5 rounded outline-none cursor-pointer hover:opacity-80 transition-opacity ${worker.status === '就業中' ? 'bg-green-50 text-green-700' :
                                                         worker.status === '帰国' ? 'bg-gray-100 text-gray-600' :
                                                             worker.status === '失踪' ? 'bg-red-50 text-red-700' :
                                                                 'bg-orange-50 text-orange-700'
@@ -401,7 +401,7 @@ export default function OperationsClient({ initialWorkers, companies }: { initia
                                                     {STATUS_CARDS.filter(s => s !== 'すべて').map(s => <option key={s} value={s}>{s}</option>)}
                                                 </select>
                                             </div>
-                                            <div className="text-[10px] font-medium text-gray-600 truncate mt-0 leading-tight" title={worker.company}>
+                                            <div className="text-xs font-medium text-gray-600 truncate mt-0.5 leading-tight" title={worker.company}>
                                                 🏢 {worker.company}
                                             </div>
                                         </div>
@@ -409,39 +409,39 @@ export default function OperationsClient({ initialWorkers, companies }: { initia
                                 </td>
 
                                 {/* Certification Info */}
-                                <td className="border border-gray-350 px-1.5 py-1">
-                                    <div className="flex flex-col gap-0.5 inline-flex w-full">
-                                        <div className="text-[10px] text-gray-500 whitespace-nowrap leading-tight">
-                                            制度: <span className="text-gray-900 font-medium">{worker.systemCategory}</span>
+                                <td className="border border-gray-350 px-2.5 py-2 align-top">
+                                    <div className="flex flex-col gap-1 w-full">
+                                        <div className="text-xs text-gray-500 whitespace-nowrap leading-tight">
+                                            制度: <span className="text-gray-900 font-medium text-[13px]">{worker.systemCategory}</span>
                                         </div>
                                         <div className="flex items-center justify-between mt-0 gap-1">
-                                            <span className="text-[10px] text-gray-500 whitespace-nowrap leading-tight">職種: <span className="text-gray-900 font-medium">{worker.occupation}</span></span>
+                                            <span className="text-xs text-gray-500 whitespace-nowrap leading-tight">職種: <span className="text-gray-900 font-medium text-[13px]">{worker.occupation}</span></span>
                                         </div>
-                                        <div className="border-t border-gray-100 my-0.5"></div>
-                                        <div className="text-[10px] text-gray-500 whitespace-nowrap leading-tight">
-                                            開始: <span className="text-gray-900 font-medium">{worker.certStartDate}</span>
+                                        <div className="border-t border-gray-100 my-1"></div>
+                                        <div className="text-xs text-gray-500 whitespace-nowrap leading-tight">
+                                            開始: <span className="text-gray-900 font-medium text-[13px]">{worker.certStartDate}</span>
                                         </div>
-                                        <div className="text-[10px] text-gray-500 whitespace-nowrap leading-tight">
-                                            終了: <span className="text-gray-900 font-medium">{worker.certEndDate}</span>
+                                        <div className="text-xs text-gray-500 whitespace-nowrap leading-tight">
+                                            終了: <span className="text-gray-900 font-medium text-[13px]">{worker.certEndDate}</span>
                                         </div>
                                     </div>
                                 </td>
 
                                 {/* Residence Info (Status, Expiry, Duration) */}
-                                <td className="border border-gray-350 px-1.5 py-1">
-                                    <div className="flex flex-col gap-0.5 inline-flex w-full">
-                                        <div className="text-[10px] text-gray-500 whitespace-nowrap leading-tight">
-                                            資格: <span className="text-gray-900 font-medium">{worker.visaStatus}</span>
+                                <td className="border border-gray-350 px-2.5 py-2 align-top">
+                                    <div className="flex flex-col gap-1 w-full">
+                                        <div className="text-xs text-gray-500 whitespace-nowrap leading-tight">
+                                            資格: <span className="text-gray-900 font-medium text-[13px]">{worker.visaStatus}</span>
                                         </div>
                                         <div className="flex items-center justify-between mt-0 gap-1">
-                                            <span className="text-[10px] text-gray-500 whitespace-nowrap leading-tight">期限: <span className="text-gray-900 font-medium">{worker.visaExpiry}</span></span>
+                                            <span className="text-xs text-gray-500 whitespace-nowrap leading-tight">期限: <span className="text-gray-900 font-medium text-[13px]">{worker.visaExpiry}</span></span>
                                         </div>
-                                        <div className="border-t border-gray-100 my-0.5"></div>
-                                        <div className="text-[10px] text-gray-500 whitespace-nowrap leading-tight">
-                                            入国: <span className="text-gray-900 font-medium">{worker.entryDate || '---'}</span>
+                                        <div className="border-t border-gray-100 my-1"></div>
+                                        <div className="text-xs text-gray-500 whitespace-nowrap leading-tight">
+                                            入国: <span className="text-gray-900 font-medium text-[13px]">{worker.entryDate || '---'}</span>
                                         </div>
-                                        <div className="text-[10px] text-gray-500 whitespace-nowrap leading-tight">
-                                            期生: <span className="text-gray-900 font-medium">{getBatchString(worker.entryDate)}</span>
+                                        <div className="text-xs text-gray-500 whitespace-nowrap leading-tight">
+                                            期生: <span className="text-gray-900 font-medium text-[13px]">{getBatchString(worker.entryDate)}</span>
                                         </div>
                                     </div>
                                 </td>

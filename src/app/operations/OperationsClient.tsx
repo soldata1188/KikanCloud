@@ -51,7 +51,7 @@ export default function OperationsClient({ initialWorkers, companies }: { initia
             address: w.address || '---',
             systemCategory: w.system_type === 'tokuteigino' ? '特定技能' : (w.system_type === 'ginou_jisshu' ? '技能実習' : '育成就労'),
             occupation: w.industry_field || '---',
-            visaStatus: w.visas?.[0]?.visa_type || '---',
+            visaStatus: w.visa_status || '---',
             visaExpiry: w.visas?.[0]?.expiration_date || '---',
             entryDate: w.entry_date || '',
             certEndDate: w.cert_end_date || '---',

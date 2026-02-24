@@ -99,7 +99,7 @@ const TimelineNodeRender = ({
         target: 'text-[#24b47e]'
     };
 
-    const IconWrapper = () => {
+    const getIconWrapper = () => {
         if (node.type === 'highlight') return <CheckCircle2 size={16} className={iconColors[node.type]} />;
         if (node.type === 'warning') return <AlertTriangle size={16} className={iconColors[node.type]} />;
         if (node.type === 'target') return <Target size={16} className={iconColors[node.type]} />;
@@ -166,7 +166,7 @@ const TimelineNodeRender = ({
                     <>
                         <div className="flex items-center justify-between mb-2">
                             <h4 className="font-bold text-[14px] flex items-start gap-2 pr-4">
-                                <span className="mt-0.5"><IconWrapper /></span>
+                                <span className="mt-0.5">{getIconWrapper()}</span>
                                 <span>{node.title}</span>
                             </h4>
                             {node.duration && (
@@ -256,7 +256,7 @@ export default function RoadmapClient() {
     const addNodeAfter = (colIndex: number, nodeIndex: number) => {
         const newCols = [...columns];
         const newNode: NodeData = {
-            id: Date.now().toString() + Math.random().toString(36).substring(7),
+            id: window.crypto.randomUUID(),
             title: "新しいステップ",
             duration: "",
             desc: "説明文を入力してください。",
@@ -268,7 +268,7 @@ export default function RoadmapClient() {
     };
 
     // Avoid hydration mismatch
-    if (!mounted) return null; 
+    if (!mounted) return null;
 
     const getIcon = (idx: number) => {
         if (idx === 0) return <GraduationCap size={20} />;

@@ -6,13 +6,10 @@ import {
     ShieldCheck,
     GitMerge,
     Map,
-    Settings,
-    LogOut,
     Sparkles,
     MessageSquare,
     ClipboardList,
     Route,
-    Landmark,
 } from "lucide-react";
 import { SidebarLogo } from "./SidebarLogo";
 import { SidebarAvatar } from "./SidebarAvatar";

@@ -1,2 +1,0 @@
-src/app/procedures/[id]/edit/page.tsx(37,513): error TS2339: Property 'name_jp' does not exist on type '{ name_jp: any; }[]'.
-src/app/procedures/new/page.tsx(38,516): error TS2339: Property 'name_jp' does not exist on type '{ name_jp: any; }[]'.

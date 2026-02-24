@@ -1,7 +1,6 @@
 'use client'
 import { useState, useRef, useEffect, useCallback } from 'react'
-import Link from 'next/link'
-import { Sparkles, ArrowUp, User, MessageSquarePlus, Trash2, Search, Settings, Plus } from 'lucide-react'
+import { Sparkles, ArrowUp, User, MessageSquarePlus, Trash2, Search, Plus } from 'lucide-react'
 
 type Message = {
     id: string

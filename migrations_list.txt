@@ -1,5 +1,0 @@
-20260219140156_00001_init_saas_schema.sql
-20260219164612_00002_add_worker_full_details.sql
-20260219170509_00003_add_company_details.sql
-20260219171710_00004_add_audits_module.sql
-20260220000000_fix_admin_password.sql

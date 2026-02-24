@@ -1,11 +1,10 @@
 'use client'
 
 import React, { useState } from 'react'
+import Link from 'next/link'
 
 import { updateWorkerStatus, updateOperationData } from './actions'
-import VisaTab from '@/components/operations/VisaTab'
 import ExamTab from '@/components/operations/ExamTab'
-import TransferTab from '@/components/operations/TransferTab'
 
 export interface OperationData {
     type: string;
@@ -103,8 +102,6 @@ export default function OperationsClient({
 
     const [workers, setWorkers] = useState(mappedWorkers);
     const [selectedIds, setSelectedIds] = useState<string[]>([]);
-
-    // Modal state (Removed)
 
     // Filters State
     const DEFAULT_STATUSES = ['入国待ち', '対応中', '就業中'];
@@ -232,13 +229,33 @@ export default function OperationsClient({
         }
     };
 
-    const handleBulkChange = async (field: WorkerField, value: string) => {
+    const handleBulkChange = async (field: WorkerField | 'remarks', value: string) => {
         // Optimistic bulk UI update locally
         setWorkers(workers.map(w => selectedIds.includes(w.id) ? { ...w, [field]: value } : w));
 
         try {
             for (const id of selectedIds) {
                 await updateWorkerStatus(id, field, value);
+            }
+        } catch (error) {
+            console.error(error);
+            alert("一部の更新に失敗しました。ページをリロードしてください。");
+        }
+    };
+
+    const handleBulkOperationChange = async (field: 'kentei_status' | 'kikou_status' | 'nyukan_status', subField: keyof OperationData, value: string) => {
+        const stateField = field === 'kentei_status' ? 'kenteiStatus' : field === 'kikou_status' ? 'kikouStatus' : 'nyukanStatus';
+
+        // Optimistic bulk UI update locally
+        setWorkers(prevWorkers => prevWorkers.map(w => selectedIds.includes(w.id) ? { ...w, [stateField]: { ...w[stateField], [subField]: value } } : w));
+
+        try {
+            for (const id of selectedIds) {
+                const worker = workers.find(w => w.id === id);
+                if (worker) {
+                    const newOpData = { ...worker[stateField], [subField]: value };
+                    await updateOperationData(id, field, newOpData);
+                }
             }
         } catch (error) {
             console.error(error);
@@ -262,55 +279,37 @@ export default function OperationsClient({
         }
     };
 
-    const [activeTab, setActiveTab] = useState<'overview' | 'visa' | 'exam' | 'transfer'>('overview');
+    const [activeTab, setActiveTab] = useState<'overview' | 'exam'>('overview');
 
     return (
-        <div className="bg-white">
+        <div className="bg-transparent">
             {/* Tabs Header */}
             <div className="flex px-6 pt-4 space-x-1 border-b border-gray-350 overflow-x-auto no-scrollbar">
                 <button
                     onClick={() => setActiveTab('overview')}
                     className={`px-4 py-2 text-sm font-semibold rounded-t-md transition-colors whitespace-nowrap border-t border-l border-r ${activeTab === 'overview'
-                            ? 'bg-white text-gray-900 border-gray-350 border-b-white relative top-[1px]'
-                            : 'bg-gray-100 text-gray-500 border-transparent hover:bg-gray-200'
+                        ? 'bg-white text-gray-900 border-gray-350 border-b-white relative top-[1px]'
+                        : 'bg-gray-100 text-gray-500 border-transparent hover:bg-gray-200'
                         }`}
                 >
                     総括一覧 (Overview)
                 </button>
                 <button
-                    onClick={() => setActiveTab('visa')}
-                    className={`px-4 py-2 text-sm font-semibold rounded-t-md transition-colors whitespace-nowrap border-t border-l border-r ${activeTab === 'visa'
-                            ? 'bg-white text-gray-900 border-gray-350 border-b-white relative top-[1px]'
-                            : 'bg-gray-100 text-gray-500 border-transparent hover:bg-gray-200'
-                        }`}
-                >
-                    入管・在留 (Visa/Residence)
-                </button>
-                <button
                     onClick={() => setActiveTab('exam')}
                     className={`px-4 py-2 text-sm font-semibold rounded-t-md transition-colors whitespace-nowrap border-t border-l border-r ${activeTab === 'exam'
-                            ? 'bg-white text-gray-900 border-gray-350 border-b-white relative top-[1px]'
-                            : 'bg-gray-100 text-gray-500 border-transparent hover:bg-gray-200'
+                        ? 'bg-white text-gray-900 border-gray-350 border-b-white relative top-[1px]'
+                        : 'bg-gray-100 text-gray-500 border-transparent hover:bg-gray-200'
                         }`}
                 >
                     検定・試験 (Exams)
-                </button>
-                <button
-                    onClick={() => setActiveTab('transfer')}
-                    className={`px-4 py-2 text-sm font-semibold rounded-t-md transition-colors whitespace-nowrap border-t border-l border-r ${activeTab === 'transfer'
-                            ? 'bg-white text-gray-900 border-gray-350 border-b-white relative top-[1px]'
-                            : 'bg-gray-100 text-gray-500 border-transparent hover:bg-gray-200'
-                        }`}
-                >
-                    移籍・転籍 (Transfers)
                 </button>
             </div>
 
             {/* Filter & Sort Bar (Global for Overview) */}
             {activeTab === 'overview' && (
-                <div className="p-6 pb-2">
+                <div className="w-[1200px] mx-auto p-6 pb-2">
                     <div className="flex flex-wrap gap-8 mb-6">
-                        {STATUS_CARDS.map(status => {
+                        {STATUS_CARDS.filter(s => s !== 'すべて').map(status => {
                             const count = status === 'すべて' ? workers.length : workers.filter(w => w.status === status).length;
                             const isActive = activeStatuses.includes(status);
                             return (
@@ -321,7 +320,7 @@ export default function OperationsClient({
                                 >
                                     <div className="flex justify-between items-center mb-1.5">
                                         <span className={`text-sm font-bold tracking-wide transition-colors ${isActive ? 'text-[#198f63]' : 'text-gray-500 group-hover:text-gray-800'}`}>
-                                            {status === 'すべて' ? '全ステータス' : status}
+                                            {status}
                                         </span>
                                         <div className={`relative inline-flex h-[18px] w-8 shrink-0 items-center rounded-full transition-colors duration-300 ${isActive ? 'bg-[#24b47e] shadow-inner' : 'bg-gray-200 group-hover:bg-gray-300'}`}>
                                             <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform duration-300 shadow-sm ${isActive ? 'translate-x-[16px]' : 'translate-x-[3px]'}`} />
@@ -339,7 +338,7 @@ export default function OperationsClient({
                             <select
                                 value={filterSystem}
                                 onChange={(e) => setFilterSystem(e.target.value)}
-                                className="text-xs p-1.5 border border-[#878787] rounded outline-none focus:border-[#1f1f1f] bg-white cursor-pointer min-w-[110px]"
+                                className="text-xs p-1.5 border border-[#878787] rounded outline-none focus:border-[#1f1f1f] bg-white cursor-pointer w-[110px]"
                             >
                                 <option value="すべて" disabled>制度区分</option>
                                 {systemOptions.map(opt => <option key={opt} value={opt}>{opt === 'すべて' ? 'すべて (区分)' : opt}</option>)}
@@ -348,7 +347,7 @@ export default function OperationsClient({
                             <select
                                 value={filterCompany}
                                 onChange={(e) => setFilterCompany(e.target.value)}
-                                className="text-xs p-1.5 border border-[#878787] rounded outline-none focus:border-[#1f1f1f] bg-white cursor-pointer min-w-[130px]"
+                                className="text-xs p-1.5 border border-[#878787] rounded outline-none focus:border-[#1f1f1f] bg-white cursor-pointer w-[110px]"
                             >
                                 <option value="すべて" disabled>配属先企業</option>
                                 {companyOptions.map(opt => <option key={opt} value={opt}>{opt === 'すべて' ? 'すべて (企業)' : opt}</option>)}
@@ -357,7 +356,7 @@ export default function OperationsClient({
                             <select
                                 value={filterOccupation}
                                 onChange={(e) => setFilterOccupation(e.target.value)}
-                                className="text-xs p-1.5 border border-[#878787] rounded outline-none focus:border-[#1f1f1f] bg-white cursor-pointer min-w-[120px]"
+                                className="text-xs p-1.5 border border-[#878787] rounded outline-none focus:border-[#1f1f1f] bg-white cursor-pointer w-[110px]"
                             >
                                 <option value="すべて" disabled>職種</option>
                                 {occupationOptions.map(opt => <option key={opt} value={opt}>{opt === 'すべて' ? 'すべて (職種)' : opt}</option>)}
@@ -366,7 +365,7 @@ export default function OperationsClient({
                             <select
                                 value={filterBatch}
                                 onChange={(e) => setFilterBatch(e.target.value)}
-                                className="text-xs p-1.5 border border-[#878787] rounded outline-none focus:border-[#1f1f1f] bg-white cursor-pointer min-w-[120px]"
+                                className="text-xs p-1.5 border border-[#878787] rounded outline-none focus:border-[#1f1f1f] bg-white cursor-pointer w-[110px]"
                             >
                                 <option value="すべて" disabled>入国期生</option>
                                 {batchOptions.map(opt => <option key={opt} value={opt}>{opt === 'すべて' ? 'すべて (期生)' : opt}</option>)}
@@ -375,7 +374,7 @@ export default function OperationsClient({
                             <select
                                 value={filterVisaStatus}
                                 onChange={(e) => setFilterVisaStatus(e.target.value)}
-                                className="text-xs p-1.5 border border-[#878787] rounded outline-none focus:border-[#1f1f1f] bg-white cursor-pointer min-w-[120px]"
+                                className="text-xs p-1.5 border border-[#878787] rounded outline-none focus:border-[#1f1f1f] bg-white cursor-pointer w-[110px]"
                             >
                                 <option value="すべて" disabled>在留資格</option>
                                 {visaOptions.map(opt => <option key={opt} value={opt}>{opt === 'すべて' ? 'すべて (資格)' : opt}</option>)}
@@ -387,7 +386,7 @@ export default function OperationsClient({
                                 <select
                                     value={sortOrder}
                                     onChange={(e) => setSortOrder(e.target.value)}
-                                    className="text-sm p-1.5 border border-[#878787] rounded outline-none focus:border-[#1f1f1f] bg-white cursor-pointer min-w-[150px]"
+                                    className="text-xs p-1.5 border border-[#878787] rounded outline-none focus:border-[#1f1f1f] bg-white cursor-pointer w-[110px]"
                                 >
                                     {sortOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                                 </select>
@@ -396,226 +395,310 @@ export default function OperationsClient({
                     </div>
 
                     {selectedIds.length > 0 && (
-                        <div className="mb-4 bg-green-50 border border-green-200 rounded-lg p-3 flex flex-wrap items-center gap-4 animate-in fade-in slide-in-from-top-2">
-                            <span className="text-sm font-semibold text-green-800 shrink-0">
-                                {selectedIds.length} 件選択中
-                            </span>
+                        <div className="mb-4 bg-green-50 border border-green-200 rounded-lg p-3 flex flex-col items-start gap-2.5 animate-in fade-in slide-in-from-top-2">
+                            <div className="text-sm font-semibold text-green-800 flex items-center gap-2 w-full border-b border-green-200/60 pb-2 mb-1">
+                                <span className="text-base">🛠 {selectedIds.length} 件選択中の一括変更</span>
+                                <div className="text-[11px] text-green-700 font-normal ml-auto">※項目を変更・入力枠外クリックすると、選択中のすべての行に即時反映されます。</div>
+                            </div>
 
-                            <div className="flex items-center gap-2 border-l border-green-200 pl-4 flex-wrap">
-                                <span className="text-xs text-gray-600 font-medium">一括変更:</span>
+                            <div className="flex flex-wrap gap-2 w-full">
+                                {/* Basic Info & Status */}
+                                <div className="flex flex-wrap items-center gap-1.5 border border-green-200 rounded p-1.5 bg-white shadow-sm">
+                                    <span className="text-[10px] text-green-800 font-bold shrink-0 w-[45px]">基本管理</span>
+                                    <select onChange={(e) => handleBulkChange('status', e.target.value)} className="text-xs p-1 border border-gray-300 rounded outline-none focus:border-green-500 cursor-pointer text-gray-700 bg-gray-50 max-w-[95px]" defaultValue="">
+                                        <option value="" disabled>ステータス</option>
+                                        {STATUS_CARDS.filter(s => s !== 'すべて').map(s => <option key={s} value={s}>{s}</option>)}
+                                    </select>
+                                    <input type="text" placeholder="メモ一括上書き..." onBlur={e => handleBulkChange('remarks', e.target.value)} onKeyDown={e => { if (e.key === 'Enter') handleBulkChange('remarks', e.currentTarget.value) }} className="text-xs p-1 border border-gray-300 rounded outline-none cursor-text text-gray-700 bg-gray-50 w-[120px]" />
+                                </div>
 
-                                <select onChange={(e) => handleBulkChange('status', e.target.value)} className="text-xs p-1.5 border border-gray-300 rounded outline-none focus:border-green-500 cursor-pointer text-gray-700 bg-white" defaultValue="">
-                                    <option value="" disabled>ステータス...</option>
-                                    {STATUS_CARDS.filter(s => s !== 'すべて').map(s => <option key={s} value={s}>{s}</option>)}
-                                </select>
+                                {/* Kentei */}
+                                <div className="flex flex-wrap items-center gap-1.5 border border-green-200 rounded p-1.5 bg-white shadow-sm">
+                                    <span className="text-[10px] text-green-800 font-bold shrink-0 w-[45px]">検定業務</span>
+                                    <select onChange={e => handleBulkOperationChange('kentei_status', 'type', e.target.value)} className="text-xs p-1 border border-gray-300 rounded outline-none cursor-pointer text-gray-700 bg-gray-50 max-w-[85px]" defaultValue="">
+                                        <option value="" disabled>業務</option>
+                                        {KENTEI_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                    </select>
+                                    <select onChange={e => handleBulkOperationChange('kentei_status', 'assignee', e.target.value)} className="text-xs p-1 border border-gray-300 rounded outline-none cursor-pointer text-gray-700 bg-gray-50 max-w-[85px]" defaultValue="">
+                                        <option value="" disabled>担当</option>
+                                        {STAFF_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                    </select>
+                                    <div className="flex items-center gap-1"><span className="text-[9px] text-gray-500">学科</span><input type="date" title="学科日" onChange={e => handleBulkOperationChange('kentei_status', 'exam_date_written', e.target.value)} className="text-xs p-1 border border-gray-300 rounded outline-none cursor-pointer text-gray-700 bg-gray-50 w-[105px]" /></div>
+                                    <div className="flex items-center gap-1"><span className="text-[9px] text-gray-500">実技</span><input type="date" title="実技日" onChange={e => handleBulkOperationChange('kentei_status', 'exam_date_practical', e.target.value)} className="text-xs p-1 border border-gray-300 rounded outline-none cursor-pointer text-gray-700 bg-gray-50 w-[105px]" /></div>
+                                    <input type="text" placeholder="会場一括..." onBlur={e => handleBulkOperationChange('kentei_status', 'exam_location', e.target.value)} onKeyDown={e => { if (e.key === 'Enter') handleBulkOperationChange('kentei_status', 'exam_location', e.currentTarget.value) }} className="text-xs p-1 border border-gray-300 rounded outline-none cursor-text text-gray-700 bg-gray-50 w-[100px]" />
+                                    <select onChange={e => handleBulkOperationChange('kentei_status', 'progress', e.target.value)} className="text-xs p-1 border border-gray-300 rounded outline-none cursor-pointer text-gray-700 bg-gray-50 max-w-[85px]" defaultValue="">
+                                        <option value="" disabled>進捗</option>
+                                        {PROGRESS_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                    </select>
+                                </div>
+
+                                {/* Kikou */}
+                                <div className="flex flex-wrap items-center gap-1.5 border border-green-200 rounded p-1.5 bg-white shadow-sm">
+                                    <span className="text-[10px] text-green-800 font-bold shrink-0 w-[45px] leading-[1.2]">機構業務<br />建設特定</span>
+                                    <select onChange={e => handleBulkOperationChange('kikou_status', 'type', e.target.value)} className="text-xs p-1 border border-gray-300 rounded outline-none cursor-pointer text-gray-700 bg-gray-50 max-w-[85px]" defaultValue="">
+                                        <option value="" disabled>機構業務</option>
+                                        {KIKOU_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                    </select>
+                                    <select onChange={e => handleBulkOperationChange('kikou_status', 'assignee', e.target.value)} className="text-xs p-1 border border-gray-300 rounded outline-none cursor-pointer text-gray-700 bg-gray-50 max-w-[85px]" defaultValue="">
+                                        <option value="" disabled>機構担当</option>
+                                        {STAFF_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                    </select>
+                                    <select onChange={e => handleBulkOperationChange('kikou_status', 'construction_type', e.target.value)} className="text-xs p-1 border border-gray-300 rounded outline-none cursor-pointer text-gray-700 bg-gray-50 max-w-[85px]" defaultValue="">
+                                        <option value="" disabled>建設業務</option>
+                                        {CONSTRUCTION_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                    </select>
+                                    <select onChange={e => handleBulkOperationChange('kikou_status', 'construction_assignee', e.target.value)} className="text-xs p-1 border border-gray-300 rounded outline-none cursor-pointer text-gray-700 bg-gray-50 max-w-[85px]" defaultValue="">
+                                        <option value="" disabled>建担当</option>
+                                        {STAFF_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                    </select>
+                                    <select onChange={e => handleBulkOperationChange('kikou_status', 'progress', e.target.value)} className="text-xs p-1 border border-gray-300 rounded outline-none cursor-pointer text-gray-700 bg-gray-50 max-w-[85px]" defaultValue="">
+                                        <option value="" disabled>進捗</option>
+                                        {PROGRESS_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                    </select>
+                                </div>
+
+                                {/* Nyukan */}
+                                <div className="flex flex-wrap items-center gap-1.5 border border-green-200 rounded p-1.5 bg-white shadow-sm">
+                                    <span className="text-[10px] text-green-800 font-bold shrink-0 w-[45px]">入管業務</span>
+                                    <select onChange={e => handleBulkOperationChange('nyukan_status', 'type', e.target.value)} className="text-xs p-1 border border-gray-300 rounded outline-none cursor-pointer text-gray-700 bg-gray-50 max-w-[85px]" defaultValue="">
+                                        <option value="" disabled>業務</option>
+                                        {NYUKAN_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                    </select>
+                                    <select onChange={e => handleBulkOperationChange('nyukan_status', 'assignee', e.target.value)} className="text-xs p-1 border border-gray-300 rounded outline-none cursor-pointer text-gray-700 bg-gray-50 max-w-[85px]" defaultValue="">
+                                        <option value="" disabled>担当</option>
+                                        {STAFF_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                    </select>
+                                    <div className="flex items-center gap-1"><span className="text-[9px] text-gray-500">申請</span><input type="date" title="申請日" onChange={e => handleBulkOperationChange('nyukan_status', 'application_date', e.target.value)} className="text-xs p-1 border border-gray-300 rounded outline-none cursor-pointer text-gray-700 bg-gray-50 w-[105px]" /></div>
+                                    <div className="flex items-center gap-1"><span className="text-[9px] text-gray-500">取次</span><input type="text" placeholder="取次..." onBlur={e => handleBulkOperationChange('nyukan_status', 'agent', e.target.value)} onKeyDown={e => { if (e.key === 'Enter') handleBulkOperationChange('nyukan_status', 'agent', e.currentTarget.value) }} className="text-xs p-1 border border-gray-300 rounded outline-none cursor-text text-gray-700 bg-gray-50 w-[95px]" /></div>
+                                    <select onChange={e => handleBulkOperationChange('nyukan_status', 'progress', e.target.value)} className="text-xs p-1 border border-gray-300 rounded outline-none cursor-pointer text-gray-700 bg-gray-50 max-w-[85px]" defaultValue="">
+                                        <option value="" disabled>進捗</option>
+                                        {PROGRESS_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                    </select>
+                                </div>
                             </div>
                         </div>
                     )}
 
-                    <div className="overflow-x-auto pb-10">
-                        <table className="w-full border-collapse text-sm text-left">
-                            <thead className="bg-gray-50 text-gray-800">
-                                <tr>
-                                    <th className="border border-gray-350 px-4 py-3 text-center w-[40px] shrink-0">
-                                        <input
-                                            type="checkbox"
-                                            checked={selectedIds.length === workers.length && workers.length > 0}
-                                            onChange={toggleSelectAll}
-                                            className="w-4 h-4 text-primary-600 rounded border-gray-300 cursor-pointer"
-                                        />
-                                    </th>
-                                    <th className="border border-gray-350 px-3 py-2 font-semibold whitespace-nowrap w-[225px] min-w-[225px] max-w-[225px]">外国人材 / 受入企業</th>
-                                    <th className="border border-gray-350 px-4 py-3 font-semibold whitespace-nowrap w-[180px] min-w-[180px] max-w-[180px]">認定情報</th>
-                                    <th className="border border-gray-350 px-4 py-3 font-semibold whitespace-nowrap w-[180px] min-w-[180px] max-w-[180px]">在留情報</th>
-                                    <th className="border border-gray-350 px-4 py-3 font-semibold whitespace-nowrap w-[180px] min-w-[180px] max-w-[180px]">検定業務</th>
-                                    <th className="border border-gray-350 px-4 py-3 font-semibold whitespace-nowrap w-[180px] min-w-[180px] max-w-[180px]">機構業務/建設特定</th>
-                                    <th className="border border-gray-350 px-4 py-3 font-semibold whitespace-nowrap w-[180px] min-w-[180px] max-w-[180px]">入管業務</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {paginatedWorkers.map((worker) => (
-                                    <tr key={worker.id} className={`hover:bg-gray-50 transition-colors ${selectedIds.includes(worker.id) ? 'bg-green-50/50' : ''}`}>
-                                        <td className="border border-gray-350 p-1 bg-gray-50 text-center align-top pt-2 w-8 shrink-0">
-                                            <input
-                                                type="checkbox"
-                                                checked={selectedIds.includes(worker.id)}
-                                                onChange={() => toggleSelect(worker.id)}
-                                                className="w-3.5 h-3.5 text-primary-600 rounded border-gray-300 cursor-pointer"
-                                            />
-                                        </td>
-                                        {/* Worker Info (Avatar, Name, ID) & Company */}
-                                        <td className="border border-gray-350 p-2 align-top w-[225px] min-w-[225px] max-w-[225px]">
-                                            <div className="flex flex-col gap-1.5 w-full overflow-hidden">
-                                                <div className="flex items-start gap-2 w-full pb-0.5">
-                                                    <div className="w-8 h-8 shrink-0 rounded bg-primary-100 text-primary-700 font-bold flex items-center justify-center text-sm">
-                                                        {worker.avatar}
+                    <div className="flex flex-col gap-4 pb-10">
+                        {paginatedWorkers.length > 0 && (
+                            <div className="flex items-center gap-3 px-2 mb-2">
+                                <input
+                                    type="checkbox"
+                                    checked={selectedIds.length === workers.length && workers.length > 0}
+                                    onChange={toggleSelectAll}
+                                    className="w-4 h-4 text-primary-600 rounded border-gray-300 cursor-pointer"
+                                />
+                                <span className="text-sm font-semibold text-gray-700">すべて選択 (Select All)</span>
+                            </div>
+                        )}
+
+                        {Object.entries(
+                            paginatedWorkers.reduce((acc, worker) => {
+                                const key = `${worker.company}:::${worker.entryDate || '未定'}`;
+                                if (!acc[key]) acc[key] = [];
+                                acc[key].push(worker);
+                                return acc;
+                            }, {} as Record<string, typeof paginatedWorkers>)
+                        ).map(([groupKey, group]) => (
+                            <div key={groupKey} className="flex flex-col gap-3">
+                                {/* Group Header */}
+                                <div className="flex items-center gap-3 px-2 mt-3 mb-1">
+                                    <span className="font-bold text-gray-800 text-[15px] flex items-center gap-2">
+                                        🏢 {group[0].company}
+                                    </span>
+                                    <span className="text-xs bg-gray-100 px-2.5 py-0.5 rounded-md text-gray-600 font-medium">
+                                        入国日: {group[0].entryDate || '未定'}
+                                    </span>
+                                    <span className="text-xs text-gray-500 font-medium ml-auto">
+                                        {group.length}名
+                                    </span>
+                                </div>
+
+                                {/* Group Workers */}
+                                {group.map((worker) => (
+                                    <div key={worker.id} className={`flex flex-col xl:flex-row gap-3 p-3 border rounded-xl shadow-sm transition-all duration-200 bg-white relative ${selectedIds.includes(worker.id) ? 'border-green-400 ring-1 ring-green-400 bg-green-50/20' : 'border-gray-200 hover:border-gray-300 hover:shadow-md'}`}>
+
+                                        {/* Header / Mobile Checkbox */}
+                                        <div className="flex items-center justify-between xl:hidden font-semibold text-sm text-gray-700 border-b border-gray-100 pb-2 mb-1">
+                                            <div className="flex items-center gap-2">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={selectedIds.includes(worker.id)}
+                                                    onChange={() => toggleSelect(worker.id)}
+                                                    className="w-4 h-4 text-primary-600 rounded border-gray-300 cursor-pointer"
+                                                />
+                                                <span>選択</span>
+                                            </div>
+                                            <span className="text-xs text-gray-400 font-normal">ID: {worker.id.substring(0, 8)}...</span>
+                                        </div>
+
+                                        {/* Col 1: Worker Info & System Info */}
+                                        <div className="flex-[1.2] flex flex-col gap-2 xl:pl-4 pb-2 xl:pb-0 min-w-0">
+                                            <div className="flex items-start gap-3">
+                                                {/* Desktop absolute avatar overlapping the left edge */}
+                                                <div className="absolute -left-5 top-1/2 -translate-y-1/2 w-10 h-10 shrink-0 rounded-full bg-primary-100 text-primary-700 font-bold flex items-center justify-center text-lg shadow-md border-[3px] border-white z-10 hidden xl:flex">
+                                                    {worker.avatar}
+                                                </div>
+                                                {/* Mobile inline avatar */}
+                                                <div className="w-10 h-10 shrink-0 rounded-full bg-primary-100 text-primary-700 font-bold flex items-center justify-center text-lg mt-0.5 shadow-sm xl:hidden">
+                                                    {worker.avatar}
+                                                </div>
+                                                <div className="flex flex-col gap-0.5 min-w-0 flex-1">
+                                                    <div className="flex items-center gap-2">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={selectedIds.includes(worker.id)}
+                                                            onChange={() => toggleSelect(worker.id)}
+                                                            className="w-4 h-4 text-primary-600 rounded border-gray-300 cursor-pointer shrink-0 hidden xl:block"
+                                                        />
+                                                        <Link href={`/workers/${worker.id}`} target="_blank" rel="noopener noreferrer" className="font-bold text-gray-900 hover:text-primary-600 hover:underline truncate text-[15px] leading-tight mt-0.5" title={worker.name}>
+                                                            {worker.name}
+                                                        </Link>
                                                     </div>
-                                                    <div className="flex flex-col gap-1 w-full min-w-0">
-                                                        <div className="text-xs font-semibold text-gray-700 truncate leading-tight" title={worker.company}>
-                                                            {worker.company}
-                                                        </div>
-                                                        <div className="flex items-center w-full">
-                                                            <select
-                                                                value={worker.status}
-                                                                onChange={(e) => handleChange(worker.id, 'status', e.target.value)}
-                                                                className={`text-xs truncate font-semibold outline-none cursor-pointer hover:opacity-80 transition-opacity bg-transparent text-left -ml-1 ${worker.status === '就業中' ? 'text-green-700' :
-                                                                    worker.status === '帰国' ? 'text-gray-600' :
-                                                                        worker.status === '失踪' ? 'text-red-700' :
-                                                                            'text-orange-700'
-                                                                    }`}
-                                                            >
-                                                                {STATUS_CARDS.filter(s => s !== 'すべて').map(s => <option key={s} value={s}>{s}</option>)}
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div className="flex flex-col min-w-0 overflow-hidden border-t border-gray-100 pt-1.5">
-                                                    <div className="font-semibold text-gray-900 truncate text-sm leading-tight" title={worker.name}>{worker.name}</div>
-                                                    <div className="text-[10px] text-gray-400 mt-0.5 truncate leading-tight" title={worker.furigana}>{worker.furigana}</div>
+                                                    <div className="text-[10px] text-gray-400 truncate -mt-0.5" title={worker.furigana}>{worker.furigana}</div>
+                                                    <textarea
+                                                        className="mt-1.5 w-full text-[11px] border border-gray-200 rounded-md p-1.5 outline-none focus:border-primary-400 focus:ring-1 focus:ring-primary-400 resize-none h-20 bg-gray-50/50 placeholder-gray-400 text-gray-700"
+                                                        placeholder="メモ・備考..."
+                                                        value={worker.remarks || ''}
+                                                        onChange={(e) => setWorkers(workers.map(w => w.id === worker.id ? { ...w, remarks: e.target.value } : w))}
+                                                        onBlur={() => handleRemarksBlur(worker.id)}
+                                                    />
                                                 </div>
                                             </div>
-                                        </td>
+                                        </div>
 
-                                        {/* Certification Info */}
-                                        <td className="border border-gray-350 px-2.5 py-2 align-top w-[180px] min-w-[180px] max-w-[180px]">
-                                            <div className="flex flex-col gap-1 w-full">
-                                                <div className="text-xs text-gray-500 whitespace-nowrap leading-tight">
-                                                    制度: <span className="text-gray-900 font-medium text-[13px]">{worker.systemCategory}</span>
-                                                </div>
-                                                <div className="flex items-center justify-between mt-0 gap-1">
-                                                    <span className="text-xs text-gray-500 whitespace-nowrap leading-tight">職種: <span className="text-gray-900 font-medium text-[13px]">{worker.occupation}</span></span>
-                                                </div>
-                                                <div className="border-t border-gray-100 my-1"></div>
-                                                <div className="text-xs text-gray-500 whitespace-nowrap leading-tight">
-                                                    開始: <span className="text-gray-900 font-medium text-[13px]">{worker.certStartDate}</span>
-                                                </div>
-                                                <div className="text-xs text-gray-500 whitespace-nowrap leading-tight">
-                                                    終了: <span className="text-gray-900 font-medium text-[13px]">{worker.certEndDate}</span>
-                                                </div>
-                                            </div>
-                                        </td>
-
-                                        {/* Residence Info (Status, Expiry, Duration) */}
-                                        <td className="border border-gray-350 px-2.5 py-2 align-top w-[180px] min-w-[180px] max-w-[180px]">
-                                            <div className="flex flex-col gap-1 w-full">
-                                                <div className="text-xs text-gray-500 whitespace-nowrap leading-tight">
-                                                    資格: <span className="text-gray-900 font-medium text-[13px]">{worker.visaStatus}</span>
-                                                </div>
-                                                <div className="flex items-center justify-between mt-0 gap-1">
-                                                    <span className="text-xs text-gray-500 whitespace-nowrap leading-tight">期限: <span className="text-gray-900 font-medium text-[13px]">{worker.visaExpiry}</span></span>
-                                                </div>
-                                                <div className="border-t border-gray-100 my-1"></div>
-                                                <div className="text-xs text-gray-500 whitespace-nowrap leading-tight">
-                                                    入国: <span className="text-gray-900 font-medium text-[13px]">{worker.entryDate || '---'}</span>
-                                                </div>
-                                                <div className="text-xs text-gray-500 whitespace-nowrap leading-tight">
-                                                    期生: <span className="text-gray-900 font-medium text-[13px]">{getBatchString(worker.entryDate)}</span>
-                                                </div>
-                                            </div>
-                                        </td>
-
-                                        {/* 検定業務 (Kentei Ops) */}
-                                        <td className="border border-gray-350 p-1 align-top w-[180px] min-w-[180px] max-w-[180px]">
-                                            <div className="flex flex-col gap-1.5 h-full relative">
-                                                <div className="flex justify-between gap-1">
-                                                    <select value={worker.kenteiStatus.type} onChange={e => handleOperationChange(worker.id, 'kentei_status', 'type', e.target.value)} className="text-xs p-1 outline-none w-1/2 cursor-pointer bg-transparent text-gray-700 font-medium">
-                                                        {KENTEI_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                        {/* Col 2: Residence Info */}
+                                        <div className="flex-1 xl:flex-none xl:w-[170px] flex flex-col gap-1.5 border-t xl:border-t-0 xl:border-l border-gray-100 pt-3 xl:pt-0 xl:pl-4 min-w-0">
+                                            <div className="flex justify-between items-center w-full">
+                                                <div className="text-[10px] font-bold text-gray-500 bg-gray-50 px-1.5 py-0.5 w-fit rounded">在留情報</div>
+                                                <div className="flex items-center relative shrink-0">
+                                                    <select
+                                                        value={worker.status}
+                                                        onChange={(e) => handleChange(worker.id, 'status', e.target.value)}
+                                                        className={`appearance-none text-[10px] pl-2 pr-5 py-0.5 rounded-full font-bold outline-none cursor-pointer transition-all duration-300 shadow-sm border focus:ring-2 focus:ring-offset-1 ${worker.status === '就業中' ? 'bg-gradient-to-r from-emerald-50 to-green-100 text-emerald-800 border-emerald-200 focus:ring-emerald-400 hover:shadow-md hover:border-emerald-300' :
+                                                            worker.status === '帰国' ? 'bg-gradient-to-r from-gray-50 to-gray-100 text-gray-700 border-gray-200 focus:ring-gray-300 hover:shadow-md hover:border-gray-300' :
+                                                                worker.status === '失踪' ? 'bg-gradient-to-r from-rose-50 to-red-100 text-rose-800 border-rose-200 focus:ring-rose-400 hover:shadow-md hover:border-rose-300' :
+                                                                    'bg-gradient-to-r from-amber-50 to-orange-100 text-orange-800 border-orange-200 focus:ring-orange-400 hover:shadow-md hover:border-orange-300'
+                                                            }`}
+                                                        style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='2.5' stroke='%236B7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9' /%3E%3C/svg%3E")`, backgroundPosition: 'right 0.3rem center', backgroundRepeat: 'no-repeat', backgroundSize: '0.8em 0.8em' }}
+                                                    >
+                                                        {STATUS_CARDS.filter(s => s !== 'すべて').map(s => <option key={s} value={s}>{s}</option>)}
                                                     </select>
-                                                    <select value={worker.kenteiStatus.assignee} onChange={e => handleOperationChange(worker.id, 'kentei_status', 'assignee', e.target.value)} className="text-xs p-1 outline-none w-1/2 cursor-pointer bg-transparent text-gray-700 text-right">
+                                                </div>
+                                            </div>
+                                            <div className="flex flex-col gap-1.5 mt-0.5">
+                                                <div className="text-[11px] text-gray-500 flex justify-between items-center -mt-0.5">
+                                                    <span>資格:</span> <span className="text-gray-900 font-medium">{worker.visaStatus}</span>
+                                                </div>
+                                                <div className="text-[11px] text-gray-500 flex justify-between items-center">
+                                                    <span>期限:</span> <span className="text-gray-900 font-medium">{worker.visaExpiry}</span>
+                                                </div>
+                                                <div className="text-[11px] text-gray-500 flex justify-between items-center">
+                                                    <span>認定:</span> <span className="text-gray-900 font-medium truncate ml-2">{(worker.certStartDate && worker.certStartDate !== '---') ? worker.certStartDate : '---'} ~ {(worker.certEndDate && worker.certEndDate !== '---') ? worker.certEndDate : '---'}</span>
+                                                </div>
+                                                <div className="text-[11px] text-gray-500 flex justify-between items-start mt-0.5 pt-1.5 border-t border-gray-100">
+                                                    <span className="shrink-0">職種:</span> <span className="text-gray-900 font-medium text-right line-clamp-2 leading-[1.3]">{worker.occupation || '---'}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Col 4: Kentei Ops */}
+                                        <div className="flex-1 flex flex-col gap-1.5 border-t xl:border-t-0 xl:border-l border-gray-100 pt-3 xl:pt-0 xl:pl-4 min-w-0">
+                                            <div className="text-[10px] font-bold text-gray-500 bg-gray-50 px-1.5 py-0.5 w-fit rounded">検定業務</div>
+                                            <div className="flex justify-between gap-1 mt-0.5">
+                                                <select value={worker.kenteiStatus.type} onChange={e => handleOperationChange(worker.id, 'kentei_status', 'type', e.target.value)} className="text-[11px] py-0.5 px-1 outline-none w-1/2 rounded bg-gray-50 border border-gray-200 text-gray-700 font-medium cursor-pointer max-w-[50%]">
+                                                    {KENTEI_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                                </select>
+                                                <select value={worker.kenteiStatus.assignee} onChange={e => handleOperationChange(worker.id, 'kentei_status', 'assignee', e.target.value)} className="text-[11px] py-0.5 px-1 outline-none w-1/2 rounded bg-gray-50 border border-gray-200 text-gray-700 cursor-pointer">
+                                                    {STAFF_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                                </select>
+                                            </div>
+                                            <div className="flex flex-col gap-1 border border-gray-100 rounded p-1 bg-gray-50/50">
+                                                <div className="flex items-center gap-1.5">
+                                                    <span className="text-[9px] bg-white border border-gray-200 rounded px-1 py-px text-gray-500 shrink-0 shadow-sm leading-none">学科</span>
+                                                    <input type="date" value={worker.kenteiStatus.exam_date_written || ''} onChange={e => handleOperationChange(worker.id, 'kentei_status', 'exam_date_written', e.target.value)} className="text-[11px] flex-1 w-full bg-transparent outline-none text-gray-700 cursor-pointer" />
+                                                </div>
+                                                <div className="flex items-center gap-1.5">
+                                                    <span className="text-[9px] bg-white border border-gray-200 rounded px-1 py-px text-gray-500 shrink-0 shadow-sm leading-none">実技</span>
+                                                    <input type="date" value={worker.kenteiStatus.exam_date_practical || ''} onChange={e => handleOperationChange(worker.id, 'kentei_status', 'exam_date_practical', e.target.value)} className="text-[11px] flex-1 w-full bg-transparent outline-none text-gray-700 cursor-pointer" />
+                                                </div>
+                                                <div className="flex items-center gap-1.5">
+                                                    <span className="text-[9px] bg-white border border-gray-200 rounded px-1 py-px text-gray-500 shrink-0 shadow-sm leading-none">会場</span>
+                                                    <input type="text" placeholder="---" value={worker.kenteiStatus.exam_location || ''} onChange={e => handleOperationChange(worker.id, 'kentei_status', 'exam_location', e.target.value)} className="text-[11px] flex-1 w-full bg-transparent outline-none text-gray-700 placeholder-gray-300 pl-1" />
+                                                </div>
+                                            </div>
+                                            <select value={worker.kenteiStatus.progress} onChange={e => handleOperationChange(worker.id, 'kentei_status', 'progress', e.target.value)} className={`text-[11px] py-1 px-1.5 rounded font-medium outline-none w-full text-center cursor-pointer transition-colors mt-auto shadow-sm ${worker.kenteiStatus.progress === '完了' ? 'bg-green-100 text-green-700 border-green-200 border' : worker.kenteiStatus.progress === '進行中' ? 'bg-blue-100 text-blue-700 border-blue-200 border' : 'bg-gray-100 text-gray-600 border-gray-200 border'}`}>
+                                                {PROGRESS_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                            </select>
+                                        </div>
+
+                                        {/* Col 5: Kikou Ops */}
+                                        <div className="flex-1 flex flex-col gap-1.5 border-t xl:border-t-0 xl:border-l border-gray-100 pt-3 xl:pt-0 xl:pl-4 min-w-0">
+                                            <div className="text-[10px] font-bold text-gray-500 bg-gray-50 px-1.5 py-0.5 w-fit rounded">機構業務/建設特定</div>
+                                            <div className="flex justify-between gap-1 mt-0.5">
+                                                <select value={worker.kikouStatus.type} onChange={e => handleOperationChange(worker.id, 'kikou_status', 'type', e.target.value)} className="text-[11px] py-0.5 px-1 outline-none w-1/2 rounded bg-gray-50 border border-gray-200 text-gray-700 font-medium cursor-pointer max-w-[50%]">
+                                                    {KIKOU_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                                </select>
+                                                <select value={worker.kikouStatus.assignee} onChange={e => handleOperationChange(worker.id, 'kikou_status', 'assignee', e.target.value)} className="text-[11px] py-0.5 px-1 outline-none w-1/2 rounded bg-gray-50 border border-gray-200 text-gray-700 cursor-pointer">
+                                                    {STAFF_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                                </select>
+                                            </div>
+                                            <div className="flex flex-col gap-1 border border-gray-100 rounded p-1 bg-gray-50/50">
+                                                <div className="flex items-center gap-1.5">
+                                                    <span className="text-[9px] bg-white border border-gray-200 rounded px-1 py-px text-gray-500 shrink-0 shadow-sm leading-none">業務</span>
+                                                    <select value={worker.kikouStatus.construction_type || '---'} onChange={e => handleOperationChange(worker.id, 'kikou_status', 'construction_type', e.target.value)} className="text-[11px] flex-1 w-full bg-transparent outline-none text-gray-700 cursor-pointer truncate pl-1">
+                                                        {CONSTRUCTION_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                                    </select>
+                                                </div>
+                                                <div className="flex items-center gap-1.5">
+                                                    <span className="text-[9px] bg-white border border-gray-200 rounded px-1 py-px text-gray-500 shrink-0 shadow-sm leading-none">担当</span>
+                                                    <select value={worker.kikouStatus.construction_assignee || '---'} onChange={e => handleOperationChange(worker.id, 'kikou_status', 'construction_assignee', e.target.value)} className="text-[11px] flex-1 w-full bg-transparent outline-none text-gray-700 cursor-pointer text-left pl-1">
                                                         {STAFF_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                                                     </select>
                                                 </div>
-                                                <div className="flex justify-between gap-1 border-t border-gray-100 pt-1.5 mt-0.5 mb-1 flex-1">
-                                                    <div className="flex flex-col gap-1 text-[10px] w-full">
-                                                        <div className="flex items-center gap-1">
-                                                            <span className="text-gray-400 w-10 shrink-0">学科</span>
-                                                            <input type="date" value={worker.kenteiStatus.exam_date_written || ''} onChange={e => handleOperationChange(worker.id, 'kentei_status', 'exam_date_written', e.target.value)} className="flex-1 w-full bg-transparent outline-none text-gray-700 cursor-pointer" />
-                                                        </div>
-                                                        <div className="flex items-center gap-1">
-                                                            <span className="text-gray-400 w-10 shrink-0">実技</span>
-                                                            <input type="date" value={worker.kenteiStatus.exam_date_practical || ''} onChange={e => handleOperationChange(worker.id, 'kentei_status', 'exam_date_practical', e.target.value)} className="flex-1 w-full bg-transparent outline-none text-gray-700 cursor-pointer" />
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <select value={worker.kenteiStatus.progress} onChange={e => handleOperationChange(worker.id, 'kentei_status', 'progress', e.target.value)} className={`text-xs p-1 rounded font-medium outline-none w-full text-center cursor-pointer transition-colors mt-auto ${worker.kenteiStatus.progress === '完了' ? 'bg-green-100 text-green-700' : worker.kenteiStatus.progress === '進行中' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500'}`}>
-                                                    {PROGRESS_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-                                                </select>
                                             </div>
-                                        </td>
+                                            <select value={worker.kikouStatus.progress} onChange={e => handleOperationChange(worker.id, 'kikou_status', 'progress', e.target.value)} className={`text-[11px] py-1 px-1.5 rounded font-medium outline-none w-full text-center cursor-pointer transition-colors mt-auto shadow-sm ${worker.kikouStatus.progress === '完了' ? 'bg-green-100 text-green-700 border-green-200 border' : worker.kikouStatus.progress === '進行中' ? 'bg-purple-100 text-purple-700 border-purple-200 border' : 'bg-gray-100 text-gray-600 border-gray-200 border'}`}>
+                                                {PROGRESS_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                            </select>
+                                        </div>
 
-                                        {/* 機構業務/建設特定 (Kikou Ops) */}
-                                        <td className="border border-gray-350 p-1 align-top w-[180px] min-w-[180px] max-w-[180px]">
-                                            <div className="flex flex-col gap-1.5 h-full relative">
-                                                <div className="flex justify-between gap-1">
-                                                    <select value={worker.kikouStatus.type} onChange={e => handleOperationChange(worker.id, 'kikou_status', 'type', e.target.value)} className="text-xs p-1 outline-none w-1/2 cursor-pointer bg-transparent text-gray-700 font-medium">
-                                                        {KIKOU_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-                                                    </select>
-                                                    <select value={worker.kikouStatus.assignee} onChange={e => handleOperationChange(worker.id, 'kikou_status', 'assignee', e.target.value)} className="text-xs p-1 outline-none w-1/2 cursor-pointer bg-transparent text-gray-700 text-right">
-                                                        {STAFF_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-                                                    </select>
-                                                </div>
-                                                <div className="flex justify-between gap-1 border-t border-gray-100 pt-1.5 mt-0.5 mb-1 flex-1">
-                                                    <div className="flex flex-col gap-1 text-[10px] w-full">
-                                                        <div className="flex items-center gap-1">
-                                                            <span className="text-gray-400 w-10 shrink-0">業務</span>
-                                                            <select value={worker.kikouStatus.construction_type || '---'} onChange={e => handleOperationChange(worker.id, 'kikou_status', 'construction_type', e.target.value)} className="flex-1 w-full bg-transparent outline-none text-gray-700 cursor-pointer truncate">
-                                                                {CONSTRUCTION_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-                                                            </select>
-                                                        </div>
-                                                        <div className="flex items-center gap-1">
-                                                            <span className="text-gray-400 w-10 shrink-0">担当</span>
-                                                            <select value={worker.kikouStatus.construction_assignee || '---'} onChange={e => handleOperationChange(worker.id, 'kikou_status', 'construction_assignee', e.target.value)} className="flex-1 w-full bg-transparent outline-none text-gray-700 cursor-pointer">
-                                                                {STAFF_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <select value={worker.kikouStatus.progress} onChange={e => handleOperationChange(worker.id, 'kikou_status', 'progress', e.target.value)} className={`text-xs p-1 rounded font-medium outline-none w-full text-center cursor-pointer transition-colors mt-auto ${worker.kikouStatus.progress === '完了' ? 'bg-green-100 text-green-700' : worker.kikouStatus.progress === '進行中' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-500'}`}>
-                                                    {PROGRESS_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                        {/* Col 6: Nyukan Ops */}
+                                        <div className="flex-1 flex flex-col gap-1.5 border-t xl:border-t-0 xl:border-l border-gray-100 pt-3 xl:pt-0 xl:pl-4 min-w-0">
+                                            <div className="text-[10px] font-bold text-gray-500 bg-gray-50 px-1.5 py-0.5 w-fit rounded">入管業務</div>
+                                            <div className="flex justify-between gap-1 mt-0.5">
+                                                <select value={worker.nyukanStatus.type} onChange={e => handleOperationChange(worker.id, 'nyukan_status', 'type', e.target.value)} className="text-[11px] py-0.5 px-1 outline-none w-1/2 rounded bg-gray-50 border border-gray-200 text-gray-700 font-medium cursor-pointer max-w-[50%]">
+                                                    {NYUKAN_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                                </select>
+                                                <select value={worker.nyukanStatus.assignee} onChange={e => handleOperationChange(worker.id, 'nyukan_status', 'assignee', e.target.value)} className="text-[11px] py-0.5 px-1 outline-none w-1/2 rounded bg-gray-50 border border-gray-200 text-gray-700 cursor-pointer">
+                                                    {STAFF_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                                                 </select>
                                             </div>
-                                        </td>
-
-                                        {/* 入管業務 (Nyukan Ops) */}
-                                        <td className="border border-gray-350 p-1 align-top w-[180px] min-w-[180px] max-w-[180px]">
-                                            <div className="flex flex-col gap-1.5 h-full relative">
-                                                <div className="flex justify-between gap-1">
-                                                    <select value={worker.nyukanStatus.type} onChange={e => handleOperationChange(worker.id, 'nyukan_status', 'type', e.target.value)} className="text-xs p-1 outline-none w-1/2 cursor-pointer bg-transparent text-gray-700 font-medium">
-                                                        {NYUKAN_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-                                                    </select>
-                                                    <select value={worker.nyukanStatus.assignee} onChange={e => handleOperationChange(worker.id, 'nyukan_status', 'assignee', e.target.value)} className="text-xs p-1 outline-none w-1/2 cursor-pointer bg-transparent text-gray-700 text-right">
-                                                        {STAFF_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-                                                    </select>
+                                            <div className="flex flex-col gap-1 border border-gray-100 rounded p-1 bg-gray-50/50">
+                                                <div className="flex items-center gap-1.5">
+                                                    <span className="text-[9px] bg-white border border-gray-200 rounded px-1 py-px text-gray-500 shrink-0 shadow-sm leading-none">申請</span>
+                                                    <input type="date" value={worker.nyukanStatus.application_date || ''} onChange={e => handleOperationChange(worker.id, 'nyukan_status', 'application_date', e.target.value)} className="text-[11px] flex-1 w-full bg-transparent outline-none text-gray-700 cursor-pointer" />
                                                 </div>
-                                                <div className="flex justify-between gap-1 border-t border-gray-100 pt-1.5 mt-0.5 mb-1 flex-1">
-                                                    <div className="flex flex-col gap-1 text-[10px] w-full">
-                                                        <div className="flex items-center gap-1">
-                                                            <span className="text-gray-400 w-10 shrink-0">申請日</span>
-                                                            <input type="date" value={worker.nyukanStatus.application_date || ''} onChange={e => handleOperationChange(worker.id, 'nyukan_status', 'application_date', e.target.value)} className="flex-1 w-full bg-transparent outline-none text-gray-700 cursor-pointer" />
-                                                        </div>
-                                                        <div className="flex items-center gap-1">
-                                                            <span className="text-gray-400 w-10 shrink-0">取次者</span>
-                                                            <input type="text" placeholder="---" value={worker.nyukanStatus.agent || ''} onChange={e => handleOperationChange(worker.id, 'nyukan_status', 'agent', e.target.value)} className="flex-1 w-full bg-transparent outline-none text-gray-700 placeholder-gray-300" />
-                                                        </div>
-                                                    </div>
+                                                <div className="flex items-center gap-1.5">
+                                                    <span className="text-[9px] bg-white border border-gray-200 rounded px-1 py-px text-gray-500 shrink-0 shadow-sm leading-none">取次</span>
+                                                    <input type="text" placeholder="---" value={worker.nyukanStatus.agent || ''} onChange={e => handleOperationChange(worker.id, 'nyukan_status', 'agent', e.target.value)} className="text-[11px] flex-1 w-full bg-transparent outline-none text-gray-700 placeholder-gray-300 pl-1" />
                                                 </div>
-                                                <select value={worker.nyukanStatus.progress} onChange={e => handleOperationChange(worker.id, 'nyukan_status', 'progress', e.target.value)} className={`text-xs p-1 rounded font-medium outline-none w-full text-center cursor-pointer transition-colors mt-auto ${worker.nyukanStatus.progress === '完了' ? 'bg-green-100 text-green-700' : worker.nyukanStatus.progress === '進行中' ? 'bg-orange-100 text-orange-700' : 'bg-gray-100 text-gray-500'}`}>
-                                                    {PROGRESS_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-                                                </select>
                                             </div>
-                                        </td>
-                                    </tr>
+                                            <select value={worker.nyukanStatus.progress} onChange={e => handleOperationChange(worker.id, 'nyukan_status', 'progress', e.target.value)} className={`text-[11px] py-1 px-1.5 rounded font-medium outline-none w-full text-center cursor-pointer transition-colors mt-auto shadow-sm ${worker.nyukanStatus.progress === '完了' ? 'bg-green-100 text-green-700 border-green-200 border' : worker.nyukanStatus.progress === '進行中' ? 'bg-orange-100 text-orange-700 border-orange-200 border' : 'bg-gray-100 text-gray-600 border-gray-200 border'}`}>
+                                                {PROGRESS_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                            </select>
+                                        </div>
+                                    </div>
                                 ))}
-                            </tbody>
-                        </table>
+                            </div>
+                        ))}
+
                         {processedWorkers.length === 0 && (
-                            <div className="text-center py-10 text-gray-500 text-sm border-b border-l border-r border-gray-350">
+                            <div className="text-center py-12 text-gray-500 text-sm bg-gray-50 rounded-xl border border-gray-200">
                                 データがありません。
                             </div>
                         )}
                         {totalPages > 1 && (
-                            <div className="flex items-center justify-between px-4 py-3 bg-white border border-t-0 border-gray-350 rounded-b">
+                            <div className="flex items-center justify-between px-4 py-3 bg-transparent mt-2">
                                 <div className="text-sm text-gray-500">
                                     全 <span className="font-semibold">{processedWorkers.length}</span> 件中 <span className="font-semibold">{(currentPage - 1) * itemsPerPage + 1}</span> - <span className="font-semibold">{Math.min(currentPage * itemsPerPage, processedWorkers.length)}</span> 件を表示
                                 </div>
@@ -646,9 +729,11 @@ export default function OperationsClient({
                 </div>
             )}
 
-            {activeTab === 'visa' && <VisaTab initialVisas={initialVisas} />}
-            {activeTab === 'exam' && <ExamTab initialExams={initialExams} />}
-            {activeTab === 'transfer' && <TransferTab initialTransfers={initialTransfers} />}
+            {activeTab === 'exam' && (
+                <div className="w-[1200px] mx-auto p-6 print-target print:w-full print:mx-0 print:p-0">
+                    <ExamTab workers={workers} onUpdate={handleOperationChange} />
+                </div>
+            )}
         </div>
     )
 }

@@ -27,38 +27,34 @@ export default function VisaTab({ initialVisas = [] }: { initialVisas?: any[] })
                                 </td>
                             </tr>
                         ) : (
-                            initialVisas.map((worker, idx) => (
+                            initialVisas.map((visa, idx) => (
                                 <tr key={idx} className="hover:bg-primary-50 transition-colors">
                                     <td className="border border-gray-350 p-3 bg-white sticky left-0 z-10 shadow-[1px_0_0_0_#d1d5db] font-medium group-hover:bg-primary-50">
-                                        {worker.full_name_romaji || '---'}
+                                        {visa.worker?.full_name_romaji || '---'}
                                     </td>
                                     <td className="border border-gray-350 p-3 bg-white sticky left-[150px] z-10 shadow-[1px_0_0_0_#d1d5db] text-gray-600 group-hover:bg-primary-50">
-                                        {worker.companies?.name_jp || '---'}
+                                        {visa.worker?.companies?.name_jp || '---'}
                                     </td>
                                     <td className="border border-gray-350 p-3">
-                                        {worker.system_type === 'tokuteigino' ? '特定技能' : (worker.system_type === 'ginou_jisshu' ? '技能実習' : '育成就労')}
+                                        {visa.worker?.system_type === 'tokuteigino' ? '特定技能' : (visa.worker?.system_type === 'ginou_jisshu' ? '技能実習' : '育成就労')}
                                     </td>
                                     <td className="border border-gray-350 p-3">
-                                        {worker.visas && worker.visas.length > 0 ? worker.visas[0].visa_type : <span className="text-gray-400">データなし</span>}
+                                        {visa.visa_type || <span className="text-gray-400">データなし</span>}
                                     </td>
                                     <td className="border border-gray-350 p-3">
-                                        {worker.visas && worker.visas.length > 0 ? worker.visas[0].expiration_date : <span className="text-gray-400">データなし</span>}
+                                        {visa.expiration_date || <span className="text-gray-400">データなし</span>}
                                     </td>
                                     <td className="border border-gray-350 p-2">
-                                        {worker.visas && worker.visas.length > 0 ? (
-                                            <select
-                                                value={worker.visas[0].process_status || 'gathering'}
-                                                className="w-full text-xs p-1.5 border border-gray-350 bg-gray-50 rounded outline-none focus:border-primary-500 cursor-pointer"
-                                                onChange={() => { }} // Placeholder for active handle implementation
-                                            >
-                                                <option value="gathering">書類収集 (Gathering)</option>
-                                                <option value="submitted">申請済 (Submitted)</option>
-                                                <option value="additional_req">追加資料 (Additional Req)</option>
-                                                <option value="approved">許可 (Approved)</option>
-                                            </select>
-                                        ) : (
-                                            <span className="text-gray-400">データなし</span>
-                                        )}
+                                        <select
+                                            value={visa.process_status || 'gathering'}
+                                            className="w-full text-xs p-1.5 border border-gray-350 bg-gray-50 rounded outline-none focus:border-primary-500 cursor-pointer"
+                                            onChange={() => { }} // Placeholder for active handle implementation
+                                        >
+                                            <option value="gathering">書類収集 (Gathering)</option>
+                                            <option value="submitted">申請済 (Submitted)</option>
+                                            <option value="additional_req">追加資料 (Additional Req)</option>
+                                            <option value="approved">許可 (Approved)</option>
+                                        </select>
                                     </td>
                                 </tr>
                             ))

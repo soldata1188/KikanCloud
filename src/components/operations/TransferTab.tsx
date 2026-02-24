@@ -28,41 +28,37 @@ export default function TransferTab({ initialTransfers = [] }: { initialTransfer
                                 </td>
                             </tr>
                         ) : (
-                            initialTransfers.map((worker, idx) => (
+                            initialTransfers.map((transfer, idx) => (
                                 <tr key={idx} className="hover:bg-primary-50 transition-colors">
                                     <td className="border border-gray-350 p-3 bg-white sticky left-0 z-10 shadow-[1px_0_0_0_#d1d5db] font-medium group-hover:bg-primary-50">
-                                        {worker.full_name_romaji || '---'}
+                                        {transfer.worker?.full_name_romaji || '---'}
                                     </td>
                                     <td className="border border-gray-350 p-3 bg-white sticky left-[150px] z-10 shadow-[1px_0_0_0_#d1d5db] text-gray-600 group-hover:bg-primary-50">
-                                        {worker.companies?.name_jp || '---'}
+                                        {transfer.worker?.companies?.name_jp || '---'}
                                     </td>
                                     <td className="border border-gray-350 p-3">
-                                        {worker.job_transfers && worker.job_transfers.length > 0 && worker.job_transfers[0].from_company ? worker.job_transfers[0].from_company.name_jp : <span className="text-gray-400">データなし</span>}
+                                        {transfer.from_company?.name_jp || <span className="text-gray-400">データなし</span>}
                                     </td>
                                     <td className="border border-gray-350 p-3">
-                                        {worker.job_transfers && worker.job_transfers.length > 0 ? (worker.job_transfers[0].to_company ? worker.job_transfers[0].to_company.name_jp : '未定 (TBD)') : <span className="text-gray-400">データなし</span>}
+                                        {transfer.to_company ? transfer.to_company.name_jp : '未定 (TBD)'}
                                     </td>
                                     <td className="border border-gray-350 p-3">
-                                        {worker.job_transfers && worker.job_transfers.length > 0 ? (worker.job_transfers[0].reason === 'voluntary' ? '自己都合' : '会社都合') : <span className="text-gray-400">データなし</span>}
+                                        {transfer.reason === 'voluntary' ? '自己都合' : '会社都合'}
                                     </td>
                                     <td className="border border-gray-350 p-3">
-                                        {worker.job_transfers && worker.job_transfers.length > 0 ? worker.job_transfers[0].transfer_date : <span className="text-gray-400">データなし</span>}
+                                        {transfer.transfer_date || <span className="text-gray-400">データなし</span>}
                                     </td>
                                     <td className="border border-gray-350 p-2">
-                                        {worker.job_transfers && worker.job_transfers.length > 0 ? (
-                                            <select
-                                                value={worker.job_transfers[0].status || 'intent_declared'}
-                                                className="w-full text-xs p-1.5 border border-gray-350 bg-gray-50 rounded outline-none focus:border-primary-500 cursor-pointer"
-                                                onChange={() => { }} // Placeholder for future mutations
-                                            >
-                                                <option value="intent_declared">意向表明 (Intent Declared)</option>
-                                                <option value="hello_work_matching">ハローワーク (Hello Work)</option>
-                                                <option value="paperwork_submitted">書類提出 (Paperwork Submitted)</option>
-                                                <option value="transferred">移籍完了 (Transferred)</option>
-                                            </select>
-                                        ) : (
-                                            <span className="text-gray-400">データなし</span>
-                                        )}
+                                        <select
+                                            value={transfer.status || 'intent_declared'}
+                                            className="w-full text-xs p-1.5 border border-gray-350 bg-gray-50 rounded outline-none focus:border-primary-500 cursor-pointer"
+                                            onChange={() => { }} // Placeholder for future mutations
+                                        >
+                                            <option value="intent_declared">意向表明 (Intent Declared)</option>
+                                            <option value="hello_work_matching">ハローワーク (Hello Work)</option>
+                                            <option value="paperwork_submitted">書類提出 (Paperwork Submitted)</option>
+                                            <option value="transferred">移籍完了 (Transferred)</option>
+                                        </select>
                                     </td>
                                 </tr>
                             ))

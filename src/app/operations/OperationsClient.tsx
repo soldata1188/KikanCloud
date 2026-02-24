@@ -356,7 +356,8 @@ export default function OperationsClient({ initialWorkers, companies }: { initia
                                 />
                             </th>
                             <th className="border border-gray-350 px-4 py-3 font-semibold whitespace-nowrap min-w-[200px]">外国人材 / 受入企業</th>
-                            <th className="border border-gray-350 px-4 py-3 font-semibold whitespace-nowrap w-[240px] min-w-[240px] max-w-[240px]">在留・認定情報</th>
+                            <th className="border border-gray-350 px-4 py-3 font-semibold whitespace-nowrap w-[160px] min-w-[160px] max-w-[160px]">認定情報</th>
+                            <th className="border border-gray-350 px-4 py-3 font-semibold whitespace-nowrap w-[160px] min-w-[160px] max-w-[160px]">在留情報</th>
                             <th className="border border-gray-350 px-4 py-3 font-semibold whitespace-nowrap w-[200px] min-w-[200px]">検定業務</th>
                             <th className="border border-gray-350 px-4 py-3 font-semibold whitespace-nowrap w-[200px] min-w-[200px]">機構業務/建設特定</th>
                             <th className="border border-gray-350 px-4 py-3 font-semibold whitespace-nowrap w-[200px] min-w-[200px]">入管業務</th>
@@ -407,31 +408,40 @@ export default function OperationsClient({ initialWorkers, companies }: { initia
                                     </div>
                                 </td>
 
-                                {/* Combined Residence & Certification Info */}
-                                <td className="border border-gray-350 p-1.5 align-top">
-                                    <div className="flex flex-col gap-1 w-full bg-white">
-                                        {/* Certification Sub-block */}
-                                        <div className="flex flex-col gap-0.5">
-                                            <div className="flex items-center justify-between text-[10px] text-gray-500 leading-tight">
-                                                <span>制度: <span className="text-gray-900 font-medium">{worker.systemCategory}</span></span>
-                                                <span>職種: <span className="text-gray-900 font-medium">{worker.occupation}</span></span>
-                                            </div>
-                                            <div className="flex items-center justify-between text-[10px] text-gray-500 leading-tight">
-                                                <span>開始: <span className="text-gray-900 font-medium">{worker.certStartDate}</span></span>
-                                                <span>終了: <span className="text-gray-900 font-medium">{worker.certEndDate}</span></span>
-                                            </div>
+                                {/* Certification Info */}
+                                <td className="border border-gray-350 px-1.5 py-1">
+                                    <div className="flex flex-col gap-0.5 inline-flex w-full">
+                                        <div className="text-[10px] text-gray-500 whitespace-nowrap leading-tight">
+                                            制度: <span className="text-gray-900 font-medium">{worker.systemCategory}</span>
+                                        </div>
+                                        <div className="flex items-center justify-between mt-0 gap-1">
+                                            <span className="text-[10px] text-gray-500 whitespace-nowrap leading-tight">職種: <span className="text-gray-900 font-medium">{worker.occupation}</span></span>
                                         </div>
                                         <div className="border-t border-gray-100 my-0.5"></div>
-                                        {/* Residence Sub-block */}
-                                        <div className="flex flex-col gap-0.5">
-                                            <div className="flex items-center justify-between text-[10px] text-gray-500 leading-tight">
-                                                <span>資格: <span className="text-gray-900 font-medium">{worker.visaStatus}</span></span>
-                                                <span>期限: <span className="text-gray-900 font-medium">{worker.visaExpiry}</span></span>
-                                            </div>
-                                            <div className="flex items-center justify-between text-[10px] text-gray-500 leading-tight">
-                                                <span>入国: <span className="text-gray-900 font-medium">{worker.entryDate || '---'}</span></span>
-                                                <span>期生: <span className="text-gray-900 font-medium">{getBatchString(worker.entryDate)}</span></span>
-                                            </div>
+                                        <div className="text-[10px] text-gray-500 whitespace-nowrap leading-tight">
+                                            開始: <span className="text-gray-900 font-medium">{worker.certStartDate}</span>
+                                        </div>
+                                        <div className="text-[10px] text-gray-500 whitespace-nowrap leading-tight">
+                                            終了: <span className="text-gray-900 font-medium">{worker.certEndDate}</span>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                {/* Residence Info (Status, Expiry, Duration) */}
+                                <td className="border border-gray-350 px-1.5 py-1">
+                                    <div className="flex flex-col gap-0.5 inline-flex w-full">
+                                        <div className="text-[10px] text-gray-500 whitespace-nowrap leading-tight">
+                                            資格: <span className="text-gray-900 font-medium">{worker.visaStatus}</span>
+                                        </div>
+                                        <div className="flex items-center justify-between mt-0 gap-1">
+                                            <span className="text-[10px] text-gray-500 whitespace-nowrap leading-tight">期限: <span className="text-gray-900 font-medium">{worker.visaExpiry}</span></span>
+                                        </div>
+                                        <div className="border-t border-gray-100 my-0.5"></div>
+                                        <div className="text-[10px] text-gray-500 whitespace-nowrap leading-tight">
+                                            入国: <span className="text-gray-900 font-medium">{worker.entryDate || '---'}</span>
+                                        </div>
+                                        <div className="text-[10px] text-gray-500 whitespace-nowrap leading-tight">
+                                            期生: <span className="text-gray-900 font-medium">{getBatchString(worker.entryDate)}</span>
                                         </div>
                                     </div>
                                 </td>

@@ -336,10 +336,10 @@ export default function OperationsClient({ initialWorkers, companies }: { initia
                                                 <select
                                                     value={worker.status}
                                                     onChange={(e) => handleChange(worker.id, 'status', e.target.value)}
-                                                    className={`text-[10px] font-medium px-1.5 py-0.5 rounded border outline-none cursor-pointer hover:opacity-80 transition-opacity ${worker.status === '就業中' ? 'bg-green-50 text-green-700 border-green-200' :
-                                                        worker.status === '帰国' ? 'bg-gray-100 text-gray-600 border-gray-200' :
-                                                            worker.status === '失踪' ? 'bg-red-50 text-red-700 border-red-200' :
-                                                                'bg-orange-50 text-orange-700 border-orange-200'
+                                                    className={`text-[10px] font-medium px-1.5 py-0.5 rounded outline-none cursor-pointer hover:opacity-80 transition-opacity ${worker.status === '就業中' ? 'bg-green-50 text-green-700' :
+                                                        worker.status === '帰国' ? 'bg-gray-100 text-gray-600' :
+                                                            worker.status === '失踪' ? 'bg-red-50 text-red-700' :
+                                                                'bg-orange-50 text-orange-700'
                                                         }`}
                                                 >
                                                     {STATUS_CARDS.filter(s => s !== 'すべて').map(s => <option key={s} value={s}>{s}</option>)}

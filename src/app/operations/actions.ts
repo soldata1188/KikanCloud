@@ -31,6 +31,7 @@ export async function getOperationsData() {
             )
         `)
         .eq('is_deleted', false)
+        .order('expiration_date', { foreignTable: 'visas', ascending: false })
         .order('created_at', { ascending: false })
 
     // RLS will automatically handle filtering by tenant_id and user_role according to migration 00023.

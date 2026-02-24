@@ -356,10 +356,10 @@ export default function OperationsClient({ initialWorkers, companies }: { initia
                                 {/* Residence Info (Status, Expiry, Duration) */}
                                 <td className="border border-gray-350 px-4 py-3">
                                     <div className="flex flex-col gap-1 inline-flex w-full">
-                                        <div className="inline-flex max-w-fit items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
-                                            {worker.visaStatus}
+                                        <div className="text-xs text-gray-500 whitespace-nowrap">
+                                            在留資格: <span className="text-gray-900 font-medium">{worker.visaStatus}</span>
                                         </div>
-                                        <div className="flex items-center justify-between mt-1 gap-2">
+                                        <div className="flex items-center justify-between mt-0.5 gap-2">
                                             <span className="text-xs text-gray-500 whitespace-nowrap">期限: <span className="text-gray-900 font-medium">{worker.visaExpiry}</span></span>
                                         </div>
                                         <div className="text-xs text-gray-500 whitespace-nowrap">

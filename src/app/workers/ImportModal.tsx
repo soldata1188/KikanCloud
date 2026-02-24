@@ -38,7 +38,9 @@ export function ImportModal() {
                     full_name_romaji: row['氏名（ローマ字）'],
                     dob: row['生年月日'],
                     gender: row['性別'],
+                    has_spouse: row['配偶者'] === '有' ? true : (row['配偶者'] === '無' ? false : null),
                     nationality: row['国籍'],
+                    birthplace: row['本国の出生地'],
                     entry_date: row['入国日'],
                     visa_status: row['在留資格'],
                 }))
@@ -65,9 +67,9 @@ export function ImportModal() {
 
     const downloadTemplate = () => {
         const headers = [
-            '配属先企業', '氏名（ローマ字）', '生年月日', '性別', '国籍', '入国日', '在留資格'
+            '配属先企業', '氏名（ローマ字）', '生年月日', '性別', '配偶者', '国籍', '本国の出生地', '入国日', '在留資格'
         ]
-        const csvContent = "data:text/csv;charset=utf-8,\uFEFF" + headers.join(',') + '\n株式会社サンプル,NGUYEN VAN A,2000/01/01,男性,ベトナム,2024/04/01,技能実習'
+        const csvContent = "data:text/csv;charset=utf-8,\uFEFF" + headers.join(',') + '\n株式会社サンプル,NGUYEN VAN A,2000/01/01,男性,有,ベトナム,ハノイ市,2024/04/01,技能実習'
         const encodedUri = encodeURI(csvContent)
         const link = document.createElement("a")
         link.setAttribute("href", encodedUri)
@@ -124,14 +126,16 @@ export function ImportModal() {
                                     <div className="border border-gray-350 rounded-md overflow-hidden max-h-[300px] overflow-y-auto">
                                         <table className="w-full text-left text-[12px]">
                                             <thead className="bg-white sticky top-0 border-b border-gray-350">
-                                                <tr><th className="px-4 py-2 font-medium text-[#878787] uppercase">配属先企業</th><th className="px-4 py-2 font-medium text-[#878787] uppercase">氏名（ローマ字）</th><th className="px-4 py-2 font-medium text-[#878787] uppercase">国籍</th><th className="px-4 py-2 font-medium text-[#878787] uppercase">在留資格</th></tr>
+                                                <tr><th className="px-4 py-2 font-medium text-[#878787] uppercase">配属先企業</th><th className="px-4 py-2 font-medium text-[#878787] uppercase">氏名（ローマ字）</th><th className="px-4 py-2 font-medium text-[#878787] uppercase">配偶者</th><th className="px-4 py-2 font-medium text-[#878787] uppercase">国籍</th><th className="px-4 py-2 font-medium text-[#878787] uppercase">本国の出生地</th><th className="px-4 py-2 font-medium text-[#878787] uppercase">在留資格</th></tr>
                                             </thead>
                                             <tbody className="divide-y divide-[#ededed]">
                                                 {parsedData.slice(0, 100).map((row, i) => (
                                                     <tr key={i} className="hover:bg-gray-50">
                                                         <td className="px-4 py-2 text-[#1f1f1f]">{row.company_name || '-'}</td>
                                                         <td className="px-4 py-2 font-medium text-[#1f1f1f]">{row.full_name_romaji || '-'}</td>
+                                                        <td className="px-4 py-2 text-[#878787]">{row.has_spouse === true ? '有' : row.has_spouse === false ? '無' : '-'}</td>
                                                         <td className="px-4 py-2 text-[#878787]">{row.nationality || '-'}</td>
+                                                        <td className="px-4 py-2 text-[#878787]">{row.birthplace || '-'}</td>
                                                         <td className="px-4 py-2 text-[#878787]">{row.visa_status || '-'}</td>
                                                     </tr>
                                                 ))}

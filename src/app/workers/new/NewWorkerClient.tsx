@@ -29,6 +29,8 @@ interface WorkerData {
     cert_start_date: string;
     cert_end_date: string;
     remarks: string;
+    has_spouse: string;
+    birthplace: string;
 }
 
 const initialWorkerData: WorkerData = {
@@ -36,7 +38,7 @@ const initialWorkerData: WorkerData = {
     nationality: 'ベトナム', address: '', company_id: '', industry_field: '', sending_org: '',
     system_type: 'ikusei_shuro', status: 'waiting', entry_batch: '', entry_date: '', insurance_exp: '',
     visa_status: '', zairyu_no: '', zairyu_exp: '', passport_no: '', passport_exp: '', cert_no: '', cert_start_date: '', cert_end_date: '',
-    remarks: ''
+    remarks: '', has_spouse: 'false', birthplace: ''
 };
 
 const DOC_TYPES = [
@@ -326,6 +328,18 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
                                         <option value="female">女性</option>
                                     </select>
                                 </FormRow>
+                                <FormRow label="配偶者">
+                                    <div className="flex gap-4">
+                                        <label className="flex items-center gap-1.5 cursor-pointer">
+                                            <input type="radio" name="has_spouse" value="true" checked={formData.has_spouse === 'true'} onChange={handleInputChange} className="accent-[#24b47e]" />
+                                            <span className="text-[13px] text-[#1f1f1f]">有</span>
+                                        </label>
+                                        <label className="flex items-center gap-1.5 cursor-pointer">
+                                            <input type="radio" name="has_spouse" value="false" checked={formData.has_spouse === 'false'} onChange={handleInputChange} className="accent-[#24b47e]" />
+                                            <span className="text-[13px] text-[#1f1f1f]">無</span>
+                                        </label>
+                                    </div>
+                                </FormRow>
                                 <FormRow label="血液型">
                                     <select name="blood_type" value={formData.blood_type} onChange={handleInputChange} className={getInputClass("blood_type") + " appearance-none"}>
                                         <option value="">選択してください</option>
@@ -339,6 +353,9 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
                                         <option value="フィリピン">フィリピン</option>
                                         <option value="カンボジア">カンボジア</option>
                                     </select>
+                                </FormRow>
+                                <FormRow label="本国の出生地">
+                                    <input name="birthplace" value={formData.birthplace} onChange={handleInputChange} className={getInputClass("birthplace")} placeholder="例: ハノイ市" />
                                 </FormRow>
                                 <FormRow label="社宅住所" isLast={true}>
                                     <input name="address" value={formData.address} onChange={handleInputChange} className={getInputClass("address")} placeholder="例: 東京都新宿区..." />

@@ -45,6 +45,8 @@ export async function POST(req: NextRequest) {
             cert_start_date: getStr('cert_start_date'),
             cert_end_date: getStr('cert_end_date'),
             remarks: getStr('remarks'),
+            has_spouse: getStr('has_spouse') === 'true' ? true : (getStr('has_spouse') === 'false' ? false : null),
+            birthplace: getStr('birthplace'),
         };
 
         // Clear empty strings to null for text fields and dates to avoid parsing issues

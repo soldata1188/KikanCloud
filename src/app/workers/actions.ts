@@ -126,7 +126,9 @@ export type ImportWorkerPayload = {
     full_name_romaji?: string;
     dob?: string;
     gender?: string;
+    has_spouse?: boolean | null;
     nationality?: string;
+    birthplace?: string;
     entry_date?: string;
     visa_status?: string;
 };
@@ -184,7 +186,9 @@ export async function importWorkers(workersData: ImportWorkerPayload[]) {
             full_name_kana: '-', // Required by DB Schema
             dob: parseDate(w.dob) || '2000-01-01', // DOB is mandatory
             gender: mapGender(w.gender),
+            has_spouse: w.has_spouse,
             nationality: mapNationality(w.nationality),
+            birthplace: w.birthplace ? String(w.birthplace).trim() : null,
             entry_date: parseDate(w.entry_date),
             visa_status: w.visa_status ? String(w.visa_status).trim() : null,
             status: 'working',

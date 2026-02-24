@@ -160,8 +160,10 @@ export default function WorkerDetailClient({ worker, documents }: { worker: any,
                                 <DataRow label="氏名（カナ）" value={worker.full_name_kana} />
                                 <DataRow label="生年月日" value={worker.dob} />
                                 <DataRow label="性別" value={worker.gender === 'male' ? '男性' : worker.gender === 'female' ? '女性' : worker.gender} />
+                                <DataRow label="配偶者" value={worker.has_spouse === true ? '有' : worker.has_spouse === false ? '無' : worker.has_spouse} />
                                 <DataRow label="血液型" value={worker.blood_type} />
                                 <DataRow label="国籍" value={worker.nationality} />
+                                <DataRow label="本国の出生地" value={worker.birthplace} />
                                 <DataRow label="社宅住所" value={worker.address} isLast />
                             </div>
                         </div>

@@ -345,9 +345,6 @@ export default function OperationsClient({ initialWorkers, companies }: { initia
                                                     {STATUS_CARDS.filter(s => s !== 'すべて').map(s => <option key={s} value={s}>{s}</option>)}
                                                 </select>
                                             </div>
-                                            <div className="text-xs font-medium text-gray-600 truncate" title={worker.address}>
-                                                {worker.address}
-                                            </div>
                                         </div>
                                     </div>
                                 </td>

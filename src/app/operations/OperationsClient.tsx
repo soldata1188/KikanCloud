@@ -45,6 +45,7 @@ export default function OperationsClient({ initialWorkers, companies }: { initia
         return {
             id: w.id,
             name: w.full_name_romaji || '名前なし',
+            furigana: w.full_name_kana || '---',
             avatar: (w.full_name_romaji || '?').charAt(0).toUpperCase(),
             company: w.companies?.name_jp || '未所属',
             address: w.address || '---',
@@ -328,7 +329,7 @@ export default function OperationsClient({ initialWorkers, companies }: { initia
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <div className="font-semibold text-gray-900 truncate" title={worker.name}>{worker.name}</div>
-                                                <div className="text-[11px] text-gray-400 mt-0.5 truncate" title={worker.company}>{worker.company}</div>
+                                                <div className="text-[11px] text-gray-400 mt-0.5 truncate" title={worker.furigana}>{worker.furigana}</div>
                                             </div>
                                         </div>
                                         <div className="flex flex-col gap-1.5 border-t border-gray-100 pt-2 mt-1">
@@ -344,6 +345,9 @@ export default function OperationsClient({ initialWorkers, companies }: { initia
                                                 >
                                                     {STATUS_CARDS.filter(s => s !== 'すべて').map(s => <option key={s} value={s}>{s}</option>)}
                                                 </select>
+                                            </div>
+                                            <div className="text-[11px] font-medium text-gray-600 truncate mt-0.5" title={worker.company}>
+                                                🏢 {worker.company}
                                             </div>
                                         </div>
                                     </div>

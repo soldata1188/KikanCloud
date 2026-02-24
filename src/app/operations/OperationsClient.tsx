@@ -500,11 +500,6 @@ export default function OperationsClient({ initialWorkers, companies }: { initia
                                                         {STAFF_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                                                     </select>
                                                 </div>
-                                                {/* Consistent height dummy row */}
-                                                <div className="flex items-center gap-1 opacity-0 pointer-events-none">
-                                                    <span className="w-10">...</span>
-                                                    <input type="text" className="flex-1" />
-                                                </div>
                                             </div>
                                         </div>
                                         <select value={worker.kikouStatus.progress} onChange={e => handleOperationChange(worker.id, 'kikou_status', 'progress', e.target.value)} className={`text-xs p-1 rounded font-medium outline-none w-full text-center cursor-pointer transition-colors mt-auto ${worker.kikouStatus.progress === '完了' ? 'bg-green-100 text-green-700' : worker.kikouStatus.progress === '進行中' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-500'}`}>
@@ -549,7 +544,7 @@ export default function OperationsClient({ initialWorkers, companies }: { initia
                                         onChange={(e) => setWorkers(prev => prev.map(w => w.id === worker.id ? { ...w, remarks: e.target.value } : w))}
                                         onBlur={() => handleRemarksBlur(worker.id)}
                                         placeholder="特記事項やメモを入力..."
-                                        className="w-full h-full min-h-[110px] text-[11px] p-2 border border-gray-200 rounded outline-none focus:border-primary-500 hover:border-gray-300 transition-colors resize-none bg-white/50 focus:bg-white leading-tight"
+                                        className="w-full h-full min-h-[85px] text-[11px] p-2 border border-gray-200 rounded outline-none focus:border-primary-500 hover:border-gray-300 transition-colors resize-none bg-white/50 focus:bg-white leading-tight"
                                     />
                                 </td>
 

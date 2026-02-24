@@ -121,7 +121,15 @@ export async function deleteWorker(formData: FormData) {
     redirect('/workers')
 }
 
-export type ImportWorkerPayload = Partial<Worker> & { company_name?: string };
+export type ImportWorkerPayload = {
+    company_name?: string;
+    full_name_romaji?: string;
+    dob?: string;
+    gender?: string;
+    nationality?: string;
+    entry_date?: string;
+    visa_status?: string;
+};
 
 export async function importWorkers(workersData: ImportWorkerPayload[]) {
     const supabase = await createClient()
@@ -142,19 +150,11 @@ export async function importWorkers(workersData: ImportWorkerPayload[]) {
         return isNaN(d.getTime()) ? null : d.toISOString().split('T')[0];
     }
 
-    const mapSystemType = (text?: string | null) => {
+    const mapGender = (text?: string | null) => {
         const t = String(text || '');
-        if (t.includes('育成就労')) return 'ikusei_shuro'
-        if (t.includes('特定技能')) return 'tokuteigino'
-        return 'ginou_jisshu'
-    }
-
-    const mapStatus = (text?: string | null) => {
-        const t = String(text || '');
-        if (t.includes('待機') || t.includes('入国待')) return 'waiting'
-        if (t.includes('失踪')) return 'missing'
-        if (t.includes('帰国')) return 'returned'
-        return 'working' // Default is Working
+        if (t.includes('男')) return 'male'
+        if (t.includes('女')) return 'female'
+        return 'other'
     }
 
     const mapNationality = (text?: string | null) => {
@@ -167,31 +167,28 @@ export async function importWorkers(workersData: ImportWorkerPayload[]) {
 
     // 2. Normalize data and convert types
     const payload = workersData.map(w => {
-        // If a company name is entered in Excel, search for the Company ID
-        let cId = null;
-        if (w.company_name) {
-            const found = companies?.find(c => c.name_jp === String(w.company_name).trim())
-            if (found) cId = found.id
+        // STRICT COMPANY MATCHING
+        if (!w.company_name || String(w.company_name).trim() === '') {
+            throw new Error(`エラー: 配属先企業（Company Name）が未入力の行が存在します。`)
+        }
+
+        const foundCompany = companies?.find(c => c.name_jp === String(w.company_name).trim())
+        if (!foundCompany) {
+            throw new Error(`エラー: 「${w.company_name}」という企業名はシステムに登録されていません。受入企業一覧を先に確認・登録してください。`)
         }
 
         return {
             tenant_id: userData?.tenant_id,
+            company_id: foundCompany.id,
             full_name_romaji: w.full_name_romaji ? String(w.full_name_romaji).toUpperCase().trim() : 'UNKNOWN',
-            full_name_kana: w.full_name_kana ? String(w.full_name_kana).trim() : '-',
-            dob: parseDate(w.dob) || '2000-01-01', // Date of birth is mandatory
-            company_id: cId,
-            system_type: mapSystemType(w.system_type),
-            status: mapStatus(w.status),
-            zairyu_no: w.zairyu_no ? String(w.zairyu_no).toUpperCase().trim() : null,
-            entry_date: parseDate(w.entry_date),
-            passport_exp: parseDate(w.passport_exp),
-            cert_start_date: parseDate(w.cert_start_date),
-            cert_end_date: parseDate(w.cert_end_date),
-            insurance_exp: parseDate(w.insurance_exp),
-            entry_batch: w.entry_batch ? String(w.entry_batch).trim() : null,
+            full_name_kana: '-', // Required by DB Schema
+            dob: parseDate(w.dob) || '2000-01-01', // DOB is mandatory
+            gender: mapGender(w.gender),
             nationality: mapNationality(w.nationality),
-            sending_org: w.sending_org ? String(w.sending_org).trim() : null,
-            address: w.address ? String(w.address).trim() : null,
+            entry_date: parseDate(w.entry_date),
+            visa_status: w.visa_status ? String(w.visa_status).trim() : null,
+            status: 'working',
+            system_type: 'ikusei_shuro'
         }
     })
 

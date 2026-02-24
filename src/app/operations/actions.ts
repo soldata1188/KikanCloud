@@ -133,3 +133,25 @@ export async function updateWorkerStatus(workerId: string, column: string, value
     revalidatePath('/operations')
     return { success: true }
 }
+
+export async function updateOperationData(workerId: string, column: 'kentei_status' | 'kikou_status' | 'nyukan_status', data: any) {
+    const supabase = await createClient()
+
+    const updates: any = {
+        updated_at: new Date().toISOString()
+    }
+    updates[column] = data; // Overwrite the JSON object entirely
+
+    const { error } = await supabase
+        .from('workers')
+        .update(updates)
+        .eq('id', workerId)
+
+    if (error) {
+        console.error('Error updating operation data:', error)
+        throw new Error('更新に失敗しました。(Failed to update operation): ' + error.message)
+    }
+
+    revalidatePath('/operations')
+    return { success: true }
+}

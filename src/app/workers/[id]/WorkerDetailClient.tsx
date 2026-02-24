@@ -164,7 +164,8 @@ export default function WorkerDetailClient({ worker, documents }: { worker: any,
                                 <DataRow label="血液型" value={worker.blood_type} />
                                 <DataRow label="国籍" value={worker.nationality} />
                                 <DataRow label="本国の出生地" value={worker.birthplace} />
-                                <DataRow label="社宅住所" value={worker.address} isLast />
+                                <DataRow label="社宅住所" value={worker.address} />
+                                <DataRow label="日本の居住地" value={worker.japan_residence} isLast />
                             </div>
                         </div>
 

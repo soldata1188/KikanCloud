@@ -131,6 +131,11 @@ export type ImportWorkerPayload = {
     birthplace?: string;
     entry_date?: string;
     visa_status?: string;
+    industry_field?: string;
+    passport_no?: string;
+    passport_exp?: string;
+    address?: string;
+    japan_residence?: string;
 };
 
 export async function importWorkers(workersData: ImportWorkerPayload[]) {
@@ -191,6 +196,11 @@ export async function importWorkers(workersData: ImportWorkerPayload[]) {
             birthplace: w.birthplace ? String(w.birthplace).trim() : null,
             entry_date: parseDate(w.entry_date),
             visa_status: w.visa_status ? String(w.visa_status).trim() : null,
+            industry_field: w.industry_field ? String(w.industry_field).trim() : null,
+            passport_no: w.passport_no ? String(w.passport_no).trim() : null,
+            passport_exp: parseDate(w.passport_exp),
+            address: w.address ? String(w.address).trim() : null,
+            japan_residence: w.japan_residence ? String(w.japan_residence).trim() : null,
             status: 'working',
             system_type: 'ikusei_shuro'
         }

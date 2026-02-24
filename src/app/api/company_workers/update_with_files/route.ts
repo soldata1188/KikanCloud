@@ -46,6 +46,7 @@ export async function POST(req: NextRequest) {
             remarks: getStr('remarks'),
             has_spouse: getStr('has_spouse') === 'true' ? true : (getStr('has_spouse') === 'false' ? false : null),
             birthplace: getStr('birthplace'),
+            japan_residence: getStr('japan_residence'),
         };
 
         // Clear empty strings to null for text fields and dates to avoid parsing issues

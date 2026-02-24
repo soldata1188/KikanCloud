@@ -32,6 +32,7 @@ interface WorkerData {
     remarks: string;
     has_spouse: string;
     birthplace: string;
+    japan_residence: string;
 }
 
 const DOC_TYPES = [
@@ -92,7 +93,8 @@ export default function EditWorkerClient({ companies, worker }: { companies: any
         cert_end_date: worker.cert_end_date || '',
         remarks: worker.remarks || '',
         has_spouse: worker.has_spouse ? 'true' : 'false',
-        birthplace: worker.birthplace || ''
+        birthplace: worker.birthplace || '',
+        japan_residence: worker.japan_residence || ''
     });
 
     const [files, setFiles] = useState<Record<string, { id: string, file: File, timestamp: string }[]>>({});
@@ -378,8 +380,11 @@ export default function EditWorkerClient({ companies, worker }: { companies: any
                                 <FormRow label="本国の出生地">
                                     <input name="birthplace" value={formData.birthplace} onChange={handleInputChange} className={getInputClass("birthplace")} placeholder="例: ハノイ市" />
                                 </FormRow>
-                                <FormRow label="社宅住所" isLast={true}>
+                                <FormRow label="社宅住所">
                                     <input name="address" value={formData.address} onChange={handleInputChange} className={getInputClass("address")} placeholder="例: 東京都新宿区..." />
+                                </FormRow>
+                                <FormRow label="日本の居住地" isLast={true}>
+                                    <input name="japan_residence" value={formData.japan_residence} onChange={handleInputChange} className={getInputClass("japan_residence")} placeholder="例: 東京都新宿区大久保1-1-1..." />
                                 </FormRow>
                             </div>
                         </div>

@@ -21,10 +21,10 @@ export function SidebarAvatar({ userProfile }: { userProfile: any }) {
     const initials = userProfile?.full_name ? userProfile.full_name.substring(0, 1).toUpperCase() : 'U'
 
     return (
-        <div className="relative flex w-full justify-center mb-6" ref={ref}>
+        <div className="relative flex items-center justify-center" ref={ref}>
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="w-10 h-10 rounded-full bg-gradient-to-br from-[#24b47e] to-[#1a8b60] text-white flex items-center justify-center font-bold text-[15px] shadow-sm hover:shadow-md hover:ring-2 hover:ring-[#24b47e] hover:ring-offset-2 transition-all focus:outline-none"
+                className="w-8 h-8 rounded-full bg-gradient-to-br from-[#24b47e] to-[#1a8b60] text-white flex items-center justify-center font-bold text-[13px] shadow-sm hover:shadow-md hover:ring-2 hover:ring-[#24b47e] hover:ring-offset-2 transition-all focus:outline-none shrink-0"
             >
                 {initials}
             </button>

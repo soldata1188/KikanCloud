@@ -1,6 +1,11 @@
 'use client'
 import { useState, useEffect, useTransition, useRef } from 'react'
-import { Sparkles, ArrowUp, Loader2, MapPin, User, Users, Building2, PlaneLanding, UserMinus, Bell, TrendingUp, ChevronRight, Activity, ClipboardList } from 'lucide-react'
+import {
+    Sparkles, ArrowUp, Loader2, MapPin, User, Users, Building2,
+    PlaneLanding, UserMinus, Bell, TrendingUp, ChevronRight,
+    Activity, ClipboardList, ShieldCheck, GitMerge, Map, Route,
+    MessageSquare, LayoutGrid
+} from 'lucide-react'
 import { chatWithOmniAI } from './actions/dashboardAi'
 import Link from 'next/link'
 
@@ -141,6 +146,59 @@ export default function DashboardClient({ userName, dashboardData }: { userName:
                         </div>
                     </div>
                 ))}
+            </div>
+
+            {/* Quick Navigation Section: Executive Dashboard Grid */}
+            <div className="space-y-6">
+                <div className="flex items-center justify-between px-2">
+                    <h3 className="text-xl font-bold text-slate-900 flex items-center gap-3">
+                        <LayoutGrid className="text-emerald-500" size={20} />
+                        クイックアクセス
+                    </h3>
+                    <p className="text-slate-400 text-sm font-medium">主要機能へ素早く移動できます</p>
+                </div>
+
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                    {[
+                        { name: "業務管理", href: "/operations", icon: <ClipboardList size={22} />, desc: "スケジュール・タスク", color: "emerald" },
+                        { name: "実習生一覧", href: "/workers", icon: <Users size={22} />, desc: "データベース管理", color: "blue" },
+                        { name: "受入企業一覧", href: "/companies", icon: <Building2 size={22} />, desc: "取引先・機関連係", color: "indigo" },
+                        { name: "監査・訪問", href: "/audits", icon: <ShieldCheck size={22} />, desc: "法令遵守・巡回指導", color: "purple" },
+                        { name: "業務フロー", href: "/workflows", icon: <GitMerge size={22} />, desc: "ステータス管理", color: "amber" },
+                        { name: "ルート最適化", href: "/routing", icon: <Map size={22} />, desc: "訪問経路自動選定", color: "emerald" },
+                        { name: "制度ロードマップ", href: "/roadmap", icon: <Route size={22} />, desc: "法改正・対応計画", color: "blue" },
+                        { name: "AIチャット", href: "/chat", icon: <Sparkles size={22} />, desc: "コンプライアンス相談", color: "emerald" },
+                        { name: "企業連絡", href: "/b2b-chat", icon: <MessageSquare size={22} />, desc: "ダイレクトメッセージ", color: "rose" },
+                        { name: "システム設定", href: "/settings", icon: <User size={22} />, desc: "アカウント・権限設定", color: "slate" },
+                    ].map((item) => (
+                        <Link
+                            key={item.href}
+                            href={item.href}
+                            className="group relative bg-white border border-slate-200 p-5 rounded-[28px] transition-all duration-300 hover:shadow-[0_15px_30px_rgba(0,0,0,0.06)] hover:-translate-y-1 flex flex-col gap-3"
+                        >
+                            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:scale-110
+                                ${item.color === 'emerald' ? 'bg-emerald-50 text-emerald-500 group-hover:bg-emerald-500 group-hover:text-white' : ''}
+                                ${item.color === 'blue' ? 'bg-blue-50 text-blue-500 group-hover:bg-blue-500 group-hover:text-white' : ''}
+                                ${item.color === 'indigo' ? 'bg-indigo-50 text-indigo-500 group-hover:bg-indigo-500 group-hover:text-white' : ''}
+                                ${item.color === 'purple' ? 'bg-purple-50 text-purple-500 group-hover:bg-purple-500 group-hover:text-white' : ''}
+                                ${item.color === 'amber' ? 'bg-amber-50 text-amber-500 group-hover:bg-amber-500 group-hover:text-white' : ''}
+                                ${item.color === 'rose' ? 'bg-rose-50 text-rose-500 group-hover:bg-rose-500 group-hover:text-white' : ''}
+                                ${item.color === 'slate' ? 'bg-slate-50 text-slate-500 group-hover:bg-slate-500 group-hover:text-white' : ''}
+                            `}>
+                                {item.icon}
+                            </div>
+                            <div className="space-y-0.5">
+                                <p className="text-[14px] font-bold text-slate-900 group-hover:text-emerald-600 transition-colors uppercase tracking-tight">{item.name}</p>
+                                <p className="text-[10px] text-slate-400 font-medium leading-none">{item.desc}</p>
+                            </div>
+                            <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <div className="w-6 h-6 rounded-full bg-slate-900 flex items-center justify-center">
+                                    <ChevronRight size={14} className="text-white" />
+                                </div>
+                            </div>
+                        </Link>
+                    ))}
+                </div>
             </div>
 
             {/* Action Center */}
@@ -318,7 +376,7 @@ export default function DashboardClient({ userName, dashboardData }: { userName:
 
                 <div className="px-8 py-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 backdrop-blur-md sticky top-0 z-10">
                     <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-[22px] bg-slate-900 flex items-center justify-center text-emerald-400 shadow-xl group-hover:rotate-12 transition-transform duration-500">
+                        <div className="w-12 h-12 rounded-full bg-slate-900 flex items-center justify-center text-emerald-400 shadow-xl group-hover:rotate-12 transition-transform duration-500">
                             <Sparkles size={22} strokeWidth={2.5} />
                         </div>
                         <div>
@@ -332,7 +390,7 @@ export default function DashboardClient({ userName, dashboardData }: { userName:
                     {messages.map((msg) => (
                         <div key={msg.id} className={`flex gap-4 ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-in slide-in-from-bottom-4`}>
                             {msg.role === 'model' && (
-                                <div className="w-10 h-10 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center shrink-0 shadow-lg">
+                                <div className="w-10 h-10 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center shrink-0 shadow-lg">
                                     <Sparkles size={18} className="text-emerald-400" />
                                 </div>
                             )}
@@ -340,7 +398,7 @@ export default function DashboardClient({ userName, dashboardData }: { userName:
                                 {msg.isTyping ? <Loader2 size={18} className="animate-spin text-emerald-500" /> : <div className="whitespace-pre-wrap">{msg.text}</div>}
                             </div>
                             {msg.role === 'user' && (
-                                <div className="w-10 h-10 rounded-2xl bg-white border border-slate-200 flex items-center justify-center shrink-0 shadow-md">
+                                <div className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center shrink-0 shadow-md">
                                     <User size={18} className="text-slate-400" />
                                 </div>
                             )}

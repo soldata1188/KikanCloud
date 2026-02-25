@@ -49,7 +49,7 @@ export function SidebarClient({ active, userRole, userProfile }: SidebarClientPr
             onMouseLeave={() => setIsHovered(false)}
         >
             <aside
-                className={`absolute top-0 left-0 h-full bg-[#fbfcfd] border-r border-gray-350 flex flex-col py-6 transition-all duration-300 ease-in-out shadow-2xl ${isHovered ? 'w-[240px]' : 'w-12'}`}
+                className={`absolute top-0 left-0 h-full bg-[#fbfcfd] border-r border-gray-350 flex flex-col pt-3 pb-6 transition-all duration-300 ease-in-out shadow-2xl ${isHovered ? 'w-[240px]' : 'w-12'}`}
             >
                 {/* Top section with Avatar Workspace */}
                 <div className={`w-full flex items-center mb-8 px-2 transition-all duration-300 ${isHovered ? 'justify-start px-4' : 'justify-center'}`}>

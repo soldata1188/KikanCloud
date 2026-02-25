@@ -12,13 +12,10 @@ import {
     Sparkles,
     MessageSquare,
     ClipboardList,
-    Route,
-    ChevronLeft,
-    ChevronRight
+    Route
 } from "lucide-react";
 import { SidebarLogo } from "./SidebarLogo";
 import { SidebarAvatar } from "./SidebarAvatar";
-import GlobalOmniSearch from "./dashboard/GlobalOmniSearch";
 
 const NAV_ITEMS = [
     { id: "dashboard", name: "ホーム", href: "/", icon: LayoutDashboard },
@@ -36,103 +33,92 @@ const NAV_ITEMS = [
 interface SidebarClientProps {
     active: string;
     userRole: string;
-    userProfile: any;
+    userProfile: {
+        full_name?: string;
+        avatar_url?: string;
+    } | null;
 }
 
 export function SidebarClient({ active, userRole, userProfile }: SidebarClientProps) {
-    const [isExpanded, setIsExpanded] = useState(true);
+    const [isHovered, setIsHovered] = useState(false);
 
     return (
-        <aside className={`shrink-0 h-screen bg-[#fbfcfd] border-r border-gray-350 flex flex-col py-6 relative transition-all duration-300 ${isExpanded ? 'w-16 md:w-[180px]' : 'w-16'}`}>
-
-            {/* Toggle Button */}
-            <button
-                onClick={() => setIsExpanded(!isExpanded)}
-                className="hidden md:flex absolute -right-3 top-6 w-6 h-6 bg-white border border-gray-300 rounded-full items-center justify-center text-gray-500 hover:text-primary-600 hover:border-primary-500 hover:bg-primary-50 transition-colors z-[60] shadow-sm"
+        <div
+            className="w-12 shrink-0 h-screen relative z-[100]"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+        >
+            <aside
+                className={`absolute top-0 left-0 h-full bg-[#fbfcfd] border-r border-gray-350 flex flex-col py-6 transition-all duration-300 ease-in-out shadow-2xl ${isHovered ? 'w-[240px]' : 'w-12'}`}
             >
-                {isExpanded ? <ChevronLeft size={14} /> : <ChevronRight size={14} />}
-            </button>
-
-            {/* Top section with Avatar Workspace */}
-            <div className={`w-full flex items-center justify-center ${isExpanded ? 'md:justify-start md:px-4' : 'px-0'} mt-[-8px] mb-4 transition-all duration-300 gap-3`}>
-                <div className={`shrink-0 flex items-center justify-center ${isExpanded ? 'w-full md:w-auto' : 'w-12 h-12'}`}>
-                    <SidebarAvatar userProfile={userProfile} />
-                </div>
-                {/* Desktop-only Username Display */}
-                {isExpanded && (
-                    <div className="hidden md:flex flex-col flex-1 min-w-0 pr-2 pb-5">
-                        <span className="text-[14px] font-bold text-[#1f1f1f] truncate leading-tight">
-                            {userProfile?.full_name || 'Hồ sơ người dùng'}
-                        </span>
-                        <span className="text-[12px] text-[#878787] font-mono uppercase truncate mt-0.5">
-                            {userRole === 'staff' ? 'QUẢN LÝ' : userRole}
-                        </span>
+                {/* Top section with Avatar Workspace */}
+                <div className={`w-full flex items-center mb-8 px-2 transition-all duration-300 ${isHovered ? 'justify-start px-4' : 'justify-center'}`}>
+                    <div className="shrink-0 w-8 h-8 flex items-center justify-center">
+                        <SidebarAvatar userProfile={userProfile} />
                     </div>
-                )}
-            </div>
-
-            {/* Navigation Menu */}
-            <nav className={`flex flex-col gap-2 w-full ${isExpanded ? 'px-0 md:px-3' : 'px-0 items-center'}`}>
-                {NAV_ITEMS.map((item) => {
-                    const isActive = active === item.id;
-                    const Icon = item.icon;
-
-                    return (
-                        <Link
-                            key={item.href}
-                            href={item.href}
-                            title={!isExpanded ? item.name : undefined}
-                            className={`group relative items-center justify-center ${isExpanded ? 'md:justify-start w-full md:px-3' : 'w-12 px-0'} h-12 md:h-11 md:rounded-[8px] hover:bg-gray-100 transition-colors ${['dashboard', 'b2b-chat', 'chat'].includes(item.id)
-                                ? 'flex'
-                                : 'hidden md:flex'
-                                } ${isActive && 'bg-primary-50/50 md:bg-primary-50 md:hover:bg-primary-50'}`}
-                        >
-                            {/* Left-Border Accent for Active State (Mobile only) */}
-                            {isActive && (
-                                <div className="md:hidden absolute left-0 top-0 bottom-0 w-[4px] bg-[#24b47e]" />
-                            )}
-
-                            {/* Icon Container */}
-                            <div
-                                className={`flex items-center justify-center shrink-0 transition-colors duration-200 ${isActive ? "text-[#24b47e]" : "text-[#737373] group-hover:text-[#1f1f1f]"
-                                    }`}
-                            >
-                                <Icon strokeWidth={isActive ? 2 : 1.75} className="w-[22px] h-[22px]" />
-                            </div>
-
-                            {/* Label Text (Desktop only) */}
-                            {isExpanded && (
-                                <span
-                                    className={`hidden md:block ml-3.5 text-[13px] font-bold transition-colors duration-200 ${isActive ? "text-[#1a8b60]" : "text-[#5e5e5e] group-hover:text-[#1f1f1f]"
-                                        } flex-1 truncate`}
-                                >
-                                    {item.name}
-                                </span>
-                            )}
-
-                            {/* Tooltip Text (Mobile or Collapsed) */}
-                            <span
-                                className={`${isExpanded ? 'md:hidden' : 'hidden md:flex'} absolute left-full ml-2 px-2 py-1.5 bg-[#24b47e] text-white text-xs font-medium rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-50 shadow-none pointer-events-none items-center`}
-                            >
-                                <span className="absolute -left-1 w-2 h-2 bg-[#24b47e] rotate-45 rounded-sm"></span>
-                                <span className="relative z-10">{item.name}</span>
+                    {isHovered && (
+                        <div className="ml-3 flex flex-col overflow-hidden animate-in fade-in slide-in-from-left-2 duration-300">
+                            <span className="text-sm font-bold text-[#1f1f1f] truncate">
+                                {userProfile?.full_name || "Guest User"}
                             </span>
-                        </Link>
-                    );
-                })}
-            </nav>
-
-            {/* Bottom section */}
-            <div className={`w-full shrink-0 mt-auto pb-4 ${isExpanded ? 'px-2' : 'px-0 flex flex-col items-center'}`}>
-                {isExpanded && (
-                    <div className="hidden md:block mb-4 px-1">
-                        <GlobalOmniSearch compact={true} />
-                    </div>
-                )}
-                <div className={`${isExpanded ? 'px-0' : 'scale-50 origin-bottom'}`}>
-                    <SidebarLogo />
+                            <span className="text-[10px] text-[#737373] font-medium uppercase tracking-wider">
+                                {userRole || "Administrator"}
+                            </span>
+                        </div>
+                    )}
                 </div>
-            </div>
-        </aside>
+
+                {/* Navigation Menu */}
+                <nav className="flex-1 flex flex-col gap-1 w-full px-1 overflow-y-auto no-scrollbar">
+                    {NAV_ITEMS.map((item) => {
+                        const isActive = active === item.id;
+                        const Icon = item.icon;
+
+                        return (
+                            <Link
+                                key={item.href}
+                                href={item.href}
+                                className={`group relative flex items-center h-10 rounded-[10px] transition-all duration-300 ${['dashboard', 'b2b-chat', 'chat'].includes(item.id)
+                                    ? 'flex'
+                                    : 'hidden md:flex'
+                                    } ${isActive
+                                        ? 'bg-[#24b47e] text-white shadow-[0_8px_16px_rgba(36,180,126,0.2)]'
+                                        : 'hover:bg-gray-100 text-[#737373] hover:text-[#1f1f1f]'}`}
+                            >
+                                {/* Icon Container */}
+                                <div
+                                    className={`w-10 flex items-center justify-center shrink-0 transition-all duration-300 ${isActive ? "scale-110" : "group-hover:scale-110"}`}
+                                >
+                                    <Icon strokeWidth={isActive ? 2.5 : 2} className="w-[18px] h-[18px]" />
+                                </div>
+
+                                {/* Label text visible only on hover */}
+                                {isHovered && (
+                                    <span className="ml-2 text-[13px] font-bold whitespace-nowrap overflow-hidden animate-in fade-in slide-in-from-left-2 duration-300">
+                                        {item.name}
+                                    </span>
+                                )}
+
+                                {/* Simple Hover Label - Shown only when NOT expanded */}
+                                {!isHovered && (
+                                    <div
+                                        className="absolute left-full ml-4 px-2 py-1 bg-slate-800 text-white text-[10px] font-bold rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-200 whitespace-nowrap z-[110] shadow-sm pointer-events-none"
+                                    >
+                                        {item.name}
+                                    </div>
+                                )}
+                            </Link>
+                        );
+                    })}
+                </nav>
+
+                {/* Bottom section */}
+                <div className={`w-full shrink-0 flex flex-col items-center mt-auto pb-8 px-2 transition-all duration-300 ${isHovered ? 'items-start px-4' : 'items-center'}`}>
+                    <div className={`transition-all duration-500 scale-[0.4] opacity-20 hover:opacity-100 ${isHovered ? 'ml-[-15px] scale-50 opacity-40' : ''}`}>
+                        <SidebarLogo />
+                    </div>
+                </div>
+            </aside>
+        </div>
     );
 }

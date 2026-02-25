@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect, useTransition, useRef } from 'react'
-import { Sparkles, ArrowUp, Loader2, Plus, MapPin, User, Users, Building2, PlaneLanding, UserMinus } from 'lucide-react'
+import { Sparkles, ArrowUp, Loader2, MapPin, User, Users, Building2, PlaneLanding, UserMinus, Bell, TrendingUp, ChevronRight, Activity, ClipboardList } from 'lucide-react'
 import { chatWithOmniAI } from './actions/dashboardAi'
 import Link from 'next/link'
 
@@ -8,7 +8,6 @@ type Message = { id: string; role: 'user' | 'model'; text: string; isTyping?: bo
 
 export default function DashboardClient({ userName, dashboardData }: { userName: string, dashboardData: any }) {
     const [currentTime, setCurrentTime] = useState<Date | null>(null)
-
     const [userInput, setUserInput] = useState('')
     const [messages, setMessages] = useState<Message[]>([])
     const [isPendingChat, startChat] = useTransition()
@@ -21,9 +20,9 @@ export default function DashboardClient({ userName, dashboardData }: { userName:
 
         // Initial AI Greeting
         const h = new Date().getHours()
-        let initialGreeting = 'お疲れ様です。本日の業務サポートを開始します。'
-        if (h >= 5 && h < 11) initialGreeting = 'おはようございます！本日の業務も頑張りましょう。'
-        else if (h >= 11 && h < 17) initialGreeting = 'お疲れ様です！午後の業務サポートを開始します。'
+        let initialGreeting = 'お疲れ様です。エグゼクティブ・アシスタントとして、本日の業務を全力でサポートいたします。'
+        if (h >= 5 && h < 11) initialGreeting = 'おはようございます。洗練された一日となりますよう、サポートを開始いたします。'
+        else if (h >= 11 && h < 17) initialGreeting = 'お疲れ様です。午後の重要案件に向けた準備を整えましょう。'
         setMessages([{ id: 'msg-0', role: 'model', text: initialGreeting }])
 
         return () => clearInterval(timer)
@@ -33,26 +32,11 @@ export default function DashboardClient({ userName, dashboardData }: { userName:
 
     const formatDate = (date: Date) => {
         const days = ['日', '月', '火', '水', '木', '金', '土']
-        return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日（${days[date.getDay()]}）`
+        return `${date.getFullYear()}年 ${date.getMonth() + 1}月 ${date.getDate()}日 (${days[date.getDay()]})`
     }
 
     const formatTime = (date: Date) => {
         return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`
-    }
-
-    const getHeroGreeting = (date: Date) => {
-        const h = date.getHours()
-        if (h >= 5 && h < 11) return `${userName}さん、おはようございます！今日も一日頑張りましょう。`
-        if (h >= 11 && h < 17) return `${userName}さん、お疲れ様です！午後の業務も順調ですか？`
-        return `${userName}さん、こんばんは！夜遅くまで本当にお疲れ様です。`
-    }
-
-    const handleMoodClick = (moodLabel: string) => {
-        setUserInput(`今のコンディションは「${moodLabel}」です。本日の優先業務についてアドバイスをください。`)
-        setTimeout(() => {
-            chatInputRef.current?.focus()
-            chatInputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-        }, 100)
     }
 
     const handleChat = (e?: React.FormEvent) => {
@@ -71,89 +55,159 @@ export default function DashboardClient({ userName, dashboardData }: { userName:
         })
     }
 
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleChat(); }
-    }
-
     if (!currentTime) return null;
 
     return (
-        <div className="max-w-[1200px] mx-auto space-y-8 animate-in fade-in duration-700 pb-10">
+        <div className="max-w-[1400px] mx-auto space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-1000 pb-20 px-4 sm:px-6 lg:px-8">
 
-            {/* 1. BUTTON ADD NEW */}
-            <div className="flex justify-end">
-                <Link href="/workers/new" className="px-5 py-2.5 bg-[#24b47e] text-white font-medium rounded hover:bg-[#1e8e3e] transition-colors flex items-center gap-2 text-[14px]">
-                    <Plus size={18} /> 実習生を新規追加
-                </Link>
-            </div>
-
-            {/* 2. HERO SECTION (HTML MOCKUP) */}
-            <div className="bg-white border border-[#ededed] rounded flex flex-col md:flex-row overflow-hidden">
-                <div className="p-8 border-b md:border-b-0 md:border-r border-[#ededed] flex flex-col items-center justify-center bg-white min-w-[280px]">
-                    <p className="text-lg text-[#878787] font-medium mb-1 tracking-wide">{formatDate(currentTime)}</p>
-                    <h2 className="text-5xl font-black text-[#1f1f1f] tracking-tight tabular-nums">{formatTime(currentTime)}</h2>
-                    <p className="text-sm text-[#878787] mt-3 flex items-center gap-1.5 font-medium">
-                        <MapPin size={14} className="text-[#24b47e]" /> 大阪府堺市 (Sakai, Osaka)
-                    </p>
+            {/* Header Section: Original Mesh Gradient */}
+            <div className="relative group overflow-hidden rounded-[32px] bg-slate-900 border border-white/5 shadow-2xl">
+                {/* Decorative Mesh Gradient Background */}
+                <div className="absolute inset-0 opacity-40">
+                    <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[80%] rounded-full bg-emerald-500/30 blur-[120px]" />
+                    <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[80%] rounded-full bg-blue-500/20 blur-[120px]" />
                 </div>
 
-                <div className="p-8 flex-1 bg-[#e8f5e9]/50 flex flex-col justify-center">
-                    <div className="flex items-start gap-5">
-                        <div className="w-14 h-14 rounded bg-[#24b47e] flex items-center justify-center text-white shrink-0 shadow-sm">
-                            <Sparkles size={28} />
+                <div className="relative p-8 lg:p-12 flex flex-col lg:flex-row items-center justify-between gap-10">
+                    <div className="flex-1 space-y-6">
+                        <div className="flex items-center gap-3">
+                            <span className="px-4 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold tracking-widest uppercase">KikanCloud Performance</span>
+                            <div className="h-1 w-1 rounded-full bg-white/20" />
+                            <span className="text-white/40 text-xs font-medium">{formatDate(currentTime)}</span>
                         </div>
-                        <div>
-                            <h2 className="text-xl font-bold text-[#1f1f1f] mb-2">{getHeroGreeting(currentTime)}</h2>
-                            <p className="text-[#444746] leading-relaxed mb-4 text-[14px]">
-                                日々の業務本当にお疲れ様です。<br />
-                                急ぎの更新書類が <span className="text-[#d93025] font-bold">{dashboardData.alerts.length}件</span> ありますが、焦らず一つずつ片付けていきましょう。KikanCloud AIが全力でサポートします！
-                            </p>
 
-                            <div className="flex flex-wrap items-center gap-3">
-                                <span className="text-[13px] text-[#878787] flex items-center mr-1">今のコンディション：</span>
-                                <button onClick={() => handleMoodClick('絶好調')} className="px-4 py-1.5 text-[13px] bg-white border border-[#ededed] rounded hover:bg-[#e8f5e9] hover:border-[#24b47e] hover:text-[#1e8e3e] transition-colors">😊 絶好調</button>
-                                <button onClick={() => handleMoodClick('普通')} className="px-4 py-1.5 text-[13px] bg-white border border-[#ededed] rounded hover:bg-[#fbfcfd] hover:border-[#878787] hover:text-[#1f1f1f] transition-colors">😐 普通</button>
-                                <button onClick={() => handleMoodClick('疲れ気味')} className="px-4 py-1.5 text-[13px] bg-white border border-[#ededed] rounded hover:bg-[#fff9f9] hover:border-[#fce8e6] hover:text-[#d93025] transition-colors">😩 疲れ気味</button>
+                        <div className="space-y-2">
+                            <h1 className="text-4xl lg:text-6xl font-light text-white leading-tight tracking-tight">
+                                <span className="font-bold bg-clip-text text-transparent bg-gradient-to-r from-white via-white to-white/40">{userName}</span> 様、
+                                <br />本日の業務概要です
+                            </h1>
+                            <p className="text-white/50 text-lg max-w-2xl font-light leading-relaxed">
+                                信頼と革新のパートナーとして、あなたの意思決定を高度なAI技術で支えます。
+                                現時点で <span className="text-emerald-400 font-semibold underline decoration-emerald-400/30 underline-offset-4">{dashboardData.alerts.length}件</span> の優先事項があります。
+                            </p>
+                        </div>
+
+                        <div className="flex flex-wrap gap-4 pt-2">
+                            <Link href="/operations" className="px-8 py-4 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-2xl transition-all duration-300 flex items-center gap-3 shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:scale-[1.02] active:scale-[0.98]">
+                                <ClipboardList size={20} strokeWidth={3} />
+                                業務管理を確認
+                            </Link>
+                            <button onClick={() => chatInputRef.current?.focus()} className="px-8 py-4 bg-white/5 hover:bg-white/10 text-white font-bold rounded-2xl transition-all duration-300 flex items-center gap-3 border border-white/10 backdrop-blur-md">
+                                <Sparkles size={20} className="text-emerald-400" />
+                                AIへ状況を確認
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="relative shrink-0 flex flex-col items-center">
+                        <div className="absolute inset-0 bg-emerald-500/10 blur-[80px] rounded-full" />
+                        <div className="relative bg-white/5 backdrop-blur-3xl border border-white/10 p-10 rounded-[48px] shadow-2xl flex flex-col items-center justify-center text-center">
+                            <h2 className="text-7xl font-bold text-white tracking-tighter tabular-nums drop-shadow-lg">{formatTime(currentTime)}</h2>
+                            <div className="h-px w-12 bg-white/20 my-6" />
+                            <div className="space-y-1">
+                                <p className="text-white/60 text-sm font-medium flex items-center justify-center gap-2">
+                                    <MapPin size={14} className="text-emerald-400" /> Sakai, Osaka
+                                </p>
+                                <p className="text-white/40 text-[11px] tracking-widest uppercase font-bold">Local Time</p>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* 3. STATS CARDS */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div className="bg-white border border-[#ededed] p-5 rounded"><p className="text-[13px] text-[#878787] mb-2 font-medium flex items-center gap-1.5"><Users size={16} /> 総実習生数</p><div className="flex items-baseline gap-2"><h3 className="text-3xl font-black text-[#1f1f1f]">{dashboardData.stats.totalWorkers}</h3><span className="text-[13px] text-[#878787]">名</span></div></div>
-                <div className="bg-white border border-[#ededed] p-5 rounded"><p className="text-[13px] text-[#878787] mb-2 font-medium flex items-center gap-1.5"><Building2 size={16} /> 受入企業数</p><div className="flex items-baseline gap-2"><h3 className="text-3xl font-black text-[#1f1f1f]">{dashboardData.stats.totalCompanies}</h3><span className="text-[13px] text-[#878787]">社</span></div></div>
-                <div className="bg-white border border-[#ededed] p-5 rounded"><p className="text-[13px] text-[#878787] mb-2 font-medium flex items-center gap-1.5"><PlaneLanding size={16} /> 入国対応中</p><div className="flex items-baseline gap-2"><h3 className="text-3xl font-black text-[#1f1f1f]">{dashboardData.stats.enteringWorkers}</h3><span className="text-[13px] text-[#878787]">名</span></div></div>
-                <div className="bg-white border border-[#ededed] p-5 rounded"><p className="text-[13px] text-[#878787] mb-2 font-medium flex items-center gap-1.5"><UserMinus size={16} /> 失踪・帰国</p><div className="flex items-baseline gap-2"><h3 className="text-3xl font-black text-[#1f1f1f]">{dashboardData.stats.missingWorkers}</h3><span className="text-[13px] text-[#878787]">名</span></div></div>
+            {/* Core Metrics: White Luxury Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
+                {[
+                    { label: '総実習生数', val: dashboardData.stats.totalWorkers, unit: '名', icon: <Users size={24} />, trend: '+4.2%', color: 'emerald' },
+                    { label: '受入企業数', val: dashboardData.stats.totalCompanies, unit: '社', icon: <Building2 size={24} />, trend: '+1.5%', color: 'blue' },
+                    { label: '入国対応中', val: dashboardData.stats.enteringWorkers, unit: '名', icon: <PlaneLanding size={24} />, trend: 'Stable', color: 'purple' },
+                    { label: '失踪・帰国', val: dashboardData.stats.missingWorkers, unit: '名', icon: <UserMinus size={24} />, trend: '0.0%', color: 'rose' },
+                ].map((stat) => (
+                    <div key={stat.label} className="group relative bg-white border border-slate-200 p-8 rounded-[38px] transition-all duration-500 hover:shadow-[0_20px_40px_rgba(0,0,0,0.04)] hover:-translate-y-1">
+                        <div className={`absolute top-0 right-0 w-32 h-32 bg-${stat.color}-50 rounded-full blur-[50px] opacity-0 group-hover:opacity-100 transition-opacity`} />
+                        <div className="relative space-y-5">
+                            <div className="flex justify-between items-start">
+                                <div className={`p-4 rounded-2xl bg-slate-50 text-slate-400 group-hover:bg-emerald-500 group-hover:text-white transition-all duration-300`}>
+                                    {stat.icon}
+                                </div>
+                                <span className={`text-xs font-bold px-2 py-1 rounded-md bg-emerald-50 text-emerald-600`}>{stat.trend}</span>
+                            </div>
+                            <div>
+                                <h3 className="text-4xl font-extrabold text-slate-900 flex items-baseline gap-1">
+                                    {stat.val}<span className="text-sm font-medium text-slate-400">{stat.unit}</span>
+                                </h3>
+                                <p className="text-slate-500 font-bold text-xs uppercase tracking-widest mt-1.5">{stat.label}</p>
+                            </div>
+                        </div>
+                    </div>
+                ))}
             </div>
 
-            {/* 4. ALERTS TABLE & CHARTS */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Action Center */}
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
 
-                {/* Alerts Table */}
-                <div className="lg:col-span-2 bg-white border border-[#ededed] rounded overflow-hidden">
-                    <div className="px-5 py-4 border-b border-[#ededed] bg-[#fbfcfd] flex justify-between items-center">
-                        <h3 className="font-bold text-[#1f1f1f] text-[14px]">要対応アラート：更新期限が近い書類 <span className="text-[#d93025] font-normal text-[13px] ml-1">(90日以内)</span></h3>
+                {/* Premium Alerts Table */}
+                <div className="lg:col-span-3 bg-white border border-slate-200 rounded-[40px] shadow-sm overflow-hidden flex flex-col">
+                    <div className="p-8 border-b border-slate-100 flex items-center justify-between bg-slate-50/30">
+                        <div className="space-y-1">
+                            <h3 className="text-xl font-bold text-slate-900 flex items-center gap-3">
+                                <Bell className="text-emerald-500" size={20} />
+                                優先対応事項
+                            </h3>
+                            <p className="text-slate-400 text-sm">更新期限が迫っている重要な書類をリストアップしています</p>
+                        </div>
+                        <Link href="/operations" className="text-xs font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1 group">
+                            詳細を見る <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
+                        </Link>
                     </div>
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left text-[14px]">
-                            <thead className="text-[#878787] bg-[#fbfcfd] border-b border-[#ededed]">
+                    <div className="flex-1 overflow-x-auto">
+                        <table className="w-full text-left">
+                            <thead className="bg-slate-50/50 text-slate-400 text-[10px] uppercase tracking-widest font-extrabold">
                                 <tr>
-                                    <th className="px-5 py-3 font-medium">氏名</th><th className="px-5 py-3 font-medium">企業</th><th className="px-5 py-3 font-medium">種類</th><th className="px-5 py-3 font-medium">期限</th><th className="px-5 py-3 font-medium">残り</th>
+                                    <th className="px-8 py-4">対象者</th>
+                                    <th className="px-8 py-4">所属先</th>
+                                    <th className="px-8 py-4 text-center">ステータス</th>
+                                    <th className="px-8 py-4 text-right">残り日数</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-[#ededed]">
+                            <tbody className="divide-y divide-slate-50">
                                 {dashboardData.alerts.length === 0 ? (
-                                    <tr><td colSpan={5} className="px-5 py-8 text-center text-[#878787]">アラートはありません。</td></tr>
+                                    <tr>
+                                        <td colSpan={4} className="px-8 py-16 text-center">
+                                            <div className="flex flex-col items-center gap-2 opacity-30">
+                                                <Activity size={40} />
+                                                <p className="text-sm font-bold">すべての要件はクリアされています</p>
+                                            </div>
+                                        </td>
+                                    </tr>
                                 ) : (
-                                    dashboardData.alerts.map((alert: any) => (
-                                        <tr key={alert.id} className={alert.daysLeft <= 30 ? 'bg-[#fff9f9]' : 'bg-[#fffcf0]/50'}>
-                                            <td className={`px-5 py-3 font-bold ${alert.daysLeft <= 30 ? 'text-[#d93025]' : 'text-[#1f1f1f]'}`}>{alert.name}</td>
-                                            <td className="px-5 py-3 text-[#444746]">{alert.company || '未配属'}</td>
-                                            <td className="px-5 py-3"><span className="px-2 py-1 bg-white border border-[#ededed] text-[12px] rounded text-[#666666]">{alert.type}</span></td>
-                                            <td className="px-5 py-3 text-[#444746] font-mono">{new Date(alert.expDate).toLocaleDateString('ja-JP')}</td>
-                                            <td className={`px-5 py-3 font-bold ${alert.daysLeft <= 30 ? 'text-[#d93025]' : 'text-[#d97706]'}`}>あと{alert.daysLeft}日</td>
+                                    dashboardData.alerts.slice(0, 5).map((alert: any) => (
+                                        <tr key={alert.id} className="group hover:bg-slate-50 transition-colors cursor-pointer">
+                                            <td className="px-8 py-6">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-500 text-sm group-hover:bg-emerald-500 group-hover:text-white transition-colors">
+                                                        {alert.name.charAt(0)}
+                                                    </div>
+                                                    <div className="space-y-0.5">
+                                                        <p className="text-sm font-bold text-slate-900 group-hover:text-emerald-600 transition-colors">{alert.name}</p>
+                                                        <p className="text-[11px] text-slate-400 uppercase font-bold tracking-tighter">{alert.type}</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="px-8 py-6">
+                                                <p className="text-sm text-slate-600">{alert.company || '未配属'}</p>
+                                            </td>
+                                            <td className="px-8 py-6 text-center">
+                                                <span className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest ${alert.daysLeft <= 30 ? 'bg-rose-50 text-rose-600' : 'bg-amber-50 text-amber-600'}`}>
+                                                    Critical
+                                                </span>
+                                            </td>
+                                            <td className="px-8 py-6 text-right">
+                                                <div className="space-y-0.5">
+                                                    <p className={`text-base font-black ${alert.daysLeft <= 30 ? 'text-rose-600' : 'text-amber-600'}`}>{alert.daysLeft}d</p>
+                                                    <p className="text-[10px] text-slate-400 font-medium font-mono">{new Date(alert.expDate).toLocaleDateString('ja-JP')}</p>
+                                                </div>
+                                            </td>
                                         </tr>
                                     ))
                                 )}
@@ -162,63 +216,163 @@ export default function DashboardClient({ userName, dashboardData }: { userName:
                     </div>
                 </div>
 
-                {/* Nationalities Chart */}
-                <div className="bg-white border border-[#ededed] rounded flex flex-col">
-                    <div className="px-5 py-4 border-b border-[#ededed] bg-[#fbfcfd]">
-                        <h3 className="font-bold text-[#1f1f1f] text-[14px]">国籍別分布</h3>
+                {/* Distribution Chart Card */}
+                <div className="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-[40px] shadow-2xl p-8 flex flex-col space-y-8">
+                    <div className="space-y-2">
+                        <h3 className="text-xl font-bold text-white flex items-center gap-3">
+                            <TrendingUp className="text-emerald-400" size={20} />
+                            国籍別分布
+                        </h3>
+                        <p className="text-white/40 text-sm font-light leading-relaxed">多様性は我々の強みです。現在の主要な国籍分布状況を示します。</p>
                     </div>
-                    <div className="p-5 flex-1 flex flex-col justify-center gap-5">
+
+                    <div className="flex-1 flex flex-col justify-center space-y-8">
                         {dashboardData.nationalities.length === 0 ? (
-                            <div className="text-center text-[#878787] text-[13px] py-8">データがありません</div>
+                            <div className="text-center text-white/20 text-sm py-12">No data recorded</div>
                         ) : (
                             dashboardData.nationalities.map((nat: any, index: number) => {
-                                const colors = ['bg-[#24b47e]', 'bg-[#1a73e8]', 'bg-[#f59e0b]', 'bg-[#8b5cf6]']
+                                const colors = ['bg-emerald-400', 'bg-blue-400', 'bg-amber-400', 'bg-purple-400']
                                 return (
-                                    <div key={nat.name}>
-                                        <div className="flex justify-between text-[13px] mb-1.5"><span className="font-medium text-[#444746]">{nat.name}</span><span className="text-[#878787] font-mono">{nat.percentage}%</span></div>
-                                        <div className="w-full bg-[#fbfcfd] h-2 rounded border border-[#ededed] overflow-hidden">
-                                            <div className={`h-full transition-all duration-1000 ${colors[index % colors.length]}`} style={{ width: `${nat.percentage}%` }}></div>
+                                    <div key={nat.name} className="group cursor-default">
+                                        <div className="flex justify-between items-end mb-3">
+                                            <div className="space-y-0.5">
+                                                <span className="text-white/50 text-[10px] font-bold uppercase tracking-widest group-hover:text-white transition-colors">National Group</span>
+                                                <p className="text-white font-bold text-base">{nat.name}</p>
+                                            </div>
+                                            <div className="flex items-center gap-3 transition-transform group-hover:scale-105 origin-right">
+                                                <div className="text-right">
+                                                    <span className="block text-2xl font-black text-white leading-none">{nat.percentage}<span className="text-xs font-medium text-white/30 ml-0.5">%</span></span>
+                                                    <span className="text-[10px] font-bold text-emerald-400/60 uppercase tracking-tighter">{nat.count} 名</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="w-full bg-white/5 h-1.5 rounded-full border border-white/5 overflow-hidden">
+                                            <div className={`h-full rounded-full transition-all duration-1000 group-hover:brightness-125 ${colors[index % colors.length]}`} style={{ width: `${nat.percentage}%` }}></div>
                                         </div>
                                     </div>
                                 )
                             })
                         )}
                     </div>
+
+                    <button className="w-full py-4 text-white/40 hover:text-white text-xs font-bold uppercase tracking-widest border border-white/10 rounded-2xl transition-all duration-300 hover:bg-white/5">
+                        全データを確認
+                    </button>
+                </div>
+
+                {/* Top Industries Table Card */}
+                <div className="lg:col-span-full bg-white border border-slate-200 rounded-[40px] shadow-sm overflow-hidden flex flex-col">
+                    <div className="p-8 border-b border-slate-100 flex items-center justify-between bg-slate-50/30">
+                        <div className="space-y-1">
+                            <h3 className="text-xl font-bold text-slate-900 flex items-center gap-3">
+                                <Activity className="text-blue-500" size={20} />
+                                主要職種トップ5
+                            </h3>
+                            <p className="text-slate-400 text-sm">現在稼働している上位5つの職種区分です</p>
+                        </div>
+                    </div>
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left">
+                            <thead className="bg-slate-50/50 text-slate-400 text-[10px] uppercase tracking-widest font-extrabold">
+                                <tr>
+                                    <th className="px-8 py-4">職種区分 / Industry Field</th>
+                                    <th className="px-8 py-4 text-right">実習生数</th>
+                                    <th className="px-8 py-4 text-right">構成比</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-50">
+                                {dashboardData.industries.length === 0 ? (
+                                    <tr>
+                                        <td colSpan={3} className="px-8 py-12 text-center text-slate-300 font-medium">職種データがありません</td>
+                                    </tr>
+                                ) : (
+                                    dashboardData.industries.map((ind: any, idx: number) => (
+                                        <tr key={ind.name} className="group hover:bg-slate-50 transition-colors">
+                                            <td className="px-8 py-5">
+                                                <div className="flex items-center gap-4">
+                                                    <span className="w-6 text-xs font-black text-slate-200 group-hover:text-blue-500 transition-colors">0{idx + 1}</span>
+                                                    <span className="text-sm font-bold text-slate-700">{ind.name}</span>
+                                                </div>
+                                            </td>
+                                            <td className="px-8 py-5 text-right font-black text-slate-900">{ind.count} <span className="text-[10px] text-slate-400 font-medium">名</span></td>
+                                            <td className="px-8 py-5 text-right">
+                                                <div className="flex items-center justify-end gap-3">
+                                                    <span className="text-xs font-bold text-slate-500">{Math.round((ind.count / (dashboardData.stats.totalWorkers || 1)) * 100)}%</span>
+                                                    <div className="w-20 h-1.5 bg-slate-100 rounded-full overflow-hidden hidden sm:block">
+                                                        <div className="h-full bg-blue-500 rounded-full" style={{ width: `${(ind.count / (dashboardData.stats.totalWorkers || 1)) * 100}%` }} />
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
-            {/* 5. OMNI-CHANNEL AI CHATBOT (GIỮ NGUYÊN) */}
-            <div className="mt-8 bg-white border border-[#ededed] rounded relative overflow-hidden flex flex-col h-[400px]">
-                <div className="px-6 py-4 border-b border-[#ededed] bg-[#fbfcfd] flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-[32px] bg-[#24b47e]/10 flex items-center justify-center text-[#24b47e]"><Sparkles size={14} /></div>
-                    <h3 className="font-bold text-[#1f1f1f] text-[14px]">KikanCloud AI アシスタント</h3>
-                </div>
-                <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4 bg-white/50">
-                    {messages.length === 0 && (
-                        <div className="h-full flex flex-col items-center justify-center text-center text-[#878787] opacity-60">
-                            <Sparkles size={40} className="mb-4" />
-                            <p className="text-[13px] font-bold">質問、翻訳、データ分析など、何でもサポートします。</p>
+            {/* AI Assistant: Executive Intelligence AI */}
+            <div className="group relative bg-white border border-slate-200 rounded-[48px] shadow-2xl overflow-hidden flex flex-col h-[500px] transform hover:-translate-y-1 transition-all duration-500">
+                <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-emerald-400 to-blue-500" />
+
+                <div className="px-8 py-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 backdrop-blur-md sticky top-0 z-10">
+                    <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-[22px] bg-slate-900 flex items-center justify-center text-emerald-400 shadow-xl group-hover:rotate-12 transition-transform duration-500">
+                            <Sparkles size={22} strokeWidth={2.5} />
                         </div>
-                    )}
+                        <div>
+                            <h3 className="font-black text-slate-900 text-lg tracking-tight">Executive Intelligence AI</h3>
+                            <p className="text-emerald-600 text-[11px] font-black uppercase tracking-[0.2em]">Always at your command</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="flex-1 overflow-y-auto px-8 py-6 space-y-6 bg-white custom-scrollbar bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:24px_24px] [background-position:0_0]">
                     {messages.map((msg) => (
-                        <div key={msg.id} className={`flex gap-4 ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-in slide-in-from-bottom-2`}>
-                            {msg.role === 'model' && <div className="w-8 h-8 rounded-[32px] bg-[#24b47e] flex items-center justify-center shrink-0 mt-0.5"><Sparkles size={14} className="text-white" /></div>}
-                            <div className={`max-w-[80%] rounded-[32px] px-5 py-3.5 text-[14px] leading-relaxed shadow-sm ${msg.role === 'user' ? 'bg-blue-50 text-blue-900 rounded-tr-none' : 'bg-[#fbfcfd] border border-[#ededed] text-[#1f1f1f] rounded-tl-none'}`}>
-                                {msg.isTyping ? <Loader2 size={16} className="animate-spin text-[#24b47e]" /> : <div className="whitespace-pre-wrap">{msg.text}</div>}
+                        <div key={msg.id} className={`flex gap-4 ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-in slide-in-from-bottom-4`}>
+                            {msg.role === 'model' && (
+                                <div className="w-10 h-10 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center shrink-0 shadow-lg">
+                                    <Sparkles size={18} className="text-emerald-400" />
+                                </div>
+                            )}
+                            <div className={`max-w-[85%] rounded-[30px] px-6 py-4 text-sm leading-relaxed shadow-sm border ${msg.role === 'user' ? 'bg-emerald-500 text-white border-emerald-400 rounded-tr-none font-medium' : 'bg-white border-slate-100 text-slate-800 rounded-tl-none font-medium'}`}>
+                                {msg.isTyping ? <Loader2 size={18} className="animate-spin text-emerald-500" /> : <div className="whitespace-pre-wrap">{msg.text}</div>}
                             </div>
-                            {msg.role === 'user' && <div className="w-8 h-8 rounded-[32px] bg-white border border-[#ededed] flex items-center justify-center shrink-0 shadow-sm mt-0.5"><User size={14} className="text-[#878787]" /></div>}
+                            {msg.role === 'user' && (
+                                <div className="w-10 h-10 rounded-2xl bg-white border border-slate-200 flex items-center justify-center shrink-0 shadow-md">
+                                    <User size={18} className="text-slate-400" />
+                                </div>
+                            )}
                         </div>
                     ))}
                     <div ref={messagesEndRef} />
                 </div>
-                <div className="p-4 border-t border-[#ededed] bg-white">
+
+                <div className="p-8 bg-slate-50 border-t border-slate-100">
                     <form onSubmit={handleChat} className="relative flex items-center">
-                        <textarea ref={chatInputRef} value={userInput} onChange={e => setUserInput(e.target.value)} onKeyDown={handleKeyDown} disabled={isPendingChat} placeholder="AIに質問・指示を入力... (Shift+Enterで改行)" className="w-full bg-[#fbfcfd] border border-[#ededed] focus:border-[#24b47e] rounded-[32px] pl-4 pr-12 py-3 text-[14px] outline-none resize-none h-[46px] overflow-hidden transition-colors" rows={1} />
-                        <button type="submit" disabled={isPendingChat || !userInput.trim()} className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-[#1f1f1f] hover:bg-[#24b47e] text-white rounded-[32px] transition-colors disabled:opacity-50"><ArrowUp size={16} strokeWidth={2.5} /></button>
+                        <textarea
+                            ref={chatInputRef}
+                            value={userInput}
+                            onChange={e => setUserInput(e.target.value)}
+                            onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleChat(); } }}
+                            disabled={isPendingChat}
+                            placeholder="AIエグゼクティブ・アシスタントに要件を指令..."
+                            className="w-full bg-white border-none focus:ring-0 rounded-[28px] pl-6 pr-14 py-4 text-sm shadow-[0_10px_30px_rgba(0,0,0,0.05)] outline-none resize-none h-[56px] overflow-hidden transition-all placeholder:text-slate-300 font-medium"
+                            rows={1}
+                        />
+                        <button type="submit" disabled={isPendingChat || !userInput.trim()} className="absolute right-2 top-1/2 -translate-y-1/2 w-11 h-11 flex items-center justify-center bg-slate-900 hover:bg-emerald-500 hover:scale-105 active:scale-95 text-white rounded-2xl transition-all shadow-xl disabled:opacity-50">
+                            <ArrowUp size={20} strokeWidth={3} />
+                        </button>
                     </form>
                 </div>
             </div>
 
+            <style jsx global>{`
+                .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+                .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+                .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+            `}</style>
         </div>
     )
 }

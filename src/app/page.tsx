@@ -20,7 +20,7 @@ export default async function DashboardPage() {
     const [workersRes, companiesRes, workersDataRes] = await Promise.all([
         supabase.from('workers').select('id', { count: 'exact', head: true }).eq('tenant_id', tenantId),
         supabase.from('companies').select('id', { count: 'exact', head: true }).eq('tenant_id', tenantId).eq('is_deleted', false),
-        supabase.from('workers').select('id, full_name_romaji, nationality, status, residence_card_exp_date, passport_exp_date, companies(name_jp)').eq('tenant_id', tenantId)
+        supabase.from('workers').select('id, full_name_romaji, nationality, status, residence_card_exp_date, passport_exp_date, industry_field, companies(name_jp)').eq('tenant_id', tenantId)
     ])
 
     const workers = workersDataRes.data || []
@@ -41,6 +41,17 @@ export default async function DashboardPage() {
         .map(([name, count]) => ({ name, count, percentage: Math.round((count / (totalWorkers || 1)) * 100) }))
         .sort((a, b) => b.count - a.count)
         .slice(0, 4)
+
+    // Calculate Industries
+    const indCounts: Record<string, number> = {}
+    workers.forEach(w => {
+        const ind = w.industry_field || '未設定'
+        indCounts[ind] = (indCounts[ind] || 0) + 1
+    })
+    const industries = Object.entries(indCounts)
+        .map(([name, count]) => ({ name, count }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 5)
 
     // Calculate Expiring Alerts (Next 90 days)
     const today = new Date()
@@ -67,11 +78,12 @@ export default async function DashboardPage() {
     const dashboardData = {
         stats: { totalWorkers, totalCompanies, enteringWorkers, missingWorkers },
         nationalities,
+        industries,
         alerts
     }
 
     return (
-        <div className="flex h-screen bg-[#fbfcfd] font-sans text-[#1f1f1f] overflow-hidden selection:bg-[#24b47e]/20">
+        <div className="flex h-screen bg-slate-50 font-sans text-slate-900 overflow-hidden selection:bg-emerald-500/20">
             <Sidebar active="dashboard" />
             <div className="flex-1 flex flex-col relative min-w-0">
                 <TopNav title="ホーム" role={userProfile?.role} />

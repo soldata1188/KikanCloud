@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React from 'react'
 import { Printer } from 'lucide-react'
 
 export default function ExamTab({ workers = [], onUpdate }: { workers?: any[], onUpdate?: (id: string, field: 'kentei_status', subField: any, value: string) => void }) {
@@ -43,13 +43,12 @@ export default function ExamTab({ workers = [], onUpdate }: { workers?: any[], o
                             <th className="border border-gray-350 px-4 py-3 font-semibold w-[10%] print:w-[10%] print-col-date">実技日</th>
                             <th className="border border-gray-350 px-4 py-3 font-semibold w-[10%] print:w-[10%] print-col-staff">担当者</th>
                             <th className="border border-gray-350 px-4 py-3 font-semibold w-[10%] print:w-[10%] print-col-status">進捗</th>
-                            <th className="border border-gray-350 px-4 py-3 font-semibold w-[20%] print:w-[20%] print-col-venue">試験会場</th>
                         </tr>
                     </thead>
                     <tbody>
                         {examWorkers.length === 0 ? (
                             <tr>
-                                <td colSpan={8} className="text-center py-10 text-gray-500 text-sm border-b border-l border-r border-gray-350">
+                                <td colSpan={7} className="text-center py-10 text-gray-500 text-sm border-b border-l border-r border-gray-350">
                                     対象データがありません。
                                 </td>
                             </tr>
@@ -81,20 +80,6 @@ export default function ExamTab({ workers = [], onUpdate }: { workers?: any[], o
                                             }`}>
                                             {worker.kenteiStatus.progress || '未着手'}
                                         </span>
-                                    </td>
-                                    <td className="border border-gray-350 p-2">
-                                        <div className="print:hidden">
-                                            <input
-                                                type="text"
-                                                placeholder="試験会場..."
-                                                value={worker.kenteiStatus.exam_location || ''}
-                                                onChange={(e) => onUpdate?.(worker.id, 'kentei_status', 'exam_location', e.target.value)}
-                                                className="w-full text-xs p-1.5 border border-gray-200 rounded outline-none focus:border-primary-400 bg-gray-50/50"
-                                            />
-                                        </div>
-                                        <div className="hidden print:block text-[9pt] px-1">
-                                            {worker.kenteiStatus.exam_location || '---'}
-                                        </div>
                                     </td>
                                 </tr>
                             ))
@@ -171,7 +156,6 @@ export default function ExamTab({ workers = [], onUpdate }: { workers?: any[], o
                     .print-col-date { width: 10% !important; }
                     .print-col-staff { width: 10% !important; }
                     .print-col-status { width: 10% !important; }
-                    .print-col-venue { width: 20% !important; }
                     
                     th {
                         background-color: #f3f4f6 !important;

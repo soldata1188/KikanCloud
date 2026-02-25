@@ -425,7 +425,6 @@ export default function OperationsClient({
                                     </select>
                                     <div className="flex items-center gap-1"><span className="text-[9px] text-gray-500">学科</span><input type="date" title="学科日" onChange={e => handleBulkOperationChange('kentei_status', 'exam_date_written', e.target.value)} className="text-xs p-1 border border-gray-300 rounded outline-none cursor-pointer text-gray-700 bg-gray-50 w-[105px]" /></div>
                                     <div className="flex items-center gap-1"><span className="text-[9px] text-gray-500">実技</span><input type="date" title="実技日" onChange={e => handleBulkOperationChange('kentei_status', 'exam_date_practical', e.target.value)} className="text-xs p-1 border border-gray-300 rounded outline-none cursor-pointer text-gray-700 bg-gray-50 w-[105px]" /></div>
-                                    <input type="text" placeholder="会場一括..." onBlur={e => handleBulkOperationChange('kentei_status', 'exam_location', e.target.value)} onKeyDown={e => { if (e.key === 'Enter') handleBulkOperationChange('kentei_status', 'exam_location', e.currentTarget.value) }} className="text-xs p-1 border border-gray-300 rounded outline-none cursor-text text-gray-700 bg-gray-50 w-[100px]" />
                                     <select onChange={e => handleBulkOperationChange('kentei_status', 'progress', e.target.value)} className="text-xs p-1 border border-gray-300 rounded outline-none cursor-pointer text-gray-700 bg-gray-50 max-w-[85px]" defaultValue="">
                                         <option value="" disabled>進捗</option>
                                         {PROGRESS_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
@@ -621,10 +620,6 @@ export default function OperationsClient({
                                                 <div className="flex items-center gap-1.5">
                                                     <span className="text-[9px] bg-white border border-gray-200 rounded px-1 py-px text-gray-500 shrink-0 shadow-sm leading-none">実技</span>
                                                     <input type="date" value={worker.kenteiStatus.exam_date_practical || ''} onChange={e => handleOperationChange(worker.id, 'kentei_status', 'exam_date_practical', e.target.value)} className="text-[11px] flex-1 w-full bg-transparent outline-none text-gray-700 cursor-pointer" />
-                                                </div>
-                                                <div className="flex items-center gap-1.5">
-                                                    <span className="text-[9px] bg-white border border-gray-200 rounded px-1 py-px text-gray-500 shrink-0 shadow-sm leading-none">会場</span>
-                                                    <input type="text" placeholder="---" value={worker.kenteiStatus.exam_location || ''} onChange={e => handleOperationChange(worker.id, 'kentei_status', 'exam_location', e.target.value)} className="text-[11px] flex-1 w-full bg-transparent outline-none text-gray-700 placeholder-gray-300 pl-1" />
                                                 </div>
                                             </div>
                                             <select value={worker.kenteiStatus.progress} onChange={e => handleOperationChange(worker.id, 'kentei_status', 'progress', e.target.value)} className={`text-[11px] py-1 px-1.5 rounded font-medium outline-none w-full text-center cursor-pointer transition-colors mt-auto shadow-sm ${worker.kenteiStatus.progress === '完了' ? 'bg-green-100 text-green-700 border-green-200 border' : worker.kenteiStatus.progress === '進行中' ? 'bg-blue-100 text-blue-700 border-blue-200 border' : 'bg-gray-100 text-gray-600 border-gray-200 border'}`}>

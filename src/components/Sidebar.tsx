@@ -1,4 +1,3 @@
-import { SidebarAvatar } from "./SidebarAvatar";
 import { SidebarClient } from "./SidebarClient";
 import { createClient } from "@/lib/supabase/server";
 

@@ -91,3 +91,35 @@ export async function resetUserPassword(userId: string, newPassword: string) {
         return { error: 'サーバーエラーが発生しました。' }
     }
 }
+
+export async function deleteProvisionedAccount(userId: string) {
+    try {
+        const supabase = await createServerClient()
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) return { error: '認証エラー' }
+
+        const { data: adminProfile } = await supabase.from('users').select('role, tenant_id').eq('id', user.id).single()
+        if (!adminProfile || !['admin', 'union_admin'].includes(adminProfile.role)) {
+            return { error: '管理者権限が必要です。' }
+        }
+
+        // Cannot delete yourself
+        if (userId === user.id) return { error: '自分自身のアカウントは削除できません。' }
+
+        // Tenant isolation: only delete within same tenant
+        const { data: targetUser } = await supabase.from('users').select('tenant_id, role').eq('id', userId).single()
+        if (!targetUser || targetUser.tenant_id !== adminProfile.tenant_id) return { error: '不正な操作です。' }
+        if (targetUser.role === 'admin') return { error: '管理者アカウントは削除できません。' }
+
+        const adminDb = getAdminSupabase()
+        const { error: delError } = await adminDb.auth.admin.deleteUser(userId)
+        if (delError) return { error: 'アカウントの削除に失敗しました: ' + delError.message }
+
+        revalidatePath('/accounts')
+        revalidatePath('/organization')
+        revalidatePath('/settings')
+        return { success: true }
+    } catch (err: any) {
+        return { error: 'サーバーエラーが発生しました。' }
+    }
+}

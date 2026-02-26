@@ -6,7 +6,7 @@ import Link from "next/link";
 import {
     LayoutDashboard, Users, Building2, ShieldCheck, GitMerge,
     Map, Sparkles, MessageSquare, ClipboardList, Route,
-    MoreHorizontal, X, ChevronRight,
+    MoreHorizontal, X, ChevronRight, Settings,
 } from "lucide-react";
 import { SidebarLogo } from "./SidebarLogo";
 import { SidebarAvatar } from "./SidebarAvatar";
@@ -23,6 +23,7 @@ const ALL_NAV_ITEMS = [
     { id: "roadmap", name: "制度ロードマップ", href: "/roadmap", icon: Route },
     { id: "chat", name: "AIチャット", href: "/chat", icon: Sparkles },
     { id: "b2b-chat", name: "企業連絡", href: "/b2b-chat", icon: MessageSquare },
+    { id: "settings", name: "システム設定", href: "/settings", icon: Settings },
 ];
 
 // Bottom bar shows 4 primary items + "More" button

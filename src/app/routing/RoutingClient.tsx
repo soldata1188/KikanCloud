@@ -32,7 +32,7 @@ interface MappableLocation extends RawLocation {
 interface FilterCompany { id: string; name: string }
 
 // ── Layer config ─────────────────────────────────────────────────
-const LAYER_CONFIG: Record<LocationType, {
+const LAYER_CONFIG: Record<string, {
     label: string
     labelJa: string
     icon: React.ReactNode
@@ -57,8 +57,8 @@ const LAYER_CONFIG: Record<LocationType, {
         badgeText: 'text-yellow-700',
     },
     worker: {
-        label: 'Worker',
-        labelJa: '実習生',
+        label: 'Resident',
+        labelJa: '対象者 (在留者)',
         icon: <User size={13} />,
         color: 'text-orange-500',
         bg: 'bg-orange-50',
@@ -148,7 +148,7 @@ export default function RoutingClient({ initialLocations, filterCompanies, googl
     const { mappable, unmapped } = partitionLocations(initialLocations)
 
     // Layers visibility
-    const [visibleLayers, setVisibleLayers] = useState<Record<LocationType, boolean>>({
+    const [visibleLayers, setVisibleLayers] = useState<Record<string, boolean>>({
         company: true, worker: true
     })
 
@@ -178,7 +178,7 @@ export default function RoutingClient({ initialLocations, filterCompanies, googl
             const json = await res.json()
             if (!res.ok) throw new Error(json.error || 'エラー')
             setBackfillResult(
-                `完了！企業 ${json.companies.updated}件・実習生 ${json.workers.updated}件の座標を登録しました。ページを再読み込み中...`
+                `完了！企業 ${json.companies.updated}件・実習生 ${json.workers.updated}件 của tọa độ đã được đăng ký. Đang tải lại trang...`
             )
             setTimeout(() => window.location.reload(), 1500)
         } catch (e: unknown) {
@@ -224,6 +224,8 @@ export default function RoutingClient({ initialLocations, filterCompanies, googl
         worker: initialLocations.filter(l => l.type === 'worker').length,
     }
     const unmappedCount = unmapped.length
+    // True if any workers exist but have no coords yet (just added columns back)
+    const hasWorkersWithNoCoords = initialLocations.some(l => l.type === 'worker' && (l.latitude === null || l.longitude === null))
 
     if (!googleMapsKey) {
         return (
@@ -340,17 +342,17 @@ export default function RoutingClient({ initialLocations, filterCompanies, googl
                         </div>
                     </div>
 
-                    {/* ── Backfill banner: shown when any location has no coords ── */}
-                    {unmappedCount > 0 && (
+                    {/* ── Backfill banner: always show if any worker has no coords ── */}
+                    {(unmappedCount > 0 || hasWorkersWithNoCoords) && (
                         <div className="mx-3 my-2 p-3 bg-amber-50 border border-amber-200 rounded-xl shrink-0">
                             <div className="flex items-start gap-2 mb-2">
                                 <AlertTriangle size={14} className="text-amber-500 shrink-0 mt-0.5" />
                                 <div>
                                     <p className="text-[11px] font-black text-amber-700">
-                                        {unmappedCount} 件が地図に未表示
+                                        {unmappedCount > 0 ? `${unmappedCount} 件が地図に未表示` : `対象者の座標を登録してください`}
                                     </p>
                                     <p className="text-[10px] text-amber-600 mt-0.5 leading-snug">
-                                        座標が未登録のため、マップに表示されていません。下のボタンで一括登録できます。
+                                        住所から座標を自動取得してマップに表示します。
                                     </p>
                                 </div>
                             </div>
@@ -367,7 +369,7 @@ export default function RoutingClient({ initialLocations, filterCompanies, googl
                                     {isBackfilling ? (
                                         <><Loader2 size={11} className="animate-spin" /> 座標を取得中...</>
                                     ) : (
-                                        <><RefreshCw size={11} /> 座標を一括登録（1回のみ）</>
+                                        <><RefreshCw size={11} /> 座標を一括登録（住所→地図）</>
                                     )}
                                 </button>
                             )}
@@ -421,7 +423,9 @@ export default function RoutingClient({ initialLocations, filterCompanies, googl
                                                             <span className={`ml-1.5 text-[9px] font-black px-1.5 py-0.5 rounded-md
                                                                 ${loc.badge === '対応中'
                                                                     ? 'bg-amber-100 text-amber-600'
-                                                                    : 'bg-emerald-100 text-emerald-600'}`}>
+                                                                    : loc.badge === '未入国'
+                                                                        ? 'bg-blue-100 text-blue-600'
+                                                                        : 'bg-emerald-100 text-emerald-600'}`}>
                                                                 {loc.badge}
                                                             </span>
                                                         )}
@@ -578,35 +582,6 @@ export default function RoutingClient({ initialLocations, filterCompanies, googl
                         <List size={16} />
                     </button>
 
-                    {/* Legend */}
-                    <div className="absolute bottom-6 left-3 z-20 bg-white/95 backdrop-blur-sm shadow-md border border-slate-200 rounded-2xl px-3.5 py-3 flex flex-col gap-2">
-                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5">凡例</p>
-                        {(Object.keys(LAYER_CONFIG) as LocationType[]).map(type => {
-                            const cfg = LAYER_CONFIG[type]
-                            const on = visibleLayers[type]
-                            return (
-                                <button
-                                    key={type}
-                                    onClick={() => toggleLayer(type)}
-                                    className={`flex items-center gap-2 text-[11px] font-bold transition-opacity ${on ? '' : 'opacity-40'}`}
-                                >
-                                    <div
-                                        className="w-3 h-3 rounded-full border-2 border-white shadow-sm"
-                                        style={{ backgroundColor: cfg.pinColor }}
-                                    />
-                                    <span className="text-slate-600">{cfg.labelJa}</span>
-                                    <span className="ml-auto text-[9px] text-slate-400 font-bold pl-2">{counts[type]}</span>
-                                    <span className="text-slate-300">{on ? <Eye size={10} /> : <EyeOff size={10} />}</span>
-                                </button>
-                            )
-                        })}
-                        {unmappedCount > 0 && (
-                            <div className="flex items-center gap-1.5 pt-1.5 border-t border-slate-100">
-                                <AlertTriangle size={10} className="text-amber-400" />
-                                <span className="text-[9px] text-amber-500 font-bold">{unmappedCount} 件 座標未登録</span>
-                            </div>
-                        )}
-                    </div>
 
                     {/* Powered by */}
                     <div className="absolute bottom-6 right-3 z-20 bg-white/90 backdrop-blur-sm border border-slate-200 px-3 py-1.5 rounded-xl pointer-events-none shadow-sm">

@@ -1,9 +1,9 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
-import { updateAudit, deleteAudit } from '@/app/audits/actions'
-import { ArrowLeft, CalendarCheck, Clock, CheckCircle2, History } from 'lucide-react'
+import { updateAudit, deleteAudit, deleteAuditHistory } from '@/app/audits/actions'
+import { ArrowLeft, CalendarCheck, Clock, CheckCircle2, History, Trash2, Pencil } from 'lucide-react'
 import { Sidebar } from '@/components/Sidebar'
-import { UpdateButton, AuditEditDeleteButton } from '@/components/SubmitButtons'
+import { UpdateButton, AuditEditDeleteButton, AuditHistoryDeleteButton } from '@/components/SubmitButtons'
 import { redirect, notFound } from 'next/navigation'
 
 const TYPE_LABELS: Record<string, string> = { homon: '訪問', kansa: '監査', rinji: '臨時' }
@@ -19,11 +19,18 @@ export default async function EditAuditPage({ params }: { params: Promise<{ id: 
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) redirect('/login')
 
-    const { data: userProfile } = await supabase.from('users').select('role').eq('id', user.id).single()
+    const { data: userProfile } = await supabase.from('users').select('role, tenant_id').eq('id', user.id).single()
     const { data: audit } = await supabase.from('audits').select('*').eq('id', id).eq('is_deleted', false).single()
     if (!audit) notFound()
 
     const { data: companies } = await supabase.from('companies').select('id, name_jp').eq('is_deleted', false).order('name_jp')
+
+    // Fetch staff list for 担当 dropdown
+    const { data: staffList } = await supabase
+        .from('users')
+        .select('id, full_name')
+        .eq('tenant_id', userProfile?.tenant_id)
+        .order('full_name')
 
     // Fetch full history for this company
     const { data: history } = await supabase.from('audits')
@@ -107,8 +114,18 @@ export default async function EditAuditPage({ params }: { params: Promise<{ id: 
 
                                 <div>
                                     <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">担当スタッフ</label>
-                                    <input name="pic_name" type="text" defaultValue={audit.pic_name || ''} placeholder="担当者名"
-                                        className="w-full bg-white border border-slate-200 focus:border-[#24b47e] rounded-xl px-3 py-2.5 outline-none text-slate-800 font-medium transition-all text-sm placeholder:text-slate-300" />
+                                    {staffList && staffList.length > 0 ? (
+                                        <select name="pic_name" defaultValue={audit.pic_name || ''}
+                                            className="w-full bg-white border border-slate-200 focus:border-[#24b47e] rounded-xl px-3 py-2.5 outline-none appearance-none text-slate-800 font-medium transition-all text-sm">
+                                            <option value="">— 担当者を選択 —</option>
+                                            {staffList.map(s => (
+                                                <option key={s.id} value={s.full_name || ''}>{s.full_name}</option>
+                                            ))}
+                                        </select>
+                                    ) : (
+                                        <input name="pic_name" type="text" defaultValue={audit.pic_name || ''} placeholder="担当者名"
+                                            className="w-full bg-white border border-slate-200 focus:border-[#24b47e] rounded-xl px-3 py-2.5 outline-none text-slate-800 font-medium transition-all text-sm placeholder:text-slate-300" />
+                                    )}
                                 </div>
 
                                 <div className="md:col-span-2">
@@ -189,11 +206,21 @@ export default async function EditAuditPage({ params }: { params: Promise<{ id: 
                                                 : <Clock size={14} className="text-blue-300 shrink-0" />
                                             }
 
-                                            {/* Edit link */}
-                                            <Link href={`/audits/${h.id}/edit`}
-                                                className="text-slate-300 hover:text-[#24b47e] text-[11px] font-bold transition-colors opacity-0 group-hover:opacity-100 shrink-0">
-                                                編集
-                                            </Link>
+                                            {/* Actions */}
+                                            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                                                <Link href={`/audits/${h.id}/edit`}
+                                                    className="p-1.5 rounded-md text-slate-400 hover:text-[#24b47e] hover:bg-emerald-50 transition-colors"
+                                                    title="編集">
+                                                    <Pencil size={14} />
+                                                </Link>
+
+                                                {userProfile?.role === 'admin' && (
+                                                    <form action={deleteAuditHistory}>
+                                                        <input type="hidden" name="id" value={h.id} />
+                                                        <AuditHistoryDeleteButton />
+                                                    </form>
+                                                )}
+                                            </div>
                                         </div>
                                     )
                                 })}

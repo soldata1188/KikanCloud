@@ -21,12 +21,11 @@ export default async function RoutingPage() {
         .eq('is_deleted', false)
 
     const companyLocations: RawLocation[] = (companies || [])
-        .filter(c => c.address?.trim())
         .map(c => ({
             id: c.id,
             name: c.name_jp ?? '名前なし',
             type: 'company' as const,
-            address: c.address,
+            address: c.address ?? '',
             latitude: c.latitude ?? null,
             longitude: c.longitude ?? null,
             companyId: c.id,
@@ -37,27 +36,25 @@ export default async function RoutingPage() {
     const companyMap: Record<string, string> = {}
         ; (companies || []).forEach(c => { if (c.name_jp) companyMap[c.id] = c.name_jp })
 
-    // ── 3. Người lao động (workers) ──────────────────────────────
-    // Fetch: 就業中 + 対応中, all visa types
+    // Fetch workers (Simple select to avoid join issues)
     const { data: workers } = await supabase
         .from('workers')
-        .select('id, full_name_romaji, full_name_kana, address, latitude, longitude, company_id, status')
-        .eq('tenant_id', userProfile?.tenant_id)
-        .in('status', ['working', 'standby'])
+        .select('id, full_name_romaji, full_name_kana, address, japan_residence, latitude, longitude, company_id, status')
         .eq('is_deleted', false)
 
     const workerLocations: RawLocation[] = (workers || [])
-        .filter(w => w.address?.trim())  // only workers with address
+        // Include residents even if entry status is 'waiting' if user wants to see them
+        .filter(w => w.status === 'working' || w.status === 'standby' || w.status === 'waiting')
         .map(w => ({
             id: w.id,
             name: w.full_name_romaji ?? w.full_name_kana ?? '名前なし',
             type: 'worker' as const,
-            address: w.address,
+            address: w.address?.trim() ? w.address : (w.japan_residence || ''),
             latitude: w.latitude ?? null,
             longitude: w.longitude ?? null,
             companyId: w.company_id ?? '',
             companyName: companyMap[w.company_id ?? ''] ?? '企業不明',
-            badge: w.status === 'standby' ? '対応中' : '就業中',
+            badge: w.status === 'standby' ? '対応中' : (w.status === 'waiting' ? '未入国' : '就業中'),
         }))
 
     // ── All locations ─────────────────────────────────────────────

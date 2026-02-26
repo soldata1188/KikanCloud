@@ -14,15 +14,19 @@ export default async function WorkersPage() {
     const { data: userProfile } = await supabase.from('users').select('role').eq('id', user.id).single()
     const { data: workers } = await supabase.from('workers').select('*, companies(name_jp)').eq('is_deleted', false).order('created_at', { ascending: false })
 
+    const next90Days = new Date();
+    next90Days.setDate(next90Days.getDate() + 90);
+    const next90DaysStr = next90Days.toISOString().split('T')[0];
+
     return (
         <div className="flex h-screen bg-white font-sans text-[#1f1f1f] overflow-hidden selection:bg-[#24b47e]/20">
             <Sidebar active="workers" />
             <div className="flex-1 flex flex-col relative min-w-0">
                 <TopNav title="実習生一覧" role={userProfile?.role} />
                 <main className="flex-1 overflow-y-auto p-6 md:p-10">
-                    <div className="w-full max-w-[1200px] mx-auto">
+                    <div className="w-full max-w-[1500px] mx-auto">
 
-                        <WorkersListClient initialWorkers={workers || []} role={userProfile?.role || 'staff'} next90DaysStr={''} />
+                        <WorkersListClient initialWorkers={workers || []} role={userProfile?.role || 'staff'} next90DaysStr={next90DaysStr} />
                     </div>
                 </main>
             </div>

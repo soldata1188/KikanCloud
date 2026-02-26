@@ -27,10 +27,11 @@ export async function getOperationsData() {
         .eq('is_deleted', false)
         .order('name_jp')
 
-    const [{ data: visas }, { data: exams }, { data: transfers }] = await Promise.all([
+    const [{ data: visas }, { data: exams }, { data: transfers }, { data: staff }] = await Promise.all([
         supabase.from('visas').select('*, worker:worker_id(full_name_romaji, system_type, companies(name_jp))').eq('is_deleted', false).order('expiration_date', { ascending: true }),
         supabase.from('exams').select('*, worker:worker_id(full_name_romaji, companies(name_jp))').eq('is_deleted', false).order('deadline_date', { ascending: true }),
-        supabase.from('job_transfers').select('*, worker:worker_id(full_name_romaji, companies(name_jp)), from_company:from_company_id(name_jp), to_company:to_company_id(name_jp)').eq('is_deleted', false).order('transfer_date', { ascending: true })
+        supabase.from('job_transfers').select('*, worker:worker_id(full_name_romaji, companies(name_jp)), from_company:from_company_id(name_jp), to_company:to_company_id(name_jp)').eq('is_deleted', false).order('transfer_date', { ascending: true }),
+        supabase.from('users').select('id, full_name').eq('tenant_id', userData.tenant_id).order('full_name')
     ])
 
     return {
@@ -38,7 +39,8 @@ export async function getOperationsData() {
         companies: companies || [],
         visas: visas || [],
         exams: exams || [],
-        transfers: transfers || []
+        transfers: transfers || [],
+        staff: staff || []
     }
 }
 

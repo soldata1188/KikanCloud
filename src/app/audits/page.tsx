@@ -16,7 +16,14 @@ export default async function AuditsPage({ searchParams }: { searchParams: Promi
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) redirect('/login')
 
-    const { data: userProfile } = await supabase.from('users').select('role, full_name').eq('id', user.id).single()
+    const { data: userProfile } = await supabase.from('users').select('role, full_name, tenant_id').eq('id', user.id).single()
+
+    // Fetch union staff for 担当 dropdown (matching Operations source)
+    const { data: staffList } = await supabase
+        .from('users')
+        .select('id, full_name, role')
+        .eq('tenant_id', userProfile?.tenant_id)
+        .order('full_name')
     const { data: companies } = await supabase
         .from('companies')
         .select('id, name_jp, address, workers(id, system_type, visa_status, is_deleted)')
@@ -132,6 +139,7 @@ export default async function AuditsPage({ searchParams }: { searchParams: Promi
                             userRole={userProfile?.role}
                             companies={companies?.map(c => ({ id: c.id, name_jp: c.name_jp })) || []}
                             defaultPicName={userProfile?.full_name || ''}
+                            staffList={(staffList || []).map(s => ({ id: s.id, name: s.full_name || '' }))}
                         />
                     </div>
                 </main>

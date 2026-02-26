@@ -135,6 +135,22 @@ export async function deleteAudit(formData: FormData) {
     } catch (e: unknown) {
         return { error: e instanceof Error ? e.message : '削除に失敗しました。' }
     }
+    redirect('/audits')
+}
+
+export async function deleteAuditHistory(formData: FormData) {
+    try {
+        const supabase = await createClient()
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) return
+        const { data: userData } = await supabase.from('users').select('role').eq('id', user.id).single()
+        if (userData?.role !== 'admin') return
+        const id = formData.get('id') as string
+        await supabase.from('audits').update({ is_deleted: true }).eq('id', id)
+        revalidatePath('/audits')
+    } catch (e: unknown) {
+        // Silently fail or log to telemetry
+    }
 }
 
 export async function quickToggleAuditStatus(auditId: string) {

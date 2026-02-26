@@ -7,13 +7,18 @@ import { useRouter } from 'next/navigation'
 type CompanyOption = { id: string; name_jp: string }
 
 const BASE_FIELDS = [
-    { id: 'address', label: '社宅住所', type: 'text' },
     { id: 'status', label: 'ステータス', type: 'select', options: ['waiting', 'standby', 'working', 'missing', 'returned', 'transferred'], labels: ['入国待ち', '対応中', '就業中', '失踪', '帰国', '転籍済'] },
-    { id: 'entry_batch', label: '期生', type: 'text' },
     { id: 'visa_status', label: '在留資格', type: 'text' },
-    { id: 'industry_field', label: '職種', type: 'text' },
+    { id: 'industry_field', label: '職種区分', type: 'text' },
+    { id: 'sending_org', label: '送出機関', type: 'text' },
+    { id: 'entry_batch', label: '期生', type: 'text' },
+    { id: 'nationality', label: '国籍', type: 'text' },
+    { id: 'dob', label: '生年月日', type: 'date' },
     { id: 'entry_date', label: '入国日', type: 'date' },
     { id: 'zairyu_exp', label: '在留期限', type: 'date' },
+    { id: 'passport_exp', label: '旅券期限', type: 'date' },
+    { id: 'insurance_exp', label: '保険期限', type: 'date' },
+    { id: 'address', label: '社宅住所', type: 'text' },
 ]
 
 export function BulkEditModal({
@@ -27,7 +32,6 @@ export function BulkEditModal({
     onSuccess: () => void
     companies?: CompanyOption[]
 }) {
-    // Build the full field list — 受入企業 first
     const EDITABLE_FIELDS = [
         { id: 'company_id', label: '受入企業', type: 'company' },
         ...BASE_FIELDS,

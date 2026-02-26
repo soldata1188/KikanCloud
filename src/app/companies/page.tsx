@@ -22,7 +22,7 @@ export default async function CompaniesPage() {
             <div className="flex-1 flex flex-col relative min-w-0">
                 <TopNav title="受入企業一覧" role={userProfile?.role} />
                 <main className="flex-1 overflow-y-auto p-6 md:p-10">
-                    <div className="max-w-[1200px] mx-auto">
+                    <div className="max-w-[1500px] mx-auto">
 
                         <CompaniesClient companies={companies || []} userRole={userProfile?.role || 'staff'} />
                     </div>

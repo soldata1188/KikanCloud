@@ -60,6 +60,8 @@ export async function proxy(request: NextRequest) {
         return redirectResponse
     }
 
+    // Mobile restriction removed by user request.
+    /*
     const userAgent = request.headers.get('user-agent') || '';
     const isMobile = /Mobile|Android|iP(hone|od)|IEMobile|BlackBerry|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)/i.test(userAgent);
 
@@ -83,6 +85,7 @@ export async function proxy(request: NextRequest) {
         url.pathname = '/desktop-only';
         return NextResponse.redirect(url);
     }
+    */
 
     if (
         !user &&

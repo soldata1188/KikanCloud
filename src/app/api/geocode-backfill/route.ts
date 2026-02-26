@@ -38,16 +38,16 @@ export async function POST(req: Request) {
     // ── Companies without coords ──────────────────────────────────
     const { data: companies } = await supabase
         .from('companies')
-        .select('id, address')
+        .select('id, address, latitude, longitude')
         .eq('is_deleted', false)
-        .not('address', 'is', null)
-        .or('latitude.is.null,longitude.is.null')
 
     let companiesUpdated = 0, companiesFailed = 0
+    const companiesToUpdate = (companies || []).filter(c =>
+        c.address?.trim() && (c.latitude === null || c.longitude === null || c.latitude === 0 || c.longitude === 0)
+    )
 
-    for (const company of companies || []) {
-        if (!company.address?.trim()) { companiesFailed++; continue }
-        const coords = await geocodeOne(company.address, apiKey)
+    for (const company of companiesToUpdate) {
+        const coords = await geocodeOne(company.address!, apiKey)
         if (coords) {
             await supabase.from('companies').update({
                 latitude: coords.lat,
@@ -57,22 +57,25 @@ export async function POST(req: Request) {
         } else {
             companiesFailed++
         }
-        await sleep(100) // 10 req/s max → well under 50 QPS limit
+        await sleep(100)
     }
 
     // ── Workers without coords ──────────────────────────────────
     const { data: workers } = await supabase
         .from('workers')
-        .select('id, address')
+        .select('id, address, japan_residence, latitude, longitude')
         .eq('is_deleted', false)
-        .not('address', 'is', null)
-        .or('latitude.is.null,longitude.is.null')
 
     let workersUpdated = 0, workersFailed = 0
+    const workersToUpdate = (workers || []).filter(w =>
+        (w.address?.trim() || w.japan_residence?.trim()) &&
+        (w.latitude === null || w.longitude === null || w.latitude === 0 || w.longitude === 0)
+    )
 
-    for (const worker of workers || []) {
-        if (!worker.address?.trim()) { workersFailed++; continue }
-        const coords = await geocodeOne(worker.address, apiKey)
+    for (const worker of workersToUpdate) {
+        const addrToUse = worker.address?.trim() || worker.japan_residence?.trim()
+        if (!addrToUse) { workersFailed++; continue }
+        const coords = await geocodeOne(addrToUse, apiKey)
         if (coords) {
             await supabase.from('workers').update({
                 latitude: coords.lat,

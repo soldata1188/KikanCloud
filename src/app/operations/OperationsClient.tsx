@@ -23,11 +23,11 @@ export interface OperationData {
 }
 
 const PROGRESS_OPTIONS = ['未着手', '進行中', '完了'];
-const KENTEI_OPTIONS = ['---', '初級', '専門級', '日本語N4', '完了'];
-const KIKOU_OPTIONS = ['---', '認定申請', '転籍申請', '軽微変更', '困難届出', '完了'];
+const KENTEI_OPTIONS = ['---', '初級', '基礎級', '専門級', '随時3級', '上級', '随時2級'];
+const KIKOU_OPTIONS = ['---', '認定申請1号', '認定申請2号', '転籍申請', '軽微変更', '困難届出'];
 const CONSTRUCTION_OPTIONS = ['---', 'オンライン申請', '変更届出等'];
-const NYUKAN_OPTIONS = ['---', '在留資格', '資格変更', '期間更新', '特定活動', '特定変更', '特定更新', '届出等', '完了'];
-const STAFF_OPTIONS = ['---', 'Yamada', 'Suzuki', 'Nguyen', 'Tran', 'Sato'];
+const NYUKAN_OPTIONS = ['---', '資格認定', '資格変更', '期間更新', '特定活動', '特定変更', '特定更新', '変更届出'];
+
 
 type WorkerField = 'status' | 'kentei_status' | 'kikou_status' | 'nyukan_status';
 
@@ -52,22 +52,22 @@ const C = {
         subchip: 'bg-amber-100 text-amber-600',
     },
     kikou: {
-        accent: '#8b5cf6',        // violet-500
-        light: 'bg-violet-50',
-        border: 'border-l-[3px] border-l-violet-400',
-        divider: 'border-violet-100',
-        chip: 'bg-violet-100 text-violet-700',
-        label: 'text-violet-600',
-        subchip: 'bg-violet-100 text-violet-600',
+        accent: '#4f46e5',        // indigo-600
+        light: 'bg-indigo-50',
+        border: 'border-l-[3px] border-l-indigo-500',
+        divider: 'border-indigo-100',
+        chip: 'bg-indigo-100 text-indigo-700',
+        label: 'text-indigo-600',
+        subchip: 'bg-indigo-100 text-indigo-600',
     },
     nyukan: {
-        accent: '#14b8a6',        // teal-500
-        light: 'bg-teal-50',
-        border: 'border-l-[3px] border-l-teal-400',
-        divider: 'border-teal-100',
-        chip: 'bg-teal-100 text-teal-700',
-        label: 'text-teal-600',
-        subchip: 'bg-teal-100 text-teal-600',
+        accent: '#2563eb',        // blue-600
+        light: 'bg-blue-50',
+        border: 'border-l-[3px] border-l-blue-500',
+        divider: 'border-blue-100',
+        chip: 'bg-blue-100 text-blue-700',
+        label: 'text-blue-600',
+        subchip: 'bg-blue-100 text-blue-600',
     },
 }
 
@@ -77,8 +77,8 @@ const progressCls = (p: string, col: keyof typeof C) => {
         const map: Record<string, string> = {
             zairyu: 'bg-blue-100 text-blue-800 border border-blue-200',
             kentei: 'bg-amber-100 text-amber-800 border border-amber-200',
-            kikou: 'bg-violet-100 text-violet-800 border border-violet-200',
-            nyukan: 'bg-teal-100 text-teal-800 border border-teal-200',
+            kikou: 'bg-indigo-100 text-indigo-800 border border-indigo-200',
+            nyukan: 'bg-blue-600 text-white border-blue-700',
         }
         return (map[col] || '') + ' font-black'
     }
@@ -88,15 +88,31 @@ const progressCls = (p: string, col: keyof typeof C) => {
 // Shared compact select style
 const SEL = "text-[11px] py-0.5 px-1.5 outline-none rounded-lg bg-white border border-slate-200 text-slate-800 font-semibold cursor-pointer focus:ring-1 focus:ring-inset transition-all"
 
+const cycleProgress = (current: string) => {
+    const idx = PROGRESS_OPTIONS.indexOf(current);
+    return PROGRESS_OPTIONS[(idx + 1) % PROGRESS_OPTIONS.length];
+};
+
+const cycleStatus = (current: string) => {
+    const statuses = ['入国待ち', '対応中', '就業中', '失踪', '帰国', '転籍済'];
+    const idx = statuses.indexOf(current);
+    if (idx === -1) return statuses[0];
+    return statuses[(idx + 1) % statuses.length];
+};
+
 export default function OperationsClient({
     initialWorkers = [],
+    staff = [],
 }: {
     initialWorkers?: any[],
     companies?: any[],
     initialVisas?: any[],
     initialExams?: any[],
-    initialTransfers?: any[]
+    initialTransfers?: any[],
+    staff?: { id: string, full_name: string }[]
 }) {
+    const STAFF_OPTIONS = ['---', ...staff.map(s => s.full_name)];
+
     const mappedWorkers = initialWorkers.map(w => {
         const reverseStatusMap: Record<string, string> = {
             'waiting': '入国待ち', 'standby': '対応中', 'working': '就業中', 'missing': '失踪', 'returned': '帰国'
@@ -236,7 +252,7 @@ export default function OperationsClient({
     }
 
     return (
-        <div className="bg-slate-100 min-h-full">
+        <div className="bg-slate-50 min-h-full">
 
             {/* ════════════════════════════════════════════════════
                 MAIN TAB BAR
@@ -253,7 +269,7 @@ export default function OperationsClient({
             </div>
 
             {activeTab === 'overview' && (
-                <div className="w-full max-w-[1500px] mx-auto">
+                <div className="w-full mx-auto">
 
                     {/* ── Status Sub-Tabs ── */}
                     <div className="flex px-6 pt-0 border-b border-slate-200 overflow-x-auto no-scrollbar bg-white">
@@ -284,7 +300,7 @@ export default function OperationsClient({
                     </div>
 
                     {/* ── Filter Bar ── */}
-                    <div className="px-6 py-3 bg-white border-b border-slate-200">
+                    <div className="px-4 md:px-6 py-3 bg-white border-b border-slate-200">
                         <div className="flex flex-wrap items-center justify-between gap-3">
                             <div className="flex flex-wrap items-center gap-2">
                                 <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest mr-1">絞り込み</span>
@@ -314,7 +330,7 @@ export default function OperationsClient({
 
                     {/* ── Bulk Edit Bar ── */}
                     {selectedIds.length > 0 && (
-                        <div className="mx-6 mt-4 bg-white border border-emerald-200 rounded-2xl p-4 shadow-sm">
+                        <div className="mx-4 md:mx-6 mt-4 bg-white border border-emerald-200 rounded-2xl p-4 shadow-sm">
                             <div className="text-sm font-black text-slate-700 flex items-center gap-2 pb-3 mb-3 border-b border-slate-100">
                                 <span className="inline-flex items-center gap-1.5 bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full text-xs font-black">🛠 {selectedIds.length} 件選択中</span>
                                 <span className="text-[11px] text-slate-400 font-normal">一括変更 — 変更後に選択中すべての行に即時反映</span>
@@ -336,22 +352,23 @@ export default function OperationsClient({
                                     <select onChange={e => handleBulkOperationChange('kentei_status', 'progress', e.target.value)} className={SEL + ' w-[80px] focus:ring-amber-300'} defaultValue=""><option value="" disabled>進捗</option>{PROGRESS_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}</select>
                                 </div>
                                 {/* Kikou */}
-                                <div className="flex flex-wrap items-center gap-1.5 bg-violet-50 rounded-xl px-3 py-2 border border-violet-200">
-                                    <span className="text-[10px] text-violet-600 font-black shrink-0 w-[45px] leading-[1.2]">機構業務<br />建設特定</span>
-                                    <select onChange={e => handleBulkOperationChange('kikou_status', 'type', e.target.value)} className={SEL + ' w-[80px] focus:ring-violet-300'} defaultValue=""><option value="" disabled>機構業務</option>{KIKOU_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}</select>
-                                    <select onChange={e => handleBulkOperationChange('kikou_status', 'assignee', e.target.value)} className={SEL + ' w-[80px] focus:ring-violet-300'} defaultValue=""><option value="" disabled>機構担当</option>{STAFF_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}</select>
-                                    <select onChange={e => handleBulkOperationChange('kikou_status', 'construction_type', e.target.value)} className={SEL + ' w-[80px] focus:ring-violet-300'} defaultValue=""><option value="" disabled>建設業務</option>{CONSTRUCTION_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}</select>
-                                    <select onChange={e => handleBulkOperationChange('kikou_status', 'construction_assignee', e.target.value)} className={SEL + ' w-[80px] focus:ring-violet-300'} defaultValue=""><option value="" disabled>建担当</option>{STAFF_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}</select>
-                                    <select onChange={e => handleBulkOperationChange('kikou_status', 'progress', e.target.value)} className={SEL + ' w-[80px] focus:ring-violet-300'} defaultValue=""><option value="" disabled>進捗</option>{PROGRESS_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}</select>
+                                <div className="flex flex-wrap items-center gap-1.5 bg-indigo-50 rounded-xl px-3 py-2 border border-indigo-200">
+                                    <span className="text-[10px] text-indigo-600 font-black shrink-0 w-[45px] leading-[1.2]">機構 / 建設</span>
+                                    <select onChange={e => handleBulkOperationChange('kikou_status', 'type', e.target.value)} className={SEL + ' w-[80px] focus:ring-indigo-300'} defaultValue=""><option value="" disabled>機構業務</option>{KIKOU_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}</select>
+                                    <select onChange={e => handleBulkOperationChange('kikou_status', 'assignee', e.target.value)} className={SEL + ' w-[80px] focus:ring-indigo-300'} defaultValue=""><option value="" disabled>機構担当</option>{STAFF_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}</select>
+                                    <select onChange={e => handleBulkOperationChange('kikou_status', 'construction_type', e.target.value)} className={SEL + ' w-[80px] focus:ring-indigo-300'} defaultValue=""><option value="" disabled>建設業務</option>{CONSTRUCTION_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}</select>
+                                    <select onChange={e => handleBulkOperationChange('kikou_status', 'construction_assignee', e.target.value)} className={SEL + ' w-[80px] focus:ring-indigo-300'} defaultValue=""><option value="" disabled>建担当</option>{STAFF_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}</select>
+                                    <select onChange={e => handleBulkOperationChange('kikou_status', 'progress', e.target.value)} className={SEL + ' w-[80px] focus:ring-indigo-300'} defaultValue=""><option value="" disabled>進捗</option>{PROGRESS_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}</select>
                                 </div>
                                 {/* Nyukan */}
-                                <div className="flex flex-wrap items-center gap-1.5 bg-teal-50 rounded-xl px-3 py-2 border border-teal-200">
-                                    <span className="text-[10px] text-teal-600 font-black shrink-0 w-[45px]">入管業務</span>
-                                    <select onChange={e => handleBulkOperationChange('nyukan_status', 'type', e.target.value)} className={SEL + ' w-[80px] focus:ring-teal-300'} defaultValue=""><option value="" disabled>業務</option>{NYUKAN_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}</select>
-                                    <select onChange={e => handleBulkOperationChange('nyukan_status', 'assignee', e.target.value)} className={SEL + ' w-[80px] focus:ring-teal-300'} defaultValue=""><option value="" disabled>担当</option>{STAFF_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}</select>
+                                <div className="flex flex-wrap items-center gap-1.5 bg-blue-50 rounded-xl px-3 py-2 border border-blue-200">
+                                    <span className="text-[10px] text-blue-600 font-black shrink-0 w-[45px]">入管業務</span>
+                                    <select onChange={e => handleBulkOperationChange('nyukan_status', 'type', e.target.value)} className={SEL + ' w-[80px] focus:ring-blue-300'} defaultValue=""><option value="" disabled>業務</option>{NYUKAN_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}</select>
+                                    <select onChange={e => handleBulkOperationChange('nyukan_status', 'assignee', e.target.value)} className={SEL + ' w-[80px] focus:ring-blue-300'} defaultValue=""><option value="" disabled>担当</option>{STAFF_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}</select>
                                     <input type="date" onChange={e => handleBulkOperationChange('nyukan_status', 'application_date', e.target.value)} className="text-xs py-0.5 px-1.5 border border-slate-200 rounded-lg outline-none text-slate-700 bg-white w-[110px]" />
-                                    <input type="text" placeholder="受理番号..." onBlur={e => handleBulkOperationChange('nyukan_status', 'receipt_number', e.target.value)} onKeyDown={e => { if (e.key === 'Enter') handleBulkOperationChange('nyukan_status', 'receipt_number', e.currentTarget.value) }} className="text-xs py-0.5 px-1.5 border border-slate-200 rounded-lg outline-none text-slate-700 bg-white w-[100px]" />
-                                    <select onChange={e => handleBulkOperationChange('nyukan_status', 'progress', e.target.value)} className={SEL + ' w-[80px] focus:ring-teal-300'} defaultValue=""><option value="" disabled>進捗</option>{PROGRESS_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}</select>
+                                    <input type="text" placeholder="取次者..." onBlur={e => handleBulkOperationChange('nyukan_status', 'agent', e.target.value)} onKeyDown={e => { if (e.key === 'Enter') handleBulkOperationChange('nyukan_status', 'agent', e.currentTarget.value) }} className="text-xs py-0.5 px-1.5 border border-slate-200 rounded-lg outline-none text-slate-700 bg-white w-[90px] focus:border-blue-400" />
+                                    <input type="text" placeholder="受理番号..." onBlur={e => handleBulkOperationChange('nyukan_status', 'receipt_number', e.target.value)} onKeyDown={e => { if (e.key === 'Enter') handleBulkOperationChange('nyukan_status', 'receipt_number', e.currentTarget.value) }} className="text-xs py-0.5 px-1.5 border border-slate-200 rounded-lg outline-none text-slate-700 bg-white w-[100px] focus:border-blue-400" />
+                                    <select onChange={e => handleBulkOperationChange('nyukan_status', 'progress', e.target.value)} className={SEL + ' w-[80px] focus:ring-blue-300'} defaultValue=""><option value="" disabled>進捗</option>{PROGRESS_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}</select>
                                 </div>
                             </div>
                         </div>
@@ -360,7 +377,7 @@ export default function OperationsClient({
                     {/* ════════════════════════════════════════════════════
                         WORKER LIST
                     ════════════════════════════════════════════════════ */}
-                    <div className="flex flex-col gap-6 p-6 pb-10">
+                    <div className="flex flex-col gap-6 p-4 md:p-6 pb-10">
                         {paginatedWorkers.length > 0 && (
                             <div className="flex items-center gap-2 px-1">
                                 <input type="checkbox" checked={selectedIds.length === workers.length && workers.length > 0} onChange={toggleSelectAll} className="w-4 h-4 rounded border-slate-300 cursor-pointer accent-slate-700" />
@@ -478,15 +495,13 @@ export default function OperationsClient({
                                             COL 2 — 在留情報 (blue accent)
                                         ────────────────────────────────────────────── */}
                                         <div className={`flex-1 xl:flex-none xl:w-[190px] flex flex-col min-w-0 border-t xl:border-t-0 xl:border-l border-slate-100 ${C.zairyu.border}`}>
-                                            <div className={`px-3 py-1.5 flex items-center gap-1.5 border-b ${C.zairyu.divider} ${C.zairyu.light}`}>
-                                                <span className={`text-[9px] font-black uppercase tracking-wider ${C.zairyu.label}`}>在留情報</span>
-                                                <div className="ml-auto flex items-center relative">
-                                                    <select value={worker.status} onChange={e => handleChange(worker.id, 'status', e.target.value)}
-                                                        className={`appearance-none text-[10px] pl-2 pr-4 py-0.5 rounded-full font-black outline-none cursor-pointer border ${statusBadgeCls(worker.status)}`}
-                                                        style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2.5'%3E%3Cpath d='M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9'/%3E%3C/svg%3E")`, backgroundPosition: 'right 0.25rem center', backgroundRepeat: 'no-repeat', backgroundSize: '0.75em' }}>
-                                                        {STATUS_CARDS.filter(s => s !== 'すべて').map(s => <option key={s} value={s}>{s}</option>)}
-                                                    </select>
-                                                </div>
+                                            <div className={`px-3 py-1.5 flex items-center justify-between gap-1.5 border-b ${C.zairyu.divider} bg-slate-50/50`}>
+                                                <span className={`text-[11px] font-black uppercase tracking-wider ${C.zairyu.label}`}>在留情報</span>
+                                                <select value={worker.status} onChange={e => handleChange(worker.id, 'status', e.target.value)}
+                                                    className={`appearance-none text-[10px] px-2 py-0.5 rounded-full font-black outline-none cursor-pointer border ${statusBadgeCls(worker.status)}`}
+                                                    style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2.5'%3E%3Cpath d='M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9'/%3E%3C/svg%3E")`, backgroundPosition: 'right 0.25rem center', backgroundRepeat: 'no-repeat', backgroundSize: '0.75em' }}>
+                                                    {STATUS_CARDS.filter(s => s !== 'すべて').map(s => <option key={s} value={s}>{s}</option>)}
+                                                </select>
                                             </div>
                                             <div className="flex-1 flex flex-col gap-1 p-3">
                                                 {[
@@ -500,6 +515,8 @@ export default function OperationsClient({
                                                         <span className="text-slate-700 font-semibold text-right line-clamp-2 leading-[1.3]">{value}</span>
                                                     </div>
                                                 ))}
+
+
                                             </div>
                                         </div>
 
@@ -507,8 +524,13 @@ export default function OperationsClient({
                                             COL 3 — 検定業務 (amber accent)
                                         ────────────────────────────────────────────── */}
                                         <div className={`flex-1 flex flex-col min-w-0 border-t xl:border-t-0 xl:border-l border-slate-100 ${C.kentei.border}`}>
-                                            <div className={`px-3 py-1.5 flex items-center gap-1.5 border-b ${C.kentei.divider} ${C.kentei.light}`}>
-                                                <span className={`text-[9px] font-black uppercase tracking-wider ${C.kentei.label}`}>検定業務</span>
+                                            <div className={`px-3 py-1.5 flex items-center justify-between gap-1.5 border-b ${C.kentei.divider} bg-slate-50/50`}>
+                                                <span className={`text-[11px] font-black uppercase tracking-wider ${C.kentei.label}`}>検定業務</span>
+                                                <div
+                                                    onClick={() => handleOperationChange(worker.id, 'kentei_status', 'progress', cycleProgress(worker.kenteiStatus.progress))}
+                                                    className={`text-[9px] px-2 py-0.5 rounded-full font-black cursor-pointer select-none transition-all active:scale-95 ${progressCls(worker.kenteiStatus.progress, 'kentei')}`}>
+                                                    {worker.kenteiStatus.progress}
+                                                </div>
                                             </div>
                                             <div className="flex-1 flex flex-col gap-2 p-3">
                                                 <div className="flex gap-1.5">
@@ -529,10 +551,7 @@ export default function OperationsClient({
                                                         <input type="date" value={worker.kenteiStatus.exam_date_practical || ''} onChange={e => handleOperationChange(worker.id, 'kentei_status', 'exam_date_practical', e.target.value)} className="text-[11px] flex-1 bg-transparent outline-none text-slate-700 cursor-pointer font-medium" />
                                                     </div>
                                                 </div>
-                                                <select value={worker.kenteiStatus.progress} onChange={e => handleOperationChange(worker.id, 'kentei_status', 'progress', e.target.value)}
-                                                    className={`text-[11px] py-1 px-2 rounded-xl font-black outline-none w-full text-center cursor-pointer transition-all ${progressCls(worker.kenteiStatus.progress, 'kentei')}`}>
-                                                    {PROGRESS_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
-                                                </select>
+
                                             </div>
                                         </div>
 
@@ -540,8 +559,13 @@ export default function OperationsClient({
                                             COL 4 — 機構業務 (violet accent)
                                         ────────────────────────────────────────────── */}
                                         <div className={`flex-1 flex flex-col min-w-0 border-t xl:border-t-0 xl:border-l border-slate-100 ${C.kikou.border}`}>
-                                            <div className={`px-3 py-1.5 flex items-center gap-1.5 border-b ${C.kikou.divider} ${C.kikou.light}`}>
-                                                <span className={`text-[9px] font-black uppercase tracking-wider ${C.kikou.label}`}>機構業務 / 建設特定</span>
+                                            <div className={`px-3 py-1.5 flex items-center justify-between gap-1.5 border-b ${C.kikou.divider} bg-slate-50/50`}>
+                                                <span className={`text-[11px] font-black uppercase tracking-wider ${C.kikou.label}`}>機構 / 建設</span>
+                                                <div
+                                                    onClick={() => handleOperationChange(worker.id, 'kikou_status', 'progress', cycleProgress(worker.kikouStatus.progress))}
+                                                    className={`text-[9px] px-2 py-0.5 rounded-full font-black cursor-pointer select-none transition-all active:scale-95 ${progressCls(worker.kikouStatus.progress, 'kikou')}`}>
+                                                    {worker.kikouStatus.progress}
+                                                </div>
                                             </div>
                                             <div className="flex-1 flex flex-col gap-2 p-3">
                                                 <div className="flex gap-1.5">
@@ -566,10 +590,7 @@ export default function OperationsClient({
                                                         </select>
                                                     </div>
                                                 </div>
-                                                <select value={worker.kikouStatus.progress} onChange={e => handleOperationChange(worker.id, 'kikou_status', 'progress', e.target.value)}
-                                                    className={`text-[11px] py-1 px-2 rounded-xl font-black outline-none w-full text-center cursor-pointer transition-all ${progressCls(worker.kikouStatus.progress, 'kikou')}`}>
-                                                    {PROGRESS_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
-                                                </select>
+
                                             </div>
                                         </div>
 
@@ -577,8 +598,13 @@ export default function OperationsClient({
                                             COL 5 — 入管業務 (teal accent)
                                         ────────────────────────────────────────────── */}
                                         <div className={`flex-1 flex flex-col min-w-0 border-t xl:border-t-0 xl:border-l border-slate-100 ${C.nyukan.border}`}>
-                                            <div className={`px-3 py-1.5 flex items-center gap-1.5 border-b ${C.nyukan.divider} ${C.nyukan.light}`}>
-                                                <span className={`text-[9px] font-black uppercase tracking-wider ${C.nyukan.label}`}>入管業務</span>
+                                            <div className={`px-3 py-1.5 flex items-center justify-between gap-1.5 border-b ${C.nyukan.divider} bg-slate-50/50`}>
+                                                <span className={`text-[11px] font-black uppercase tracking-wider ${C.nyukan.label}`}>入管業務</span>
+                                                <div
+                                                    onClick={() => handleOperationChange(worker.id, 'nyukan_status', 'progress', cycleProgress(worker.nyukanStatus.progress))}
+                                                    className={`text-[9px] px-2 py-0.5 rounded-full font-black cursor-pointer select-none transition-all active:scale-95 ${progressCls(worker.nyukanStatus.progress, 'nyukan')}`}>
+                                                    {worker.nyukanStatus.progress}
+                                                </div>
                                             </div>
                                             <div className="flex-1 flex flex-col gap-2 p-3">
                                                 <div className="flex gap-1.5">
@@ -589,18 +615,19 @@ export default function OperationsClient({
                                                         {STAFF_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
                                                     </select>
                                                 </div>
-                                                <div className="flex flex-col gap-1 rounded-lg bg-teal-50/60 border border-teal-100 p-2">
+                                                <div className="flex flex-col gap-1.5 rounded-lg bg-blue-50/60 border border-blue-100 p-2">
                                                     <div className="flex items-center gap-1.5">
                                                         <span className={`text-[9px] font-black rounded px-1 py-px shrink-0 ${C.nyukan.subchip}`}>申請</span>
                                                         <input type="date" value={worker.nyukanStatus.application_date || ''} onChange={e => handleOperationChange(worker.id, 'nyukan_status', 'application_date', e.target.value)} className="text-[11px] flex-1 bg-transparent outline-none text-slate-700 cursor-pointer font-medium" />
+                                                        <span className={`text-[9px] font-black rounded px-1 py-px shrink-0 ${C.nyukan.subchip}`}>取次者</span>
+                                                        <input type="text" placeholder="---" value={worker.nyukanStatus.agent || ''} onChange={e => handleOperationChange(worker.id, 'nyukan_status', 'agent', e.target.value)} className="text-[11px] w-[80px] bg-transparent outline-none text-slate-600 placeholder-slate-300 font-medium" />
+                                                    </div>
+                                                    <div className="flex items-center gap-1.5">
                                                         <span className={`text-[9px] font-black rounded px-1 py-px shrink-0 ${C.nyukan.subchip}`}>受理番号</span>
-                                                        <input type="text" placeholder="---" value={worker.nyukanStatus.receipt_number || ''} onChange={e => handleOperationChange(worker.id, 'nyukan_status', 'receipt_number', e.target.value)} className="text-[11px] w-[80px] bg-transparent outline-none text-slate-600 placeholder-slate-300 font-medium border-b border-teal-200 focus:border-teal-400" />
+                                                        <input type="text" placeholder="---" value={worker.nyukanStatus.receipt_number || ''} onChange={e => handleOperationChange(worker.id, 'nyukan_status', 'receipt_number', e.target.value)} className="text-[11px] flex-1 bg-transparent outline-none text-slate-600 placeholder-slate-300 font-medium" />
                                                     </div>
                                                 </div>
-                                                <select value={worker.nyukanStatus.progress} onChange={e => handleOperationChange(worker.id, 'nyukan_status', 'progress', e.target.value)}
-                                                    className={`text-[11px] py-1 px-2 rounded-xl font-black outline-none w-full text-center cursor-pointer transition-all ${progressCls(worker.nyukanStatus.progress, 'nyukan')}`}>
-                                                    {PROGRESS_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
-                                                </select>
+
                                             </div>
                                         </div>
 
@@ -647,7 +674,7 @@ export default function OperationsClient({
             )}
 
             {activeTab === 'exam' && (
-                <div className="w-full max-w-[1500px] mx-auto p-6 print-target print:w-full print:mx-0 print:p-0">
+                <div className="w-full mx-auto p-6 print-target print:w-full print:mx-0 print:p-0">
                     <ExamTab workers={workers} onUpdate={handleOperationChange} />
                 </div>
             )}

@@ -1,8 +1,7 @@
 'use client'
 import { useState } from 'react'
-import { Search, Grid, List, Plus, FileSpreadsheet } from 'lucide-react'
+import { Search, Grid, List, Plus } from 'lucide-react'
 import Link from 'next/link'
-import * as XLSX from 'xlsx'
 
 interface DataTableToolbarProps<T> {
     data: T[];
@@ -21,7 +20,6 @@ interface DataTableToolbarProps<T> {
 export function DataTableToolbar<T>({ data, filename, searchPlaceholder, onSearch, type, role, addLink, importNode, filterNode, layout, onLayoutChange }: DataTableToolbarProps<T>) {
     const [searchTerm, setSearchTerm] = useState('')
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => { const term = e.target.value; setSearchTerm(term); onSearch(term); }
-    const handleExport = () => { try { const exportData = data.map((d, i) => ({ 'No': i + 1, 'Data': JSON.stringify(d) })); const ws = XLSX.utils.json_to_sheet(exportData); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Data"); XLSX.writeFile(wb, `${filename}.xlsx`); } catch (e) { } }
 
     return (
         <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between mb-4 gap-4 w-full">
@@ -40,14 +38,6 @@ export function DataTableToolbar<T>({ data, filename, searchPlaceholder, onSearc
                         <button onClick={() => onLayoutChange('list')} className={`p-1 rounded ${layout === 'list' ? 'bg-white text-[#1f1f1f] border border-slate-200 shadow-sm' : 'text-[#878787] hover:text-[#1f1f1f] hover:bg-slate-50'}`}><List size={14} /></button>
                     </div>
                 ) : null}
-                {role === 'admin' && (
-                    <button onClick={handleExport} className="group relative h-[32px] w-[32px] flex items-center justify-center bg-white border border-slate-200 hover:bg-slate-50 text-[#1f1f1f] rounded-md transition-colors shrink-0">
-                        <FileSpreadsheet size={16} />
-                        <div className="absolute top-full mt-2 px-2 py-1 bg-[#1f1f1f] text-white text-[11px] font-medium rounded-sm opacity-0 invisible translate-y-[-5px] group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all duration-200 whitespace-nowrap z-[60] pointer-events-none">
-                            Excel出力
-                        </div>
-                    </button>
-                )}
                 {importNode}
                 {addLink && (role === 'admin' || role === 'staff') && (
                     <Link href={addLink} className="group relative h-[32px] w-[32px] flex items-center justify-center bg-[#24b47e] hover:bg-[#1e9a6a] text-white rounded-md transition-colors shrink-0">

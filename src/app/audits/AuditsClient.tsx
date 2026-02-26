@@ -15,7 +15,7 @@ import { createAuditInline, upsertAuditSchedule } from './actions'
 // ─────────────────────────────────────────────────────────────
 // Constants
 // ─────────────────────────────────────────────────────────────
-const PAGE_SIZE = 20
+const PAGE_SIZE = 25
 
 const AUDIT_TYPES = [
     { key: 'homon', label: '社宅訪問', badge: 'bg-blue-50 text-blue-700 border border-blue-200' },
@@ -180,16 +180,17 @@ function PdfSettingsModal({
     )
 }
 
-// ─────────────────────────────────────────────────────────────
+// ──────────────────────────────────────────────────────────────
 // InlineTypeCell — input row for one audit type (date + person)
-// ─────────────────────────────────────────────────────────────
+// ──────────────────────────────────────────────────────────────
 function InlineTypeCell({
     auditType, typeLabel, typeBadge,
-    companyId, filterMonth, existingAudit, onSaved,
+    companyId, filterMonth, existingAudit, onSaved, staffList = [],
 }: {
     auditType: string; typeLabel: string; typeBadge: string
     companyId: string; filterMonth: string
     existingAudit?: any; onSaved: () => void
+    staffList?: { id: string; name: string }[]
 }) {
     const defaultDate = filterMonth ? `${filterMonth}-15` : ''
     const [date, setDate] = useState(existingAudit?.scheduled_date || '')
@@ -241,14 +242,30 @@ function InlineTypeCell({
                         : 'bg-white border-slate-200 focus:border-[#24b47e] text-slate-700'}`}
             />
 
-            {/* 担当 */}
-            <input
-                type="text"
-                value={person}
-                onChange={e => { setPerson(e.target.value); markDirty() }}
-                placeholder="担当"
-                className="h-7 text-[11px] px-2 rounded-lg border border-slate-200 focus:border-[#24b47e] bg-white text-slate-700 outline-none transition-all flex-1 min-w-0 placeholder:text-slate-300"
-            />
+            {/* 担当 — dropdown if staffList provided, fallback to text */}
+            {staffList.length > 0 ? (
+                <select
+                    value={person}
+                    onChange={e => { setPerson(e.target.value); markDirty() }}
+                    className={`h-7 text-[11px] px-1 rounded-lg border outline-none transition-all flex-1 min-w-0 appearance-none cursor-pointer
+                        ${isDone
+                            ? 'bg-emerald-50 border-emerald-200 text-emerald-700 opacity-70'
+                            : 'bg-white border-slate-200 focus:border-[#24b47e] text-slate-700'}`}
+                >
+                    <option value="">— 担当 —</option>
+                    {staffList.map(s => (
+                        <option key={s.id} value={s.name}>{s.name}</option>
+                    ))}
+                </select>
+            ) : (
+                <input
+                    type="text"
+                    value={person}
+                    onChange={e => { setPerson(e.target.value); markDirty() }}
+                    placeholder="担当"
+                    className="h-7 text-[11px] px-2 rounded-lg border border-slate-200 focus:border-[#24b47e] bg-white text-slate-700 outline-none transition-all flex-1 min-w-0 placeholder:text-slate-300"
+                />
+            )}
 
             {/* Save button — appears when dirty */}
             {isDirty && date ? (
@@ -343,10 +360,11 @@ function InlineOpsCell({
 // ─────────────────────────────────────────────────────────────
 // Add Schedule Modal
 // ─────────────────────────────────────────────────────────────
-function AddScheduleModal({ companies, defaultPicName, defaultCompanyId, defaultAuditType = 'homon', filterMonth, onClose, onSuccess }: {
+function AddScheduleModal({ companies, defaultPicName, defaultCompanyId, defaultAuditType = 'homon', filterMonth, onClose, onSuccess, staffList = [] }: {
     companies: { id: string; name_jp: string }[]
     defaultPicName: string; defaultCompanyId: string; defaultAuditType?: string; filterMonth: string
     onClose: () => void; onSuccess: () => void
+    staffList?: { id: string; name: string }[]
 }) {
     const [status, setStatus] = useState<'planned' | 'completed'>('planned')
     const [isPending, startTransition] = useTransition()
@@ -431,8 +449,18 @@ function AddScheduleModal({ companies, defaultPicName, defaultCompanyId, default
                         </div>
                         <div>
                             <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">担当スタッフ</label>
-                            <input name="pic_name" type="text" defaultValue={defaultPicName} placeholder="担当者名"
-                                className="w-full bg-white border border-slate-200 focus:border-[#24b47e] rounded-xl px-3 py-2.5 outline-none text-slate-800 font-medium text-sm placeholder:text-slate-300" />
+                            {staffList.length > 0 ? (
+                                <select name="pic_name" defaultValue={defaultPicName}
+                                    className="w-full bg-white border border-slate-200 focus:border-[#24b47e] rounded-xl px-3 py-2.5 outline-none appearance-none text-slate-800 font-medium text-sm">
+                                    <option value="">— 担当者を選択 —</option>
+                                    {staffList.map(s => (
+                                        <option key={s.id} value={s.name}>{s.name}</option>
+                                    ))}
+                                </select>
+                            ) : (
+                                <input name="pic_name" type="text" defaultValue={defaultPicName} placeholder="担当者名"
+                                    className="w-full bg-white border border-slate-200 focus:border-[#24b47e] rounded-xl px-3 py-2.5 outline-none text-slate-800 font-medium text-sm placeholder:text-slate-300" />
+                            )}
                         </div>
                     </div>
 
@@ -479,11 +507,12 @@ function AddScheduleModal({ companies, defaultPicName, defaultCompanyId, default
 // ─────────────────────────────────────────────────────────────
 export function AuditsClient({
     matrixData, filterMonth, userRole,
-    companies = [], defaultPicName = '',
+    companies = [], defaultPicName = '', staffList = [],
 }: {
     matrixData: any[]; filterMonth: string; userRole?: string
     companies?: { id: string; name_jp: string }[]
     defaultPicName?: string
+    staffList?: { id: string; name: string }[]
 }) {
     const router = useRouter()
     const [filtered, setFiltered] = useState(matrixData)
@@ -561,13 +590,14 @@ export function AuditsClient({
     ) : null
 
     return (
-        <div className="flex flex-col gap-5">
+        <div className="flex flex-col gap-5 px-4 md:px-0">
             {showModal && (
                 <AddScheduleModal
                     companies={companies} defaultPicName={defaultPicName}
                     defaultCompanyId={preselectedCompanyId}
                     defaultAuditType={preselectedAuditType}
                     filterMonth={filterMonth}
+                    staffList={staffList}
                     onClose={() => setShowModal(false)}
                     onSuccess={() => { setShowModal(false); router.refresh() }}
                 />
@@ -588,10 +618,10 @@ export function AuditsClient({
                     const isActive = activeTab === key
                     return (
                         <button key={key} onClick={() => setActiveTab(key)}
-                            className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl border text-[12px] font-bold transition-all select-none
+                            className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl border text-[14px] font-bold transition-all select-none
                                 ${isActive ? `${cfg.activeBg} ${cfg.activeText} ${cfg.activeBorder} shadow-md -translate-y-0.5` : `${cfg.bg} ${cfg.text} ${cfg.border} hover:bg-slate-50 hover:-translate-y-0.5`}`}>
                             <span className="flex items-center gap-1.5">{cfg.icon}{cfg.label}</span>
-                            <span className={`text-[10px] font-bold min-w-[20px] h-5 inline-flex items-center justify-center px-1.5 rounded-full ${isActive ? 'bg-white/20 text-white' : `${cfg.badgeBg} ${cfg.badgeText}`}`}>{count}</span>
+                            <span className={`text-[12px] font-bold min-w-[20px] h-5 inline-flex items-center justify-center px-1.5 rounded-full ${isActive ? 'bg-white/20 text-white' : `${cfg.badgeBg} ${cfg.badgeText}`}`}>{count}</span>
                         </button>
                     )
                 })}
@@ -610,11 +640,11 @@ export function AuditsClient({
                 importNode={
                     <div className="flex items-center gap-2">
                         <button onClick={() => setShowPdfModal(true)}
-                            className="inline-flex items-center gap-1.5 h-[32px] px-3 bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 text-[11px] font-bold rounded-md transition-colors">
+                            className="inline-flex items-center gap-1.5 h-[32px] px-3 bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 text-[13px] font-bold rounded-md transition-colors">
                             <FileDown size={13} /><span>PDF出力</span>
                         </button>
                         <button onClick={() => openModal()}
-                            className="inline-flex items-center gap-1.5 h-[32px] px-3 bg-emerald-500 hover:bg-emerald-600 text-white text-[11px] font-bold rounded-md transition-colors shadow-sm">
+                            className="inline-flex items-center gap-1.5 h-[32px] px-3 bg-emerald-500 hover:bg-emerald-600 text-white text-[13px] font-bold rounded-md transition-colors shadow-sm">
                             <CalendarPlus size={13} /> スケジュール追加
                         </button>
                     </div>
@@ -627,30 +657,30 @@ export function AuditsClient({
                     <thead>
                         <tr className="bg-slate-800">
                             {/* 1 No. */}
-                            <th className="px-3 py-3.5 font-bold text-[11px] uppercase tracking-wider text-slate-300 w-[42px] text-center border-r border-slate-700">No.</th>
+                            <th className="px-3 py-3.5 font-bold text-[13px] uppercase tracking-wider text-slate-300 w-[42px] text-center border-r border-slate-700">No.</th>
                             {/* 2 受入企業 */}
-                            <th className="px-4 py-3.5 font-bold text-[11px] uppercase tracking-wider text-slate-300 border-r border-slate-700">受入企業</th>
+                            <th className="px-4 py-3.5 font-bold text-[13px] uppercase tracking-wider text-slate-300 border-r border-slate-700">受入企業</th>
                             {/* 3 在籍状況 */}
-                            <th className="px-3 py-3.5 font-bold text-[11px] uppercase tracking-wider text-slate-300 w-[110px] border-r border-slate-700">在籍人数</th>
+                            <th className="px-3 py-3.5 font-bold text-[13px] uppercase tracking-wider text-slate-300 w-[110px] border-r border-slate-700">在籍人数</th>
                             {/* 4 ステータス */}
-                            <th className="px-3 py-3.5 font-bold text-[11px] uppercase tracking-wider text-slate-300 w-[120px] text-center border-r border-slate-700">ステータス</th>
+                            <th className="px-3 py-3.5 font-bold text-[13px] uppercase tracking-wider text-slate-300 w-[120px] text-center border-r border-slate-700">ステータス</th>
                             {/* 5 今月予定 */}
-                            <th className="px-4 py-3.5 font-bold text-[11px] uppercase tracking-wider text-slate-300 border-r border-slate-700">
+                            <th className="px-4 py-3.5 font-bold text-[13px] uppercase tracking-wider text-slate-300 border-r border-slate-700">
                                 今月予定
                                 <span className="ml-1.5 text-slate-500 font-normal normal-case tracking-normal">— 実施日・担当</span>
                             </th>
                             {/* 6 前回 — 監査訪問のみ */}
-                            <th className="px-4 py-3.5 font-bold text-[11px] uppercase tracking-wider text-slate-300 w-[150px] border-r border-slate-700">
+                            <th className="px-4 py-3.5 font-bold text-[13px] uppercase tracking-wider text-slate-300 w-[150px] border-r border-slate-700">
                                 前回
                                 <span className="ml-1 text-slate-500 font-normal normal-case text-[10px]">監査</span>
                             </th>
                             {/* 7 前々回 — 監査訪問のみ */}
-                            <th className="px-4 py-3.5 font-bold text-[11px] uppercase tracking-wider text-slate-300 w-[150px] border-r border-slate-700">
+                            <th className="px-4 py-3.5 font-bold text-[13px] uppercase tracking-wider text-slate-300 w-[150px] border-r border-slate-700">
                                 前々回
                                 <span className="ml-1 text-slate-500 font-normal normal-case text-[10px]">監査</span>
                             </th>
                             {/* 8 操作 */}
-                            <th className="px-3 py-3.5 font-bold text-[11px] uppercase tracking-wider text-slate-300 w-[130px]">操作</th>
+                            <th className="px-3 py-3.5 font-bold text-[13px] uppercase tracking-wider text-slate-300 w-[130px]">操作</th>
                         </tr>
                     </thead>
                     <tbody className="">
@@ -684,19 +714,19 @@ export function AuditsClient({
                                     {/* Col 2: 受入企業 (no icon, with address) */}
                                     <td className="px-4 py-3 align-top border-r border-slate-100">
                                         <Link href={`/companies/${row.company.id}`} target="_blank"
-                                            className="font-bold text-slate-800 hover:text-[#24b47e] transition-colors text-[13px] leading-snug block"
+                                            className="font-bold text-slate-800 hover:text-[#24b47e] transition-colors text-[15px] leading-snug block"
                                             title={row.company.name_jp}>
                                             {row.company.name_jp}
                                         </Link>
                                         {row.company.address && (
-                                            <div className="text-[10px] text-slate-400 mt-0.5 leading-snug">{row.company.address}</div>
+                                            <div className="text-[12px] text-slate-400 mt-0.5 leading-snug">{row.company.address}</div>
                                         )}
                                     </td>
 
                                     {/* Col 3: 在籍状況 — fixed grid, numbers aligned */}
                                     <td className="px-3 py-3 align-top border-r border-slate-100">
                                         <div className="w-full">
-                                            <div className="grid text-[10px] pb-1 mb-1 border-b border-slate-100"
+                                            <div className="grid text-[11px] pb-1 mb-1 border-b border-slate-100"
                                                 style={{ gridTemplateColumns: '1fr 24px' }}>
                                                 <span className="text-slate-400">合計</span>
                                                 <span className="font-bold text-slate-700 text-right tabular-nums">{row.workerCounts?.total || 0}</span>
@@ -705,7 +735,7 @@ export function AuditsClient({
                                                 {VISA_ORDER
                                                     .filter(visa => (row.workerCounts?.visaGroups?.[visa] || 0) > 0)
                                                     .map(visa => (
-                                                        <div key={visa} className="grid text-[9px]"
+                                                        <div key={visa} className="grid text-[10px]"
                                                             style={{ gridTemplateColumns: '1fr 24px' }}>
                                                             <span className="text-slate-400 truncate">{visa}</span>
                                                             <span className="font-bold text-slate-500 text-right tabular-nums">{row.workerCounts.visaGroups[visa]}</span>
@@ -715,7 +745,7 @@ export function AuditsClient({
                                                 {visaEntries
                                                     .filter(([v]) => !VISA_ORDER.includes(v as any))
                                                     .map(([visa, cnt]) => (
-                                                        <div key={visa} className="grid text-[9px]"
+                                                        <div key={visa} className="grid text-[10px]"
                                                             style={{ gridTemplateColumns: '1fr 24px' }}>
                                                             <span className="text-slate-400 truncate">{visa}</span>
                                                             <span className="font-bold text-slate-500 text-right tabular-nums">{cnt}</span>
@@ -741,6 +771,7 @@ export function AuditsClient({
                                                     companyId={row.company.id} filterMonth={filterMonth}
                                                     existingAudit={row.auditsByType?.[key]}
                                                     onSaved={handleSaved}
+                                                    staffList={staffList}
                                                 />
                                             ))}
                                         </div>

@@ -60,14 +60,15 @@ export default function TeamManagerClient({
     const handleCreate = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         setCreateMsg({ type: '', text: '' })
-        const formData = new FormData(e.currentTarget)
+        const form = e.currentTarget          // capture before transition nullifies it
+        const formData = new FormData(form)
         startCreate(async () => {
             const res = await createProvisionedAccount(formData)
             if (res.error) setCreateMsg({ type: 'error', text: res.error })
             else {
                 setCreateMsg({ type: 'success', text: 'アカウントが発行されました。', loginId: res.loginId, password: res.password })
                 setCreatePw('')
-                e.currentTarget.reset()
+                form.reset()
                 setSelectedRole('staff')
             }
         })

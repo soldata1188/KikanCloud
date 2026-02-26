@@ -38,7 +38,27 @@ export async function proxy(request: NextRequest) {
         }
     )
 
-    const { data: { user } } = await supabase.auth.getUser()
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+
+    // Handle invalid / expired refresh token → sign out and redirect to login
+    if (authError && (
+        authError.message?.includes('Refresh Token Not Found') ||
+        authError.message?.includes('Invalid Refresh Token') ||
+        (authError as any).code === 'refresh_token_not_found'
+    )) {
+        await supabase.auth.signOut()
+        const loginUrl = request.nextUrl.clone()
+        loginUrl.pathname = '/login'
+        loginUrl.searchParams.set('error', 'セッションが期限切れです。再度ログインしてください。')
+        const redirectResponse = NextResponse.redirect(loginUrl)
+        // Clear stale Supabase auth cookies
+        request.cookies.getAll().forEach((cookie) => {
+            if (cookie.name.startsWith('sb-') || cookie.name.includes('supabase')) {
+                redirectResponse.cookies.delete(cookie.name)
+            }
+        })
+        return redirectResponse
+    }
 
     const userAgent = request.headers.get('user-agent') || '';
     const isMobile = /Mobile|Android|iP(hone|od)|IEMobile|BlackBerry|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)/i.test(userAgent);

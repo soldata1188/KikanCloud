@@ -350,7 +350,7 @@ export default function OperationsClient({
                                     <select onChange={e => handleBulkOperationChange('nyukan_status', 'type', e.target.value)} className={SEL + ' w-[80px] focus:ring-teal-300'} defaultValue=""><option value="" disabled>業務</option>{NYUKAN_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}</select>
                                     <select onChange={e => handleBulkOperationChange('nyukan_status', 'assignee', e.target.value)} className={SEL + ' w-[80px] focus:ring-teal-300'} defaultValue=""><option value="" disabled>担当</option>{STAFF_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}</select>
                                     <input type="date" onChange={e => handleBulkOperationChange('nyukan_status', 'application_date', e.target.value)} className="text-xs py-0.5 px-1.5 border border-slate-200 rounded-lg outline-none text-slate-700 bg-white w-[110px]" />
-                                    <input type="text" placeholder="取次..." onBlur={e => handleBulkOperationChange('nyukan_status', 'agent', e.target.value)} onKeyDown={e => { if (e.key === 'Enter') handleBulkOperationChange('nyukan_status', 'agent', e.currentTarget.value) }} className="text-xs py-0.5 px-1.5 border border-slate-200 rounded-lg outline-none text-slate-700 bg-white w-[90px]" />
+                                    <input type="text" placeholder="受理番号..." onBlur={e => handleBulkOperationChange('nyukan_status', 'receipt_number', e.target.value)} onKeyDown={e => { if (e.key === 'Enter') handleBulkOperationChange('nyukan_status', 'receipt_number', e.currentTarget.value) }} className="text-xs py-0.5 px-1.5 border border-slate-200 rounded-lg outline-none text-slate-700 bg-white w-[100px]" />
                                     <select onChange={e => handleBulkOperationChange('nyukan_status', 'progress', e.target.value)} className={SEL + ' w-[80px] focus:ring-teal-300'} defaultValue=""><option value="" disabled>進捗</option>{PROGRESS_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}</select>
                                 </div>
                             </div>
@@ -593,10 +593,8 @@ export default function OperationsClient({
                                                     <div className="flex items-center gap-1.5">
                                                         <span className={`text-[9px] font-black rounded px-1 py-px shrink-0 ${C.nyukan.subchip}`}>申請</span>
                                                         <input type="date" value={worker.nyukanStatus.application_date || ''} onChange={e => handleOperationChange(worker.id, 'nyukan_status', 'application_date', e.target.value)} className="text-[11px] flex-1 bg-transparent outline-none text-slate-700 cursor-pointer font-medium" />
-                                                    </div>
-                                                    <div className="flex items-center gap-1.5">
-                                                        <span className={`text-[9px] font-black rounded px-1 py-px shrink-0 ${C.nyukan.subchip}`}>取次</span>
-                                                        <input type="text" placeholder="---" value={worker.nyukanStatus.agent || ''} onChange={e => handleOperationChange(worker.id, 'nyukan_status', 'agent', e.target.value)} className="text-[11px] flex-1 bg-transparent outline-none text-slate-600 placeholder-slate-300 font-medium" />
+                                                        <span className={`text-[9px] font-black rounded px-1 py-px shrink-0 ${C.nyukan.subchip}`}>受理番号</span>
+                                                        <input type="text" placeholder="---" value={worker.nyukanStatus.receipt_number || ''} onChange={e => handleOperationChange(worker.id, 'nyukan_status', 'receipt_number', e.target.value)} className="text-[11px] w-[80px] bg-transparent outline-none text-slate-600 placeholder-slate-300 font-medium border-b border-teal-200 focus:border-teal-400" />
                                                     </div>
                                                 </div>
                                                 <select value={worker.nyukanStatus.progress} onChange={e => handleOperationChange(worker.id, 'nyukan_status', 'progress', e.target.value)}

@@ -83,7 +83,7 @@ export async function updateWorkerStatus(workerId: string, column: string, value
     let dbValue = value
     if (column === 'status') {
         const statusMap: Record<string, string> = {
-            '入国待ち': 'waiting',
+            '未入国': 'waiting',
             '対応中': 'standby',
             '就業中': 'working',
             '失踪': 'missing',

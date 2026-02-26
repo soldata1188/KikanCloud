@@ -94,7 +94,7 @@ const cycleProgress = (current: string) => {
 };
 
 const cycleStatus = (current: string) => {
-    const statuses = ['入国待ち', '対応中', '就業中', '失踪', '帰国', '転籍済'];
+    const statuses = ['未入国', '対応中', '就業中', '失踪', '帰国', '転籍済'];
     const idx = statuses.indexOf(current);
     if (idx === -1) return statuses[0];
     return statuses[(idx + 1) % statuses.length];
@@ -115,14 +115,14 @@ export default function OperationsClient({
 
     const mappedWorkers = initialWorkers.map(w => {
         const reverseStatusMap: Record<string, string> = {
-            'waiting': '入国待ち', 'standby': '対応中', 'working': '就業中', 'missing': '失踪', 'returned': '帰国'
+            'waiting': '未入国', 'standby': '対応中', 'working': '就業中', 'missing': '失踪', 'returned': '帰国'
         };
         return {
             id: w.id,
             name: w.full_name_romaji || '名前なし',
             furigana: w.full_name_kana || '---',
             avatar: (w.full_name_romaji || '?').charAt(0).toUpperCase(),
-            photoUrl: w.photo_url || null,
+            photoUrl: w.avatar_url || null,
             company: w.companies?.name_jp || '未所属',
             systemCategory: w.system_type === 'tokuteigino' ? '特定技能' : (w.system_type === 'ginou_jisshu' ? '技能実習' : '育成就労'),
             occupation: w.industry_field || '---',
@@ -133,7 +133,7 @@ export default function OperationsClient({
             certEndDate: w.cert_end_date || '---',
             remarks: w.remarks || '',
             address: w.address || '',
-            status: reverseStatusMap[w.status] || '入国待ち',
+            status: reverseStatusMap[w.status] || '未入国',
             kenteiStatus: (typeof w.kentei_status === 'object' && w.kentei_status ? w.kentei_status : { type: '---', progress: '未着手', assignee: '---', exam_date_written: '', exam_date_practical: '' }) as OperationData,
             kikouStatus: (typeof w.kikou_status === 'object' && w.kikou_status ? w.kikou_status : { type: '---', progress: '未着手', assignee: '---', construction_type: '---', construction_assignee: '---' }) as OperationData,
             nyukanStatus: (typeof w.nyukan_status === 'object' && w.nyukan_status ? w.nyukan_status : { type: '---', progress: '未着手', assignee: '---', application_date: '', agent: '' }) as OperationData
@@ -145,7 +145,7 @@ export default function OperationsClient({
 
     type StatusTabKey = 'waiting' | 'active' | 'closed'
     const STATUS_TAB_GROUPS: { key: StatusTabKey; label: string; statuses: string[]; icon: React.ReactNode; color: string }[] = [
-        { key: 'waiting', label: '未入国', statuses: ['入国待ち'], icon: <Clock size={13} />, color: 'amber' },
+        { key: 'waiting', label: '未入国', statuses: ['未入国'], icon: <Clock size={13} />, color: 'amber' },
         { key: 'active', label: '就業中・対応中', statuses: ['就業中', '対応中'], icon: <Briefcase size={13} />, color: 'emerald' },
         { key: 'closed', label: '失踪・帰国・転籍済', statuses: ['失踪', '帰国', '転籍済'], icon: <AlertTriangle size={13} />, color: 'rose' },
     ];
@@ -167,7 +167,7 @@ export default function OperationsClient({
 
     React.useEffect(() => { setCurrentPage(1); }, [activeStatusTab, filterSystem, filterCompany, filterOccupation, filterBatch, filterVisaStatus, sortOrder]);
 
-    const STATUS_CARDS = ['すべて', '入国待ち', '対応中', '就業中', '失踪', '帰国', '転籍済'];
+    const STATUS_CARDS = ['すべて', '未入国', '対応中', '就業中', '失踪', '帰国', '転籍済'];
     const systemOptions = ['すべて', '育成就労', '技能実習', '特定技能'];
     const companyOptions = ['すべて', ...Array.from(new Set(workers.map(w => w.company)))].filter(Boolean);
     const occupationOptions = ['すべて', ...Array.from(new Set(workers.map(w => w.occupation)))].filter(Boolean);
@@ -451,9 +451,13 @@ export default function OperationsClient({
                                         <div className="flex-[1.3] flex flex-col p-4 min-w-0 bg-white">
                                             {/* ─ Name row ─ */}
                                             <div className="flex items-start gap-2.5">
-                                                {/* Avatar circle — mobile only */}
-                                                <div className="xl:hidden w-8 h-8 shrink-0 rounded-full bg-slate-700 text-white font-black flex items-center justify-center text-[13px] shadow-sm mt-0.5">
-                                                    {worker.avatar}
+                                                {/* Avatar circle/image — mobile only */}
+                                                <div className="xl:hidden w-9 h-9 shrink-0 rounded-xl bg-slate-700 border border-slate-600 overflow-hidden flex items-center justify-center shadow-sm">
+                                                    {worker.photoUrl ? (
+                                                        <img src={worker.photoUrl} className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <span className="text-white font-black text-[13px]">{worker.avatar}</span>
+                                                    )}
                                                 </div>
                                                 <div className="flex flex-col gap-0 min-w-0 flex-1">
                                                     <div className="flex items-baseline gap-2 min-w-0">

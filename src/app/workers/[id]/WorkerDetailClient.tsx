@@ -56,7 +56,7 @@ export default function WorkerDetailClient({ worker, documents }: { worker: any;
     };
 
     const statusCfg: Record<string, { label: string; dot: string; bg: string; text: string; border: string }> = {
-        'waiting': { label: '入国待', dot: 'bg-amber-400', bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-200' },
+        'waiting': { label: '未入国', dot: 'bg-amber-400', bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-200' },
         'standby': { label: '対応中', dot: 'bg-blue-400', bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200' },
         'working': { label: '就業中', dot: 'bg-emerald-400', bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200' },
         'missing': { label: '失踪', dot: 'bg-red-400', bg: 'bg-red-50', text: 'text-red-700', border: 'border-red-200' },

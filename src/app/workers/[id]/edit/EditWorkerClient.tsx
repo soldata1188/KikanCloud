@@ -342,7 +342,7 @@ export default function EditWorkerClient({ companies, worker }: { companies: any
                             </FormRow>
                             <FormRow label="ステータス">
                                 <select name="status" value={formData.status} onChange={handleInputChange} className={inputCls('status') + ' appearance-none'}>
-                                    <option value="waiting">入国待</option>
+                                    <option value="waiting">未入国</option>
                                     <option value="standby">対応中</option>
                                     <option value="working">就業中</option>
                                     <option value="missing">失踪</option>

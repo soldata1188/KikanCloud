@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation'
 type CompanyOption = { id: string; name_jp: string }
 
 const BASE_FIELDS = [
-    { id: 'status', label: 'ステータス', type: 'select', options: ['waiting', 'standby', 'working', 'missing', 'returned', 'transferred'], labels: ['入国待ち', '対応中', '就業中', '失踪', '帰国', '転籍済'] },
+    { id: 'status', label: 'ステータス', type: 'select', options: ['waiting', 'standby', 'working', 'missing', 'returned', 'transferred'], labels: ['未入国', '対応中', '就業中', '失踪', '帰国', '転籍済'] },
     { id: 'visa_status', label: '在留資格', type: 'text' },
     { id: 'industry_field', label: '職種区分', type: 'text' },
     { id: 'sending_org', label: '送出機関', type: 'text' },

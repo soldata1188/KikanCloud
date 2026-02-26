@@ -65,19 +65,13 @@ export async function updateProfile(formData: FormData) {
 
     if (fullName) {
         const { error } = await adminClient.from('users').update({ full_name: fullName }).eq('id', user.id)
-        if (error) {
-            console.error("Failed to update full_name in users table:", error)
-            throw new Error('名前の更新に失敗しました')
-        }
+        if (error) throw new Error('名前の更新に失敗しました')
         await adminClient.auth.admin.updateUserById(user.id, { user_metadata: { full_name: fullName } })
     }
 
     if (password && password.length >= 6) {
         const { error } = await adminClient.auth.admin.updateUserById(user.id, { password })
-        if (error) {
-            console.error("Failed to update password:", error)
-            throw new Error('パスワードの更新に失敗しました')
-        }
+        if (error) throw new Error('パスワードの更新に失敗しました')
     }
 
     revalidatePath('/settings')

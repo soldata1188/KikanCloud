@@ -3,11 +3,44 @@ import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Geocoding helper (server-side, called ONCE on save — zero client cost)
+// Uses Google Maps Geocoding API with the server-only key
+// ─────────────────────────────────────────────────────────────────────────────
+async function geocodeAddress(address: string | null): Promise<{ latitude: number | null; longitude: number | null }> {
+    if (!address?.trim()) return { latitude: null, longitude: null }
+
+    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+    if (!apiKey) return { latitude: null, longitude: null }
+
+    try {
+        const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&language=ja&key=${apiKey}`
+        const res = await fetch(url, { cache: 'no-store' })
+        if (!res.ok) return { latitude: null, longitude: null }
+
+        const json = await res.json()
+        if (json.status !== 'OK' || !json.results?.[0]) return { latitude: null, longitude: null }
+
+        const loc = json.results[0].geometry.location
+        return { latitude: loc.lat, longitude: loc.lng }
+    } catch {
+        return { latitude: null, longitude: null }
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CREATE
+// ─────────────────────────────────────────────────────────────────────────────
 export async function createCompany(formData: FormData) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error('Unauthorized')
     const { data: userData } = await supabase.from('users').select('tenant_id').eq('id', user.id).single()
+
+    const address = formData.get('address') as string || null
+
+    // ── Geocode once on server ──────────────────────────────────
+    const { latitude, longitude } = await geocodeAddress(address)
 
     const newCompany = {
         tenant_id: userData?.tenant_id,
@@ -16,7 +49,9 @@ export async function createCompany(formData: FormData) {
         name_romaji: formData.get('name_romaji') as string || null,
         corporate_number: formData.get('corporate_number') as string || null,
         postal_code: formData.get('postal_code') as string || null,
-        address: formData.get('address') as string || null,
+        address,
+        latitude,
+        longitude,
         phone: formData.get('phone') as string || null,
         email: formData.get('email') as string || null,
         industry: formData.get('industry') as string || null,
@@ -47,9 +82,30 @@ export async function createCompany(formData: FormData) {
     redirect('/companies')
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// UPDATE
+// ─────────────────────────────────────────────────────────────────────────────
 export async function updateCompany(formData: FormData) {
     const supabase = await createClient()
     const id = formData.get('id') as string
+    const address = formData.get('address') as string || null
+
+    // ── Only re-geocode if address actually changed ─────────────
+    const { data: existing } = await supabase
+        .from('companies')
+        .select('address, latitude, longitude')
+        .eq('id', id)
+        .single()
+
+    let latitude = existing?.latitude ?? null
+    let longitude = existing?.longitude ?? null
+
+    const addressChanged = (address ?? '') !== (existing?.address ?? '')
+    if (addressChanged) {
+        const coords = await geocodeAddress(address)
+        latitude = coords.latitude
+        longitude = coords.longitude
+    }
 
     const updatedData = {
         name_jp: formData.get('name_jp') as string,
@@ -57,7 +113,9 @@ export async function updateCompany(formData: FormData) {
         name_romaji: formData.get('name_romaji') as string || null,
         corporate_number: formData.get('corporate_number') as string || null,
         postal_code: formData.get('postal_code') as string || null,
-        address: formData.get('address') as string || null,
+        address,
+        latitude,
+        longitude,
         phone: formData.get('phone') as string || null,
         industry: formData.get('industry') as string || null,
         accepted_occupations: formData.get('accepted_occupations') as string || null,
@@ -87,6 +145,9 @@ export async function updateCompany(formData: FormData) {
     redirect('/companies')
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// DELETE
+// ─────────────────────────────────────────────────────────────────────────────
 export async function deleteCompany(formData: FormData) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
@@ -101,7 +162,10 @@ export async function deleteCompany(formData: FormData) {
     redirect('/companies')
 }
 
-export async function importCompanies(companiesData: any[]) {
+// ─────────────────────────────────────────────────────────────────────────────
+// IMPORT (bulk CSV — no geocoding to avoid quota spikes)
+// ─────────────────────────────────────────────────────────────────────────────
+export async function importCompanies(companiesData: { [key: string]: string | number | null }[]) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error('Unauthorized')
@@ -109,7 +173,6 @@ export async function importCompanies(companiesData: any[]) {
     if (userData?.role !== 'admin') throw new Error('管理者権限が必要です。(Admin only)')
     if (!userData?.tenant_id) throw new Error('Tenant ID not found')
 
-    // 挿入前のデータ正規化
     const payload = companiesData.map(c => ({
         tenant_id: userData?.tenant_id,
         name_jp: c.name_jp,
@@ -117,6 +180,8 @@ export async function importCompanies(companiesData: any[]) {
         corporate_number: c.corporate_number || null,
         postal_code: c.postal_code || null,
         address: c.address || null,
+        // latitude/longitude intentionally omitted for bulk import:
+        // User can open & re-save each record to geocode, or use a separate backfill job.
         phone: c.phone || null,
         email: c.email || null,
         industry: c.industry || null,
@@ -142,7 +207,6 @@ export async function importCompanies(companiesData: any[]) {
 
     const { error } = await supabase.from('companies').insert(payload)
     if (error) {
-        console.error('Import Error:', error)
         throw new Error('インポートに失敗しました。データ形式を確認してください。')
     }
 

@@ -12,12 +12,12 @@ export default async function AccountsPage() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) redirect('/login')
 
-    const { data: userProfile } = await supabase.from('users').select('full_name, role, tenant_id, email').eq('id', user.id).single()
+    const { data: userProfile } = await supabase.from('users').select('full_name, role, tenant_id, login_id').eq('id', user.id).single()
 
-    const { data: staffList } = await supabase.from('users').select('id, full_name, email, login_id, role, companies(name_jp)').eq('tenant_id', userProfile?.tenant_id).in('role', ['admin', 'staff', 'company_admin']).order('role', { ascending: true })
+    const { data: staffList } = await supabase.from('users').select('id, full_name, login_id, role, companies(name_jp)').eq('tenant_id', userProfile?.tenant_id).in('role', ['admin', 'union_admin', 'staff', 'company_admin']).order('role', { ascending: true })
     const { data: companies } = await supabase.from('companies').select('id, name_jp').eq('tenant_id', userProfile?.tenant_id).eq('is_deleted', false).order('name_jp', { ascending: true })
 
-    const isAdmin = userProfile?.role === 'admin'
+    const isAdmin = userProfile?.role === 'admin' || userProfile?.role === 'union_admin'
 
     return (
         <div className="flex h-screen bg-[#fbfcfd] font-sans text-[#1f1f1f] overflow-hidden selection:bg-[#24b47e]/20">
@@ -35,7 +35,7 @@ export default async function AccountsPage() {
                                 </div>
                                 <div>
                                     <h2 className="text-xl font-bold text-[#1f1f1f]">{userProfile?.full_name}</h2>
-                                    <p className="text-[13px] font-mono text-[#878787] mt-1">{userProfile?.email}</p>
+                                    <p className="text-[13px] font-mono text-[#878787] mt-1">{userProfile?.login_id || user.email}</p>
                                 </div>
                             </div>
                         </div>

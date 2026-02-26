@@ -28,14 +28,13 @@ export async function GET(req: Request) {
             systemInstruction: SYSTEM_INSTRUCTION
         });
 
-        // Generate content
-        const result = await model.generateContent("Create the daily briefing.");
+        const result = await model.generateContent('Create the daily briefing.')
         const responseText = result.response.text();
 
         return NextResponse.json({ reply: responseText });
 
-    } catch (error: any) {
-        console.error("AI Briefing API Error:", error);
-        return NextResponse.json({ error: error.message || "Something went wrong." }, { status: 500 });
+    } catch (error: unknown) {
+        const msg = error instanceof Error ? error.message : 'Something went wrong.'
+        return NextResponse.json({ error: msg }, { status: 500 })
     }
 }

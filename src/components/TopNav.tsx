@@ -1,40 +1,42 @@
 'use client'
 import { useState } from 'react'
-import { Bell, Sparkles } from 'lucide-react'
+import { Sparkles } from 'lucide-react'
 import { GlobalSearch } from './GlobalSearch'
-import { usePathname } from 'next/navigation'
 import AIChatSidebar from '@/components/ai/AIChatSidebar'
 
 export function TopNav({ title, role }: { title: string, role?: string }) {
     const [isAIChatOpen, setIsAIChatOpen] = useState(false)
-    const pathname = usePathname()
+
     return (
         <>
-            <header className="h-10 bg-[#fbfcfd] border-b border-gray-350 flex items-center justify-between px-4 sm:px-6 sticky top-0 z-40 shrink-0 w-full">
-                <div className="flex items-center gap-2 text-[13px] font-sans pl-1">
-                    <span className="font-medium text-[#1f1f1f]">KikanCloud</span>
-                    <span className="text-[#878787] ml-1">/</span>
-                    <span className="text-[#1f1f1f] font-bold">{title}</span>
+            <header className="h-12 bg-white border-b border-slate-200 flex items-center justify-between px-4 sm:px-5 sticky top-0 z-40 shrink-0 w-full">
+                {/* Left: breadcrumb (hidden on mobile) / page title (mobile) */}
+                <div className="flex items-center gap-2 min-w-0">
+                    {/* Desktop: KikanCloud / Title */}
+                    <div className="hidden sm:flex items-center gap-1.5 text-[13px] font-sans">
+                        <span className="font-medium text-slate-500">KikanCloud</span>
+                        <span className="text-slate-300">/</span>
+                        <span className="text-slate-800 font-bold">{title}</span>
+                    </div>
+                    {/* Mobile: just the title, prominent */}
+                    <span className="sm:hidden text-[15px] font-black text-slate-800 truncate">{title}</span>
                 </div>
 
-                <div className="flex items-center gap-4">
-                    <GlobalSearch />
-
-                    {pathname !== '/' && (
-                        <button
-                            onClick={() => setIsAIChatOpen(true)}
-                            className="relative cursor-pointer hover:bg-[#e8f5f0] p-1.5 rounded-md transition-colors border border-gray-350 bg-white"
-                            title="AIアシスタント"
-                        >
-                            <Sparkles size={16} className="text-[#24b47e]" />
-                        </button>
-                    )}
-
-                    <div className="relative cursor-pointer hover:bg-gray-50 p-1.5 rounded-md transition-colors border border-transparent">
-                        <Bell size={16} className="text-[#878787]" />
-                        <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-[#d93025] rounded-md border border-white"></span>
+                {/* Right: actions */}
+                <div className="flex items-center gap-2">
+                    {/* Search — hidden on small mobile, shown on sm+ */}
+                    <div className="hidden sm:block">
+                        <GlobalSearch />
                     </div>
 
+                    {/* AI chat button */}
+                    <button
+                        onClick={() => setIsAIChatOpen(true)}
+                        className="cursor-pointer p-2 rounded-xl transition-colors border border-slate-200 bg-white hover:bg-emerald-50 hover:border-emerald-200 active:scale-95"
+                        title="AIアシスタント"
+                    >
+                        <Sparkles size={16} className="text-[#24b47e]" />
+                    </button>
                 </div>
             </header>
 

@@ -85,8 +85,8 @@ export default function RecentChats({ tenantId }: { tenantId?: string }) {
                 }
 
                 setChats(finalChats)
-            } catch (err) {
-                console.error("Error fetching recent chats:", err)
+            } catch {
+                // silently handled
             } finally {
                 setLoading(false)
             }

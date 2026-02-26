@@ -75,8 +75,7 @@ export function QuickChatBot() {
             } else {
                 setMessages((prev) => [...prev, { role: "ai", content: "エラーが発生しました。もう一度お試しください。" }]);
             }
-        } catch (err) {
-            console.error(err);
+        } catch {
             setMessages((prev) => [...prev, { role: "ai", content: "通信エラーが発生しました。" }]);
         } finally {
             setIsLoading(false);

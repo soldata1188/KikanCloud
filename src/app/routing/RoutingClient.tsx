@@ -1,232 +1,621 @@
 'use client'
-import { useState, useTransition, useEffect } from 'react'
-import { APIProvider, Map, AdvancedMarker, useMap, useMapsLibrary, InfoWindow } from '@vis.gl/react-google-maps'
-import { Sparkles, MapPin, Building2, User, Loader2, Navigation, Clock, CheckCircle2, Coffee, CheckSquare, Square, Trash2 } from 'lucide-react'
-import { optimizeRouteWithAI } from '../actions/routeAi'
+import { useState, useCallback } from 'react'
+import { APIProvider, Map, AdvancedMarker, useMap, InfoWindow } from '@vis.gl/react-google-maps'
+import {
+    MapPin as MapPinIcon, Building2, User, Search, X,
+    ChevronDown, Filter, Navigation, Layers,
+    Eye, EyeOff, List, AlertTriangle, Loader2, RefreshCw
+} from 'lucide-react'
+import { useEffect } from 'react'
 
-// Directions Renderer Component
-function DirectionsRendererComponent({ itinerary, locations }: { itinerary: any[], locations: any[] }) {
- const map = useMap();
- const routesLibrary = useMapsLibrary('routes');
- const [directionsService, setDirectionsService] = useState<google.maps.DirectionsService>();
- const [directionsRenderer, setDirectionsRenderer] = useState<google.maps.DirectionsRenderer>();
+// ── Types ────────────────────────────────────────────────────────
+export type LocationType = 'company' | 'worker'
 
- useEffect(() => {
- if (!routesLibrary || !map) return;
- setDirectionsService(new routesLibrary.DirectionsService());
- const renderer = new routesLibrary.DirectionsRenderer({ map, suppressMarkers: true, polylineOptions: { strokeColor: '#24b47e', strokeWeight: 5, strokeOpacity: 0.8 } });
- setDirectionsRenderer(renderer);
- return () => renderer.setMap(null);
- }, [routesLibrary, map]);
-
- useEffect(() => {
- if (!directionsService || !directionsRenderer || itinerary.length < 2) return;
-
- // Filter valid stops present in locations (Ignore lunch breaks if ID does not map)
- const sortedLocs = itinerary.map(item => locations.find(l => l.id === item.id)).filter(Boolean);
- if (sortedLocs.length < 2) return;
-
- const origin = { lat: sortedLocs[0].latitude, lng: sortedLocs[0].longitude };
- const destination = { lat: sortedLocs[sortedLocs.length - 1].latitude, lng: sortedLocs[sortedLocs.length - 1].longitude };
-
- // Intermediate waypoints
- const waypoints = sortedLocs.slice(1, -1).map(loc => ({ location: { lat: loc.latitude, lng: loc.longitude }, stopover: true }));
-
- // Options for drawing routes with traffic (requires departureTime to be now or in the future)
- const drivingOptions = {
- departureTime: new Date(Date.now() + 1000 * 60 * 5), // 5 minutes later
- trafficModel: google.maps.TrafficModel.BEST_GUESS
- };
-
- directionsService.route({ origin, destination, waypoints, travelMode: google.maps.TravelMode.DRIVING, drivingOptions })
- .then(response => directionsRenderer.setDirections(response))
- .catch(e => console.error('Directions request failed', e));
- }, [directionsService, directionsRenderer, itinerary, locations]);
-
- return null;
+export interface RawLocation {
+    id: string
+    name: string
+    type: LocationType
+    address: string | null
+    latitude: number | null
+    longitude: number | null
+    companyId?: string
+    companyName?: string
+    badge?: string
 }
 
-export default function RoutingClient({ initialLocations, googleMapsKey }: { initialLocations: any[], googleMapsKey: string }) {
- const [selectedIds, setSelectedIds] = useState<string[]>(initialLocations.map(l => l.id)); // Default: select all
- const [aiData, setAiData] = useState<any>(null);
- const [isPending, startTransition] = useTransition();
- // Info window state
- const [activeMarkerId, setActiveMarkerId] = useState<string | null>(null);
+/** Only locations that have valid DB coordinates are renderable on map */
+interface MappableLocation extends RawLocation {
+    latitude: number
+    longitude: number
+}
 
- const handleOptimize = () => {
- const locsToVisit = initialLocations.filter(l => selectedIds.includes(l.id));
- if (locsToVisit.length < 2) return alert('ルートを作成するには、少なくとも2つの場所を選択してください。');
+interface FilterCompany { id: string; name: string }
 
- startTransition(async () => {
- const res = await optimizeRouteWithAI(locsToVisit);
- if (res.success && res.data) {
- setAiData(res.data);
- setActiveMarkerId(null); // Close Info window when drawing route
- }
- else alert('AI Error: ' + res.error);
- });
- };
+// ── Layer config ─────────────────────────────────────────────────
+const LAYER_CONFIG: Record<LocationType, {
+    label: string
+    labelJa: string
+    icon: React.ReactNode
+    color: string
+    bg: string
+    pinColor: string
+    ring: string
+    textColor: string
+    badgeBg: string
+    badgeText: string
+}> = {
+    company: {
+        label: 'Company',
+        labelJa: '受入企業',
+        icon: <Building2 size={13} />,
+        color: 'text-yellow-600',
+        bg: 'bg-yellow-50',
+        pinColor: '#ca8a04',
+        ring: 'ring-yellow-400',
+        textColor: 'text-yellow-700',
+        badgeBg: 'bg-yellow-100',
+        badgeText: 'text-yellow-700',
+    },
+    worker: {
+        label: 'Worker',
+        labelJa: '実習生',
+        icon: <User size={13} />,
+        color: 'text-orange-500',
+        bg: 'bg-orange-50',
+        pinColor: '#f97316',
+        ring: 'ring-orange-400',
+        textColor: 'text-orange-600',
+        badgeBg: 'bg-orange-100',
+        badgeText: 'text-orange-600',
+    },
+}
 
- const toggleSelection = (id: string) => {
- if (selectedIds.includes(id)) setSelectedIds(prev => prev.filter(i => i !== id));
- else setSelectedIds(prev => [...prev, id]);
- }
+// ── Separate mappable from unmapped ──────────────────────────────
+function partitionLocations(locs: RawLocation[]): {
+    mappable: MappableLocation[]
+    unmapped: RawLocation[]
+} {
+    const mappable: MappableLocation[] = []
+    const unmapped: RawLocation[] = []
+    for (const loc of locs) {
+        if (loc.latitude != null && loc.longitude != null && loc.latitude !== 0 && loc.longitude !== 0) {
+            mappable.push(loc as MappableLocation)
+        } else {
+            unmapped.push(loc)
+        }
+    }
+    return { mappable, unmapped }
+}
 
- const selectAll = () => setSelectedIds(initialLocations.map(l => l.id));
- const deselectAll = () => setSelectedIds([]);
+// ── Map panner ───────────────────────────────────────────────────
+function MapPanner({ center }: { center: { lat: number; lng: number } | null }) {
+    const map = useMap()
+    useEffect(() => {
+        if (map && center) {
+            map.panTo(center)
+            map.setZoom(15)
+        }
+    }, [map, center])
+    return null
+}
 
- const removeLocation = (id: string) => {
- setSelectedIds(prev => prev.filter(i => i !== id));
- setActiveMarkerId(null);
- };
+// ── Custom Map Pin ───────────────────────────────────────────────
+function LocationPin({ type, isActive, label }: { type: LocationType; isActive: boolean; label?: string }) {
+    const cfg = LAYER_CONFIG[type]
+    const bgColor = cfg.pinColor
+    return (
+        <div
+            className={`relative flex flex-col items-center transition-transform duration-150 ${isActive ? 'scale-125 z-50' : 'hover:scale-110'}`}
+            style={{ filter: isActive ? `drop-shadow(0 4px 6px ${bgColor}88)` : undefined }}
+        >
+            <div
+                className={`flex items-center justify-center rounded-full border-2 border-white text-white font-bold shadow-lg cursor-pointer
+                    ${type === 'company' ? 'w-6 h-6' : 'w-5 h-5'}`}
+                style={{ backgroundColor: bgColor }}
+            >
+                {type === 'company' ? <Building2 size={10} /> : <User size={9} />}
+            </div>
+            {/* Needle */}
+            <div
+                className="w-0 h-0"
+                style={{
+                    borderLeft: '4px solid transparent',
+                    borderRight: '4px solid transparent',
+                    borderTop: `6px solid ${bgColor}`,
+                    marginTop: '-1px',
+                }}
+            />
+            {/* Label bubble (only on active) */}
+            {isActive && label && (
+                <div
+                    className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 rounded-xl px-2.5 py-1 text-[11px] font-bold text-white whitespace-nowrap shadow-xl"
+                    style={{ backgroundColor: bgColor }}
+                >
+                    {label}
+                </div>
+            )}
+        </div>
+    )
+}
 
- if (!googleMapsKey) {
- return (
- <div className="h-full flex items-center justify-center bg-[#fbfcfd] p-6">
- <div className="text-center max-w-md bg-white p-8 rounded-md border border-[#ededed] relative overflow-hidden">
- <div className="absolute top-0 left-0 w-full h-1 bg-[#d93025]"></div>
- <MapPin size={48} className="mx-auto text-[#878787] mb-4"/>
- <h2 className="text-lg font-bold text-[#1f1f1f] mb-2">Google Maps Key Missing</h2>
- <p className="text-[13px] text-[#666666] leading-relaxed">Please add <code className="bg-[#fbfcfd] px-1.5 py-0.5 rounded text-[#d93025] border border-[#ededed]">NEXT_PUBLIC_GOOGLE_MAPS_API_KEY</code> to your .env.local file to enable the interactive map & AI Routing.</p>
- </div>
- </div>
- )
- }
+// ── Main component ───────────────────────────────────────────────
+export default function RoutingClient({ initialLocations, filterCompanies, googleMapsKey }: {
+    initialLocations: RawLocation[]
+    filterCompanies: FilterCompany[]
+    googleMapsKey: string
+}) {
+    // Partition ONCE at mount — no runtime geocoding
+    const { mappable, unmapped } = partitionLocations(initialLocations)
 
- // Center coordinates (Sakai, Osaka)
- const center = initialLocations[0] ? { lat: initialLocations[0].latitude, lng: initialLocations[0].longitude } : { lat: 34.5733, lng: 135.4814 };
+    // Layers visibility
+    const [visibleLayers, setVisibleLayers] = useState<Record<LocationType, boolean>>({
+        company: true, worker: true
+    })
 
- return (
- <div className="flex flex-col md:flex-row h-[calc(100vh-56px)] w-full overflow-hidden">
- {/* LEFT BLOCK: AI ROUTE PLANNER */}
- <div className="w-full md:w-[400px] bg-white border-r border-[#ededed] flex flex-col h-[50vh] md:h-full 4px_0_24px_rgba(0,0,0,0.02)] z-10 shrink-0">
- <div className="p-6 border-b border-[#ededed] bg-[#fbfcfd] shrink-0">
- <h2 className="text-[18px] font-black text-[#1f1f1f] flex items-center gap-2 tracking-tight mb-2"><Sparkles size={18} className="text-[#24b47e]"/> 巡回ルート最適化</h2>
- <p className="text-[12px] text-[#878787]">AIが訪問先を分析し、最も効率的な監査ルートとスケジュールを自動生成します。</p>
- </div>
+    // Filter state
+    const [companyFilter, setCompanyFilter] = useState('all')
+    const [searchQuery, setSearchQuery] = useState('')
 
- <div className="flex-1 overflow-y-auto p-6 space-y-6">
- {!aiData ? (
- <div className="animate-in fade-in duration-300 h-full flex flex-col">
- <div className="flex items-center justify-between mb-3 shrink-0">
- <h3 className="text-[11px] font-bold text-[#878787] uppercase tracking-widest flex items-center">
- 訪問先を選択
- <span className="text-[10px] bg-[#24b47e]/10 text-[#24b47e] px-2 py-0.5 rounded ml-2">{selectedIds.length} Selected</span>
- </h3>
- <div className="flex items-center gap-2">
- <button onClick={selectAll} className="text-[11px] font-bold text-[#878787] hover:text-[#24b47e] flex items-center gap-1 transition-colors"><CheckSquare size={12} /> 全て</button>
- <button onClick={deselectAll} className="text-[11px] font-bold text-[#878787] hover:text-red-500 flex items-center gap-1 transition-colors"><Square size={12} /> 解除</button>
- </div>
- </div>
- <div className="space-y-2 flex-1 overflow-y-auto pr-2 mb-4 custom-scrollbar">
- {initialLocations.map(loc => (
- <label key={loc.id} className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${selectedIds.includes(loc.id) ? 'bg-[#fbfcfd] border-[#24b47e]/50 ' : 'bg-white border-[#ededed] hover:border-[#878787]'}`}>
- <input type="checkbox"checked={selectedIds.includes(loc.id)} onChange={() => toggleSelection(loc.id)} className="mt-1 accent-[#24b47e]"/>
- <div>
- <div className="text-[13px] font-bold text-[#1f1f1f] flex items-center gap-1.5">
- {loc.type === 'company' || loc.type === 'office' ? <Building2 size={14} className="text-[#878787]"/> : <User size={14} className="text-[#878787]"/>} {loc.name}
- </div>
- <div className="text-[11px] text-[#878787] mt-0.5 truncate max-w-[240px]">{loc.address}</div>
- </div>
- </label>
- ))}
- </div>
+    // Map state
+    const [activeMarkerId, setActiveMarkerId] = useState<string | null>(null)
+    const [panTarget, setPanTarget] = useState<{ lat: number; lng: number } | null>(null)
+    const [isSidebarOpen, setIsSidebarOpen] = useState(true)
 
- <button onClick={handleOptimize} disabled={isPending || selectedIds.length < 2} className="w-full flex justify-center items-center gap-2 py-3 bg-[#1f1f1f] hover:bg-[#333] disabled:opacity-50 text-white rounded-md text-[13px] font-bold transition-all shrink-0">
- {isPending ? <Loader2 size={16} className="animate-spin"/> : <Navigation size={16} />} {isPending ? 'AIが計算中...' : '最適化スタート'}
- </button>
- </div>
- ) : (
- <div className="animate-in slide-in-from-right-4 duration-300">
- <div className="bg-[#e8f5e9] border border-[#24b47e]/20 rounded-md p-4 mb-6 relative overflow-hidden">
- <div className="absolute top-0 left-0 w-1 h-full bg-[#24b47e]"></div>
- <h4 className="text-[12px] font-bold text-[#1e8e3e] uppercase tracking-widest mb-1">AI INSIGHT</h4>
- <p className="text-[13px] text-[#1f1f1f] font-medium leading-relaxed">{aiData.summary}</p>
- <p className="text-[11px] text-[#878787] mt-2 font-mono">Total Time: {aiData.total_time}</p>
- </div>
+    // Backfill state
+    const [isBackfilling, setIsBackfilling] = useState(false)
+    const [backfillResult, setBackfillResult] = useState<string | null>(null)
 
- <h3 className="text-[11px] font-bold text-[#878787] uppercase tracking-widest mb-4 flex items-center gap-1.5"><Clock size={14} className="text-[#24b47e]"/> AI Schedule</h3>
- <div className="space-y-4 relative">
- <div className="absolute left-[7px] top-3 bottom-3 w-[2px] bg-[#ededed] -z-10"></div>
- {aiData.itinerary.map((step: any, idx: number) => (
- <div key={idx} className="relative pl-6">
- <div className="absolute left-0 top-1 w-4 h-4 rounded-md bg-white border-2 border-[#24b47e] flex items-center justify-center"><div className="w-1.5 h-1.5 rounded-md bg-[#24b47e]"></div></div>
- <div className={`bg-white border p-3 rounded-lg transition-colors ${step.type === 'break' ? 'border-orange-200 bg-orange-50/50' : 'border-[#ededed] hover:border-[#24b47e]'}`}>
- <div className="flex items-center justify-between mb-1">
- <span className="text-[13px] font-bold text-[#1f1f1f] flex items-center gap-1.5">
- {step.type === 'break' ? <Coffee size={14} className="text-orange-500"/> : null} {step.name}
- </span>
- <span className="text-[10px] font-mono font-bold text-[#878787] bg-[#fbfcfd] border border-[#ededed] px-1.5 py-0.5 rounded">{step.arrivalTime} - {step.departureTime}</span>
- </div>
- {step.notes && <p className="text-[11px] text-[#666666] leading-relaxed flex items-start gap-1 mt-2"><CheckCircle2 size={12} className="text-[#24b47e] shrink-0 mt-0.5"/> {step.notes}</p>}
- </div>
- </div>
- ))}
- </div>
+    const handleBackfill = async () => {
+        setIsBackfilling(true)
+        setBackfillResult(null)
+        try {
+            // Last 12 chars of the public anon key — simple shared secret for this internal route
+            const token = (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '').slice(-12)
+            const res = await fetch('/api/geocode-backfill', {
+                method: 'POST',
+                headers: { 'x-backfill-secret': token }
+            })
+            const json = await res.json()
+            if (!res.ok) throw new Error(json.error || 'エラー')
+            setBackfillResult(
+                `完了！企業 ${json.companies.updated}件・実習生 ${json.workers.updated}件の座標を登録しました。ページを再読み込み中...`
+            )
+            setTimeout(() => window.location.reload(), 1500)
+        } catch (e: unknown) {
+            setBackfillResult(`エラー: ${e instanceof Error ? e.message : '不明'}`)
+        } finally {
+            setIsBackfilling(false)
+        }
+    }
 
- <div className="mt-8 pt-4 border-t border-[#ededed]">
- <button onClick={() => setAiData(null)} className="w-full text-center text-[12px] font-bold text-red-500 hover:text-red-700 hover:bg-red-50 py-2 rounded-lg transition-colors flex items-center justify-center gap-2">
- <Trash2 size={14} /> AI結果をリセット
- </button>
- </div>
- </div>
- )}
- </div>
- </div>
+    const defaultCenter = mappable.length > 0
+        ? { lat: mappable[0].latitude, lng: mappable[0].longitude }
+        : { lat: 34.5733, lng: 135.4814 }
 
- {/* RIGHT BLOCK: GOOGLE MAPS & POLYLINE */}
- <div className="flex-1 h-[50vh] md:h-full relative bg-[#e5e3df]">
- <APIProvider apiKey={googleMapsKey}>
- <Map mapId="KIKANCLOUD_MAP"defaultCenter={center} defaultZoom={12} gestureHandling={'greedy'} disableDefaultUI={true} className="w-full h-full">
+    const flyTo = useCallback((loc: MappableLocation) => {
+        setPanTarget({ lat: loc.latitude, lng: loc.longitude })
+        setActiveMarkerId(loc.id)
+    }, [])
 
- {/* Draw Pins on the map */}
- {initialLocations.filter(l => selectedIds.includes(l.id)).map((loc, index) => {
- // Get display order from AI if available (skip breaks)
- const itinIndex = aiData ? aiData.itinerary.filter((i: any) => i.type !== 'break').findIndex((i: any) => i.id === loc.id) : index;
- const badgeNum = itinIndex !== -1 ? itinIndex + 1 : index + 1;
- const isCompany = loc.type === 'company' || loc.type === 'office';
- const isActive = activeMarkerId === loc.id;
+    const toggleLayer = (type: LocationType) => {
+        setVisibleLayers(prev => ({ ...prev, [type]: !prev[type] }))
+    }
 
- return (
- <AdvancedMarker key={loc.id} position={{ lat: loc.latitude, lng: loc.longitude }} onClick={() => setActiveMarkerId(loc.id)}>
- <div className={`relative flex items-center justify-center w-8 h-8 rounded-md border-2 border-white text-white font-bold text-xs cursor-pointer transform hover:scale-110 transition-transform ${isCompany ? 'bg-[#1f1f1f]' : 'bg-[#24b47e]'} ${isActive ? 'ring-4 ring-[#24b47e]/30 scale-110' : ''}`}>
- {badgeNum}
- <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 rotate-45 border-r-2 border-b-2 border-white"style={{ backgroundColor: isCompany ? '#1f1f1f' : '#24b47e' }}></div>
- </div>
- </AdvancedMarker>
- )
- })}
+    // ── Filter helpers ───────────────────────────────────────────
+    const applyFilters = (locs: RawLocation[]) => locs.filter(loc => {
+        if (!visibleLayers[loc.type]) return false
+        if (companyFilter !== 'all') {
+            if (loc.type === 'company' && loc.id !== companyFilter) return false
+            if (loc.type === 'worker' && loc.companyId !== companyFilter) return false
+        }
+        if (searchQuery.trim()) {
+            const q = searchQuery.toLowerCase()
+            if (!loc.name.toLowerCase().includes(q) && !(loc.address ?? '').toLowerCase().includes(q)) return false
+        }
+        return true
+    })
 
- {/* Info Window */}
- {activeMarkerId && (() => {
- const loc = initialLocations.find(l => l.id === activeMarkerId);
- if (!loc) return null;
- const isCompany = loc.type === 'company' || loc.type === 'office';
- return (
- <InfoWindow position={{ lat: loc.latitude, lng: loc.longitude }} onCloseClick={() => setActiveMarkerId(null)} headerDisabled>
- <div className="p-1 min-w-[200px]">
- <div className="flex items-center gap-2 mb-2 pb-2 border-b border-[#ededed]">
- {isCompany ? <Building2 size={16} className="text-[#1f1f1f]"/> : <User size={16} className="text-[#24b47e]"/>}
- <h3 className="font-bold text-[13px] text-[#1f1f1f]">{loc.name}</h3>
- </div>
- <p className="text-[11px] text-[#666666] mb-3 leading-relaxed">{loc.address}</p>
- <button onClick={() => removeLocation(loc.id)} className="w-full py-1.5 text-[11px] font-bold text-red-500 bg-red-50 hover:bg-red-100 rounded transition-colors flex items-center justify-center gap-1.5">
- <Trash2 size={12} /> ルートから外す
- </button>
- </div>
- </InfoWindow>
- );
- })()}
+    const filteredMappable = applyFilters(mappable) as MappableLocation[]
+    const filteredUnmapped = applyFilters(unmapped)
 
- {/* When AI returns a route, call Directions API to draw Polyline */}
- {aiData && <DirectionsRendererComponent itinerary={aiData.itinerary.filter((i: any) => i.type !== 'break')} locations={initialLocations} />}
- </Map>
- </APIProvider>
+    // Counts (all, not just filtered)
+    const counts = {
+        company: initialLocations.filter(l => l.type === 'company').length,
+        worker: initialLocations.filter(l => l.type === 'worker').length,
+    }
+    const unmappedCount = unmapped.length
 
- <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm border border-[#ededed] px-3 py-1.5 rounded-md pointer-events-none">
- <p className="text-[10px] font-bold text-[#878787] uppercase tracking-widest flex items-center gap-1.5"><Navigation size={12} className="text-[#4285F4]"/> Powered by Google Maps</p>
- </div>
- </div>
- </div>
-)
+    if (!googleMapsKey) {
+        return (
+            <div className="h-full flex items-center justify-center bg-slate-50 p-6">
+                <div className="text-center max-w-md bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
+                    <MapPinIcon size={40} className="mx-auto text-slate-300 mb-4" />
+                    <h2 className="text-base font-bold text-slate-800 mb-2">Google Maps Key Missing</h2>
+                    <p className="text-[13px] text-slate-500">
+                        <code className="bg-slate-50 px-1.5 py-0.5 rounded text-red-500 border border-slate-200 text-[11px]">NEXT_PUBLIC_GOOGLE_MAPS_API_KEY</code> を .env.local に追加してください。
+                    </p>
+                </div>
+            </div>
+        )
+    }
+
+    return (
+        <APIProvider apiKey={googleMapsKey}>
+            {/* ── Full layout ── */}
+            <div className="flex h-[calc(100vh-56px)] w-full overflow-hidden relative">
+
+                {/* ══════════════ SIDEBAR ══════════════ */}
+                <div className={`
+                    flex flex-col bg-white border-r border-slate-200 h-full z-20 shadow-lg
+                    transition-all duration-300 ease-in-out shrink-0
+                    ${isSidebarOpen ? 'w-[340px]' : 'w-0 overflow-hidden border-r-0'}
+                `}>
+                    {/* Sidebar header */}
+                    <div className="px-4 pt-4 pb-3 border-b border-slate-100 shrink-0">
+                        <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-2">
+                                <div className="w-7 h-7 rounded-lg bg-slate-800 flex items-center justify-center">
+                                    <Layers size={13} className="text-white" />
+                                </div>
+                                <div>
+                                    <h2 className="text-[13px] font-black text-slate-800 tracking-tight">位置情報マップ</h2>
+                                    <p className="text-[10px] text-slate-400 leading-none mt-0.5">Location Overview</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Layer toggles */}
+                        <div className="flex gap-1.5 flex-wrap">
+                            {(Object.keys(LAYER_CONFIG) as LocationType[]).map(type => {
+                                const cfg = LAYER_CONFIG[type]
+                                const on = visibleLayers[type]
+                                return (
+                                    <button
+                                        key={type}
+                                        onClick={() => toggleLayer(type)}
+                                        className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[11px] font-bold transition-all
+                                            ${on ? `${cfg.badgeBg} ${cfg.badgeText} border-transparent` : 'bg-white text-slate-400 border-slate-200 opacity-60'}`}
+                                    >
+                                        {cfg.icon}
+                                        {cfg.labelJa}
+                                        <span className={`text-[9px] font-black px-1.5 py-0.5 rounded-md ${on ? 'bg-white/60' : 'bg-slate-100'}`}>
+                                            {counts[type]}
+                                        </span>
+                                    </button>
+                                )
+                            })}
+                        </div>
+                    </div>
+
+                    {/* Search + filter */}
+                    <div className="px-3 py-2.5 border-b border-slate-100 space-y-2 shrink-0">
+                        <div className="relative">
+                            <Search size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                            <input
+                                type="text"
+                                placeholder="名前・住所で検索..."
+                                value={searchQuery}
+                                onChange={e => setSearchQuery(e.target.value)}
+                                className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-7 pr-7 py-2 text-[12px] outline-none focus:border-slate-400 focus:bg-white transition-all"
+                            />
+                            {searchQuery && (
+                                <button onClick={() => setSearchQuery('')} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-300 hover:text-slate-500">
+                                    <X size={12} />
+                                </button>
+                            )}
+                        </div>
+
+                        {/* Company filter */}
+                        <div className="relative">
+                            <Filter size={11} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                            <select
+                                value={companyFilter}
+                                onChange={e => setCompanyFilter(e.target.value)}
+                                className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-7 pr-7 py-2 text-[12px] font-medium text-slate-700 outline-none appearance-none cursor-pointer focus:border-slate-400 focus:bg-white transition-all"
+                            >
+                                <option value="all">🏭 全ての受入企業</option>
+                                <optgroup label="受入企業で絞り込む">
+                                    {filterCompanies.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                                </optgroup>
+                            </select>
+                            <ChevronDown size={11} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                        </div>
+
+                        {/* Result count */}
+                        <div className="flex items-center justify-between">
+                            <span className="text-[10px] text-slate-400">
+                                <span className="font-bold text-slate-600">{filteredMappable.length}</span> 件表示中
+                                {unmappedCount > 0 && (
+                                    <span className="ml-2 text-amber-500 font-bold">({unmappedCount} 件 座標未登録)</span>
+                                )}
+                            </span>
+                            {(searchQuery || companyFilter !== 'all') && (
+                                <button
+                                    onClick={() => { setSearchQuery(''); setCompanyFilter('all') }}
+                                    className="text-[10px] font-bold text-slate-400 hover:text-slate-600 flex items-center gap-0.5"
+                                >
+                                    <X size={9} /> クリア
+                                </button>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* ── Backfill banner: shown when any location has no coords ── */}
+                    {unmappedCount > 0 && (
+                        <div className="mx-3 my-2 p-3 bg-amber-50 border border-amber-200 rounded-xl shrink-0">
+                            <div className="flex items-start gap-2 mb-2">
+                                <AlertTriangle size={14} className="text-amber-500 shrink-0 mt-0.5" />
+                                <div>
+                                    <p className="text-[11px] font-black text-amber-700">
+                                        {unmappedCount} 件が地図に未表示
+                                    </p>
+                                    <p className="text-[10px] text-amber-600 mt-0.5 leading-snug">
+                                        座標が未登録のため、マップに表示されていません。下のボタンで一括登録できます。
+                                    </p>
+                                </div>
+                            </div>
+                            {backfillResult ? (
+                                <p className={`text-[10px] font-bold px-2 py-1.5 rounded-lg ${backfillResult.startsWith('エラー') ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-700'}`}>
+                                    {backfillResult}
+                                </p>
+                            ) : (
+                                <button
+                                    onClick={handleBackfill}
+                                    disabled={isBackfilling}
+                                    className="w-full flex items-center justify-center gap-1.5 py-2 bg-amber-500 hover:bg-amber-600 disabled:opacity-60 disabled:cursor-not-allowed text-white text-[11px] font-black rounded-lg transition-colors"
+                                >
+                                    {isBackfilling ? (
+                                        <><Loader2 size={11} className="animate-spin" /> 座標を取得中...</>
+                                    ) : (
+                                        <><RefreshCw size={11} /> 座標を一括登録（1回のみ）</>
+                                    )}
+                                </button>
+                            )}
+                        </div>
+                    )}
+
+                    {/* List */}
+                    <div className="flex-1 overflow-y-auto py-2 space-y-0.5 px-2" style={{ scrollbarWidth: 'thin' }}>
+                        {filteredMappable.length === 0 && filteredUnmapped.length === 0 && (
+                            <div className="flex flex-col items-center justify-center h-32 text-slate-300">
+                                <Search size={24} className="mb-2" />
+                                <p className="text-[11px]">該当する場所がありません</p>
+                            </div>
+                        )}
+
+                        {/* Group mappable by type */}
+                        {(Object.keys(LAYER_CONFIG) as LocationType[]).map(type => {
+                            if (!visibleLayers[type]) return null
+                            const group = filteredMappable.filter(l => l.type === type)
+                            if (group.length === 0) return null
+                            const cfg = LAYER_CONFIG[type]
+                            return (
+                                <div key={type}>
+                                    <div className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg mx-0.5 mb-0.5 ${cfg.badgeBg}`}>
+                                        <span className={cfg.badgeText}>{cfg.icon}</span>
+                                        <span className={`text-[10px] font-black uppercase tracking-wider ${cfg.badgeText}`}>{cfg.labelJa}</span>
+                                        <span className={`ml-auto text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-white/70 ${cfg.textColor}`}>{group.length}</span>
+                                    </div>
+                                    {group.map(loc => {
+                                        const isActive = activeMarkerId === loc.id
+                                        return (
+                                            <button
+                                                key={loc.id}
+                                                className={`w-full text-left flex items-start gap-2.5 px-3 py-2.5 rounded-xl transition-all duration-150 group mb-0.5
+                                                    ${isActive
+                                                        ? `${cfg.badgeBg} ring-1 ${cfg.ring}`
+                                                        : 'hover:bg-slate-50 cursor-pointer'
+                                                    }`}
+                                                onClick={() => flyTo(loc)}
+                                            >
+                                                <div className={`w-7 h-7 rounded-lg shrink-0 flex items-center justify-center mt-0.5
+                                                    ${isActive ? cfg.badgeBg : 'bg-slate-100 group-hover:' + cfg.bg}`}
+                                                    style={{ color: cfg.pinColor }}
+                                                >
+                                                    {cfg.icon}
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <div className={`text-[12px] font-bold truncate ${isActive ? cfg.textColor : 'text-slate-800'}`}>
+                                                        {loc.name}
+                                                        {loc.badge && (
+                                                            <span className={`ml-1.5 text-[9px] font-black px-1.5 py-0.5 rounded-md
+                                                                ${loc.badge === '対応中'
+                                                                    ? 'bg-amber-100 text-amber-600'
+                                                                    : 'bg-emerald-100 text-emerald-600'}`}>
+                                                                {loc.badge}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    <div className="text-[10px] text-slate-400 truncate mt-0.5 leading-snug">
+                                                        {loc.address || '住所なし'}
+                                                    </div>
+                                                    {loc.companyName && loc.type === 'worker' && (
+                                                        <div className={`text-[9px] font-bold mt-0.5 ${isActive ? cfg.textColor : 'text-slate-300'}`}>
+                                                            {loc.companyName}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <Navigation
+                                                    size={12}
+                                                    className={`shrink-0 mt-1 opacity-0 group-hover:opacity-100 transition-opacity ${cfg.color}`}
+                                                />
+                                            </button>
+                                        )
+                                    })}
+                                    <div className="h-2" />
+                                </div>
+                            )
+                        })}
+
+                        {/* Unmapped section — shown but not clickable on map */}
+                        {filteredUnmapped.length > 0 && (
+                            <div>
+                                <div className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg mx-0.5 mb-0.5 bg-amber-50">
+                                    <AlertTriangle size={11} className="text-amber-500" />
+                                    <span className="text-[10px] font-black uppercase tracking-wider text-amber-600">座標未登録</span>
+                                    <span className="ml-auto text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-white/70 text-amber-600">{filteredUnmapped.length}</span>
+                                </div>
+                                {filteredUnmapped.map(loc => {
+                                    const cfg = LAYER_CONFIG[loc.type]
+                                    return (
+                                        <div
+                                            key={loc.id}
+                                            className="w-full text-left flex items-start gap-2.5 px-3 py-2.5 rounded-xl opacity-50 mb-0.5"
+                                            title="企業フォームで住所を保存すると座標が自動登録されます"
+                                        >
+                                            <div className="w-7 h-7 rounded-lg shrink-0 flex items-center justify-center mt-0.5 bg-amber-50"
+                                                style={{ color: cfg.pinColor }}
+                                            >
+                                                {cfg.icon}
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <div className="text-[12px] font-bold truncate text-slate-600">{loc.name}</div>
+                                                <div className="text-[10px] text-slate-400 truncate mt-0.5">{loc.address || '住所なし'}</div>
+                                                <div className="text-[9px] font-bold text-amber-500 mt-0.5 flex items-center gap-1">
+                                                    <AlertTriangle size={8} /> 地図未表示（座標未登録）
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )
+                                })}
+                                <div className="h-2" />
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                {/* ══════════════ MAP ══════════════ */}
+                <div className="flex-1 h-full relative bg-slate-200">
+                    <Map
+                        mapId="KIKANCLOUD_MAP"
+                        defaultCenter={defaultCenter}
+                        defaultZoom={10}
+                        gestureHandling="greedy"
+                        disableDefaultUI={false}
+                        mapTypeControl={false}
+                        streetViewControl={false}
+                        fullscreenControl={false}
+                        zoomControl={true}
+                        className="w-full h-full"
+                    >
+                        <MapPanner center={panTarget} />
+
+                        {/* Markers — ONLY pre-stored coordinates from DB */}
+                        {filteredMappable
+                            .filter(l => visibleLayers[l.type])
+                            .map(loc => (
+                                <AdvancedMarker
+                                    key={loc.id}
+                                    position={{ lat: loc.latitude, lng: loc.longitude }}
+                                    onClick={() => {
+                                        setActiveMarkerId(loc.id)
+                                        setPanTarget({ lat: loc.latitude, lng: loc.longitude })
+                                    }}
+                                    zIndex={loc.type === 'company' ? 20 : 10}
+                                >
+                                    <LocationPin
+                                        type={loc.type}
+                                        isActive={activeMarkerId === loc.id}
+                                        label={loc.name}
+                                    />
+                                </AdvancedMarker>
+                            ))}
+
+                        {/* Info window */}
+                        {activeMarkerId && (() => {
+                            const loc = filteredMappable.find(l => l.id === activeMarkerId)
+                            if (!loc) return null
+                            const cfg = LAYER_CONFIG[loc.type]
+                            return (
+                                <InfoWindow
+                                    position={{ lat: loc.latitude, lng: loc.longitude }}
+                                    onCloseClick={() => { setActiveMarkerId(null); setPanTarget(null) }}
+                                    headerDisabled
+                                >
+                                    <div className="p-2.5 min-w-[220px] max-w-[280px]">
+                                        <div className="flex items-center gap-2 mb-2 pb-2 border-b border-slate-100">
+                                            <div
+                                                className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
+                                                style={{ backgroundColor: cfg.pinColor + '20', color: cfg.pinColor }}
+                                            >
+                                                {cfg.icon}
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <div className={`text-[11px] font-black uppercase tracking-wider ${cfg.textColor}`}>{cfg.labelJa}</div>
+                                                <h3 className="font-bold text-[13px] text-slate-800 leading-tight truncate">{loc.name}</h3>
+                                            </div>
+                                        </div>
+                                        {loc.companyName && loc.type === 'worker' && (
+                                            <p className="text-[10px] font-bold text-slate-400 mb-1 flex items-center gap-1">
+                                                <Building2 size={9} /> {loc.companyName}
+                                            </p>
+                                        )}
+                                        <p className="text-[11px] text-slate-500 leading-relaxed flex items-start gap-1.5">
+                                            <MapPinIcon size={11} className="shrink-0 mt-0.5 text-slate-400" />
+                                            {loc.address || '住所なし'}
+                                        </p>
+                                        <a
+                                            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(loc.address || loc.name)}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="mt-2.5 w-full flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-[11px] font-bold text-white transition-colors"
+                                            style={{ backgroundColor: cfg.pinColor }}
+                                        >
+                                            <Navigation size={11} /> Googleマップで開く
+                                        </a>
+                                    </div>
+                                </InfoWindow>
+                            )
+                        })()}
+                    </Map>
+
+                    {/* ── Sidebar toggle button ── */}
+                    <button
+                        onClick={() => setIsSidebarOpen(v => !v)}
+                        className="absolute top-3 left-3 z-30 w-9 h-9 bg-white rounded-xl shadow-md border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50 transition-all"
+                        title={isSidebarOpen ? 'サイドバーを隠す' : 'サイドバーを表示'}
+                    >
+                        <List size={16} />
+                    </button>
+
+                    {/* Legend */}
+                    <div className="absolute bottom-6 left-3 z-20 bg-white/95 backdrop-blur-sm shadow-md border border-slate-200 rounded-2xl px-3.5 py-3 flex flex-col gap-2">
+                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5">凡例</p>
+                        {(Object.keys(LAYER_CONFIG) as LocationType[]).map(type => {
+                            const cfg = LAYER_CONFIG[type]
+                            const on = visibleLayers[type]
+                            return (
+                                <button
+                                    key={type}
+                                    onClick={() => toggleLayer(type)}
+                                    className={`flex items-center gap-2 text-[11px] font-bold transition-opacity ${on ? '' : 'opacity-40'}`}
+                                >
+                                    <div
+                                        className="w-3 h-3 rounded-full border-2 border-white shadow-sm"
+                                        style={{ backgroundColor: cfg.pinColor }}
+                                    />
+                                    <span className="text-slate-600">{cfg.labelJa}</span>
+                                    <span className="ml-auto text-[9px] text-slate-400 font-bold pl-2">{counts[type]}</span>
+                                    <span className="text-slate-300">{on ? <Eye size={10} /> : <EyeOff size={10} />}</span>
+                                </button>
+                            )
+                        })}
+                        {unmappedCount > 0 && (
+                            <div className="flex items-center gap-1.5 pt-1.5 border-t border-slate-100">
+                                <AlertTriangle size={10} className="text-amber-400" />
+                                <span className="text-[9px] text-amber-500 font-bold">{unmappedCount} 件 座標未登録</span>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Powered by */}
+                    <div className="absolute bottom-6 right-3 z-20 bg-white/90 backdrop-blur-sm border border-slate-200 px-3 py-1.5 rounded-xl pointer-events-none shadow-sm">
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+                            <Navigation size={11} className="text-blue-500" /> Powered by Google Maps
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </APIProvider>
+    )
 }

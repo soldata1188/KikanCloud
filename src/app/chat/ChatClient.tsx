@@ -76,8 +76,7 @@ export default function ChatClient() {
                 } else {
                     createNewSession()
                 }
-            } catch (error) {
-                console.error("Error parsing chat history", error)
+            } catch {
                 createNewSession()
             }
         } else {
@@ -157,8 +156,7 @@ export default function ChatClient() {
                     return s
                 })
             )
-        } catch (error) {
-            console.error('Chat error:', error)
+        } catch {
             setSessions(prev =>
                 prev.map(s => {
                     if (s.id === currentSessionId) {

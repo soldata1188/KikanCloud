@@ -211,9 +211,9 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
                     setTimeout(() => setHighlightedFields([]), 2000);
                 }
             };
-        } catch (e: any) {
-            console.error(e);
-            alert(`AIスキャンに失敗いたしました: ${e.message}`);
+        } catch (e: unknown) {
+            const msg = e instanceof Error ? e.message : 'AIスキャンエラー'
+            alert(`AIスキャンに失敗いたしました: ${msg}`);
         } finally {
             setIsScanning(null);
         }
@@ -246,10 +246,10 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
                 throw new Error(result.error || "保存システムエラーが発生いたしました。");
             }
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } catch (error: any) {
-            console.error(error);
-            setToastError(`保存に失敗いたしました: ${error.message}`);
-            setTimeout(() => setToastError(null), 5000); // clear after 5s
+        } catch (error: unknown) {
+            const msg = error instanceof Error ? error.message : '保存システムエラーが発生いたしました。'
+            setToastError(`保存に失敗いたしました: ${msg}`);
+            setTimeout(() => setToastError(null), 5000);
         } finally {
             setIsSubmitting(false);
         }

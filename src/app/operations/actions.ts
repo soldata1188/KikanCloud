@@ -6,52 +6,27 @@ import { revalidatePath } from 'next/cache'
 export async function getOperationsData() {
     const supabase = await createClient()
 
-    // Get user information to check permissions / tenant
     const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
-        throw new Error('未認証のユーザーです。(Unauthorized)')
-    }
+    if (!user) throw new Error('未認証のユーザーです。(Unauthorized)')
 
     const { data: userData } = await supabase.from('users').select('role, tenant_id, company_id').eq('id', user.id).single()
-    if (!userData?.tenant_id) {
-        throw new Error('テナントIDが見つかりません。(Tenant ID not found)')
-    }
+    if (!userData?.tenant_id) throw new Error('テナントIDが見つかりません。(Tenant ID not found)')
 
-    // Basic query statement
-    const query = supabase
+    const { data: workers, error } = await supabase
         .from('workers')
-        .select(`
-            *,
-            companies (
-                name_jp
-            ),
-            visas (
-                visa_type,
-                expiration_date
-            )
-        `)
+        .select(`*, companies(name_jp), visas(visa_type, expiration_date)`)
         .eq('is_deleted', false)
         .order('expiration_date', { foreignTable: 'visas', ascending: false })
         .order('created_at', { ascending: false })
 
-    // RLS will automatically handle filtering by tenant_id and user_role according to migration 00023.
-    // Execute query
-    const { data: workers, error } = await query
+    if (error) throw new Error('データの取得に失敗しました。(Failed to fetch data)')
 
-    if (error) {
-        console.error('Error fetching operations data:', error)
-        throw new Error('データの取得に失敗しました。(Failed to fetch data)')
-    }
+    const { data: companies } = await supabase
+        .from('companies')
+        .select('id, name_jp')
+        .eq('is_deleted', false)
+        .order('name_jp')
 
-    // If companies need a list for dropdown during new creation:
-    const companiesQuery = supabase.from('companies').select('id, name_jp').eq('is_deleted', false).order('name_jp')
-    const { data: companies, error: companiesError } = await companiesQuery
-
-    if (companiesError) {
-        console.error('Error fetching companies:', companiesError)
-    }
-
-    // Separate queries for Tabs Data
     const [{ data: visas }, { data: exams }, { data: transfers }] = await Promise.all([
         supabase.from('visas').select('*, worker:worker_id(full_name_romaji, system_type, companies(name_jp))').eq('is_deleted', false).order('expiration_date', { ascending: true }),
         supabase.from('exams').select('*, worker:worker_id(full_name_romaji, companies(name_jp))').eq('is_deleted', false).order('deadline_date', { ascending: true }),
@@ -80,26 +55,21 @@ export async function addWorker(formData: FormData) {
 
     if (!fullNameRomaji) throw new Error('名前を入力してください。(Name is required)')
 
-    const newWorker = {
-        tenant_id: userData.tenant_id,
-        company_id: companyId ? companyId : null,
-        full_name_romaji: fullNameRomaji,
-        full_name_kana: '', // Indicates intention, will be filled later
-        dob: '2000-01-01', // Dummy data, UI input required later
-        system_type: 'ikusei_shuro', // Default
-        status: 'waiting', // Default is 入国待ち (waiting for entry)
-    }
-
     const { data, error } = await supabase
         .from('workers')
-        .insert(newWorker)
+        .insert({
+            tenant_id: userData.tenant_id,
+            company_id: companyId || null,
+            full_name_romaji: fullNameRomaji,
+            full_name_kana: '',
+            dob: '2000-01-01',
+            system_type: 'ikusei_shuro',
+            status: 'waiting',
+        })
         .select()
         .single()
 
-    if (error) {
-        console.error('Error adding worker:', error)
-        throw new Error('追加に失敗しました。(Failed to add worker): ' + error.message)
-    }
+    if (error) throw new Error('追加に失敗しました。(Failed to add worker): ' + error.message)
 
     revalidatePath('/operations')
     return { success: true, data }
@@ -108,15 +78,7 @@ export async function addWorker(formData: FormData) {
 export async function updateWorkerStatus(workerId: string, column: string, value: string) {
     const supabase = await createClient()
 
-    // Map column from UI to Database (depending on schema)
-    // Currently, the workers schema has a 'status' column ('waiting', 'working', 'missing', 'returned')
-    // If columns like kenteiStatus, etc., are not in the DB, they must be created or JSON used; here, we temporarily map
-    // to a basic struct. If the DB does not yet support kentei_status, kikou_status... we update the main status first.
-
-    // Convert Japanese status to ENUM if updating the `status` column
-    const dbColumn = column;
-    let dbValue = value;
-
+    let dbValue = value
     if (column === 'status') {
         const statusMap: Record<string, string> = {
             '入国待ち': 'waiting',
@@ -124,46 +86,28 @@ export async function updateWorkerStatus(workerId: string, column: string, value
             '就業中': 'working',
             '失踪': 'missing',
             '帰国': 'returned'
-        };
-        dbValue = statusMap[value] || value; // Fallback
+        }
+        dbValue = statusMap[value] ?? value
     }
 
-    const updates: any = {
-        updated_at: new Date().toISOString()
-    }
-    updates[dbColumn] = dbValue;
+    const updates: Record<string, unknown> = { updated_at: new Date().toISOString() }
+    updates[column] = dbValue
 
-    const { error } = await supabase
-        .from('workers')
-        .update(updates)
-        .eq('id', workerId)
-
-    if (error) {
-        console.error('Error updating worker status:', error)
-        throw new Error('更新に失敗しました。(Failed to update status): ' + error.message)
-    }
+    const { error } = await supabase.from('workers').update(updates).eq('id', workerId)
+    if (error) throw new Error('更新に失敗しました。(Failed to update status): ' + error.message)
 
     revalidatePath('/operations')
     return { success: true }
 }
 
-export async function updateOperationData(workerId: string, column: 'kentei_status' | 'kikou_status' | 'nyukan_status', data: any) {
+export async function updateOperationData(workerId: string, column: 'kentei_status' | 'kikou_status' | 'nyukan_status', data: unknown) {
     const supabase = await createClient()
 
-    const updates: any = {
-        updated_at: new Date().toISOString()
-    }
-    updates[column] = data; // Overwrite the JSON object entirely
+    const updates: Record<string, unknown> = { updated_at: new Date().toISOString() }
+    updates[column] = data
 
-    const { error } = await supabase
-        .from('workers')
-        .update(updates)
-        .eq('id', workerId)
-
-    if (error) {
-        console.error('Error updating operation data:', error)
-        throw new Error('更新に失敗しました。(Failed to update operation): ' + error.message)
-    }
+    const { error } = await supabase.from('workers').update(updates).eq('id', workerId)
+    if (error) throw new Error('更新に失敗しました。(Failed to update operation): ' + error.message)
 
     revalidatePath('/operations')
     return { success: true }

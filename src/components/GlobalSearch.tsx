@@ -3,8 +3,10 @@ import { useState, useEffect, useTransition, useRef } from 'react'
 import { Search, Users, Building2, Loader2, X, ArrowRight } from 'lucide-react'
 import { globalSearch } from '@/app/actions/search'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 
 export function GlobalSearch() {
+    const pathname = usePathname()
     const [isOpen, setIsOpen] = useState(false)
     const [query, setQuery] = useState('')
     const [results, setResults] = useState<{ workers: any[], companies: any[] }>({ workers: [], companies: [] })
@@ -40,9 +42,9 @@ export function GlobalSearch() {
         <>
             <div onClick={() => setIsOpen(true)} className="relative hidden md:block group cursor-pointer">
                 <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#878787] group-hover:text-[#24b47e] transition-colors" size={14} />
-                <div className="h-[30px] w-52 bg-[#fbfcfd] border border-[#ededed] rounded-md pl-8 pr-12 text-xs flex items-center text-[#a0a0a0] group-hover:border-[#24b47e] transition-all">検索...</div>
+                <div className="h-[30px] w-52 bg-[#fbfcfd] border border-slate-200 rounded-md pl-8 pr-12 text-xs flex items-center text-[#a0a0a0] group-hover:border-[#24b47e] transition-all">検索...</div>
                 <div className="absolute right-1.5 top-1/2 -translate-y-1/2 flex items-center gap-0.5 text-[#878787] text-[10px] font-mono">
-                    <span className="border border-[#ededed] bg-white rounded px-1 group-hover:border-[#24b47e]/50">⌘</span><span className="border border-[#ededed] bg-white rounded px-1 group-hover:border-[#24b47e]/50">K</span>
+                    <span className="border border-slate-200 bg-white rounded px-1 group-hover:border-[#24b47e]/50">⌘</span><span className="border border-slate-200 bg-white rounded px-1 group-hover:border-[#24b47e]/50">K</span>
                 </div>
             </div>
 
@@ -69,7 +71,7 @@ export function GlobalSearch() {
                                         <div>
                                             <div className="px-3 py-1.5 text-[10px] font-bold text-[#878787] uppercase tracking-widest flex items-center gap-1.5"><Users size={12} /> 実習生 ({results.workers.length})</div>
                                             {results.workers.map(w => (
-                                                <Link key={w.id} href={`/workers/${w.id}`} onClick={() => setIsOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white hover: border border-gray-350 hover:border-[#ededed] group transition-all">
+                                                <Link key={w.id} href={`/workers/${w.id}`} onClick={() => setIsOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-lg group transition-all">
                                                     <div className="flex-1"><div className="text-[13px] font-bold text-[#1f1f1f] group-hover:text-[#24b47e] transition-colors">{w.full_name_romaji}</div><div className="text-[11px] text-[#878787] font-mono mt-0.5">{w.residence_card_number || 'N/A'}</div></div>
                                                     <ArrowRight size={14} className="text-[#878787] opacity-0 group-hover:opacity-100 group-hover:text-[#24b47e] transition-all -translate-x-2 group-hover:translate-x-0" />
                                                 </Link>
@@ -80,7 +82,7 @@ export function GlobalSearch() {
                                         <div>
                                             <div className="px-3 py-1.5 text-[10px] font-bold text-[#878787] uppercase tracking-widest flex items-center gap-1.5"><Building2 size={12} /> 受入企業 ({results.companies.length})</div>
                                             {results.companies.map(c => (
-                                                <Link key={c.id} href={`/companies/${c.id}`} onClick={() => setIsOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white hover: border border-gray-350 hover:border-[#ededed] group transition-all">
+                                                <Link key={c.id} href={`/companies/${c.id}`} onClick={() => setIsOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-lg group transition-all">
                                                     <div className="flex-1"><div className="text-[13px] font-bold text-[#1f1f1f] group-hover:text-[#24b47e] transition-colors">{c.name_jp}</div></div>
                                                     <ArrowRight size={14} className="text-[#878787] opacity-0 group-hover:opacity-100 group-hover:text-[#24b47e] transition-all -translate-x-2 group-hover:translate-x-0" />
                                                 </Link>

@@ -70,19 +70,18 @@ export async function globalOmniSearch(query: string): Promise<SearchResult[]> {
     // Search Chat Users (for direct messaging contacts)
     const { data: users } = await supabase
         .from('users')
-        .select('id, full_name, email, role')
+        .select('id, full_name, login_id, role')
         .eq('tenant_id', tenantId)
-        .or(`full_name.ilike.${searchPattern},email.ilike.${searchPattern}`)
+        .or(`full_name.ilike.${searchPattern},login_id.ilike.${searchPattern}`)
         .limit(5);
 
     if (users) {
         users.forEach(u => {
-            // Avoid adding self
-            if (u.id !== user.id) {
+            if (!results.find(r => r.id === u.id)) {
                 results.push({
                     id: u.id,
                     type: 'chat',
-                    title: u.full_name || u.email || '名無しユーザー',
+                    title: u.full_name || u.login_id || '名無しユーザー',
                     subtitle: `連絡先 (${u.role})`,
                     link: `/b2b-chat`
                 });

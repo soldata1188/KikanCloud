@@ -31,6 +31,8 @@ export interface Company {
     category_3_supervision_fee?: number;
     support_fee?: number;
     remarks?: string;
+    latitude?: number | null;
+    longitude?: number | null;
     is_deleted?: boolean;
     updated_at?: string;
 }

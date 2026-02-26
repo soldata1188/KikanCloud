@@ -41,8 +41,8 @@ export async function POST(req: Request) {
 
         return NextResponse.json({ reply: responseText });
 
-    } catch (error: any) {
-        console.error("AI Chat API Error:", error);
-        return NextResponse.json({ error: error.message || "Something went wrong processing the AI request." }, { status: 500 });
+    } catch (error: unknown) {
+        const msg = error instanceof Error ? error.message : 'Something went wrong processing the AI request.'
+        return NextResponse.json({ error: msg }, { status: 500 })
     }
 }

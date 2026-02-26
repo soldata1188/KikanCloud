@@ -11,7 +11,6 @@ export function SidebarLogo() {
                 <button
                     onClick={() => setIsBrandModalOpen(true)}
                     className="flex flex-col items-center justify-center cursor-pointer group focus:outline-none p-2 rounded-xl hover:bg-gray-50/50 transition-colors"
-                    title="About KikanCloud"
                 >
                     <span className="hidden md:flex items-center text-[15px] font-extrabold tracking-tight select-none transform transition-all duration-300 group-hover:scale-105 group-hover:-translate-y-0.5">
                         <span className="text-gray-800">Kikan</span>

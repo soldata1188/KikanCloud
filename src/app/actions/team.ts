@@ -26,7 +26,9 @@ export async function createProvisionedAccount(formData: FormData) {
         const { data: { user } } = await supabase.auth.getUser()
         if (!user) return { error: '認証エラー' }
         const { data: adminProfile } = await supabase.from('users').select('role, tenant_id').eq('id', user.id).single()
-        if (adminProfile?.role !== 'admin' || !adminProfile?.tenant_id) return { error: '管理者権限が必要です。' }
+        if (!adminProfile || !['admin', 'union_admin'].includes(adminProfile.role) || !adminProfile.tenant_id) {
+            return { error: '管理者権限が必要です。' }
+        }
 
         const adminDb = getAdminSupabase()
 
@@ -51,6 +53,8 @@ export async function createProvisionedAccount(formData: FormData) {
         }
 
         revalidatePath('/accounts')
+        revalidatePath('/organization')
+        revalidatePath('/settings')
         return { success: true, loginId, password }
     } catch (err: any) {
         return { error: 'サーバーエラーが発生しました。' }
@@ -66,7 +70,9 @@ export async function resetUserPassword(userId: string, newPassword: string) {
         if (!user) return { error: '認証エラー' }
 
         const { data: adminProfile } = await supabase.from('users').select('role, tenant_id').eq('id', user.id).single()
-        if (adminProfile?.role !== 'admin') return { error: '管理者権限が必要です。' }
+        if (!adminProfile || !['admin', 'union_admin'].includes(adminProfile.role)) {
+            return { error: '管理者権限が必要です。' }
+        }
 
         // RLS check
         const { data: targetUser } = await supabase.from('users').select('tenant_id').eq('id', userId).single()
@@ -78,6 +84,8 @@ export async function resetUserPassword(userId: string, newPassword: string) {
         if (updateError) return { error: 'パスワードのリセットに失敗しました: ' + updateError.message }
 
         revalidatePath('/accounts')
+        revalidatePath('/organization')
+        revalidatePath('/settings')
         return { success: true }
     } catch (err: any) {
         return { error: 'サーバーエラーが発生しました。' }

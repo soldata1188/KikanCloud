@@ -4,6 +4,8 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  /* Mobile bottom nav height — used for padding content */
+  --mobile-nav-h: 64px;
 }
 
 @theme inline {
@@ -36,9 +38,38 @@ body {
   font-family: var(--font-sans);
 }
 
+/* ──────────────────────────────────────────────────────────────
+   Mobile: ensure page content is never hidden under bottom nav
+   On md+ screens this has no effect (bottom nav hidden via CSS)
+────────────────────────────────────────────────────────────── */
+@media (max-width: 767px) {
+
+  /* All main scroll areas automatically clear the bottom nav */
+  main {
+    padding-bottom: calc(var(--mobile-nav-h, 64px) + 8px) !important;
+  }
+
+  /* Scrollable main areas get padding so content clears bottom nav */
+  .mobile-scroll-content {
+    padding-bottom: var(--mobile-nav-h) !important;
+  }
+
+  /* Fix 100vh bug on iOS Safari — use dvh where supported */
+  .mobile-full-h {
+    height: 100dvh;
+    height: 100vh;
+    /* fallback */
+  }
+
+  /* Tables: horizontal scroll on mobile */
+  .mobile-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
 ::placeholder {
   color: #adb5bd !important;
-  /* Lighter transparent gray for placeholders */
   opacity: 0.6 !important;
 }
 
@@ -50,5 +81,23 @@ body {
   .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
+  }
+
+  /* Custom thin scrollbar */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 2px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
   }
 }

@@ -35,8 +35,7 @@ export default function GlobalOmniSearch({ compact = false }: { compact?: boolea
             try {
                 const data = await globalOmniSearch(query);
                 setResults(data);
-            } catch (err) {
-                console.error(err);
+            } catch {
                 setResults([]);
             } finally {
                 setIsLoading(false);

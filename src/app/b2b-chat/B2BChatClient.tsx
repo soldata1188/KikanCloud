@@ -375,8 +375,8 @@ export default function B2BChatClient() {
             let fileUrl = "";
             try {
                 fileUrl = (await uploadFile(file)) || "";
-            } catch (err) {
-                console.error("Error uploading file:", err);
+            } catch {
+                // fileUrl stays empty on upload failure
             }
 
             const fileData: FileData = {

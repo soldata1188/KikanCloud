@@ -1,8 +1,7 @@
 'use server'
 import { createClient } from '@/lib/supabase/server'
 
-// 1. Static Briefing Generator
-export async function getDashboardAIBriefing(userName: string, role: string, systemData: any) {
+export async function getDashboardAIBriefing(userName: string, role: string, systemData: unknown) {
     try {
         const apiKey = process.env.GEMINI_API_KEY;
         if (!apiKey) throw new Error('API Key missing');
@@ -10,7 +9,8 @@ export async function getDashboardAIBriefing(userName: string, role: string, sys
         const { GoogleGenAI } = await import('@google/genai');
         const ai = new GoogleGenAI({ apiKey });
 
-        const dataContext = JSON.stringify({ workers: systemData?.stats?.workers || 0, companies: systemData?.stats?.companies || 0, audits: systemData?.stats?.audits || 0 });
+        const sd = systemData as any
+        const dataContext = JSON.stringify({ workers: sd?.stats?.workers || 0, companies: sd?.stats?.companies || 0, audits: sd?.stats?.audits || 0 })
         const prompt = `You are KikanCloud AI Copilot for ${userName}. LIVE DATA: ${dataContext}. Generate JSON: {"question":"業務のフォーカスについて尋ねる","tip": {"label":"ヒント","title":"アドバイス","content":"..."},"alert": {"label":"通知","title":"アラート","content":"...","hasDanger": boolean } }\n\nCRITICAL INSTRUCTION: You MUST output your responses EXCLUSIVELY in professional Japanese (Keigo). Under NO circumstances should you use or output Vietnamese.`;
 
         const response = await ai.models.generateContent({ model: 'gemini-2.5-flash', contents: prompt, config: { temperature: 0.2, responseMimeType: "application/json" } });
@@ -21,8 +21,7 @@ export async function getDashboardAIBriefing(userName: string, role: string, sys
     }
 }
 
-// 2. AUTONOMOUS AGENT WITH FUNCTION CALLING
-export async function chatWithOmniAI(history: any[], newMessage: string, userName: string, systemData: any) {
+export async function chatWithOmniAI(history: unknown[], newMessage: string, userName: string, systemData: unknown) {
     try {
         const apiKey = process.env.GEMINI_API_KEY;
         if (!apiKey) throw new Error('API Key missing');
@@ -36,8 +35,6 @@ export async function chatWithOmniAI(history: any[], newMessage: string, userNam
         const { GoogleGenAI, Type } = await import('@google/genai');
         const ai = new GoogleGenAI({ apiKey });
 
-        // 1. DECLARE TOOLS FOR GEMINI
-        // This allows AI to fetch real database info
         const dbTool = {
             functionDeclarations: [
                 {
@@ -67,28 +64,23 @@ export async function chatWithOmniAI(history: any[], newMessage: string, userNam
       5. TOOL USAGE: If asked about specific workers, companies, or audits, ALWAYS call the 'query_kikancloud_database' tool first. If no data, reply ONLY: "該当データが見つかりませんでした。"
     `;
 
-        // Construct conversation history array
-        const contents = [...history, { role: 'user', parts: [{ text: newMessage }] }];
+        const contents = [...history as object[], { role: 'user', parts: [{ text: newMessage }] }]
 
-        // CALL 1: AI thinks whether to call Tool
         let response = await ai.models.generateContent({
             model: 'gemini-2.5-flash',
             contents: contents,
             config: { systemInstruction, temperature: 0.1, tools: [dbTool] }
         });
 
-        // HANDLE IF GEMINI COMMANDS TO SEARCH DATABASE
         if (response.functionCalls && response.functionCalls.length > 0) {
-            const call = response.functionCalls[0];
-            let functionResult: any = { error: "データが見つからないか、無効なテーブルです" };
+            const call = response.functionCalls[0]
+            let functionResult: unknown = { error: 'データが見つからないか、無効なテーブルです' }
 
             if (call.name === 'query_kikancloud_database') {
-                const args = call.args as any;
-                const table = args.table;
-                const keyword = args.keyword || '';
-                const searchTerm = keyword ? `%${keyword}%` : '%';
-
-                // EXECUTE SUPABASE QUERY BASED ON AI REQUEST (with RLS Tenant protection)
+                const args = call.args as Record<string, string>
+                const table = args.table
+                const keyword = args.keyword || ''
+                const searchTerm = keyword ? `%${keyword}%` : '%'
                 if (table === 'workers') {
                     const { data } = await supabase.from('workers')
                         .select('full_name_romaji, nationality, status, system_type, residence_card_number')
@@ -116,20 +108,17 @@ export async function chatWithOmniAI(history: any[], newMessage: string, userNam
                 }
             }
 
-            // Append AI function call back into conversation history
-            if (response.candidates && response.candidates[0].content) {
-                contents.push(response.candidates[0].content as any);
+            if (response.candidates?.[0]?.content) {
+                contents.push(response.candidates[0].content as object)
             } else {
-                contents.push({ role: 'model', parts: [{ functionCall: call }] });
+                contents.push({ role: 'model', parts: [{ functionCall: call }] })
             }
 
-            // Append Database result (JSON) back to AI
             contents.push({
                 role: 'user',
                 parts: [{ functionResponse: { name: call.name, response: { result: functionResult } } }]
-            });
+            })
 
-            // CALL 2: AI reads database result, synthesizes and replies to user
             response = await ai.models.generateContent({
                 model: 'gemini-2.5-flash',
                 contents: contents,
@@ -137,9 +126,8 @@ export async function chatWithOmniAI(history: any[], newMessage: string, userNam
             });
         }
 
-        return { success: true, text: response.text };
-    } catch (error: any) {
-        console.error('Omni AI Agent Error:', error);
-        return { success: false, text: "申し訳ありません。AIシステムの接続に問題が発生しました。" };
+        return { success: true, text: response.text }
+    } catch {
+        return { success: false, text: '申し訳ありません。AIシステムの接続に問題が発生しました。' }
     }
 }

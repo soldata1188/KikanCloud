@@ -17,21 +17,17 @@ export async function POST(req: Request) {
             return NextResponse.json({ message: 'Invalid payload' }, { status: 400 })
         }
 
-        const insertData = payload.map((row: any) => ({
+        const insertData = payload.map((row: Record<string, unknown>) => ({
             ...row,
             tenant_id: userData?.tenant_id,
         }))
 
         const { error } = await supabase.from('companies').insert(insertData)
-
-        if (error) {
-            console.error('Insert error:', error)
-            return NextResponse.json({ message: error.message }, { status: 500 })
-        }
+        if (error) return NextResponse.json({ message: error.message }, { status: 500 })
 
         return NextResponse.json({ success: true, count: payload.length })
-    } catch (err: any) {
-        console.error('API /companies/bulk Error:', err)
-        return NextResponse.json({ message: err.message || 'Internal Server Error' }, { status: 500 })
+    } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : 'Internal Server Error'
+        return NextResponse.json({ message: msg }, { status: 500 })
     }
 }

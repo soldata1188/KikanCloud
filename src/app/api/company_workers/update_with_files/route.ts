@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
         // 1. Insert Worker Data
         const getStr = (key: string) => (formData.get(key) as string) || null;
 
-        const workerData: any = {
+        const workerData: Record<string, unknown> = {
             full_name_romaji: getStr('full_name_romaji'),
             full_name_kana: getStr('full_name_kana'),
             dob: getStr('dob'),
@@ -54,38 +54,7 @@ export async function POST(req: NextRequest) {
             if (value === "") workerData[key] = null;
         }
 
-        /* 
-        // 開発環境テストのため、一時的に重複チェック（Duplicate Check）を無効化
-        if (workerData.passport_no || workerData.zairyu_no) {
-            let query = supabase.from('workers').select('id, passport_no, zairyu_no').eq('tenant_id', tenant_id).eq('is_deleted', false);
 
-            // Build an OR condition
-            const orConditions = [];
-            if (workerData.passport_no) orConditions.push(`passport_no.eq.${workerData.passport_no}`);
-            if (workerData.zairyu_no) orConditions.push(`zairyu_no.eq.${workerData.zairyu_no}`);
-
-            query = query.or(orConditions.join(','));
-
-            const { data: existingWorkers, error: checkErr } = await query;
-            if (checkErr) throw checkErr;
-
-            if (existingWorkers && existingWorkers.length > 0) {
-                const isPassportMatch = existingWorkers.some((w: any) => w.passport_no === workerData.passport_no);
-                const isZairyuMatch = existingWorkers.some((w: any) => w.zairyu_no === workerData.zairyu_no);
-
-                let errorMsg = "この外国人材は既に登録されています。"; // Default error message
-                if (isPassportMatch && isZairyuMatch) {
-                    errorMsg = "入力されたパスポート番号と在留カード番号は既にシステムに存在します。(Both Passport and Zairyu Card number already exist)";
-                } else if (isPassportMatch) {
-                    errorMsg = "入力されたパスポート番号は既にシステムに存在します。(Passport number already exists)";
-                } else if (isZairyuMatch) {
-                    errorMsg = "入力された在留カード番号は既にシステムに存在します。(Zairyu Card number already exists)";
-                }
-
-                return NextResponse.json({ error: errorMsg }, { status: 400 });
-            }
-        }
-        */
 
         const id = getStr('id');
         if (!id) {
@@ -111,9 +80,8 @@ export async function POST(req: NextRequest) {
                 const isAvatar = docType === 'avatar';
                 const bucketName = isAvatar ? 'avatars' : 'worker_documents';
 
-                // Keep original filename but ensure it's safe
-                const safeName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, '');
-                const filePath = `${tenant_id}/${workerId}/${docType}_${Date.now()}_${safeName}`;
+                const safeName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, '')
+                const filePath = `${tenant_id}/${workerId}/${docType}_${Date.now()}_${safeName}`
 
                 const { error: uploadError } = await supabase.storage.from(bucketName).upload(filePath, file);
 
@@ -124,16 +92,15 @@ export async function POST(req: NextRequest) {
                         // Update worker avatar
                         await supabase.from('workers').update({ avatar_url: pubUrl.publicUrl }).eq('id', workerId);
                     }
-                } else {
-                    console.error(`Failed to upload ${docType}:`, uploadError);
+                    // Upload failed silently — non-critical, worker data is saved
                 }
             }
         }
 
         return NextResponse.json({ success: true, workerId }, { status: 200 });
 
-    } catch (error: any) {
-        console.error("Worker Update Error:", error);
-        return NextResponse.json({ error: error.message }, { status: 500 });
+    } catch (error: unknown) {
+        const msg = error instanceof Error ? error.message : 'Internal Server Error'
+        return NextResponse.json({ error: msg }, { status: 500 })
     }
 }

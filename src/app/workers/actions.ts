@@ -209,7 +209,6 @@ export async function importWorkers(workersData: ImportWorkerPayload[]) {
     // 3. Bulk insert (save array to DB at once)
     const { error } = await supabase.from('workers').insert(payload)
     if (error) {
-        console.error('Worker Import Error:', error)
         throw new Error('インポートに失敗しました。日付の形式（YYYY/MM/DD）等を確認してください。')
     }
 

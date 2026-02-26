@@ -15,9 +15,6 @@ export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
         const { base64str, mimeType } = body;
-
-
-
         if (!base64str || !mimeType) {
             return NextResponse.json(
                 { error: "Image base64 data and mimeType are required" },
@@ -69,11 +66,11 @@ Required JSON Structure:
         const jsonData = JSON.parse(text);
 
         return NextResponse.json({ data: jsonData }, { status: 200 });
-    } catch (error: any) {
-        console.error("Gemini AI Extract Error:", error);
+    } catch (error: unknown) {
+        const msg = error instanceof Error ? error.message : 'Unknown error'
         return NextResponse.json(
-            { error: "Failed to extract data using AI", details: error.message },
+            { error: 'Failed to extract data using AI', details: msg },
             { status: 500 }
-        );
+        )
     }
 }

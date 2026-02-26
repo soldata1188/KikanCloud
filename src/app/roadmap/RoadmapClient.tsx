@@ -216,8 +216,8 @@ export default function RoadmapClient() {
                 if (parsed && Array.isArray(parsed) && parsed.length > 0) {
                     setColumns(parsed);
                 }
-            } catch (e) {
-                console.error("Failed to parse roadmap data", e);
+            } catch {
+                // corrupt data — keep default columns
             }
         }
     }, []);

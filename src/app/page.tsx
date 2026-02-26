@@ -83,7 +83,7 @@ export default async function DashboardPage() {
     }
 
     return (
-        <div className="flex h-screen bg-slate-50 font-sans text-slate-900 overflow-hidden selection:bg-emerald-500/20">
+        <div className="flex h-screen bg-white font-sans text-slate-900 overflow-hidden selection:bg-emerald-500/20">
             <Sidebar active="dashboard" />
             <div className="flex-1 flex flex-col relative min-w-0">
                 <TopNav title="ホーム" role={userProfile?.role} />

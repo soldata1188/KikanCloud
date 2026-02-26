@@ -2,9 +2,8 @@
 import { useState, useTransition, useEffect } from 'react'
 import Link from 'next/link'
 import { DataTableToolbar } from '@/components/DataTableToolbar'
-import { UserCircle2, Search, CheckSquare, Square, Loader2, Trash2, FileText, Edit3 } from 'lucide-react'
+import { UserCircle2, Search, CheckSquare, Square, Loader2, Trash2, Edit3, Users, Clock, Briefcase, AlertTriangle, Plane, ChevronLeft, ChevronRight } from 'lucide-react'
 import { bulkUpdateWorkerStatus, bulkDeleteWorkers } from '@/app/actions/operations'
-import * as XLSX from 'xlsx'
 import { ImportModal } from './ImportModal'
 import { BulkEditModal } from './BulkEditModal'
 import { Worker } from '@/types/schema'
@@ -22,12 +21,50 @@ function calculateAge(dob: string | null | undefined): number | null {
     return age;
 }
 
+// Badge config for displaying status badge inside table rows
+const STATUS_BADGE: Record<string, { label: string; bg: string; text: string; dot: string }> = {
+    waiting: { label: '未入国', bg: 'bg-blue-50', text: 'text-blue-600', dot: 'bg-blue-500' },
+    standby: { label: '対応中', bg: 'bg-amber-50', text: 'text-amber-600', dot: 'bg-amber-500' },
+    working: { label: '就業中', bg: 'bg-emerald-50', text: 'text-emerald-600', dot: 'bg-emerald-500' },
+    missing: { label: '失踪', bg: 'bg-red-50', text: 'text-red-500', dot: 'bg-red-500' },
+    returned: { label: '帰国', bg: 'bg-slate-100', text: 'text-slate-500', dot: 'bg-slate-400' },
+    transferred: { label: '転籍済', bg: 'bg-purple-50', text: 'text-purple-600', dot: 'bg-purple-500' },
+}
+
+// 3 tab groups
+type TabKey = 'waiting' | 'active' | 'closed'
+const TAB_GROUPS: { key: TabKey; label: string; sub: string; statuses: string[]; icon: React.ReactNode }[] = [
+    {
+        key: 'waiting',
+        label: '未入国',
+        sub: 'Pre-Entry',
+        statuses: ['waiting'],
+        icon: <Clock size={14} />,
+    },
+    {
+        key: 'active',
+        label: '就業中・対応中',
+        sub: 'Working / Standby',
+        statuses: ['working', 'standby'],
+        icon: <Briefcase size={14} />,
+    },
+    {
+        key: 'closed',
+        label: '失踪・帰国・転籍済',
+        sub: 'Closed Cases',
+        statuses: ['missing', 'returned', 'transferred'],
+        icon: <AlertTriangle size={14} />,
+    },
+]
+
 export default function WorkersListClient({ initialWorkers, role, next90DaysStr }: { initialWorkers: Worker[], role: string, next90DaysStr: string }) {
     const [filtered, setFiltered] = useState(initialWorkers)
     const [selectedIds, setSelectedIds] = useState<string[]>([])
     const [isPending, startTransition] = useTransition()
     const [layout, setLayout] = useState<'list' | 'grid'>('list')
     const [isBulkEditModalOpen, setIsBulkEditModalOpen] = useState(false)
+    const [currentPage, setCurrentPage] = useState(1)
+    const pageSize = 20
 
     // Filter states
     const [searchTerm, setSearchTerm] = useState('')
@@ -37,42 +74,14 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
     const [nationalityFilter, setNationalityFilter] = useState('all')
     const [sortOrder, setSortOrder] = useState('氏名順')
 
-    const STATUS_MAP: Record<string, string> = {
-        'all': '全ステータス',
-        'waiting': '入国待ち',
-        'standby': '対応中',
-        'working': '就業中',
-        'missing': '失踪',
-        'returned': '帰国',
-        'transferred': '転籍済',
-    };
-    const STATUS_KEYS = ['all', 'waiting', 'standby', 'working', 'missing', 'returned'];
-    const DEFAULT_STATUSES = ['waiting', 'standby', 'working'];
-
-    const [activeStatuses, setActiveStatuses] = useState<string[]>(DEFAULT_STATUSES);
-
-    const toggleStatus = (statusKey: string) => {
-        if (statusKey === 'all') {
-            setActiveStatuses(['all']);
-            return;
-        }
-
-        let newStatuses = activeStatuses.filter(s => s !== 'all');
-        if (newStatuses.includes(statusKey)) {
-            newStatuses = newStatuses.filter(s => s !== statusKey);
-        } else {
-            newStatuses.push(statusKey);
-        }
-
-        if (newStatuses.length === 0) {
-            setActiveStatuses(DEFAULT_STATUSES);
-        } else {
-            setActiveStatuses(newStatuses);
-        }
-    };
+    // Tab group: 'waiting' | 'active' | 'closed'
+    const [activeTab, setActiveTab] = useState<TabKey>('active')
 
     // Extract dynamic options for filters
     const companies = Array.from(new Set(initialWorkers.map(w => w.companies?.name_jp).filter(Boolean))) as string[]
+    const companyOptions = Array.from(
+        new Map(initialWorkers.filter(w => w.company_id && w.companies?.name_jp).map(w => [w.company_id!, { id: w.company_id!, name_jp: w.companies!.name_jp }])).values()
+    )
     const entryBatchesStr = Array.from(new Set(initialWorkers.map(w => {
         if (!w.entry_date) return null;
         const d = new Date(w.entry_date);
@@ -81,9 +90,19 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
     const entryBatches = entryBatchesStr.sort((a: string, b: string) => b.localeCompare(a))
     const nationalities = Array.from(new Set(initialWorkers.map(w => w.nationality).filter(Boolean))) as string[]
 
+    // Count per tab group
+    const countByTab = (tab: TabKey) => {
+        const group = TAB_GROUPS.find(g => g.key === tab)!
+        return initialWorkers.filter(w => group.statuses.includes(w.status || '')).length
+    }
+
     // Combined filter logic
     useEffect(() => {
         let result = initialWorkers
+
+        // Filter by tab group (status group)
+        const group = TAB_GROUPS.find(g => g.key === activeTab)!
+        result = result.filter(w => group.statuses.includes(w.status || ''))
 
         if (searchTerm) {
             const lower = searchTerm.toLowerCase()
@@ -92,10 +111,6 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
 
         if (companyFilter !== 'all') {
             result = result.filter(w => w.companies?.name_jp === companyFilter)
-        }
-
-        if (!activeStatuses.includes('all')) {
-            result = result.filter(w => activeStatuses.includes(w.status || ''))
         }
 
         if (categoryFilter !== 'all') {
@@ -134,8 +149,12 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
         })
 
         setFiltered(result)
-        setSelectedIds([]) // Reset selection on filter change
-    }, [searchTerm, companyFilter, activeStatuses, categoryFilter, entryBatchFilter, nationalityFilter, sortOrder, initialWorkers])
+        setSelectedIds([])
+        setCurrentPage(1)
+    }, [searchTerm, companyFilter, activeTab, categoryFilter, entryBatchFilter, nationalityFilter, sortOrder, initialWorkers])
+
+    const totalPages = Math.ceil(filtered.length / pageSize)
+    const paginatedData = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize)
 
     const handleSearch = (term: string) => {
         setSearchTerm(term)
@@ -158,20 +177,15 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
         startTransition(async () => { await bulkDeleteWorkers(selectedIds); setSelectedIds([]); alert('一括削除しました。') })
     }
 
-    const generateLegalRoster = () => {
-        const selectedData = filtered.filter(w => selectedIds.includes(w.id))
-        const exportData = selectedData.map((w, index) => ({
-            '整理番号': index + 1, '氏名 (ローマ字)': w.full_name_romaji, '氏名 (カタカナ)': w.full_name_kana || '',
-            '生年月日': w.dob?.replace(/-/g, '/') || '', '国籍': w.nationality || '', '性別': w.gender === 'male' ? '男' : w.gender === 'female' ? '女' : '',
-            '在留資格区分': w.system_type === 'tokuteigino' ? '特定技能' : w.system_type === 'ikusei_shuro' ? '育成就労' : '技能実習',
-            '在留カード番号': w.zairyu_no || '', 'パスポート有効期限': w.passport_exp?.replace(/-/g, '/') || '',
-            '実習実施者名': w.companies?.name_jp || '', '状況': w.status === 'working' ? '就業中' : w.status === 'standby' ? '対応中' : 'その他'
-        }))
-        const ws = XLSX.utils.json_to_sheet(exportData)
-        ws['!cols'] = [{ wch: 8 }, { wch: 30 }, { wch: 25 }, { wch: 12 }, { wch: 10 }, { wch: 8 }, { wch: 15 }, { wch: 15 }, { wch: 20 }, { wch: 10 }]
-        const wb = XLSX.utils.book_new()
-        XLSX.utils.book_append_sheet(wb, ws, "技能実習生等名簿")
-        XLSX.writeFile(wb, `技能実習生等名簿_${new Date().toISOString().split('T')[0]}.xlsx`)
+    const getStatusBadge = (status: string | null | undefined) => {
+        const cfg = STATUS_BADGE[status || '']
+        if (!cfg) return <span className="text-xs text-slate-400">{status}</span>
+        return (
+            <span className={`inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1 rounded-full ${cfg.bg} ${cfg.text}`}>
+                <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} />
+                {cfg.label}
+            </span>
+        )
     }
 
     const advancedFilters = (
@@ -179,7 +193,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
             <select
                 value={companyFilter}
                 onChange={(e) => setCompanyFilter(e.target.value)}
-                className="h-[32px] w-[140px] bg-white border border-gray-350 hover:bg-gray-50 rounded-md px-2 text-[12px] outline-none focus:border-[#878787] transition-colors text-[#1f1f1f] cursor-pointer text-ellipsis overflow-hidden whitespace-nowrap"
+                className="h-[32px] w-[115px] bg-white border border-slate-200 hover:bg-slate-50 rounded-md px-1.5 text-[11px] outline-none focus:border-[#24b47e] transition-colors text-[#1f1f1f] cursor-pointer text-ellipsis overflow-hidden whitespace-nowrap"
             >
                 <option value="all">企業名 (すべて)</option>
                 {companies.map(c => <option key={c} value={c}>{c}</option>)}
@@ -188,18 +202,16 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
             <select
                 value={nationalityFilter}
                 onChange={(e) => setNationalityFilter(e.target.value)}
-                className="h-[32px] w-[140px] bg-white border border-gray-350 hover:bg-gray-50 rounded-md px-2 text-[12px] outline-none focus:border-[#878787] transition-colors text-[#1f1f1f] cursor-pointer text-ellipsis overflow-hidden whitespace-nowrap"
+                className="h-[32px] w-[110px] bg-white border border-slate-200 hover:bg-slate-50 rounded-md px-1.5 text-[11px] outline-none focus:border-[#24b47e] transition-colors text-[#1f1f1f] cursor-pointer text-ellipsis overflow-hidden whitespace-nowrap"
             >
                 <option value="all">国籍 (すべて)</option>
                 {nationalities.map(n => <option key={n} value={n}>{n}</option>)}
             </select>
 
-
-
             <select
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value)}
-                className="h-[32px] w-[140px] bg-white border border-gray-350 hover:bg-gray-50 rounded-md px-2 text-[12px] outline-none focus:border-[#878787] transition-colors text-[#1f1f1f] cursor-pointer text-ellipsis overflow-hidden whitespace-nowrap"
+                className="h-[32px] w-[100px] bg-white border border-slate-200 hover:bg-slate-50 rounded-md px-1.5 text-[11px] outline-none focus:border-[#24b47e] transition-colors text-[#1f1f1f] cursor-pointer text-ellipsis overflow-hidden whitespace-nowrap"
             >
                 <option value="all">区分 (すべて)</option>
                 <option value="tokuteigino">特定技能</option>
@@ -209,33 +221,32 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
             <select
                 value={entryBatchFilter}
                 onChange={(e) => setEntryBatchFilter(e.target.value)}
-                className="h-[32px] w-[140px] bg-white border border-gray-350 hover:bg-gray-50 rounded-md px-2 text-[12px] outline-none focus:border-[#878787] transition-colors text-[#1f1f1f] cursor-pointer text-ellipsis overflow-hidden whitespace-nowrap"
+                className="h-[32px] w-[115px] bg-white border border-slate-200 hover:bg-slate-50 rounded-md px-1.5 text-[11px] outline-none focus:border-[#24b47e] transition-colors text-[#1f1f1f] cursor-pointer text-ellipsis overflow-hidden whitespace-nowrap"
             >
                 <option value="all">入国期生 (すべて)</option>
                 {entryBatches.map(b => <option key={b} value={b}>{b}</option>)}
             </select>
 
-            {(companyFilter !== 'all' || categoryFilter !== 'all' || entryBatchFilter !== 'all' || nationalityFilter !== 'all' || (activeStatuses.length !== DEFAULT_STATUSES.length || !DEFAULT_STATUSES.every(s => activeStatuses.includes(s)))) && (
+            {(companyFilter !== 'all' || categoryFilter !== 'all' || entryBatchFilter !== 'all' || nationalityFilter !== 'all') && (
                 <button
                     onClick={() => {
                         setCompanyFilter('all')
                         setNationalityFilter('all')
-                        setActiveStatuses(DEFAULT_STATUSES)
                         setCategoryFilter('all')
                         setEntryBatchFilter('all')
                     }}
-                    className="text-[12px] text-[#24b47e] hover:text-[#1e9a6a] transition-colors ml-1 font-medium select-none"
+                    className="text-[11px] text-[#24b47e] hover:text-[#1e9a6a] transition-colors ml-1 font-bold select-none"
                 >
                     クリア
                 </button>
             )}
 
-            <div className="w-px h-[24px] bg-gray-300 mx-1"></div>
+            <div className="w-px h-[20px] bg-slate-200 mx-1"></div>
 
             <select
                 value={sortOrder}
                 onChange={(e) => setSortOrder(e.target.value)}
-                className="h-[32px] w-[140px] bg-white border border-gray-350 hover:bg-gray-50 rounded-md px-2 text-[12px] outline-none focus:border-[#878787] transition-colors text-[#1f1f1f] cursor-pointer text-ellipsis overflow-hidden whitespace-nowrap"
+                className="h-[32px] w-[125px] bg-white border border-slate-200 hover:bg-slate-50 rounded-md px-1.5 text-[11px] outline-none focus:border-[#24b47e] transition-colors text-[#1f1f1f] cursor-pointer text-ellipsis overflow-hidden whitespace-nowrap"
             >
                 <option value="氏名順">並び順: 氏名順</option>
                 <option value="入国日が新しい順">入国日が新しい順</option>
@@ -246,250 +257,275 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
     )
 
     return (
-        <div className="flex flex-col gap-6">
-            <div className="flex flex-wrap gap-6 mt-2 ml-2">
-                {STATUS_KEYS.map(statusKey => {
-                    const count = statusKey === 'all' ? initialWorkers.length : initialWorkers.filter(w => w.status === statusKey).length;
-                    const isActive = activeStatuses.includes(statusKey);
+        <div className="bg-transparent">
+
+            {/* ── Tab Header (styled like 総括一覧) ── */}
+            <div className="flex px-6 pt-4 space-x-1 border-b border-slate-200 overflow-x-auto no-scrollbar bg-[#f1f5f9]/30">
+                {TAB_GROUPS.map((tab) => {
+                    const isActive = activeTab === tab.key
+                    const count = countByTab(tab.key)
                     return (
-                        <div
-                            key={statusKey}
-                            onClick={() => toggleStatus(statusKey)}
-                            className="group relative flex flex-col min-w-[120px] pr-4 py-2 cursor-pointer transition-all duration-200 ease-out"
+                        <button
+                            key={tab.key}
+                            onClick={() => setActiveTab(tab.key)}
+                            className={`flex items-center gap-2 px-5 py-2.5 text-sm font-bold rounded-t-[12px] transition-all whitespace-nowrap border-t border-l border-r ${isActive
+                                ? 'bg-white text-[#24b47e] border-slate-200 border-b-white relative top-[1px] shadow-sm'
+                                : 'bg-transparent text-slate-400 border-transparent hover:text-slate-600 hover:bg-slate-50'
+                                }`}
                         >
-                            <div className="flex justify-between items-center mb-1.5">
-                                <span className={`text-sm font-bold tracking-wide transition-colors ${isActive ? 'text-[#198f63]' : 'text-gray-500 group-hover:text-gray-800'}`}>
-                                    {STATUS_MAP[statusKey] || statusKey}
-                                </span>
-                                <div className={`relative inline-flex h-[18px] w-8 shrink-0 items-center rounded-full transition-colors duration-300 ${isActive ? 'bg-[#24b47e] shadow-inner' : 'bg-gray-200 group-hover:bg-gray-300'}`}>
-                                    <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform duration-300 shadow-sm ${isActive ? 'translate-x-[16px]' : 'translate-x-[3px]'}`} />
-                                </div>
-                            </div>
-                        </div>
-                    );
+                            <span className={isActive ? 'text-[#24b47e]' : 'text-slate-400'}>{tab.icon}</span>
+                            <span>{tab.label}</span>
+                            <span className={`text-[10px] font-bold min-w-[20px] h-5 inline-flex items-center justify-center px-1.5 rounded-full ${isActive ? 'bg-[#24b47e]/10 text-[#24b47e]' : 'bg-slate-100 text-slate-500'
+                                }`}>
+                                {count}
+                            </span>
+                        </button>
+                    )
                 })}
             </div>
 
-            <DataTableToolbar data={filtered} filename="外国人材リスト" searchPlaceholder="氏名、企業名で検索..." onSearch={handleSearch} type="workers" role={role} addLink="/workers/new" importNode={<ImportModal />} filterNode={advancedFilters} layout={layout} onLayoutChange={setLayout} />
+            {/* ── Content ── */}
+            <div className="flex flex-col gap-5 p-6">
 
-            {
-                selectedIds.length > 0 && (
-                    <div className="mb-4 bg-green-50 border border-green-200 rounded-lg p-3 flex flex-wrap items-center gap-4 animate-in fade-in slide-in-from-top-2">
-                        <span className="text-sm font-semibold text-green-800 shrink-0">
-                            {selectedIds.length} 件選択中
-                        </span>
+                <DataTableToolbar data={filtered} filename="外国人材リスト" searchPlaceholder="氏名、企業名で検索..." onSearch={handleSearch} type="workers" role={role} addLink="/workers/new" importNode={<ImportModal />} filterNode={advancedFilters} layout={layout} onLayoutChange={setLayout} />
 
-                        <div className="flex items-center gap-3 border-l border-green-200 pl-4 flex-wrap flex-1">
-                            <div className="flex items-center gap-2">
-                                <span className="text-xs text-gray-600 font-medium whitespace-nowrap">ステータス変更:</span>
-                                <select
-                                    onChange={(e) => {
-                                        if (e.target.value) handleBulkStatus(e.target.value);
-                                        e.target.value = "";
-                                    }}
-                                    className="text-xs p-1.5 border border-gray-300 rounded outline-none focus:border-green-500 cursor-pointer text-gray-700 bg-white"
-                                    defaultValue=""
-                                    disabled={isPending}
-                                >
-                                    <option value="" disabled>選択...</option>
-                                    <option value="working">就業中</option>
-                                    <option value="standby">対応中</option>
-                                    <option value="returned">帰国</option>
-                                    <option value="waiting">入国待ち</option>
-                                    <option value="missing">失踪</option>
-                                </select>
-                            </div>
+                {
+                    selectedIds.length > 0 && (
+                        <div className="mb-4 bg-emerald-50 border border-emerald-200 rounded-[16px] p-4 flex flex-wrap items-center gap-4 animate-in fade-in slide-in-from-top-2">
+                            <span className="text-sm font-bold text-[#198f63] shrink-0">
+                                {selectedIds.length} 名を選択中
+                            </span>
 
-                            <div className="w-px h-4 bg-gray-300"></div>
-
-                            <button onClick={() => setIsBulkEditModalOpen(true)} className="text-xs font-semibold text-primary-600 hover:text-primary-700 flex items-center gap-1 bg-white border border-primary-200 px-2.5 py-1.5 rounded transition-colors shadow-sm">
-                                <Edit3 size={14} /> その他の一括変更
-                            </button>
-
-                            <div className="flex-1"></div>
-
-                            <button onClick={generateLegalRoster} className="text-xs font-semibold text-green-700 hover:text-green-800 flex items-center gap-1 bg-white border border-green-200 px-2.5 py-1.5 rounded transition-colors shadow-sm">
-                                <FileText size={14} /> 名簿出力
-                            </button>
-
-                            {(role === 'admin' || role === 'super_admin') && (
-                                <button onClick={handleBulkDelete} disabled={isPending} className="text-xs font-semibold text-red-600 hover:text-red-700 flex items-center gap-1 bg-white border border-red-200 px-2.5 py-1.5 rounded transition-colors shadow-sm disabled:opacity-50">
-                                    {isPending ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />} 削除
-                                </button>
-                            )}
-                        </div>
-                    </div>
-                )
-            }
-
-            {
-                layout === 'grid' ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pb-16">
-                        {filtered.length === 0 && <div className="col-span-full py-12 text-center text-[#878787] bg-white border border-gray-350 rounded-md"><Search size={32} className="mx-auto mb-2 opacity-30" />データがありません。</div>}
-                        {filtered.map((w) => {
-                            const isExpiring = (w.passport_exp && w.passport_exp <= next90DaysStr) || (w.cert_end_date && w.cert_end_date <= next90DaysStr);
-                            const isChecked = selectedIds.includes(w.id);
-                            return (
-                                <div key={w.id} className={`group relative bg-white border rounded-md p-5 transition-colors duration-200 ${isChecked ? 'border-[#24b47e] ring-1 ring-[#24b47e]' : 'border-gray-350 hover:border-[#24b47e]'}`}>
-                                    <button className="absolute top-4 right-4 text-gray-300 hover:text-[#24b47e] transition-colors z-10" onClick={() => toggleSelect(w.id)}>
-                                        {isChecked ? <CheckSquare className="text-[#24b47e]" size={20} /> : <Square size={20} />}
-                                    </button>
-                                    <div className="flex items-start gap-4 mb-4">
-                                        <div className="w-12 h-12 rounded-md bg-gray-50 flex items-center justify-center shrink-0 border border-gray-350 overflow-hidden">
-                                            {w.avatar_url ? <img src={w.avatar_url} className="w-full h-full object-cover" /> : <UserCircle2 size={24} className="text-[#878787]" />}
-                                        </div>
-                                        <div className="pr-6">
-                                            <Link href={`/workers/${w.id}`} className="font-bold text-[#1f1f1f] hover:text-[#24b47e] transition-colors line-clamp-1">{w.full_name_romaji}</Link>
-                                            <div className="text-xs text-[#878787] mt-1 line-clamp-1">{w.companies?.name_jp || '未配属'}</div>
-                                        </div>
-                                    </div>
-                                    <div className="space-y-2 mb-4">
-                                        <div className="flex items-center justify-between text-xs">
-                                            <span className="text-[#878787]">在留資格</span>
-                                            <span className="font-medium text-[#1f1f1f] truncate max-w-[150px]" title={w.visa_status || ''}>{w.visa_status || '-'}</span>
-                                        </div>
-                                        <div className="flex items-center justify-between text-xs mt-2">
-                                            <span className="text-[#878787]">受入職種</span>
-                                            <span className="font-medium text-[#1f1f1f] truncate max-w-[150px]" title={w.industry_field || ''}>{w.industry_field || '-'}</span>
-                                        </div>
-                                        <div className="flex items-center justify-between text-xs mt-2">
-                                            <span className="text-[#878787]">入国日</span>
-                                            <span className="font-mono font-medium text-[#1f1f1f]">{w.entry_date ? w.entry_date.replace(/-/g, '/') : '-'}</span>
-                                        </div>
-                                        <div className="flex items-center justify-between text-xs mt-2">
-                                            <span className="text-[#878787]">在留期限</span>
-                                            <span className={`font-mono font-medium ${w.zairyu_exp && w.zairyu_exp <= next90DaysStr ? 'text-red-600' : 'text-[#1f1f1f]'}`}>{w.zairyu_exp ? w.zairyu_exp.replace(/-/g, '/') : '-'}</span>
-                                        </div>
-                                        <div className="flex items-center justify-between text-xs mt-2">
-                                            <span className="text-[#878787]">生年月日/国籍</span>
-                                            <span className="font-mono font-medium text-[#1f1f1f]">
-                                                {w.dob ? w.dob.replace(/-/g, '/') : '-'} <span className="font-sans text-gray-500 ml-1">{w.nationality || ''}</span>
-                                            </span>
-                                        </div>
-                                        <div className="flex items-center justify-between text-xs">
-                                            <span className="text-[#878787]">ステータス</span>
-                                            <span className={`px-2 py-0.5 border rounded-md text-[10px] font-bold uppercase tracking-widest bg-transparent ${w.status === 'working' ? 'border-[#24b47e] text-[#24b47e]' : 'border-gray-350 text-[#878787]'}`}>
-                                                {w.status === 'working' ? '就業中' : w.status === 'standby' ? '対応中' : w.status === 'returned' ? '帰国' : w.status === 'waiting' ? '入国待ち' : w.status === 'missing' ? '失踪' : w.status}
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div className="pt-4 border-t border-gray-350 flex items-center justify-between">
-                                        <Link href={`/workers/${w.id}`} className="text-xs font-medium text-[#878787] hover:text-[#24b47e] transition-colors px-2 py-1 -ml-2 rounded-md hover:bg-[#24b47e]/5">詳細を見る</Link>
-                                    </div>
+                            <div className="flex items-center gap-3 border-l border-emerald-200 pl-4 flex-wrap flex-1">
+                                <div className="flex items-center gap-2">
+                                    <span className="text-xs text-slate-500 font-bold whitespace-nowrap">ステータス変更:</span>
+                                    <select
+                                        onChange={(e) => {
+                                            if (e.target.value) handleBulkStatus(e.target.value);
+                                            e.target.value = "";
+                                        }}
+                                        className="text-xs p-1.5 border border-slate-200 rounded-md outline-none focus:border-[#24b47e] cursor-pointer text-slate-700 bg-white hover:bg-slate-50 transition-colors"
+                                        defaultValue=""
+                                        disabled={isPending}
+                                    >
+                                        <option value="" disabled>選択...</option>
+                                        <option value="working">就業中</option>
+                                        <option value="standby">対応中</option>
+                                        <option value="returned">帰国</option>
+                                        <option value="waiting">入国待ち</option>
+                                        <option value="missing">失踪</option>
+                                    </select>
                                 </div>
-                            )
-                        })}
-                    </div>
-                ) : (
-                    <div className="overflow-x-auto pb-16">
-                        <table className="w-full border-collapse text-sm text-left whitespace-nowrap">
-                            <thead className="bg-gray-50 text-gray-800">
-                                <tr>
-                                    <th className="border border-gray-350 px-4 py-3 text-center w-[40px] shrink-0">
-                                        <input
-                                            type="checkbox"
-                                            checked={selectedIds.length === filtered.length && filtered.length > 0}
-                                            onChange={toggleSelectAll}
-                                            className="w-4 h-4 text-primary-600 rounded border-gray-300 cursor-pointer"
-                                        />
-                                    </th>
-                                    <th className="border border-gray-350 px-4 py-3 font-semibold w-[280px]">氏名(フリガナ)</th>
-                                    <th className="border border-gray-350 px-4 py-3 font-semibold">生年月日/国籍</th>
-                                    <th className="border border-gray-350 px-4 py-3 font-semibold w-[280px]">受入企業 / 社宅住所</th>
-                                    <th className="border border-gray-350 px-4 py-3 font-semibold">ステータス / 期生</th>
-                                    <th className="border border-gray-350 px-4 py-3 font-semibold">在留資格 / 職種</th>
-                                    <th className="border border-gray-350 px-4 py-3 font-semibold">入国日 / 在留期限</th>
-                                    <th className="border border-gray-350 px-4 py-3 font-semibold">送出機関 / 保険期限</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {filtered.length === 0 && <tr><td colSpan={8} className="border border-gray-350 px-5 py-12 text-center text-[#878787]"><Search size={32} className="mx-auto mb-2 opacity-30" />データがありません。</td></tr>}
-                                {filtered.map((w) => {
-                                    const isExpiring = (w.passport_exp && w.passport_exp <= next90DaysStr) || (w.cert_end_date && w.cert_end_date <= next90DaysStr);
+
+                                <div className="w-px h-4 bg-emerald-200"></div>
+
+                                <button onClick={() => setIsBulkEditModalOpen(true)} className="text-xs font-bold text-[#24b47e] hover:text-[#1e9a6a] flex items-center gap-1 bg-white border border-[#24b47e]/20 px-3 py-1.5 rounded-[10px] transition-all shadow-sm hover:shadow-md active:scale-95">
+                                    <Edit3 size={14} /> その他の一括変更
+                                </button>
+
+
+                                {(role === 'admin' || role === 'super_admin') && (
+                                    <button onClick={handleBulkDelete} disabled={isPending} className="text-xs font-bold text-red-500 hover:text-red-600 flex items-center gap-1 bg-white border border-red-200 px-3 py-1.5 rounded-[10px] transition-all shadow-sm hover:shadow-md active:scale-95 disabled:opacity-50">
+                                        {isPending ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />} 削除
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    )
+                }
+
+                {
+                    layout === 'grid' ? (
+                        <div className="flex flex-col gap-6 pb-16">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                                {paginatedData.length === 0 && <div className="col-span-full py-12 text-center text-slate-400 bg-white border border-slate-200 rounded-[24px]"><Search size={32} className="mx-auto mb-2 opacity-30" />データがありません。</div>}
+                                {paginatedData.map((w) => {
                                     const isChecked = selectedIds.includes(w.id);
                                     return (
-                                        <tr key={w.id} className={`transition-colors hover:bg-gray-50 ${isChecked ? 'bg-green-50/50' : ''}`}>
-                                            <td className="border border-gray-350 px-4 py-3 text-center align-top pt-5">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={isChecked}
-                                                    onChange={() => toggleSelect(w.id)}
-                                                    className="w-4 h-4 text-primary-600 rounded border-gray-300 cursor-pointer"
-                                                />
-                                            </td>
-                                            <td className="border border-gray-350 px-4 py-3 align-top">
-                                                <div className="flex flex-col gap-2">
+                                        <div key={w.id} className={`group relative bg-white border rounded-[24px] p-5 transition-all duration-300 ${isChecked ? 'border-[#24b47e] ring-1 ring-[#24b47e] shadow-sm' : 'border-slate-200 hover:border-[#24b47e] hover:-translate-y-1'}`}>
+                                            <button className="absolute top-4 right-4 text-slate-300 hover:text-[#24b47e] transition-colors z-10" onClick={() => toggleSelect(w.id)}>
+                                                {isChecked ? <CheckSquare className="text-[#24b47e]" size={20} /> : <Square size={20} />}
+                                            </button>
+                                            <div className="flex items-start gap-4 mb-4">
+                                                <div className="w-12 h-12 rounded-[12px] bg-emerald-50 flex items-center justify-center shrink-0 border border-emerald-100 overflow-hidden">
+                                                    {w.avatar_url ? <img src={w.avatar_url} className="w-full h-full object-cover" /> : <UserCircle2 size={24} className="text-[#24b47e]" />}
+                                                </div>
+                                                <div className="pr-6">
+                                                    <Link href={`/workers/${w.id}`} className="font-bold text-slate-800 hover:text-[#24b47e] transition-colors line-clamp-1">{w.full_name_romaji}</Link>
+                                                    <div className="text-xs text-slate-400 mt-1 line-clamp-1 font-medium">{w.companies?.name_jp || '未配属'}</div>
+                                                </div>
+                                            </div>
+                                            <div className="space-y-2 mb-4">
+                                                <div className="flex items-center justify-between text-[11px]">
+                                                    <span className="text-slate-400 font-bold uppercase tracking-wider">在留資格</span>
+                                                    <span className="font-bold text-slate-700 truncate max-w-[150px]" title={w.visa_status || ''}>{w.visa_status || '-'}</span>
+                                                </div>
+                                                <div className="flex items-center justify-between text-[11px]">
+                                                    <span className="text-slate-400 font-bold uppercase tracking-wider">受入職種</span>
+                                                    <span className="font-bold text-slate-700 truncate max-w-[150px]" title={w.industry_field || ''}>{w.industry_field || '-'}</span>
+                                                </div>
+                                                <div className="flex items-center justify-between text-[11px]">
+                                                    <span className="text-slate-400 font-bold uppercase tracking-wider">入国日</span>
+                                                    <span className="font-mono font-bold text-slate-700">{w.entry_date ? w.entry_date.replace(/-/g, '/') : '-'}</span>
+                                                </div>
+                                                <div className="flex items-center justify-between text-[11px]">
+                                                    <span className="text-slate-400 font-bold uppercase tracking-wider">在留期限</span>
+                                                    <span className={`font-mono font-bold ${w.zairyu_exp && w.zairyu_exp <= next90DaysStr ? 'text-red-500' : 'text-slate-700'}`}>{w.zairyu_exp ? w.zairyu_exp.replace(/-/g, '/') : '-'}</span>
+                                                </div>
+                                                <div className="flex items-center justify-between text-[11px] pt-1">
+                                                    <span className="text-slate-400 font-bold uppercase tracking-wider">ステータス</span>
+                                                    {getStatusBadge(w.status)}
+                                                </div>
+                                            </div>
+                                            <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
+                                                <Link href={`/workers/${w.id}`} className="text-xs font-bold text-slate-400 hover:text-[#24b47e] transition-colors px-2 py-1 -ml-2 rounded-md hover:bg-emerald-50">詳細を見る</Link>
+                                            </div>
+                                        </div>
+                                    )
+                                })}
+                            </div>
+                            {totalPages > 1 && (
+                                <div className="flex justify-center items-center gap-2 mt-8 pb-4">
+                                    <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}
+                                        className="w-9 h-9 flex items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
+                                        <ChevronLeft size={16} />
+                                    </button>
+                                    <div className="flex items-center gap-1">
+                                        {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                                            <button key={page} onClick={() => setCurrentPage(page)}
+                                                className={`w-9 h-9 rounded-xl text-sm font-bold transition-all ${currentPage === page ? 'bg-slate-800 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'}`}>
+                                                {page}
+                                            </button>
+                                        ))}
+                                    </div>
+                                    <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}
+                                        className="w-9 h-9 flex items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
+                                        <ChevronRight size={16} />
+                                    </button>
+                                    <span className="text-[11px] text-slate-400 ml-2">
+                                        {filtered.length} 名中 {(currentPage - 1) * pageSize + 1}–{Math.min(currentPage * pageSize, filtered.length)} 名
+                                    </span>
+                                </div>
+                            )}
+                        </div>
+                    ) : (
+                        <div className="overflow-x-auto pb-16">
+                            <table className="w-[1120px] table-fixed border-collapse text-sm text-left">
+                                <thead>
+                                    <tr className="bg-slate-800">
+                                        <th className="px-4 py-3.5 text-center w-[50px]">
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedIds.length === filtered.length && filtered.length > 0}
+                                                onChange={toggleSelectAll}
+                                                className="w-4 h-4 text-[#24b47e] rounded border-slate-300 cursor-pointer"
+                                            />
+                                        </th>
+                                        <th className="px-4 py-3.5 font-bold text-[11px] uppercase tracking-wider w-[260px] text-slate-200">氏名(フリガナ)</th>
+                                        <th className="px-4 py-3.5 font-bold text-[11px] uppercase tracking-wider w-[110px] text-slate-200">生年月日/国籍</th>
+                                        <th className="px-4 py-3.5 font-bold text-[11px] uppercase tracking-wider w-[270px] text-slate-200">受入企業 / 社宅住所</th>
+                                        <th className="px-4 py-3.5 font-bold text-[11px] uppercase tracking-wider w-[100px] text-slate-200">状態/期生</th>
+                                        <th className="px-4 py-3.5 font-bold text-[11px] uppercase tracking-wider w-[165px] text-slate-200">在留資格 / 職種</th>
+                                        <th className="px-4 py-3.5 font-bold text-[11px] uppercase tracking-wider w-[145px] text-slate-200">入国日 / 在留期限</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-300">
+                                    {paginatedData.length === 0 && <tr><td colSpan={7} className="px-5 py-16 text-center text-slate-400 font-medium"><Search size={32} className="mx-auto mb-2 opacity-30" />データがありません。</td></tr>}
+                                    {paginatedData.map((w, idx) => {
+                                        const isChecked = selectedIds.includes(w.id);
+                                        return (
+                                            <tr
+                                                key={w.id}
+                                                className={`
+                                                    transition-all duration-150
+                                                    ${isChecked
+                                                        ? 'bg-emerald-50 border-l-2 border-l-[#24b47e]'
+                                                        : idx % 2 === 0 ? 'bg-white hover:bg-slate-50/80' : 'bg-slate-50/40 hover:bg-slate-50/80'
+                                                    }
+                                                `}
+                                            >
+                                                <td className="px-4 py-3.5 text-center align-middle">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={isChecked}
+                                                        onChange={() => toggleSelect(w.id)}
+                                                        className="w-4 h-4 text-[#24b47e] rounded border-slate-300 cursor-pointer"
+                                                    />
+                                                </td>
+                                                <td className="px-4 py-3.5 align-middle">
                                                     <div className="flex items-center gap-3">
-                                                        <div className="w-9 h-9 shrink-0 rounded-md bg-primary-100 text-primary-700 font-bold flex items-center justify-center text-lg overflow-hidden border border-primary-200">
+                                                        <div className="w-9 h-9 shrink-0 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 text-white font-bold flex items-center justify-center text-sm overflow-hidden shadow-sm">
                                                             {w.avatar_url ? <img src={w.avatar_url} className="w-full h-full object-cover" /> : (w.full_name_romaji || '?').charAt(0).toUpperCase()}
                                                         </div>
                                                         <div className="flex-1 min-w-0">
-                                                            <Link href={`/workers/${w.id}`} className="group block" title={`${w.full_name_romaji} ${w.full_name_kana ? ` ${w.full_name_kana}` : ''}`}>
-                                                                <div className="font-semibold text-gray-900 group-hover:text-[#24b47e] transition-colors truncate">{w.full_name_romaji}</div>
-                                                                {w.full_name_kana && <div className="text-[11px] text-gray-400 font-normal mt-0.5 truncate">{w.full_name_kana}</div>}
-                                                            </Link>
-
+                                                            <Link href={`/workers/${w.id}`} className="block font-bold text-slate-800 hover:text-[#24b47e] transition-colors leading-snug truncate" title={w.full_name_romaji || ''}>{w.full_name_romaji}</Link>
+                                                            {w.full_name_kana && <div className="text-[11px] text-slate-400 font-medium mt-0.5 leading-snug truncate">{w.full_name_kana}</div>}
                                                         </div>
                                                     </div>
-                                                </div>
-                                            </td>
-                                            <td className="border border-gray-350 px-4 py-3 align-top">
-                                                <div className="font-mono text-[13px] text-gray-900 font-medium whitespace-nowrap">{w.dob ? w.dob.replace(/-/g, '/') : '-'}</div>
-                                                <div className="text-xs text-gray-500 mt-1 whitespace-nowrap font-medium">{w.nationality || '-'}</div>
-                                            </td>
-                                            <td className="border border-gray-350 px-4 py-3 align-top">
-                                                <div className="flex flex-col gap-1 items-start w-full">
-                                                    <div className="font-semibold text-gray-900 text-[13px] truncate" title={w.companies?.name_jp || '未配属'}>
-                                                        {w.companies?.name_jp || '未配属'}
+                                                </td>
+                                                <td className="px-4 py-3.5 align-middle">
+                                                    <div className="font-mono text-[13px] text-slate-800 font-bold whitespace-nowrap">{w.dob ? w.dob.replace(/-/g, '/') : '-'}</div>
+                                                    <div className="text-[11px] text-slate-400 mt-0.5 whitespace-nowrap font-bold uppercase tracking-wider">{w.nationality || '-'}</div>
+                                                </td>
+                                                <td className="px-4 py-3.5 align-middle">
+                                                    <div className="font-bold text-slate-800 text-[13px] leading-snug truncate" title={w.companies?.name_jp || '未配属'}>{w.companies?.name_jp || '未配属'}</div>
+                                                    <div className="text-[11px] text-slate-400 font-medium leading-snug truncate mt-0.5" title={w.address ? `社宅：${w.address}` : ''}>{w.address ? `社宅：${w.address}` : '-'}</div>
+                                                </td>
+                                                <td className="px-4 py-3.5 align-middle">
+                                                    <div className="flex flex-col gap-1 items-start">
+                                                        {getStatusBadge(w.status)}
+                                                        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest pl-0.5">{w.entry_batch ? `${w.entry_batch}期生` : '-'}</span>
                                                     </div>
-                                                    <div className="text-[11px] text-gray-500 truncate w-full" title={w.address ? `社宅：${w.address}` : ''}>
-                                                        {w.address ? `社宅：${w.address}` : '-'}
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td className="border border-gray-350 px-4 py-3 align-top">
-                                                <div className="flex flex-col gap-1 items-start">
-                                                    <span className={`text-[13px] font-bold ${w.status === 'working' ? 'text-[#24b47e]' : w.status === 'standby' ? 'text-amber-500' : w.status === 'returned' ? 'text-gray-500' : w.status === 'missing' ? 'text-red-500' : 'text-gray-500'}`}>{w.status === 'working' ? '就業中' : w.status === 'standby' ? '対応中' : w.status === 'returned' ? '帰国' : w.status === 'waiting' ? '入国待ち' : w.status === 'missing' ? '失踪' : w.status}</span>
-                                                    <span className="text-xs text-gray-400 font-medium">{w.entry_batch ? `${w.entry_batch}期生` : '-'}</span>
-                                                </div>
-                                            </td>
-                                            <td className="border border-gray-350 px-4 py-3 align-top">
-                                                <div className="flex flex-col gap-1 inline-flex w-full">
-                                                    <div className="text-[13px] font-medium text-gray-900 truncate">
-                                                        {w.visa_status || '-'}
-                                                    </div>
-                                                    <div className="text-xs text-gray-500 mt-1 truncate max-w-[150px]" title={w.industry_field || ''}>
-                                                        {w.industry_field || '-'}
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td className="border border-gray-350 px-4 py-3 align-top">
-                                                <div className="font-mono text-xs text-gray-900 font-medium whitespace-nowrap">入: {w.entry_date ? w.entry_date.replace(/-/g, '/') : '-'}</div>
-                                                <div className={`font-mono text-xs mt-1 whitespace-nowrap font-medium ${w.zairyu_exp && w.zairyu_exp <= next90DaysStr ? 'text-red-600' : 'text-gray-500'}`}>期: {w.zairyu_exp ? w.zairyu_exp.replace(/-/g, '/') : '-'}</div>
-                                            </td>
+                                                </td>
+                                                <td className="px-4 py-3.5 align-middle">
+                                                    <div className="text-[13px] font-bold text-slate-800 truncate" title={w.visa_status || ''}>{w.visa_status || '-'}</div>
+                                                    <div className="text-[11px] text-slate-400 font-bold uppercase tracking-wider truncate mt-0.5" title={w.industry_field || ''}>{w.industry_field || '-'}</div>
+                                                </td>
+                                                <td className="px-4 py-3.5 align-middle">
+                                                    <div className="font-mono text-[12px] text-slate-800 font-bold whitespace-nowrap">入: {w.entry_date ? w.entry_date.replace(/-/g, '/') : '-'}</div>
+                                                    <div className={`font-mono text-[12px] mt-0.5 whitespace-nowrap font-bold ${w.zairyu_exp && w.zairyu_exp <= next90DaysStr ? 'text-red-500' : 'text-slate-400'}`}>期: {w.zairyu_exp ? w.zairyu_exp.replace(/-/g, '/') : '-'}</div>
+                                                </td>
+                                            </tr>
+                                        )
+                                    })}
+                                </tbody>
+                            </table>
+                            {totalPages > 1 && (
+                                <div className="flex justify-center items-center gap-2 mt-8 pb-4">
+                                    <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}
+                                        className="w-9 h-9 flex items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
+                                        <ChevronLeft size={16} />
+                                    </button>
+                                    <div className="flex items-center gap-1">
+                                        {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                                            <button key={page} onClick={() => setCurrentPage(page)}
+                                                className={`w-9 h-9 rounded-xl text-sm font-bold transition-all ${currentPage === page ? 'bg-slate-800 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'}`}>
+                                                {page}
+                                            </button>
+                                        ))}
+                                    </div>
+                                    <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}
+                                        className="w-9 h-9 flex items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
+                                        <ChevronRight size={16} />
+                                    </button>
+                                    <span className="text-[11px] text-slate-400 ml-2">
+                                        {filtered.length} 名中 {(currentPage - 1) * pageSize + 1}–{Math.min(currentPage * pageSize, filtered.length)} 名
+                                    </span>
+                                </div>
+                            )}
+                        </div>
+                    )
+                }
+            </div>
 
-                                            <td className="border border-gray-350 px-4 py-3 align-top">
-                                                <div className="font-semibold text-gray-900 text-[13px] truncate max-w-[150px]" title={w.sending_org || ''}>{w.sending_org || '-'}</div>
-                                                <div className={`font-mono text-xs mt-1 whitespace-nowrap font-medium ${w.insurance_exp && w.insurance_exp <= next90DaysStr ? 'text-red-600' : 'text-gray-500'}`}>保: {w.insurance_exp ? w.insurance_exp.replace(/-/g, '/') : '-'}</div>
-                                            </td>
-                                        </tr>
-                                    )
-                                })}
-                            </tbody>
-                        </table>
-                    </div>
-                )
-            }
-
-            {
-                isBulkEditModalOpen && (
-                    <BulkEditModal
-                        selectedIds={selectedIds}
-                        onClose={() => setIsBulkEditModalOpen(false)}
-                        onSuccess={handleBulkEditSuccess}
-                    />
-                )
-            }
+            {isBulkEditModalOpen && (
+                <BulkEditModal
+                    selectedIds={selectedIds}
+                    onClose={() => setIsBulkEditModalOpen(false)}
+                    onSuccess={handleBulkEditSuccess}
+                    companies={companyOptions}
+                />
+            )}
         </div>
     )
 }

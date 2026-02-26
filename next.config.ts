@@ -12,9 +12,6 @@ const nextConfig: any = {
       { protocol: 'https', hostname: '*.supabase.in' }
     ],
   },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
   typescript: {
     ignoreBuildErrors: true,
   }

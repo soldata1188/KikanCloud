@@ -70,12 +70,12 @@ export default function UpdatePasswordPage() {
                 router.refresh()
             }, 2000)
 
-        } catch (err: any) {
-            console.error('Update password error:', err)
-            if (err.message && err.message.toLowerCase().includes('session missing')) {
+        } catch (err: unknown) {
+            const errMsg = err instanceof Error ? err.message : ''
+            if (errMsg.toLowerCase().includes('session missing')) {
                 setError('認証セッションが見つかりません。リンクが期限切れか、すでに使用されています。')
             } else {
-                setError(`エラー: ${err.message || 'パスワードの更新に失敗しました。'}`)
+                setError(`エラー: ${errMsg || 'パスワードの更新に失敗しました。'}`)
             }
         } finally {
             setLoading(false)

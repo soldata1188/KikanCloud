@@ -8,24 +8,24 @@ export default function ExamTab({ workers = [], onUpdate }: { workers?: any[], o
     const examWorkers = workers.filter(w => w.kenteiStatus && w.kenteiStatus.type && w.kenteiStatus.type !== '---');
 
     return (
-        <div className="w-full bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden print:border-none print:shadow-none print:rounded-none">
+        <div className="w-full bg-white rounded-[24px] shadow-sm border border-slate-200 overflow-hidden print:border-none print:shadow-none print:rounded-none">
             {/* Print-only Title */}
             <div className="hidden print:block text-center mb-6">
                 <h1 className="text-xl font-bold border-b-2 border-black inline-block pb-1">検定・試験進捗一覧</h1>
-                <div className="text-right text-[10px] mt-2 text-gray-500">
+                <div className="text-right text-[10px] mt-2 text-slate-500">
                     印刷日: {new Date().toLocaleDateString('ja-JP')}
                 </div>
             </div>
 
             {/* Header with Print Button */}
-            <div className="flex justify-between items-center p-4 border-b border-gray-100 bg-gray-50/30 print:hidden">
-                <h3 className="text-gray-800 font-bold flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-primary-500"></span>
+            <div className="flex justify-between items-center p-5 border-b border-slate-100 bg-slate-50/30 print:hidden">
+                <h3 className="text-slate-800 font-bold flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-[#24b47e]"></span>
                     検定・試験進捗一覧
                 </h3>
                 <button
                     onClick={() => window.print()}
-                    className="flex items-center gap-2 px-3 py-1.5 bg-primary-600 text-white rounded-md text-sm font-bold hover:bg-primary-700 transition-colors shadow-sm"
+                    className="flex items-center gap-2 px-4 py-2 bg-[#24b47e] text-white rounded-[12px] text-sm font-bold hover:bg-[#1e9a6a] transition-all shadow-md shadow-[#24b47e]/20 active:scale-95"
                 >
                     <Printer size={16} />
                     PDFとして印刷 (A4横)
@@ -34,49 +34,49 @@ export default function ExamTab({ workers = [], onUpdate }: { workers?: any[], o
 
             <div className="overflow-x-auto no-scrollbar print:overflow-visible">
                 <table className="w-full border-collapse text-sm text-left whitespace-nowrap print:whitespace-normal">
-                    <thead className="bg-gray-50 text-gray-800 print:bg-gray-100">
+                    <thead className="bg-slate-50/50 text-slate-500 print:bg-slate-100">
                         <tr>
-                            <th className="border border-gray-350 px-4 py-3 font-semibold w-[12%] sticky left-0 z-10 bg-gray-50 shadow-[1px_0_0_0_#d1d5db] print:w-[12%] print-col-name">氏名</th>
-                            <th className="border border-gray-350 px-4 py-3 font-semibold w-[18%] sticky left-[150px] z-10 bg-gray-50 shadow-[1px_0_0_0_#d1d5db] print:w-[18%] print-col-corp">受入企業</th>
-                            <th className="border border-gray-350 px-4 py-3 font-semibold w-[10%] print:w-[10%] print-col-task">業務内容</th>
-                            <th className="border border-gray-350 px-4 py-3 font-semibold w-[10%] print:w-[10%] print-col-date">学科日</th>
-                            <th className="border border-gray-350 px-4 py-3 font-semibold w-[10%] print:w-[10%] print-col-date">実技日</th>
-                            <th className="border border-gray-350 px-4 py-3 font-semibold w-[10%] print:w-[10%] print-col-staff">担当者</th>
-                            <th className="border border-gray-350 px-4 py-3 font-semibold w-[10%] print:w-[10%] print-col-status">進捗</th>
+                            <th className="border-b border-r border-slate-200 px-4 py-4 font-bold text-[11px] uppercase tracking-wider w-[12%] sticky left-0 z-10 bg-slate-50/80 backdrop-blur-sm print:w-[12%] print-col-name shadow-[1px_0_0_0_#e2e8f0]">氏名</th>
+                            <th className="border-b border-r border-slate-200 px-4 py-4 font-bold text-[11px] uppercase tracking-wider w-[18%] sticky left-[150px] z-10 bg-slate-50/80 backdrop-blur-sm print:w-[18%] print-col-corp shadow-[1px_0_0_0_#e2e8f0]">受入企業</th>
+                            <th className="border-b border-r border-slate-200 px-4 py-4 font-bold text-[11px] uppercase tracking-wider w-[10%] print:w-[10%] print-col-task text-center">業務内容</th>
+                            <th className="border-b border-r border-slate-200 px-4 py-4 font-bold text-[11px] uppercase tracking-wider w-[10%] print:w-[10%] print-col-date text-center">学科日</th>
+                            <th className="border-b border-r border-slate-200 px-4 py-4 font-bold text-[11px] uppercase tracking-wider w-[10%] print:w-[10%] print-col-date text-center">実技日</th>
+                            <th className="border-b border-r border-slate-200 px-4 py-4 font-bold text-[11px] uppercase tracking-wider w-[10%] print:w-[10%] print-col-staff text-center">担当者</th>
+                            <th className="border-b border-slate-200 px-4 py-4 font-bold text-[11px] uppercase tracking-wider w-[10%] print:w-[10%] print-col-status text-center">進捗</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody className="divide-y divide-slate-100">
                         {examWorkers.length === 0 ? (
                             <tr>
-                                <td colSpan={7} className="text-center py-10 text-gray-500 text-sm border-b border-l border-r border-gray-350">
+                                <td colSpan={7} className="text-center py-16 text-slate-400 text-sm">
                                     対象データがありません。
                                 </td>
                             </tr>
                         ) : (
                             examWorkers.map((worker) => (
-                                <tr key={worker.id} className="hover:bg-primary-50 transition-colors">
-                                    <td className="border border-gray-350 p-3 bg-white sticky left-0 z-10 shadow-[1px_0_0_0_#d1d5db] font-medium group-hover:bg-primary-50">
+                                <tr key={worker.id} className="group transition-colors hover:bg-slate-50/50">
+                                    <td className="border-r border-slate-100/50 p-4 bg-white sticky left-0 z-10 font-bold text-slate-800 shadow-[1px_0_0_0_#f1f5f9] group-hover:bg-slate-50/50 transition-colors">
                                         {worker.name || '---'}
                                     </td>
-                                    <td className="border border-gray-350 p-3 bg-white sticky left-[150px] z-10 shadow-[1px_0_0_0_#d1d5db] text-gray-600 group-hover:bg-primary-50">
+                                    <td className="border-r border-slate-100/50 p-4 bg-white sticky left-[150px] z-10 text-slate-600 font-medium shadow-[1px_0_0_0_#f1f5f9] group-hover:bg-slate-50/50 transition-colors">
                                         {worker.company || '---'}
                                     </td>
-                                    <td className="border border-gray-350 p-3">
+                                    <td className="border-r border-slate-100/50 p-4 text-slate-700 text-center">
                                         {worker.kenteiStatus.type}
                                     </td>
-                                    <td className="border border-gray-350 p-3">
-                                        {worker.kenteiStatus.exam_date_written || <span className="text-gray-400">---</span>}
+                                    <td className="border-r border-slate-100/50 p-4 text-slate-600 font-mono text-center">
+                                        {worker.kenteiStatus.exam_date_written || <span className="text-slate-300">---</span>}
                                     </td>
-                                    <td className="border border-gray-350 p-3">
-                                        {worker.kenteiStatus.exam_date_practical || <span className="text-gray-400">---</span>}
+                                    <td className="border-r border-slate-100/50 p-4 text-slate-600 font-mono text-center">
+                                        {worker.kenteiStatus.exam_date_practical || <span className="text-slate-300">---</span>}
                                     </td>
-                                    <td className="border border-gray-350 p-3">
+                                    <td className="border-r border-slate-100/50 p-4 text-slate-600 text-center">
                                         {worker.kenteiStatus.assignee || '---'}
                                     </td>
-                                    <td className="border border-gray-350 p-3">
-                                        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${worker.kenteiStatus.progress === '完了' ? 'bg-green-100 text-green-700' :
-                                            worker.kenteiStatus.progress === '進行中' ? 'bg-blue-100 text-blue-700' :
-                                                'bg-gray-100 text-gray-700'
+                                    <td className="p-4 text-center">
+                                        <span className={`px-3 py-1 rounded-full text-[11px] font-bold shadow-sm ${worker.kenteiStatus.progress === '完了' ? 'bg-emerald-50 text-[#24b47e]' :
+                                            worker.kenteiStatus.progress === '進行中' ? 'bg-blue-50 text-blue-600' :
+                                                'bg-slate-100 text-slate-400'
                                             }`}>
                                             {worker.kenteiStatus.progress || '未着手'}
                                         </span>

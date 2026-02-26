@@ -20,7 +20,7 @@ export default async function SettingsPage() {
 
     const { data: userProfile } = await supabase
         .from("users")
-        .select("full_name, role, tenant_id, login_id, tenants(*)")
+        .select("full_name, role, tenant_id, login_id, ai_model, ai_tone, tenants(*)")
         .eq("id", user.id)
         .single();
 
@@ -68,6 +68,8 @@ export default async function SettingsPage() {
                             usersList={usersList}
                             companiesList={companiesList}
                             tenant={tenant}
+                            initialAiModel={userProfile.ai_model || "gemini-2.5-flash"}
+                            initialAiTone={userProfile.ai_tone || "professional"}
                         />
                     </Suspense>
                 </main>

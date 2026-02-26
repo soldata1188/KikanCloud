@@ -76,3 +76,22 @@ export async function updateProfile(formData: FormData) {
 
     revalidatePath('/settings')
 }
+
+export async function updateAiSettings(formData: FormData) {
+    const localSupabase = await createClient()
+    const { data: { user } } = await localSupabase.auth.getUser()
+    if (!user) throw new Error('Unauthorized')
+
+    const aiModel = formData.get('aiModel') as string
+    const aiTone = formData.get('aiTone') as string
+
+    const adminClient = getAdminClient()
+    const { error } = await adminClient
+        .from('users')
+        .update({ ai_model: aiModel, ai_tone: aiTone })
+        .eq('id', user.id)
+
+    if (error) throw new Error('AI設定の保存に失敗しました: ' + error.message)
+
+    revalidatePath('/settings')
+}

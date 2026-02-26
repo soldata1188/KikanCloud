@@ -6,7 +6,7 @@ import {
     UserCircle2, Bell, Building2, Bot, Save,
     ShieldCheck, Key,
 } from "lucide-react";
-import { updateProfile } from "./actions";
+import { updateProfile, updateAiSettings } from "./actions";
 import { SaveButton } from "@/components/SubmitButtons";
 import OrganizationForm from "../organization/OrganizationForm";
 import TeamManagerClient from "../accounts/TeamManagerClient";
@@ -20,6 +20,8 @@ interface SettingsProps {
     usersList: any[];
     companiesList: any[];
     tenant: any;
+    initialAiModel?: string;
+    initialAiTone?: string;
 }
 
 // ── Shared label style ─────────────────────────────────────────────
@@ -92,8 +94,8 @@ function TabNotifications({ emailAlerts, setEmailAlerts, pushAlerts, setPushAler
 }
 
 // ── Tab: AI設定 ──────────────────────────────────────────────────
-function TabAI({ aiModel, setAiModel, aiTone, setAiTone }:
-    { aiModel: string; setAiModel: (v: string) => void; aiTone: string; setAiTone: (v: string) => void }) {
+function TabAI({ aiModel, setAiModel, aiTone, setAiTone, saved }:
+    { aiModel: string; setAiModel: (v: string) => void; aiTone: string; setAiTone: (v: string) => void; saved: boolean }) {
     return (
         <div className="max-w-sm mx-auto py-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
             <div className="mb-6">
@@ -102,31 +104,39 @@ function TabAI({ aiModel, setAiModel, aiTone, setAiTone }:
                 </h3>
                 <p className="text-[12px] text-slate-400 mt-1">Gemini AIのモデルと応答スタイルをカスタマイズします。</p>
             </div>
-            <div className="space-y-4 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+            <form action={updateAiSettings} className="space-y-4 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+                {/* hidden input to carry aiTone (set by button click) */}
+                <input type="hidden" name="aiTone" value={aiTone} />
                 <div>
                     <label className={L}>Core Engine</label>
-                    <select value={aiModel} onChange={(e) => setAiModel(e.target.value)}
+                    <select name="aiModel" value={aiModel} onChange={(e) => setAiModel(e.target.value)}
                         className="w-full h-11 px-4 bg-slate-50 border border-slate-200 rounded-xl text-[14px] font-bold outline-none focus:border-emerald-400">
-                        <option value="gemini-1.5-flash">Gemini 1.5 Flash (高速・推奨)</option>
-                        <option value="gemini-1.5-pro">Gemini 1.5 Pro (高度な推論)</option>
+                        <option value="gemini-2.5-flash">Gemini 2.5 Flash (最新・推奨)</option>
                         <option value="gemini-2.0-flash-exp">Gemini 2.0 Flash (次世代)</option>
+                        <option value="gemini-1.5-pro">Gemini 1.5 Pro (高度な推論)</option>
+                        <option value="gemini-1.5-flash">Gemini 1.5 Flash (高速・省コスト)</option>
                     </select>
                 </div>
                 <div>
                     <label className={L}>応答スタイル (Tone)</label>
                     <div className="grid grid-cols-2 gap-2">
                         {[['professional', 'プロフェッショナル'], ['friendly', 'フレンドリー']].map(([v, l]) => (
-                            <button key={v} onClick={() => setAiTone(v)}
+                            <button type="button" key={v} onClick={() => setAiTone(v)}
                                 className={`py-2.5 px-3 rounded-xl border text-[13px] font-bold transition-all ${aiTone === v ? 'bg-slate-900 text-white border-slate-900' : 'bg-white text-slate-500 border-slate-200 hover:border-slate-400'}`}>
                                 {l}
                             </button>
                         ))}
                     </div>
                 </div>
-                <button className="w-full flex items-center justify-center gap-2 bg-slate-900 text-white px-6 py-3 rounded-xl hover:bg-emerald-600 transition-colors font-bold shadow-sm text-[13px]">
+                <button type="submit" className="w-full flex items-center justify-center gap-2 bg-slate-900 text-white px-6 py-3 rounded-xl hover:bg-emerald-600 transition-colors font-bold shadow-sm text-[13px]">
                     <Save size={15} /> 設定を保存
                 </button>
-            </div>
+                {saved && (
+                    <p className="text-center text-[12px] font-bold text-emerald-600 animate-in fade-in duration-300">
+                        ✓ AI設定を保存しました
+                    </p>
+                )}
+            </form>
         </div>
     );
 }
@@ -134,7 +144,7 @@ function TabAI({ aiModel, setAiModel, aiTone, setAiTone }:
 // ══════════════════════════════════════════════════════════════════
 // MAIN COMPONENT
 // ══════════════════════════════════════════════════════════════════
-export default function SettingsPageClient({ currentUser, userRole, usersList, companiesList, tenant }: SettingsProps) {
+export default function SettingsPageClient({ currentUser, userRole, usersList, companiesList, tenant, initialAiModel, initialAiTone }: SettingsProps) {
     const searchParams = useSearchParams();
     const initialTab = (searchParams.get("tab") as TabId) || "account";
 
@@ -145,8 +155,9 @@ export default function SettingsPageClient({ currentUser, userRole, usersList, c
     const [email] = useState(currentUser.email || "");
     const [emailAlerts, setEmailAlerts] = useState(true);
     const [pushAlerts, setPushAlerts] = useState(false);
-    const [aiModel, setAiModel] = useState("gemini-1.5-flash");
-    const [aiTone, setAiTone] = useState("professional");
+    const [aiModel, setAiModel] = useState(initialAiModel || "gemini-2.5-flash");
+    const [aiTone, setAiTone] = useState(initialAiTone || "professional");
+    const [aiSaved, setAiSaved] = useState(false);
 
     const isAdmin = userRole === "admin" || userRole === "union_admin";
 
@@ -250,7 +261,7 @@ export default function SettingsPageClient({ currentUser, userRole, usersList, c
 
                     {activeTab === "ai" && (
                         <div className="p-8">
-                            <TabAI aiModel={aiModel} setAiModel={setAiModel} aiTone={aiTone} setAiTone={setAiTone} />
+                            <TabAI aiModel={aiModel} setAiModel={setAiModel} aiTone={aiTone} setAiTone={setAiTone} saved={aiSaved} />
                         </div>
                     )}
                 </div>

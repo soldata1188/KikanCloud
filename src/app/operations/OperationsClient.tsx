@@ -20,6 +20,9 @@ export interface OperationData {
     agent?: string;
     construction_type?: string;
     construction_assignee?: string;
+    witness?: string;
+    exam_result_written?: string;
+    exam_result_practical?: string;
 }
 
 const PROGRESS_OPTIONS = ['未着手', '進行中', '完了'];
@@ -129,12 +132,13 @@ export default function OperationsClient({
             visaStatus: w.visa_status || '---',
             visaExpiry: w.visas?.[0]?.expiration_date || '---',
             entryDate: w.entry_date || '',
+            entryBatch: w.entry_batch || '---',
             certStartDate: w.cert_start_date || '---',
             certEndDate: w.cert_end_date || '---',
             remarks: w.remarks || '',
             address: w.address || '',
             status: reverseStatusMap[w.status] || '未入国',
-            kenteiStatus: (typeof w.kentei_status === 'object' && w.kentei_status ? w.kentei_status : { type: '---', progress: '未着手', assignee: '---', exam_date_written: '', exam_date_practical: '' }) as OperationData,
+            kenteiStatus: (typeof w.kentei_status === 'object' && w.kentei_status ? w.kentei_status : { type: '---', progress: '未着手', assignee: '---', witness: '---', exam_location: '', exam_date_written: '', exam_date_practical: '', exam_result_written: '---', exam_result_practical: '---' }) as OperationData,
             kikouStatus: (typeof w.kikou_status === 'object' && w.kikou_status ? w.kikou_status : { type: '---', progress: '未着手', assignee: '---', construction_type: '---', construction_assignee: '---' }) as OperationData,
             nyukanStatus: (typeof w.nyukan_status === 'object' && w.nyukan_status ? w.nyukan_status : { type: '---', progress: '未着手', assignee: '---', application_date: '', agent: '' }) as OperationData
         };
@@ -269,7 +273,7 @@ export default function OperationsClient({
             </div>
 
             {activeTab === 'overview' && (
-                <div className="w-full mx-auto">
+                <div className="w-full min-[720px]:w-[1500px] mx-auto">
 
                     {/* ── Status Sub-Tabs ── */}
                     <div className="flex px-6 pt-0 border-b border-slate-200 overflow-x-auto no-scrollbar bg-white">
@@ -411,13 +415,13 @@ export default function OperationsClient({
                                 {/* ── Worker Cards ── */}
                                 {group.map((worker) => (
                                     <div key={worker.id}
-                                        className={`flex flex-col xl:flex-row overflow-hidden rounded-2xl shadow-sm transition-all duration-200 border bg-white
+                                        className={`flex flex-col min-[720px]:flex-row overflow-hidden rounded-2xl shadow-sm transition-all duration-200 border bg-white
                                             ${selectedIds.includes(worker.id)
                                                 ? 'border-slate-400 shadow-md ring-1 ring-slate-300'
                                                 : 'border-slate-200 hover:border-slate-300 hover:shadow-md'}`}>
 
                                         {/* Mobile header */}
-                                        <div className="flex items-center justify-between xl:hidden font-bold text-sm text-slate-700 border-b border-slate-100 px-4 py-2 bg-slate-50">
+                                        <div className="flex items-center justify-between min-[720px]:hidden font-bold text-sm text-slate-700 border-b border-slate-100 px-4 py-2 bg-slate-50">
                                             <div className="flex items-center gap-2">
                                                 <input type="checkbox" checked={selectedIds.includes(worker.id)} onChange={() => toggleSelect(worker.id)} className="w-4 h-4 rounded border-slate-300 cursor-pointer accent-slate-700" />
                                                 <span className="text-xs text-slate-500">選択</span>
@@ -428,7 +432,7 @@ export default function OperationsClient({
                                         {/* ══════════════════════════════════════════════
                                             AVATAR COLUMN — portrait rectangle, far left
                                         ══════════════════════════════════════════════ */}
-                                        <div className="hidden xl:block w-[72px] shrink-0 self-stretch relative overflow-hidden">
+                                        <div className="hidden min-[720px]:block w-[96px] shrink-0 self-stretch relative overflow-hidden">
                                             {worker.photoUrl ? (
                                                 <img
                                                     src={worker.photoUrl}
@@ -452,7 +456,7 @@ export default function OperationsClient({
                                             {/* ─ Name row ─ */}
                                             <div className="flex items-start gap-2.5">
                                                 {/* Avatar circle/image — mobile only */}
-                                                <div className="xl:hidden w-9 h-9 shrink-0 rounded-xl bg-slate-700 border border-slate-600 overflow-hidden flex items-center justify-center shadow-sm">
+                                                <div className="min-[720px]:hidden w-9 h-9 shrink-0 rounded-xl bg-slate-700 border border-slate-600 overflow-hidden flex items-center justify-center shadow-sm">
                                                     {worker.photoUrl ? (
                                                         <img src={worker.photoUrl} className="w-full h-full object-cover" />
                                                     ) : (
@@ -461,7 +465,7 @@ export default function OperationsClient({
                                                 </div>
                                                 <div className="flex flex-col gap-0 min-w-0 flex-1">
                                                     <div className="flex items-baseline gap-2 min-w-0">
-                                                        <input type="checkbox" checked={selectedIds.includes(worker.id)} onChange={() => toggleSelect(worker.id)} className="w-3.5 h-3.5 rounded border-slate-300 cursor-pointer accent-slate-700 hidden xl:block shrink-0" />
+                                                        <input type="checkbox" checked={selectedIds.includes(worker.id)} onChange={() => toggleSelect(worker.id)} className="w-3.5 h-3.5 rounded border-slate-300 cursor-pointer accent-slate-700 hidden min-[720px]:block shrink-0" />
                                                         <Link href={`/workers/${worker.id}`} target="_blank" rel="noopener noreferrer"
                                                             className="font-black text-slate-900 hover:text-slate-600 hover:underline truncate text-[14px] leading-tight shrink-0">
                                                             {worker.name}
@@ -498,7 +502,7 @@ export default function OperationsClient({
                                         {/* ──────────────────────────────────────────────
                                             COL 2 — 在留情報 (blue accent)
                                         ────────────────────────────────────────────── */}
-                                        <div className={`flex-1 xl:flex-none xl:w-[190px] flex flex-col min-w-0 border-t xl:border-t-0 xl:border-l border-slate-100 ${C.zairyu.border}`}>
+                                        <div className={`flex-1 min-[720px]:flex-none min-[720px]:w-[190px] flex flex-col min-w-0 border-t min-[720px]:border-t-0 min-[720px]:border-l border-slate-100 ${C.zairyu.border}`}>
                                             <div className={`px-3 py-1.5 flex items-center justify-between gap-1.5 border-b ${C.zairyu.divider} bg-slate-50/50`}>
                                                 <span className={`text-[11px] font-black uppercase tracking-wider ${C.zairyu.label}`}>在留情報</span>
                                                 <select value={worker.status} onChange={e => handleChange(worker.id, 'status', e.target.value)}
@@ -527,7 +531,7 @@ export default function OperationsClient({
                                         {/* ──────────────────────────────────────────────
                                             COL 3 — 検定業務 (amber accent)
                                         ────────────────────────────────────────────── */}
-                                        <div className={`flex-1 flex flex-col min-w-0 border-t xl:border-t-0 xl:border-l border-slate-100 ${C.kentei.border}`}>
+                                        <div className={`flex-1 flex flex-col min-w-0 border-t min-[720px]:border-t-0 min-[720px]:border-l border-slate-100 ${C.kentei.border}`}>
                                             <div className={`px-3 py-1.5 flex items-center justify-between gap-1.5 border-b ${C.kentei.divider} bg-slate-50/50`}>
                                                 <span className={`text-[11px] font-black uppercase tracking-wider ${C.kentei.label}`}>検定業務</span>
                                                 <div
@@ -562,7 +566,7 @@ export default function OperationsClient({
                                         {/* ──────────────────────────────────────────────
                                             COL 4 — 機構業務 (violet accent)
                                         ────────────────────────────────────────────── */}
-                                        <div className={`flex-1 flex flex-col min-w-0 border-t xl:border-t-0 xl:border-l border-slate-100 ${C.kikou.border}`}>
+                                        <div className={`flex-1 flex flex-col min-w-0 border-t min-[720px]:border-t-0 min-[720px]:border-l border-slate-100 ${C.kikou.border}`}>
                                             <div className={`px-3 py-1.5 flex items-center justify-between gap-1.5 border-b ${C.kikou.divider} bg-slate-50/50`}>
                                                 <span className={`text-[11px] font-black uppercase tracking-wider ${C.kikou.label}`}>機構 / 建設</span>
                                                 <div
@@ -601,7 +605,7 @@ export default function OperationsClient({
                                         {/* ──────────────────────────────────────────────
                                             COL 5 — 入管業務 (teal accent)
                                         ────────────────────────────────────────────── */}
-                                        <div className={`flex-1 flex flex-col min-w-0 border-t xl:border-t-0 xl:border-l border-slate-100 ${C.nyukan.border}`}>
+                                        <div className={`flex-1 flex flex-col min-w-0 border-t min-[720px]:border-t-0 min-[720px]:border-l border-slate-100 ${C.nyukan.border}`}>
                                             <div className={`px-3 py-1.5 flex items-center justify-between gap-1.5 border-b ${C.nyukan.divider} bg-slate-50/50`}>
                                                 <span className={`text-[11px] font-black uppercase tracking-wider ${C.nyukan.label}`}>入管業務</span>
                                                 <div
@@ -678,8 +682,8 @@ export default function OperationsClient({
             )}
 
             {activeTab === 'exam' && (
-                <div className="w-full mx-auto p-6 print-target print:w-full print:mx-0 print:p-0">
-                    <ExamTab workers={workers} onUpdate={handleOperationChange} />
+                <div className="w-full min-[720px]:w-[1500px] mx-auto p-6 print-target print:w-full print:mx-0 print:p-0">
+                    <ExamTab workers={workers} onUpdate={handleOperationChange} staff={staff} />
                 </div>
             )}
         </div>

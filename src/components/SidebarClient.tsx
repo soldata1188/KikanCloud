@@ -54,14 +54,14 @@ export function SidebarClient({ active, userRole, userProfile }: SidebarClientPr
                 DESKTOP SIDEBAR (hidden on mobile)
             ══════════════════════════════════════════════════ */}
             <div
-                className="hidden md:block w-12 shrink-0 h-screen relative z-[100]"
+                className="hidden md:block w-[72px] shrink-0 h-screen relative z-[100]"
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
             >
-                <aside className={`absolute top-0 left-0 h-full bg-[#f1f5f9] border-r border-slate-200 flex flex-col pt-3 pb-6 transition-all duration-300 ease-in-out ${isHovered ? 'w-[240px]' : 'w-12'}`}>
+                <aside className={`absolute top-0 left-0 h-full bg-[#f1f5f9] border-r border-slate-200 flex flex-col pt-4 pb-6 transition-all duration-300 ease-in-out ${isHovered ? 'w-[280px]' : 'w-[72px]'}`}>
                     {/* Avatar / User */}
-                    <div className={`w-full flex items-center mb-8 px-2 transition-all duration-300 ${isHovered ? 'justify-start px-4' : 'justify-center'}`}>
-                        <div className="shrink-0 w-8 h-8 flex items-center justify-center">
+                    <div className={`w-full flex items-center mb-10 transition-all duration-300 ${isHovered ? 'justify-start px-5' : 'justify-center'}`}>
+                        <div className="shrink-0 w-11 h-11 flex items-center justify-center">
                             <SidebarAvatar userProfile={userProfile} />
                         </div>
                         {isHovered && (
@@ -77,21 +77,22 @@ export function SidebarClient({ active, userRole, userProfile }: SidebarClientPr
                     </div>
 
                     {/* Nav */}
-                    <nav className="flex-1 flex flex-col gap-1 w-full px-1 overflow-y-auto no-scrollbar">
+                    <nav className="flex-1 flex flex-col gap-2 w-full px-0 overflow-y-auto no-scrollbar items-center">
                         {ALL_NAV_ITEMS.map((item) => {
                             const isActive = active === item.id;
                             const Icon = item.icon;
                             return (
                                 <Link key={item.href} href={item.href}
-                                    className={`group relative flex items-center h-10 rounded-[10px] transition-all duration-300
-                                        ${isActive ? 'bg-[#24b47e] text-white shadow-[0_8px_16px_rgba(36,180,126,0.2)]'
+                                    className={`group relative flex items-center h-11 transition-all duration-300 rounded-full
+                                        ${isHovered ? 'w-[calc(100%-24px)] px-4' : 'w-14 justify-center'}
+                                        ${isActive ? 'bg-[#24b47e] text-white shadow-[0_8px_20px_rgba(36,180,126,0.3)]'
                                             : 'hover:bg-black/5 text-[#737373] hover:text-[#1f1f1f]'}`}
                                 >
-                                    <div className={`w-10 flex items-center justify-center shrink-0 transition-all duration-300 ${isActive ? "scale-110" : "group-hover:scale-110"}`}>
-                                        <Icon strokeWidth={isActive ? 2.5 : 2} className="w-[18px] h-[18px]" />
+                                    <div className={`flex items-center justify-center shrink-0 transition-all duration-300 ${isActive ? "scale-110" : "group-hover:scale-110"}`}>
+                                        <Icon strokeWidth={isActive ? 2.5 : 2} className="w-[20px] h-[20px]" />
                                     </div>
                                     {isHovered && (
-                                        <span className="ml-2 text-[13px] font-bold whitespace-nowrap overflow-hidden animate-in fade-in slide-in-from-left-2 duration-300">
+                                        <span className="ml-3 text-[14px] font-bold whitespace-nowrap overflow-hidden animate-in fade-in slide-in-from-left-2 duration-300">
                                             {item.name}
                                         </span>
                                     )}
@@ -118,9 +119,9 @@ export function SidebarClient({ active, userRole, userProfile }: SidebarClientPr
                         const Icon = item.icon;
                         return (
                             <Link key={item.href} href={item.href}
-                                className={`flex flex-col items-center gap-0.5 px-3 py-2 rounded-2xl transition-all duration-200 min-w-0 flex-1
+                                className={`flex flex-col items-center gap-0.5 px-3 py-2 rounded-full transition-all duration-200 min-w-0 flex-1
                                     ${isActive ? 'text-[#24b47e]' : 'text-slate-400 hover:text-slate-600'}`}>
-                                <div className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${isActive ? 'bg-[#24b47e]/10' : ''}`}>
+                                <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${isActive ? 'bg-[#24b47e]/10 shadow-inner shadow-emerald-500/10' : ''}`}>
                                     <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
                                 </div>
                                 <span className={`text-[9px] font-bold truncate ${isActive ? 'text-[#24b47e]' : 'text-slate-400'}`}>
@@ -133,7 +134,7 @@ export function SidebarClient({ active, userRole, userProfile }: SidebarClientPr
                     {/* More button */}
                     <button onClick={() => setMoreOpen(true)}
                         className={`flex flex-col items-center justify-center gap-0.5 py-2 transition-all duration-200 flex-1 ${moreOpen ? 'text-[#24b47e]' : 'text-slate-400 active:text-slate-600'}`}>
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${moreOpen ? 'bg-[#24b47e]/10' : ''}`}>
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${moreOpen ? 'bg-[#24b47e]/10 shadow-inner shadow-emerald-500/10' : ''}`}>
                             <MoreHorizontal size={21} strokeWidth={2} />
                         </div>
                         <span className="text-[9px] font-bold tracking-tight text-slate-400">もっと</span>
@@ -169,7 +170,7 @@ export function SidebarClient({ active, userRole, userProfile }: SidebarClientPr
                         </div>
                     </div>
                     <button onClick={() => setMoreOpen(false)}
-                        className="w-8 h-8 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500">
+                        className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200 shadow-sm transition-all">
                         <X size={16} />
                     </button>
                 </div>
@@ -181,9 +182,9 @@ export function SidebarClient({ active, userRole, userProfile }: SidebarClientPr
                         const Icon = item.icon;
                         return (
                             <Link key={item.href} href={item.href}
-                                className={`flex items-center gap-3 p-3.5 rounded-2xl border transition-all
+                                className={`flex items-center gap-3 p-4 rounded-[32px] border transition-all
                                     ${isActive
-                                        ? 'bg-[#24b47e] text-white border-[#24b47e] shadow-lg shadow-emerald-500/20'
+                                        ? 'bg-[#24b47e] text-white border-[#24b47e] shadow-lg shadow-emerald-500/25'
                                         : 'bg-slate-50 text-slate-600 border-slate-100 hover:border-slate-200 hover:bg-slate-100'}`}>
                                 <Icon size={18} strokeWidth={isActive ? 2.5 : 2} />
                                 <span className="text-[12px] font-bold leading-tight">{item.name}</span>

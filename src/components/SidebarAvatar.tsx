@@ -24,13 +24,13 @@ export function SidebarAvatar({ userProfile }: { userProfile: any }) {
         <div className="relative flex items-center justify-center" ref={ref}>
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="w-8 h-8 rounded-full bg-gradient-to-br from-[#24b47e] to-[#1a8b60] text-white flex items-center justify-center font-bold text-[13px] shadow-sm hover:shadow-md hover:ring-2 hover:ring-[#24b47e] hover:ring-offset-2 transition-all focus:outline-none shrink-0"
+                className="w-11 h-11 rounded-full bg-gradient-to-br from-[#24b47e] to-[#1a8b60] text-white flex items-center justify-center font-bold text-[16px] shadow-sm hover:shadow-md hover:ring-2 hover:ring-[#24b47e] hover:ring-offset-2 transition-all focus:outline-none shrink-0"
             >
                 {initials}
             </button>
 
             {isOpen && (
-                <div className="absolute left-16 top-0 w-56 bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden z-[100] animate-in slide-in-from-left-2 fade-in duration-200">
+                <div className="absolute left-[80px] top-0 w-64 bg-white rounded-[24px] shadow-xl border border-slate-200 overflow-hidden z-[100] animate-in slide-in-from-left-2 fade-in duration-200">
                     <div className="px-4 py-3 border-b border-[#ededed] bg-gray-50 flex flex-col gap-0.5">
                         <p className="text-[13px] font-bold text-[#1f1f1f] truncate leading-tight">{userProfile?.full_name || 'User'}</p>
                         <p className="text-[11px] text-[#878787] font-mono truncate leading-tight">{userProfile?.role}</p>

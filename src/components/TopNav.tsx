@@ -35,7 +35,7 @@ export function TopNav({ title, role }: { title: string, role?: string }) {
                         className="cursor-pointer p-2 rounded-xl transition-colors border border-slate-200 bg-white hover:bg-emerald-50 hover:border-emerald-200 active:scale-95"
                         title="AIアシスタント"
                     >
-                        <Sparkles size={16} className="text-[#24b47e]" />
+                        <Sparkles size={20} className="text-[#24b47e]" />
                     </button>
                 </div>
             </header>

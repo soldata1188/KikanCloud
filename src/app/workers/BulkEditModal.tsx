@@ -65,7 +65,7 @@ export function BulkEditModal({
 
     return (
         <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4">
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="bg-white rounded-[32px] shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
 
                 {/* Header */}
                 <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 bg-slate-800">
@@ -73,16 +73,16 @@ export function BulkEditModal({
                         <Edit3 size={16} className="text-emerald-400" />
                         一括変更
                     </h3>
-                    <button onClick={onClose} className="p-1.5 hover:bg-white/10 rounded-lg text-slate-300 hover:text-white transition-colors">
-                        <X size={18} />
+                    <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full text-slate-300 hover:text-white transition-colors">
+                        <X size={20} />
                     </button>
                 </div>
 
                 <form onSubmit={handleSubmit} className="p-5 space-y-4">
 
                     {/* Count badge */}
-                    <div className="text-sm font-medium text-slate-600 bg-emerald-50 border border-emerald-100 p-3 rounded-xl flex items-center gap-2">
-                        <span className="inline-flex items-center justify-center w-6 h-6 bg-emerald-500 text-white text-xs font-bold rounded-full">{selectedIds.length}</span>
+                    <div className="text-sm font-medium text-slate-600 bg-emerald-50 border border-emerald-100 p-4 rounded-[32px] flex items-center gap-3">
+                        <span className="inline-flex items-center justify-center w-7 h-7 bg-emerald-500 text-white text-xs font-black rounded-full shadow-sm shadow-emerald-500/20">{selectedIds.length}</span>
                         名を選択中 — 以下の項目を一括変更します
                     </div>
 
@@ -117,7 +117,7 @@ export function BulkEditModal({
                             <select
                                 value={value}
                                 onChange={(e) => setValue(e.target.value)}
-                                className="w-full h-[38px] border border-slate-200 rounded-xl px-3 text-sm focus:border-[#24b47e] focus:ring-1 focus:ring-[#24b47e] outline-none transition-all bg-white"
+                                className="w-full h-[40px] border border-slate-200 rounded-[32px] px-4 text-sm focus:border-[#24b47e] focus:ring-1 focus:ring-[#24b47e] outline-none transition-all bg-white"
                                 required
                             >
                                 <option value="" disabled>企業を選択してください</option>
@@ -129,7 +129,7 @@ export function BulkEditModal({
                             <select
                                 value={value}
                                 onChange={(e) => setValue(e.target.value)}
-                                className="w-full h-[38px] border border-slate-200 rounded-xl px-3 text-sm focus:border-[#24b47e] focus:ring-1 focus:ring-[#24b47e] outline-none transition-all bg-white"
+                                className="w-full h-[40px] border border-slate-200 rounded-[32px] px-4 text-sm focus:border-[#24b47e] focus:ring-1 focus:ring-[#24b47e] outline-none transition-all bg-white"
                                 required
                             >
                                 <option value="" disabled>選択してください</option>
@@ -142,7 +142,7 @@ export function BulkEditModal({
                                 type="date"
                                 value={value}
                                 onChange={(e) => setValue(e.target.value)}
-                                className="w-full h-[38px] border border-slate-200 rounded-xl px-3 text-sm focus:border-[#24b47e] focus:ring-1 focus:ring-[#24b47e] outline-none transition-all"
+                                className="w-full h-[40px] border border-slate-200 rounded-[32px] px-4 text-sm focus:border-[#24b47e] focus:ring-1 focus:ring-[#24b47e] outline-none transition-all"
                             />
                         ) : (
                             <input
@@ -150,17 +150,17 @@ export function BulkEditModal({
                                 value={value}
                                 onChange={(e) => setValue(e.target.value)}
                                 placeholder="クリアする場合は空にしてください"
-                                className="w-full h-[38px] border border-slate-200 rounded-xl px-3 text-sm focus:border-[#24b47e] focus:ring-1 focus:ring-[#24b47e] outline-none transition-all"
+                                className="w-full h-[40px] border border-slate-200 rounded-[32px] px-4 text-sm focus:border-[#24b47e] focus:ring-1 focus:ring-[#24b47e] outline-none transition-all"
                             />
                         )}
                     </div>
 
                     {/* Footer buttons */}
                     <div className="flex gap-3 pt-2 border-t border-slate-100">
-                        <button type="button" onClick={onClose} className="flex-1 py-2.5 bg-white border border-slate-200 text-slate-600 font-bold rounded-xl hover:bg-slate-50 transition-colors text-sm">
+                        <button type="button" onClick={onClose} className="flex-1 py-3 bg-white border border-slate-200 text-slate-600 font-bold rounded-[32px] hover:bg-slate-50 hover:border-slate-300 transition-all text-sm active:scale-95">
                             キャンセル
                         </button>
-                        <button type="submit" disabled={isPending} className="flex-1 py-2.5 bg-slate-800 text-white font-bold rounded-xl hover:bg-slate-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 text-sm">
+                        <button type="submit" disabled={isPending} className="flex-1 py-3 bg-slate-800 text-white font-bold rounded-[32px] hover:bg-slate-700 shadow-lg shadow-slate-800/10 transition-all flex items-center justify-center gap-2 disabled:opacity-50 text-sm active:scale-95">
                             {isPending ? <span className="animate-spin border-2 border-white/20 border-t-white rounded-full w-4 h-4" /> : <Save size={16} />}
                             一括変更する
                         </button>

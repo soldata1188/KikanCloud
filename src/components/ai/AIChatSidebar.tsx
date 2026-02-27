@@ -90,7 +90,7 @@ export default function AIChatSidebar({ isOpen, onClose }: AIChatSidebarProps) {
                     </div>
                     <button
                         onClick={onClose}
-                        className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
+                        className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
                     >
                         <X size={20} />
                     </button>
@@ -104,15 +104,15 @@ export default function AIChatSidebar({ isOpen, onClose }: AIChatSidebarProps) {
                             className={`flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
                         >
                             {msg.role === 'assistant' && (
-                                <div className="w-8 h-8 rounded-md bg-primary-50 border border-primary-100 flex items-center justify-center shrink-0">
+                                <div className="w-8 h-8 rounded-full bg-primary-50 border border-primary-100 flex items-center justify-center shrink-0">
                                     <Bot size={18} className="text-primary-600" />
                                 </div>
                             )}
 
                             <div
-                                className={`px-4 py-3 text-[14px] leading-relaxed whitespace-pre-wrap max-w-[85%] ${msg.role === 'user'
-                                        ? 'bg-primary-600 text-white rounded-[24px] rounded-tr-sm'
-                                        : 'bg-gray-50 text-gray-900 border border-gray-350 rounded-[24px] rounded-tl-sm'
+                                className={`px-5 py-3 text-[14px] leading-relaxed whitespace-pre-wrap max-w-[85%] ${msg.role === 'user'
+                                    ? 'bg-primary-600 text-white rounded-[32px] rounded-tr-sm'
+                                    : 'bg-gray-50 text-gray-900 border border-gray-350 rounded-[32px] rounded-tl-sm'
                                     }`}
                             >
                                 {msg.content}
@@ -122,10 +122,10 @@ export default function AIChatSidebar({ isOpen, onClose }: AIChatSidebarProps) {
 
                     {isLoading && (
                         <div className="flex gap-3">
-                            <div className="w-8 h-8 rounded-md bg-primary-50 border border-primary-100 flex items-center justify-center shrink-0">
+                            <div className="w-8 h-8 rounded-full bg-primary-50 border border-primary-100 flex items-center justify-center shrink-0">
                                 <Bot size={18} className="text-primary-600" />
                             </div>
-                            <div className="px-4 py-3 bg-gray-50 border border-gray-350 rounded-[24px] rounded-tl-sm flex items-center gap-2 text-gray-500 text-[14px]">
+                            <div className="px-5 py-3 bg-gray-50 border border-gray-350 rounded-[32px] rounded-tl-sm flex items-center gap-2 text-gray-500 text-[14px]">
                                 <Loader2 size={16} className="animate-spin" />
                                 <span>AIが入力中...</span>
                             </div>
@@ -143,7 +143,7 @@ export default function AIChatSidebar({ isOpen, onClose }: AIChatSidebarProps) {
                             onKeyDown={handleKeyDown}
                             placeholder="AIに質問を入力..."
                             disabled={isLoading}
-                            className="w-full min-h-[44px] max-h-32 resize-none bg-white border border-gray-350 focus:border-primary-500 rounded-[24px] py-2.5 pl-4 pr-12 text-[14px] outline-none transition-colors text-gray-900 placeholder:text-gray-400 disabled:opacity-50"
+                            className="w-full min-h-[44px] max-h-32 resize-none bg-white border border-gray-350 focus:border-primary-500 rounded-[32px] py-3 pl-5 pr-12 text-[14px] outline-none transition-colors text-gray-900 placeholder:text-gray-400 disabled:opacity-50"
                             rows={1}
                         />
                         <button

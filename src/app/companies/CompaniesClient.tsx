@@ -93,7 +93,7 @@ export function CompaniesClient({ companies, userRole }: { companies: any[], use
             <select
                 value={filterOccupation}
                 onChange={(e) => setFilterOccupation(e.target.value)}
-                className="h-[32px] w-[140px] bg-white border border-slate-200 hover:bg-slate-50 rounded-md px-2 text-[11px] outline-none focus:border-[#24b47e] transition-colors text-[#1f1f1f] cursor-pointer text-ellipsis overflow-hidden whitespace-nowrap"
+                className="h-[40px] w-[150px] bg-white border border-slate-200 hover:bg-slate-50 rounded-[32px] px-4 text-[13px] outline-none focus:border-[#24b47e] transition-colors text-[#1f1f1f] cursor-pointer text-ellipsis overflow-hidden whitespace-nowrap"
             >
                 <option value="all">受入職種 (すべて)</option>
                 {occupations.map(opt => <option key={opt} value={opt}>{opt}</option>)}
@@ -107,19 +107,19 @@ export function CompaniesClient({ companies, userRole }: { companies: any[], use
     const Pagination = () => totalPages > 1 ? (
         <div className="flex justify-center items-center gap-2 mt-8 pb-4">
             <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}
-                className="w-9 h-9 flex items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
+                className="w-10 h-10 flex items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed transition-all">
                 <ChevronLeft size={16} />
             </button>
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1.5">
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
                     <button key={page} onClick={() => setCurrentPage(page)}
-                        className={`w-9 h-9 rounded-xl text-sm font-bold transition-all ${currentPage === page ? 'bg-slate-800 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'}`}>
+                        className={`w-10 h-10 rounded-full text-sm font-bold transition-all ${currentPage === page ? 'bg-slate-800 text-white shadow-md scale-105' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'}`}>
                         {page}
                     </button>
                 ))}
             </div>
             <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}
-                className="w-9 h-9 flex items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
+                className="w-10 h-10 flex items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed transition-all">
                 <ChevronRight size={16} />
             </button>
             <span className="text-[11px] text-slate-400 ml-2">
@@ -139,7 +139,7 @@ export function CompaniesClient({ companies, userRole }: { companies: any[], use
                     const isActive = activeTab === key
                     return (
                         <button key={key} onClick={() => setActiveTab(key)}
-                            className={`relative inline-flex items-center gap-2 px-4 py-2 rounded-xl border text-[12px] font-bold transition-all duration-200 select-none
+                            className={`relative inline-flex items-center gap-2 px-6 py-2.5 rounded-full border text-[13px] font-bold transition-all duration-200 select-none
                                 ${isActive ? `${cfg.tabActiveBg} ${cfg.tabActiveText} ${cfg.tabActiveBorder} shadow-md -translate-y-0.5` : `${cfg.tabBg} ${cfg.tabText} ${cfg.tabBorder} hover:bg-slate-50 hover:-translate-y-0.5`}`}
                         >
                             <span className="flex items-center gap-1.5">{cfg.icon}{cfg.label}</span>
@@ -175,7 +175,7 @@ export function CompaniesClient({ companies, userRole }: { companies: any[], use
                             const { total: activeWorkers } = getWorkerCounts(c)
                             const absIndex = (currentPage - 1) * PAGE_SIZE + index
                             return (
-                                <div key={c.id} className="group relative bg-white border border-slate-200 hover:border-[#24b47e] rounded-[24px] p-5 transition-all duration-300 hover:-translate-y-1 shadow-sm hover:shadow-md">
+                                <div key={c.id} className="group relative bg-white border border-slate-200 hover:border-[#24b47e] rounded-[32px] p-6 transition-all duration-300 hover:-translate-y-1 shadow-sm hover:shadow-md">
                                     <div className="absolute top-4 right-4 text-[10px] font-mono text-slate-300">#{absIndex + 1}</div>
                                     <div className="flex items-start mb-4">
                                         <div className="pr-6 min-w-0">
@@ -190,7 +190,7 @@ export function CompaniesClient({ companies, userRole }: { companies: any[], use
                                     </div>
                                     <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
                                         <span className={`text-[12px] font-bold ${activeWorkers > 0 ? 'text-emerald-600' : 'text-slate-400'}`}>在籍: {activeWorkers}名</span>
-                                        <Link href={`/companies/${c.id}`} className="text-xs font-bold text-slate-400 hover:text-[#24b47e] transition-colors px-2 py-1 rounded-md hover:bg-emerald-50">詳細を見る</Link>
+                                        <Link href={`/companies/${c.id}`} className="text-xs font-bold text-slate-400 hover:text-[#24b47e] transition-colors px-3 py-1.5 rounded-full hover:bg-emerald-50">詳細を見る</Link>
                                     </div>
                                 </div>
                             )
@@ -200,11 +200,11 @@ export function CompaniesClient({ companies, userRole }: { companies: any[], use
                 </>
             ) : (
                 <>
-                    <div className="overflow-x-auto border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+                    <div className="overflow-x-auto border border-slate-200 rounded-[32px] overflow-hidden shadow-sm">
                         <table className="w-full border-collapse text-sm text-left">
                             <thead>
                                 <tr className="bg-slate-800">
-                                    <th className="px-4 py-3.5 font-bold text-[11px] uppercase tracking-wider text-slate-200 w-[40px] text-center">No.</th>
+                                    <th className="px-4 py-3.5 font-bold text-[11px] uppercase tracking-wider text-slate-200 w-[40px]">No.</th>
                                     <th className="px-4 py-3.5 font-bold text-[11px] uppercase tracking-wider text-slate-200 w-[240px]">企業名</th>
                                     <th className="px-4 py-3.5 font-bold text-[13px] uppercase tracking-wider text-slate-200">所在地 / 連絡先</th>
                                     <th className="px-4 py-3.5 font-bold text-[13px] uppercase tracking-wider text-slate-200 min-w-[170px]">代表者 / 責任者</th>
@@ -225,7 +225,7 @@ export function CompaniesClient({ companies, userRole }: { companies: any[], use
                                     return (
                                         <tr key={c.id} className={`transition-all duration-150 ${absIndex % 2 === 0 ? 'bg-white hover:bg-slate-50/80' : 'bg-slate-50/40 hover:bg-slate-50/80'}`}>
                                             {/* No. */}
-                                            <td className="px-4 py-3.5 text-center align-middle font-mono text-slate-400 text-sm font-bold">{absIndex + 1}</td>
+                                            <td className="px-4 py-3.5 align-middle font-mono text-slate-400 text-sm font-bold">{absIndex + 1}</td>
 
                                             {/* 企業名 */}
                                             <td className="px-4 py-3.5 align-middle">
@@ -233,10 +233,6 @@ export function CompaniesClient({ companies, userRole }: { companies: any[], use
                                                     <div className="min-w-0">
                                                         <Link href={`/companies/${c.id}`} target="_blank" className="font-bold text-[17px] text-slate-800 hover:text-[#24b47e] transition-colors truncate block" title={c.name_jp}>{c.name_jp}</Link>
                                                         {c.name_romaji && <div className="text-[12px] text-slate-400 uppercase tracking-widest truncate mt-0.5">{c.name_romaji}</div>}
-                                                        <div className="text-[13px] text-slate-500 mt-0.5 truncate">
-                                                            <span className="text-slate-400">業種:</span> <span className="font-medium">{c.industry || '---'}</span>
-                                                            {c.accepted_occupations && <span className="ml-2"><span className="text-slate-400">受入:</span> <span className="font-medium">{c.accepted_occupations}</span></span>}
-                                                        </div>
                                                     </div>
                                                 </div>
                                             </td>
@@ -244,6 +240,16 @@ export function CompaniesClient({ companies, userRole }: { companies: any[], use
                                             {/* 所在地/連絡先 */}
                                             <td className="px-4 py-3.5 align-middle">
                                                 <div className="flex flex-col gap-1 text-[13px]">
+                                                    <div className="flex items-center gap-2 mb-1">
+                                                        <div className="text-[12px] text-slate-500 truncate">
+                                                            <span className="text-slate-400">業種:</span> <span className="font-medium text-slate-700">{c.industry || '---'}</span>
+                                                        </div>
+                                                        {c.accepted_occupations && (
+                                                            <div className="text-[12px] text-slate-500 truncate border-l border-slate-200 pl-2">
+                                                                <span className="text-slate-400">受入:</span> <span className="font-medium text-slate-700">{c.accepted_occupations}</span>
+                                                            </div>
+                                                        )}
+                                                    </div>
                                                     <div className="text-slate-800 font-medium leading-snug line-clamp-2" title={c.address || ''}>
                                                         {c.postal_code ? `〒${c.postal_code} ` : ''}{c.address || '---'}
                                                     </div>

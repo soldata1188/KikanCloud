@@ -50,6 +50,19 @@ const reverseStatusMap: Record<string, string> = {
 
 const PAGE_SIZE = 50
 
+// ── Entry batch timeline divider ─────────────────────────────────────────
+const TimelineDivider = ({ label, count, date }: { label: string; count: number; date: string }) => (
+    <div className="flex items-center gap-3 px-4 py-2.5">
+        <div className="w-2.5 h-2.5 rounded-full bg-orange-600 shrink-0 ring-[3px] ring-orange-600/20" />
+        <span className="text-[11px] font-black text-orange-600 tracking-widest uppercase whitespace-nowrap">
+            {label}
+        </span>
+        <div className="flex-1 h-px bg-gradient-to-r from-orange-400/40 to-transparent" />
+        <span className="text-[10px] font-bold text-gray-400 tabular-nums whitespace-nowrap">{count}名</span>
+        {date && <span className="text-[10px] font-mono text-gray-300 whitespace-nowrap ml-1">{date.substring(0, 7).replace(/-/g, '/')}</span>}
+    </div>
+)
+
 export default function WorkersListClient({ initialWorkers, role, next90DaysStr }: { initialWorkers: any[], role: string, next90DaysStr: string }) {
     const [workers, setWorkers] = useState(initialWorkers)
     const [filtered, setFiltered] = useState(initialWorkers)
@@ -149,24 +162,26 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
             result = result.filter(w => ((w as any).entry_date || '').startsWith(filterEntryYear))
         }
 
-        // Sort: 企業名 昇順 (主), 選択フィールド (副)
-        const SORT_FIELD_MAP = {
-            entry_date: 'entry_date',
-            zairyu_exp: 'zairyu_exp',
-            cert_end_date: 'cert_end_date',
-        } as const
-        const field = SORT_FIELD_MAP[sortKey]
-        result.sort((a, b) => {
-            // 主キー: 入国日 降順 (新しい順)
-            const ea = ((a as any).entry_date || '0000-00-00')
-            const eb = ((b as any).entry_date || '0000-00-00')
-            const entryCmp = eb.localeCompare(ea)
-            if (entryCmp !== 0) return entryCmp
-            // 副キー: 企業名 昇順
-            return ((a as any).companies?.name_jp || '').localeCompare(
-                (b as any).companies?.name_jp || '', 'ja'
-            )
+        // Group by entry_batch → sort groups by latest entry_date DESC → within group: company A→Z
+        const batchMap = new Map<string, any[]>()
+        result.forEach(w => {
+            const batch = (w as any).entry_batch || '未設定'
+            if (!batchMap.has(batch)) batchMap.set(batch, [])
+            batchMap.get(batch)!.push(w)
         })
+        batchMap.forEach(arr => arr.sort((a, b) => {
+            // 入国日 降順 (新しい順)
+            const ed = ((b as any).entry_date || '0000-00-00').localeCompare((a as any).entry_date || '0000-00-00')
+            if (ed !== 0) return ed
+            // 同日の場合: 企業名 昇順
+            return ((a as any).companies?.name_jp || '').localeCompare((b as any).companies?.name_jp || '', 'ja')
+        }))
+        const sortedBatches = Array.from(batchMap.entries()).sort(([, a], [, b]) => {
+            const la = a.reduce((m, w) => ((w as any).entry_date || '') > m ? (w as any).entry_date : m, '')
+            const lb = b.reduce((m, w) => ((w as any).entry_date || '') > m ? (w as any).entry_date : m, '')
+            return lb.localeCompare(la)
+        })
+        result = sortedBatches.flatMap(([, workers]) => workers)
 
         setFiltered(result)
         setSelectedIds([])
@@ -175,6 +190,21 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
 
     const totalPages = Math.ceil(filtered.length / PAGE_SIZE)
     const paginated = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
+
+    // Compute timeline groups from current page
+    const paginatedGroups = (() => {
+        const groups: { label: string; date: string; workers: any[] }[] = []
+        paginated.forEach(w => {
+            const batch = (w as any).entry_batch || '未設定'
+            const last = groups[groups.length - 1]
+            if (!last || last.label !== batch) {
+                groups.push({ label: batch, date: (w as any).entry_date || '', workers: [w] })
+            } else {
+                last.workers.push(w)
+            }
+        })
+        return groups
+    })()
 
     const handleChange = async (id: string, field: string, value: string) => {
         setWorkers(prev => prev.map(w => w.id === id ? { ...w, [field]: value } : w))
@@ -446,44 +476,48 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                     <span>{filtered.length} 名中 {Math.min(filtered.length, (currentPage - 1) * PAGE_SIZE + 1)}–{Math.min(currentPage * PAGE_SIZE, filtered.length)}を表示</span>
                 </div>
                 {layout === 'grid' ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 px-3 pb-4">
-                        {paginated.map((worker, index) => {
-                            const absIndex = (currentPage - 1) * PAGE_SIZE + index
-                            return (
-                                <div key={worker.id} className="group relative bg-white border border-gray-200 hover:border-blue-400 rounded-md p-4 transition-all duration-200 shadow-sm active:scale-[0.99]">
-                                    <div className="absolute top-4 right-4 text-[9px] font-mono text-gray-300">#{absIndex + 1}</div>
-                                    <div className="flex items-start gap-3 mb-4">
-                                        <div className="w-14 h-14 rounded-full border border-gray-100 bg-gray-50 overflow-hidden flex items-center justify-center shrink-0">
-                                            {worker.avatar_url ? (
-                                                <img src={worker.avatar_url} className="w-full h-full object-cover" />
-                                            ) : (
-                                                <User size={28} className="text-gray-300" />
-                                            )}
+                    <div className="pb-4">
+                        {paginatedGroups.length === 0 && (
+                            <div className="p-16 text-center text-gray-400 font-medium">データがありません。</div>
+                        )}
+                        {paginatedGroups.map((group, gi) => (
+                            <div key={`${group.label}-${gi}`} className="mb-2">
+                                <TimelineDivider label={group.label} count={group.workers.length} date={group.date} />
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 px-3 pb-2">
+                                    {group.workers.map(worker => (
+                                        <div key={worker.id} className="group relative bg-white border border-gray-200 hover:border-blue-400 rounded-md p-4 transition-all duration-200 shadow-sm active:scale-[0.99]">
+                                            <div className="flex items-start gap-3 mb-4">
+                                                <div className="w-14 h-14 rounded-full border border-gray-100 bg-gray-50 overflow-hidden flex items-center justify-center shrink-0">
+                                                    {worker.avatar_url ? (
+                                                        <img src={worker.avatar_url} className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <User size={28} className="text-gray-300" />
+                                                    )}
+                                                </div>
+                                                <div className="min-w-0">
+                                                    <Link href={`/workers/${worker.id}`} className="font-bold text-gray-900 hover:text-blue-600 transition-colors truncate block text-sm">{worker.full_name_romaji}</Link>
+                                                    <div className="text-[10px] text-blue-600 font-bold truncate mt-0.5">{worker.companies?.name_jp || '未所属'}</div>
+                                                    <div className="text-[9px] text-gray-400 truncate uppercase tracking-tight">{worker.nationality || '---'}</div>
+                                                </div>
+                                            </div>
+                                            <div className="space-y-1.5 mb-4 text-[11px]">
+                                                <div className="flex justify-between border-b border-gray-50 pb-1"><span className="text-gray-400 font-bold uppercase tracking-wider">在留資格</span><span className="font-bold text-gray-700 truncate max-w-[120px]">{worker.visa_status || '---'}</span></div>
+                                                <div className="flex justify-between border-b border-gray-50 pb-1"><span className="text-gray-400 font-bold uppercase tracking-wider">職種区分</span><span className="font-bold text-gray-700 truncate">{worker.industry_field || '---'}</span></div>
+                                                <div className="flex justify-between border-b border-gray-50 pb-1"><span className="text-gray-400 font-bold uppercase tracking-wider">在留期限</span><span className={`font-bold font-mono truncate max-w-[120px] ${worker.zairyu_exp && worker.zairyu_exp <= next90DaysStr ? 'text-rose-600' : 'text-gray-700'}`}>{worker.zairyu_exp ? worker.zairyu_exp.replace(/-/g, '/') : '---'}</span></div>
+                                                <div className="flex justify-between"><span className="text-gray-400 font-bold uppercase tracking-wider">認修了日</span><span className="font-mono font-bold text-gray-700">{worker.cert_end_date ? worker.cert_end_date.replace(/-/g, '/') : '---'}</span></div>
+                                            </div>
+                                            <div className="pt-3 border-t border-gray-100 flex items-center justify-between">
+                                                <select value={worker.status} onChange={e => handleChange(worker.id, 'status', e.target.value)}
+                                                    className="text-[10px] font-bold px-2 py-1 rounded-md border border-gray-100 bg-gray-50 text-gray-600 hover:bg-gray-100 transition-colors outline-none cursor-pointer">
+                                                    {Object.entries(reverseStatusMap).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+                                                </select>
+                                                <Link href={`/workers/${worker.id}`} className="text-xs font-bold text-blue-600 hover:underline transition-colors px-2 py-1 rounded hover:bg-blue-50">詳細</Link>
+                                            </div>
                                         </div>
-                                        <div className="min-w-0">
-                                            <Link href={`/workers/${worker.id}`} className="font-bold text-gray-900 hover:text-blue-600 transition-colors truncate block text-sm">{worker.full_name_romaji}</Link>
-                                            <div className="text-[10px] text-blue-600 font-bold truncate mt-0.5">{worker.companies?.name_jp || '未所属'}</div>
-                                            <div className="text-[9px] text-gray-400 truncate uppercase tracking-tight">{worker.nationality || '---'}</div>
-                                        </div>
-                                    </div>
-                                    <div className="space-y-1.5 mb-4 text-[11px]">
-                                        <div className="flex justify-between border-b border-gray-50 pb-1"><span className="text-gray-400 font-bold uppercase tracking-wider">在留資格</span><span className="font-bold text-gray-700 truncate max-w-[120px]">{worker.visa_status || '---'}</span></div>
-                                        <div className="flex justify-between border-b border-gray-50 pb-1"><span className="text-gray-400 font-bold uppercase tracking-wider">職種区分</span><span className="font-bold text-gray-700 truncate">{worker.industry_field || '---'}</span></div>
-                                        <div className="flex justify-between border-b border-gray-50 pb-1"><span className="text-gray-400 font-bold uppercase tracking-wider">在留期限</span><span className={`font-bold font-mono truncate max-w-[120px] ${worker.zairyu_exp && worker.zairyu_exp <= next90DaysStr ? 'text-rose-600' : 'text-gray-700'}`}>{worker.zairyu_exp ? worker.zairyu_exp.replace(/-/g, '/') : '---'}</span></div>
-                                        <div className="flex justify-between"><span className="text-gray-400 font-bold uppercase tracking-wider">認修了日</span><span className="font-mono font-bold text-gray-700">{worker.cert_end_date ? worker.cert_end_date.replace(/-/g, '/') : '---'}</span></div>
-                                    </div>
-                                    <div className="pt-3 border-t border-gray-100 flex items-center justify-between">
-                                        <select
-                                            value={worker.status}
-                                            onChange={e => handleChange(worker.id, 'status', e.target.value)}
-                                            className="text-[10px] font-bold px-2 py-1 rounded-md border border-gray-100 bg-gray-50 text-gray-600 hover:bg-gray-100 transition-colors outline-none cursor-pointer">
-                                            {Object.entries(reverseStatusMap).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-                                        </select>
-                                        <Link href={`/workers/${worker.id}`} className="text-xs font-bold text-blue-600 hover:underline transition-colors px-2 py-1 rounded hover:bg-blue-50">詳細</Link>
-                                    </div>
+                                    ))}
                                 </div>
-                            )
-                        })}
+                            </div>
+                        ))}
                     </div>
                 ) : (
                     <div className="mx-4 overflow-hidden border border-gray-300 rounded-md bg-transparent mb-4">
@@ -509,69 +543,77 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                                     {paginated.length === 0 && (
                                         <tr><td colSpan={10} className="px-5 py-20 text-center text-gray-400 font-medium bg-transparent">データがありません。</td></tr>
                                     )}
-                                    {paginated.map((worker, index) => {
-                                        const absIndex = (currentPage - 1) * PAGE_SIZE + index + 1
-                                        return (
-                                            <tr key={worker.id} className={`transition-all duration-150 ${index % 2 === 0 ? 'bg-white hover:bg-blue-50/40' : 'bg-white hover:bg-blue-50/40'}`}>
-                                                <td className="px-4 py-3 text-center border-r border-gray-300">
-                                                    <input type="checkbox" checked={selectedIds.includes(worker.id)} onChange={() => toggleSelect(worker.id)} className="w-4 h-4 rounded border-gray-300 accent-[#0067b8]" />
-                                                </td>
-                                                <td className="px-4 py-3 font-mono text-[#0067b8] text-[11px] font-bold border-r border-gray-300 text-center">{absIndex}</td>
-                                                <td className="px-4 py-3 border-r border-gray-300">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="w-10 h-10 shrink-0 rounded-full border border-gray-100 bg-gray-50 overflow-hidden flex items-center justify-center">
-                                                            {worker.avatar_url ? <img src={worker.avatar_url} className="w-full h-full object-cover" /> : <User size={20} className="text-gray-300" />}
-                                                        </div>
-                                                        <div className="min-w-0">
-                                                            <Link href={`/workers/${worker.id}`} className="font-bold text-[14px] text-gray-900 hover:text-[#0067b8] transition-colors block truncate">{worker.full_name_romaji}</Link>
-                                                            <div className="text-[10px] text-gray-400 uppercase tracking-tight mt-0.5 truncate">{worker.full_name_kana || '---'}</div>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td className="px-4 py-3 border-r border-gray-300">
-                                                    <div className="text-[12px] font-bold text-[#0067b8] truncate">{worker.companies?.name_jp || '---'}</div>
-                                                    <div className="text-[10px] text-gray-500 font-bold mt-0.5 truncate">{worker.industry_field || '---'}</div>
-                                                </td>
-                                                <td className="px-4 py-3 border-r border-gray-300">
-                                                    <div className="text-[11px] font-bold text-gray-700">{worker.nationality || '---'}</div>
-                                                    <div className="text-[10px] text-gray-500 font-bold mt-0.5 truncate" title={worker.sending_org || ''}>{worker.sending_org || '---'}</div>
-                                                </td>
-                                                <td className="px-4 py-3 border-r border-gray-300">
-                                                    <div className="text-[11px] font-bold text-gray-700">{worker.entry_batch || '---'}</div>
-                                                    <div className="text-[10px] text-gray-400 mt-0.5 font-mono">{worker.entry_date ? worker.entry_date.replace(/-/g, '/') : '---'}</div>
-                                                </td>
-                                                <td className="px-4 py-3 border-r border-gray-300">
-                                                    <div className="text-[11px] font-bold text-gray-700 truncate" title={worker.visa_status || ''}>{worker.visa_status || '---'}</div>
-                                                </td>
-                                                <td className="px-4 py-3 border-r border-gray-300">
-                                                    <div className="flex flex-col">
-                                                        <span className={`text-[11px] font-bold font-mono leading-tight ${worker.zairyu_exp && worker.zairyu_exp <= next90DaysStr ? 'text-rose-600' : 'text-gray-700'}`}>
-                                                            {worker.zairyu_exp ? worker.zairyu_exp.replace(/-/g, '/') : '---'}
-                                                        </span>
-                                                        <div className="text-[10px] text-gray-400 font-bold mt-0.5">
-                                                            <span className="font-mono">{worker.cert_end_date ? worker.cert_end_date.replace(/-/g, '/') : '---'}</span>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td className="px-4 py-3 border-r border-gray-300">
-                                                    <div className="flex flex-col">
-                                                        <span className="text-[11px] font-bold text-gray-700 font-mono leading-tight">{worker.passport_exp ? worker.passport_exp.replace(/-/g, '/') : '---'}</span>
-                                                        <div className="text-[10px] text-gray-400 font-bold mt-0.5">
-                                                            <span className="font-mono">{worker.insurance_exp ? worker.insurance_exp.replace(/-/g, '/') : '---'}</span>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td className="px-4 py-3 border-r border-gray-300">
-                                                    <select
-                                                        value={worker.status}
-                                                        onChange={e => handleChange(worker.id, 'status', e.target.value)}
-                                                        className="appearance-none text-[10px] px-2 py-1 rounded-md font-bold bg-gray-50 border border-gray-100 text-gray-600 hover:bg-gray-100 transition-colors w-full text-center cursor-pointer outline-none">
-                                                        {Object.entries(reverseStatusMap).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-                                                    </select>
+                                    {paginatedGroups.map((group, gi) => (
+                                        <React.Fragment key={`${group.label}-${gi}`}>
+                                            <tr>
+                                                <td colSpan={10} className="px-0 py-0 border-b-0 bg-blue-50/30">
+                                                    <TimelineDivider label={group.label} count={group.workers.length} date={group.date} />
                                                 </td>
                                             </tr>
-                                        )
-                                    })}
+                                            {group.workers.map((worker, wi) => {
+                                                const absIndex = (currentPage - 1) * PAGE_SIZE +
+                                                    paginatedGroups.slice(0, gi).reduce((s, g) => s + g.workers.length, 0) + wi + 1
+                                                return (
+                                                    <tr key={worker.id} className="bg-white hover:bg-blue-50/40 transition-all duration-150">
+                                                        <td className="px-4 py-3 text-center border-r border-gray-300">
+                                                            <input type="checkbox" checked={selectedIds.includes(worker.id)} onChange={() => toggleSelect(worker.id)} className="w-4 h-4 rounded border-gray-300 accent-[#0067b8]" />
+                                                        </td>
+                                                        <td className="px-4 py-3 font-mono text-[#0067b8] text-[11px] font-bold border-r border-gray-300 text-center">{absIndex}</td>
+                                                        <td className="px-4 py-3 border-r border-gray-300">
+                                                            <div className="flex items-center gap-3">
+                                                                <div className="w-10 h-10 shrink-0 rounded-full border border-gray-100 bg-gray-50 overflow-hidden flex items-center justify-center">
+                                                                    {worker.avatar_url ? <img src={worker.avatar_url} className="w-full h-full object-cover" /> : <User size={20} className="text-gray-300" />}
+                                                                </div>
+                                                                <div className="min-w-0">
+                                                                    <Link href={`/workers/${worker.id}`} className="font-bold text-[14px] text-gray-900 hover:text-[#0067b8] transition-colors block truncate">{worker.full_name_romaji}</Link>
+                                                                    <div className="text-[10px] text-gray-400 uppercase tracking-tight mt-0.5 truncate">{worker.full_name_kana || '---'}</div>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td className="px-4 py-3 border-r border-gray-300">
+                                                            <div className="text-[12px] font-bold text-[#0067b8] truncate">{worker.companies?.name_jp || '---'}</div>
+                                                            <div className="text-[10px] text-gray-500 font-bold mt-0.5 truncate">{worker.industry_field || '---'}</div>
+                                                        </td>
+                                                        <td className="px-4 py-3 border-r border-gray-300">
+                                                            <div className="text-[11px] font-bold text-gray-700">{worker.nationality || '---'}</div>
+                                                            <div className="text-[10px] text-gray-500 font-bold mt-0.5 truncate" title={worker.sending_org || ''}>{worker.sending_org || '---'}</div>
+                                                        </td>
+                                                        <td className="px-4 py-3 border-r border-gray-300">
+                                                            <div className="text-[11px] font-bold text-gray-700">{worker.entry_batch || '---'}</div>
+                                                            <div className="text-[10px] text-gray-400 mt-0.5 font-mono">{worker.entry_date ? worker.entry_date.replace(/-/g, '/') : '---'}</div>
+                                                        </td>
+                                                        <td className="px-4 py-3 border-r border-gray-300">
+                                                            <div className="text-[11px] font-bold text-gray-700 truncate" title={worker.visa_status || ''}>{worker.visa_status || '---'}</div>
+                                                        </td>
+                                                        <td className="px-4 py-3 border-r border-gray-300">
+                                                            <div className="flex flex-col">
+                                                                <span className={`text-[11px] font-bold font-mono leading-tight ${worker.zairyu_exp && worker.zairyu_exp <= next90DaysStr ? 'text-rose-600' : 'text-gray-700'}`}>
+                                                                    {worker.zairyu_exp ? worker.zairyu_exp.replace(/-/g, '/') : '---'}
+                                                                </span>
+                                                                <div className="text-[10px] text-gray-400 font-bold mt-0.5">
+                                                                    <span className="font-mono">{worker.cert_end_date ? worker.cert_end_date.replace(/-/g, '/') : '---'}</span>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td className="px-4 py-3 border-r border-gray-300">
+                                                            <div className="flex flex-col">
+                                                                <span className="text-[11px] font-bold text-gray-700 font-mono leading-tight">{worker.passport_exp ? worker.passport_exp.replace(/-/g, '/') : '---'}</span>
+                                                                <div className="text-[10px] text-gray-400 font-bold mt-0.5">
+                                                                    <span className="font-mono">{worker.insurance_exp ? worker.insurance_exp.replace(/-/g, '/') : '---'}</span>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td className="px-4 py-3 border-r border-gray-300">
+                                                            <select value={worker.status} onChange={e => handleChange(worker.id, 'status', e.target.value)}
+                                                                className="appearance-none text-[10px] px-2 py-1 rounded-md font-bold bg-gray-50 border border-gray-100 text-gray-600 hover:bg-gray-100 transition-colors w-full text-center cursor-pointer outline-none">
+                                                                {Object.entries(reverseStatusMap).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                )
+                                            })}
+                                        </React.Fragment>
+                                    ))}
                                 </tbody>
                             </table>
                         </div>
@@ -580,14 +622,16 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                 <Pagination />
             </div>
 
-            {isBulkEditModalOpen && (
-                <BulkEditModal
-                    selectedIds={selectedIds}
-                    onClose={() => setIsBulkEditModalOpen(false)}
-                    onSuccess={() => { setIsBulkEditModalOpen(false); setSelectedIds([]) }}
-                    companies={[]}
-                />
-            )}
-        </div>
+            {
+                isBulkEditModalOpen && (
+                    <BulkEditModal
+                        selectedIds={selectedIds}
+                        onClose={() => setIsBulkEditModalOpen(false)}
+                        onSuccess={() => { setIsBulkEditModalOpen(false); setSelectedIds([]) }}
+                        companies={[]}
+                    />
+                )
+            }
+        </div >
     )
 }

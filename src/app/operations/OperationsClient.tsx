@@ -30,7 +30,7 @@ const KIKOU_OPTIONS = ['---', '認定申請1号', '認定申請2号', '転籍申
 const CONSTRUCTION_OPTIONS = ['---', 'オンライン申請', '変更届出等'];
 const NYUKAN_OPTIONS = ['---', '資格認定', '資格変更', '期間更新', '特定活動', '特定変更', '特定更新', '変更届出'];
 
-type WorkerField = 'status' | 'kentei_status' | 'kikou_status' | 'nyukan_status' | 'remarks' | 'cert_start_date' | 'cert_end_date';
+type WorkerField = 'status' | 'kentei_status' | 'kikou_status' | 'nyukan_status' | 'remarks' | 'cert_start_date' | 'cert_end_date' | 'industry_field';
 
 const SYSTEM_TABS = [
     { key: 'ginou_jisshu', label: '技能実習', short: '実習生' },
@@ -190,12 +190,14 @@ export default function OperationsClient({
     const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
     const [batchForm, setBatchForm] = useState<{
         worker_status: string;
+        occupation: string;
         kikou_type: string; kikou_assignee: string; kikou_application_date: string; kikou_progress: string;
         nyukan_type: string; nyukan_assignee: string; nyukan_application_date: string; nyukan_progress: string;
         nyukan_receipt: string; nyukan_agent: string;
         cert_start_date: string; cert_end_date: string;
     }>({
         worker_status: '',
+        occupation: '',
         kikou_type: '', kikou_assignee: '', kikou_application_date: '', kikou_progress: '',
         nyukan_type: '', nyukan_assignee: '', nyukan_application_date: '', nyukan_progress: '',
         nyukan_receipt: '', nyukan_agent: '',
@@ -360,6 +362,7 @@ export default function OperationsClient({
             if (batchForm.cert_start_date) updates.push(updateWorkerStatus(id, 'cert_start_date', batchForm.cert_start_date));
             if (batchForm.cert_end_date) updates.push(updateWorkerStatus(id, 'cert_end_date', batchForm.cert_end_date));
             if (batchForm.worker_status) updates.push(updateWorkerStatus(id, 'status', batchForm.worker_status));
+            if (batchForm.occupation) updates.push(updateWorkerStatus(id, 'industry_field', batchForm.occupation));
             setWorkers(prev => prev.map(w => w.id === id ? {
                 ...w,
                 kikouStatus: newKikou,
@@ -367,11 +370,12 @@ export default function OperationsClient({
                 ...(batchForm.cert_start_date ? { cert_start_date: batchForm.cert_start_date } : {}),
                 ...(batchForm.cert_end_date ? { cert_end_date: batchForm.cert_end_date } : {}),
                 ...(batchForm.worker_status ? { status: batchForm.worker_status } : {}),
+                ...(batchForm.occupation ? { occupation: batchForm.occupation } : {}),
             } : w));
             try { await Promise.all(updates); } catch { alert('一括更新エラー'); }
         }
         setSelectedIds(new Set());
-        setBatchForm({ worker_status: '', kikou_type: '', kikou_assignee: '', kikou_application_date: '', kikou_progress: '', nyukan_type: '', nyukan_assignee: '', nyukan_application_date: '', nyukan_progress: '', nyukan_receipt: '', nyukan_agent: '', cert_start_date: '', cert_end_date: '' });
+        setBatchForm({ worker_status: '', occupation: '', kikou_type: '', kikou_assignee: '', kikou_application_date: '', kikou_progress: '', nyukan_type: '', nyukan_assignee: '', nyukan_application_date: '', nyukan_progress: '', nyukan_receipt: '', nyukan_agent: '', cert_start_date: '', cert_end_date: '' });
     };
 
     const currentSystemTab = SYSTEM_TABS.find(t => t.key === activeSystemTab);
@@ -599,6 +603,10 @@ export default function OperationsClient({
                                                             <span className="text-emerald-600 font-bold text-[11px]">{elapsed}</span>
                                                         </div>
                                                     )}
+                                                    <div className="col-span-2">
+                                                        <span className="text-gray-400 text-[10px]">職種: </span>
+                                                        <span className="font-semibold text-gray-700 text-[11px]">{worker.occupation || '---'}</span>
+                                                    </div>
                                                     {worker.address && (
                                                         <div className="col-span-2 flex items-center gap-1 mt-0.5 text-gray-400">
                                                             <MapPin size={10} className="shrink-0" />
@@ -952,6 +960,17 @@ export default function OperationsClient({
                                         <option key={s} value={s}>{s}</option>
                                     ))}
                                 </select>
+                            </div>
+
+                            <div>
+                                <div className="text-[11px] text-gray-500 font-bold mb-1.5 ml-1 uppercase">職種区分</div>
+                                <input
+                                    type="text"
+                                    placeholder="例: 建設、農業、介護..."
+                                    value={batchForm.occupation}
+                                    onChange={e => setBatchForm(p => ({ ...p, occupation: e.target.value }))}
+                                    className="w-full text-[13px] rounded-lg bg-gray-50 text-gray-800 border border-gray-200 py-2.5 px-3 outline-none focus:bg-white focus:border-[#0067b8] transition-all font-bold placeholder:font-normal placeholder:text-gray-300"
+                                />
                             </div>
 
                             <div className="h-px bg-gray-100 mx-2" />

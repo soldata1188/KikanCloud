@@ -24,7 +24,7 @@ export function SidebarAvatar({ userProfile }: { userProfile: any }) {
         <div className="relative flex items-center justify-center" ref={ref}>
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="w-11 h-11 rounded-full bg-gradient-to-br from-[#24b47e] to-[#1a8b60] text-white flex items-center justify-center font-bold text-[16px] shadow-sm hover:shadow-md hover:ring-2 hover:ring-[#24b47e] hover:ring-offset-2 transition-all focus:outline-none shrink-0"
+                className="w-11 h-11 rounded-full bg-[#0067b8] text-white flex items-center justify-center font-bold text-[16px] shadow-sm hover:shadow-lg hover:ring-2 hover:ring-[#0067b8] hover:ring-offset-2 transition-all focus:outline-none shrink-0"
             >
                 {initials}
             </button>

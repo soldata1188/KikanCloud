@@ -2,8 +2,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f8f9fa;
+  --foreground: #1a1a1a;
   /* Mobile bottom nav height — used for padding content */
   --mobile-nav-h: 64px;
 }
@@ -16,12 +16,16 @@
 
   --color-primary-50: #eff6ff;
   --color-primary-100: #dbeafe;
-  --color-primary-500: #3b82f6;
-  --color-primary-600: #2563eb;
-  --color-primary-700: #1d4ed8;
-  --color-primary-800: #1e40af;
-  --color-primary-900: #1e3a8a;
+  --color-primary-500: #0067b8;
+  --color-primary-600: #0059a1;
+  --color-primary-700: #004c8a;
+  --color-primary-800: #003f72;
+  --color-primary-900: #00325b;
 
+  --color-gray-50: #f8f9fa;
+  --color-gray-100: #f3f5f8;
+  --color-gray-200: #e1e4e8;
+  --color-gray-300: #d1d5da;
   --color-gray-350: #c6cad0;
 }
 

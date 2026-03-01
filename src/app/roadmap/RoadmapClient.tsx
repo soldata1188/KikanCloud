@@ -26,7 +26,7 @@ interface ColumnData {
 const defaultColumns: ColumnData[] = [
     {
         title: "技能実習制度",
-        subtitle: "GINO JISSHU (Trainee)",
+        subtitle: "技能実習",
         badge: "廃止予定 (2027年〜)",
         badgeClass: "bg-gray-100 border-gray-350 text-gray-600",
         desc: "目的は「国際貢献」。開発途上国への技能移転を名目とするが、原則転籍（転職）不可のため人権問題が指摘され、廃止・移行が決定した制度。",
@@ -42,7 +42,7 @@ const defaultColumns: ColumnData[] = [
     },
     {
         title: "育成就労制度",
-        subtitle: "IKUSEI SHURO (New System)",
+        subtitle: "育成就労（新制度）",
         badge: "2027年4月 施行予定",
         badgeClass: "bg-blue-100 border-blue-200 text-blue-700",
         desc: "目的は「人材育成・確保」。3年間で特定技能レベルの労働力に育てる。要件を満たせば「同一分野内での転籍（転職）」が認められる新制度。",
@@ -56,7 +56,7 @@ const defaultColumns: ColumnData[] = [
     },
     {
         title: "特定技能制度",
-        subtitle: "TOKUTEI GINO (Specified Skilled)",
+        subtitle: "特定技能",
         badge: "即戦力インフラ",
         badgeClass: "bg-[#24b47e]/10 border-[#24b47e]/30 text-[#1e9a6a]",
         desc: "専門性・技能を有し、即戦力となる外国人材を受け入れるための制度。新旧どちらの制度からも、この「特定技能」への移行が最終ゴールとなる。",

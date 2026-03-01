@@ -41,10 +41,10 @@ export function GlobalSearch() {
     return (
         <>
             <div onClick={() => setIsOpen(true)} className="relative hidden md:block group cursor-pointer">
-                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#878787] group-hover:text-[#24b47e] transition-colors" size={14} />
-                <div className="h-[30px] w-52 bg-[#fbfcfd] border border-slate-200 rounded-md pl-8 pr-12 text-xs flex items-center text-[#a0a0a0] group-hover:border-[#24b47e] transition-all">検索...</div>
-                <div className="absolute right-1.5 top-1/2 -translate-y-1/2 flex items-center gap-0.5 text-[#878787] text-[10px] font-mono">
-                    <span className="border border-slate-200 bg-white rounded px-1 group-hover:border-[#24b47e]/50">⌘</span><span className="border border-slate-200 bg-white rounded px-1 group-hover:border-[#24b47e]/50">K</span>
+                <Search className="absolute left-2 top-1/2 -translate-y-1/2 text-white/60 group-hover:text-white transition-colors" size={13} />
+                <div className="h-[26px] w-44 bg-white/10 border border-white/25 rounded px-7 pr-10 text-[11px] flex items-center text-white/50 group-hover:bg-white/20 transition-all">検索...</div>
+                <div className="absolute right-1.5 top-1/2 -translate-y-1/2 flex items-center gap-0.5 text-[10px] font-mono text-white/40">
+                    <span className="border border-white/25 rounded px-1">⌘</span><span className="border border-white/25 rounded px-1">K</span>
                 </div>
             </div>
 
@@ -93,7 +93,7 @@ export function GlobalSearch() {
                             )}
                         </div>
                         <div className="bg-white border-t border-[#ededed] px-4 py-2 flex items-center justify-between text-[10px] text-[#878787] font-medium">
-                            <span><kbd className="bg-white border border-[#ededed] px-1.5 py-0.5 rounded mr-1">ESC</kbd> to close</span>
+                            <span><kbd className="bg-white border border-[#ededed] px-1.5 py-0.5 rounded mr-1">ESC</kbd> で閉じる</span>
                         </div>
                     </div>
                 </div>

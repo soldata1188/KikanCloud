@@ -25,7 +25,7 @@ export default function LoginPage() {
 
     return (
         <div className="min-h-screen bg-[#fbfcfd] flex items-center justify-center p-4 font-sans text-[#1f1f1f] selection:bg-[#24b47e]/20">
-            <div className="w-full max-w-[400px] bg-white border border-[#ededed] rounded-2xl shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-500">
+            <div className="w-full max-w-[400px] bg-white border border-[#ededed] rounded-2xl shadow-xl overflow-hidden">
                 <div className="p-8 text-center bg-[#fbfcfd] border-b border-[#ededed]">
                     <div className="w-14 h-14 bg-[#1f1f1f] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
                         <Hexagon size={28} className="text-[#24b47e] fill-[#24b47e]/20" />

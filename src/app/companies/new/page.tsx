@@ -5,6 +5,7 @@ import { ArrowLeft, Building2, MapPin, Users } from 'lucide-react'
 import { Sidebar } from '@/components/Sidebar'
 import { redirect } from 'next/navigation'
 import { FormSubmitButton } from './FormSubmitButton'
+import { TopNav } from '@/components/TopNav'
 import { CompanyDocumentKanban } from './CompanyDocumentKanban'
 
 export default async function NewCompanyPage() {
@@ -12,23 +13,24 @@ export default async function NewCompanyPage() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) redirect('/login')
 
+    const { data: userProfile } = await supabase.from('users').select('role').eq('id', user.id).single()
+
     return (
-        <div className="flex h-screen bg-[#f8fcfd] font-sans text-[#1f1f1f] overflow-hidden selection:bg-[#24b47e]/20">
+        <div className="flex h-screen bg-white font-sans text-gray-900 overflow-hidden selection:bg-emerald-500/20">
             <Sidebar active="companies" />
-            <div className="flex-1 flex flex-col relative w-full h-full bg-white">
-                <form action={createCompany} className="flex flex-col h-full w-full">
-                    {/* Header */}
-                    <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-white z-20 shrink-0">
+            <div className="flex-1 flex flex-col relative min-w-0">
+                <TopNav title="受入企業 新規登録" role={userProfile?.role} />
+                <form action={createCompany} className="flex-1 flex flex-col overflow-hidden min-h-0 bg-white">
+                    {/* Toolbar */}
+                    <div className="flex items-center justify-between px-6 h-12 border-b border-gray-100 bg-white z-20 shrink-0">
                         <div className="flex items-center gap-4">
-                            <Link href="/companies" className="w-10 h-10 flex items-center justify-center rounded-none hover:bg-gray-100 transition-colors text-[#1f1f1f]">
-                                <ArrowLeft size={24} strokeWidth={1.5} />
+                            <Link href="/companies" className="flex items-center gap-2 text-gray-400 hover:text-gray-900 transition-colors">
+                                <ArrowLeft size={16} />
+                                <span className="text-xs font-bold uppercase tracking-widest leading-none">戻る</span>
                             </Link>
-                            <h2 className="text-[24px] font-medium tracking-tight text-[#1f1f1f] flex items-center gap-2">
-                                受入企業 新規登録
-                            </h2>
                         </div>
-                        <div className="flex items-center gap-3">
-                            <Link href="/companies" className="px-5 py-2.5 text-[#1f1f1f] text-sm bg-white font-medium hover:bg-gray-50 rounded-none transition-colors border border-gray-300">
+                        <div className="flex items-center gap-2">
+                            <Link href="/companies" className="px-3 py-1.5 text-gray-500 text-[11px] font-bold bg-white hover:bg-gray-50 rounded-md transition-colors border border-gray-200">
                                 キャンセル
                             </Link>
                             <FormSubmitButton />

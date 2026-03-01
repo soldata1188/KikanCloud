@@ -1,7 +1,7 @@
 'use client'
 
-import React, { useState } from 'react'
-import { Clock, Briefcase, AlertTriangle, MapPin } from 'lucide-react'
+import React, { useState, useMemo, useEffect } from 'react'
+import { MapPin, Search, Filter, Pencil, CheckCircle2, Circle, Loader2, Plus, X, ChevronRight, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react'
 import Link from 'next/link'
 
 import { updateWorkerStatus, updateOperationData } from './actions'
@@ -26,81 +26,94 @@ export interface OperationData {
 }
 
 const PROGRESS_OPTIONS = ['未着手', '進行中', '完了'];
-const KENTEI_OPTIONS = ['---', '初級', '基礎級', '専門級', '随時3級', '上級', '随時2級'];
 const KIKOU_OPTIONS = ['---', '認定申請1号', '認定申請2号', '転籍申請', '軽微変更', '困難届出'];
 const CONSTRUCTION_OPTIONS = ['---', 'オンライン申請', '変更届出等'];
 const NYUKAN_OPTIONS = ['---', '資格認定', '資格変更', '期間更新', '特定活動', '特定変更', '特定更新', '変更届出'];
 
+type WorkerField = 'status' | 'kentei_status' | 'kikou_status' | 'nyukan_status' | 'remarks' | 'cert_start_date' | 'cert_end_date';
 
-type WorkerField = 'status' | 'kentei_status' | 'kikou_status' | 'nyukan_status';
+const SYSTEM_TABS = [
+    { key: 'ginou_jisshu', label: '技能実習', short: '実習生' },
+    { key: 'ikusei', label: '育成就労', short: '育成就労' },
+    { key: 'tokuteigino', label: '特定技能', short: '特定技能' },
+    { key: 'exam', label: '検定業務', short: '検定業務' },
+];
 
-// ── Unified design tokens — soft accent system ─────────────────
-const C = {
-    zairyu: {
-        accent: '#3b82f6',        // blue-500
-        light: 'bg-blue-50',
-        border: 'border-l-[3px] border-l-blue-400',
-        divider: 'border-blue-100',
-        chip: 'bg-blue-100 text-blue-700',
-        label: 'text-blue-500',
-        subchip: 'bg-blue-100 text-blue-600',
-    },
-    kentei: {
-        accent: '#f59e0b',        // amber-500
-        light: 'bg-amber-50',
-        border: 'border-l-[3px] border-l-amber-400',
-        divider: 'border-amber-100',
-        chip: 'bg-amber-100 text-amber-700',
-        label: 'text-amber-600',
-        subchip: 'bg-amber-100 text-amber-600',
-    },
-    kikou: {
-        accent: '#4f46e5',        // indigo-600
-        light: 'bg-indigo-50',
-        border: 'border-l-[3px] border-l-indigo-500',
-        divider: 'border-indigo-100',
-        chip: 'bg-indigo-100 text-indigo-700',
-        label: 'text-indigo-600',
-        subchip: 'bg-indigo-100 text-indigo-600',
-    },
-    nyukan: {
-        accent: '#2563eb',        // blue-600
-        light: 'bg-blue-50',
-        border: 'border-l-[3px] border-l-blue-500',
-        divider: 'border-blue-100',
-        chip: 'bg-blue-100 text-blue-700',
-        label: 'text-blue-600',
-        subchip: 'bg-blue-100 text-blue-600',
-    },
-}
-
-const progressCls = (p: string, col: keyof typeof C) => {
-    if (p === '完了') return 'bg-emerald-100 text-emerald-800 border border-emerald-200 font-black'
-    if (p === '進行中') {
-        const map: Record<string, string> = {
-            zairyu: 'bg-blue-100 text-blue-800 border border-blue-200',
-            kentei: 'bg-amber-100 text-amber-800 border border-amber-200',
-            kikou: 'bg-indigo-100 text-indigo-800 border border-indigo-200',
-            nyukan: 'bg-blue-600 text-white border-blue-700',
-        }
-        return (map[col] || '') + ' font-black'
-    }
-    return 'bg-slate-100 text-slate-500 border border-slate-200 font-semibold'
-}
-
-// Shared compact select style
-const SEL = "text-[11px] py-0.5 px-1.5 outline-none rounded-lg bg-white border border-slate-200 text-slate-800 font-semibold cursor-pointer focus:ring-1 focus:ring-inset transition-all"
+const STATUS_SEG_TABS = [
+    { key: 'all', label: 'すべて', statuses: ['未入国', '対応中', '就業中', '失踪', '帰国', '転籍済'] },
+    { key: 'waiting', label: '未入国', statuses: ['未入国'] },
+    { key: 'active', label: '在籍中', statuses: ['対応中', '就業中'] },
+    { key: 'working', label: '処理中', statuses: ['失踪', '帰国', '転籍済'] },
+];
 
 const cycleProgress = (current: string) => {
     const idx = PROGRESS_OPTIONS.indexOf(current);
     return PROGRESS_OPTIONS[(idx + 1) % PROGRESS_OPTIONS.length];
 };
 
-const cycleStatus = (current: string) => {
-    const statuses = ['未入国', '対応中', '就業中', '失踪', '帰国', '転籍済'];
-    const idx = statuses.indexOf(current);
-    if (idx === -1) return statuses[0];
-    return statuses[(idx + 1) % statuses.length];
+// ── Badge helpers ────────────────────────────────────────────────
+const statusBadgeCls = (s: string) => {
+    if (s === '就業中' || s === '在籍中' || s === '在留中') return 'bg-emerald-50 text-emerald-700 border-emerald-200 uppercase font-bold'
+    if (s === '対応中') return 'bg-blue-50 text-[#0067b8] border-blue-200 font-bold'
+    if (s === '失踪') return 'bg-rose-50 text-rose-700 border-rose-200 font-bold'
+    return 'bg-gray-100 text-gray-500 border-gray-200 font-medium' // 帰国, 転籍済, 未入国
+}
+
+const progressBadgeCls = (p: string) => {
+    if (p === '完了') return 'bg-emerald-50 text-emerald-700 border-emerald-200 font-bold'
+    if (p === '進行中') return 'bg-blue-50 text-[#0067b8] border-blue-200 font-bold'
+    return 'bg-gray-50 text-gray-400 border-gray-200 font-bold'
+}
+
+const ProgressIcon = ({ p }: { p: string }) => {
+    if (p === '完了') return (
+        <div className="w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center shrink-0">
+            <CheckCircle2 size={12} className="text-white" />
+        </div>
+    )
+    if (p === '進行中') return (
+        <div className="w-5 h-5 rounded-full bg-[#0067b8] flex items-center justify-center shrink-0">
+            <Loader2 size={12} className="text-white animate-spin" />
+        </div>
+    )
+    return (
+        <div className="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center shrink-0">
+            <Circle size={12} className="text-gray-400" />
+        </div>
+    )
+}
+
+// ── Date helpers ─────────────────────────────────────────────────
+const daysUntil = (dateStr: string) => {
+    if (!dateStr || dateStr === '---') return null;
+    return Math.ceil((new Date(dateStr).getTime() - Date.now()) / 86400000);
+};
+
+const elapsedTime = (entryDate: string) => {
+    if (!entryDate) return null;
+    const totalMonths = Math.floor((Date.now() - new Date(entryDate).getTime()) / (30.44 * 86400000));
+    const y = Math.floor(totalMonths / 12), m = totalMonths % 12;
+    return y > 0 ? `${y}年 ${m}ヶ月` : `${m}ヶ月`;
+};
+
+const SEL = "text-[12px] py-1 px-2 outline-none rounded border border-gray-200 text-gray-700 bg-white font-medium cursor-pointer w-full focus:border-[#0067b8] transition-colors"
+
+// ── Pulse Timeline Helper ─────────────────────────────────────────
+const PulseMilestone = ({ date, label, color = "bg-[#0067b8]" }: { date: string, label: string, color?: string }) => {
+    if (!date || date === '---') return null;
+    const now = Date.now();
+    const futureLimit = now + (180 * 86400000); // 6 months
+    const target = new Date(date).getTime();
+    if (target < now || target > futureLimit) return null;
+
+    const percent = ((target - now) / (futureLimit - now)) * 100;
+    return (
+        <div
+            className={`absolute top-0 w-2 h-2 -ml-1 rounded-full border border-white cursor-help hover:scale-125 transition-transform ${color}`}
+            style={{ left: `${percent}%` }}
+            title={`${label}: ${date}`}
+        />
+    );
 };
 
 export default function OperationsClient({
@@ -127,565 +140,847 @@ export default function OperationsClient({
             avatar: (w.full_name_romaji || '?').charAt(0).toUpperCase(),
             photoUrl: w.avatar_url || null,
             company: w.companies?.name_jp || '未所属',
-            systemCategory: w.system_type === 'tokuteigino' ? '特定技能' : (w.system_type === 'ginou_jisshu' ? '技能実習' : '育成就労'),
+            systemType: w.system_type || 'ginou_jisshu',
             occupation: w.industry_field || '---',
             visaStatus: w.visa_status || '---',
             visaExpiry: w.visas?.[0]?.expiration_date || '---',
             entryDate: w.entry_date || '',
             entryBatch: w.entry_batch || '---',
-            certStartDate: w.cert_start_date || '---',
-            certEndDate: w.cert_end_date || '---',
+            cert_start_date: w.cert_start_date || '',
+            cert_end_date: w.cert_end_date || '',
             remarks: w.remarks || '',
             address: w.address || '',
             status: reverseStatusMap[w.status] || '未入国',
-            kenteiStatus: (typeof w.kentei_status === 'object' && w.kentei_status ? w.kentei_status : { type: '---', progress: '未着手', assignee: '---', witness: '---', exam_location: '', exam_date_written: '', exam_date_practical: '', exam_result_written: '---', exam_result_practical: '---' }) as OperationData,
-            kikouStatus: (typeof w.kikou_status === 'object' && w.kikou_status ? w.kikou_status : { type: '---', progress: '未着手', assignee: '---', construction_type: '---', construction_assignee: '---' }) as OperationData,
-            nyukanStatus: (typeof w.nyukan_status === 'object' && w.nyukan_status ? w.nyukan_status : { type: '---', progress: '未着手', assignee: '---', application_date: '', agent: '' }) as OperationData
+            kenteiStatus: (typeof w.kentei_status === 'object' && w.kentei_status
+                ? w.kentei_status
+                : { type: '---', progress: '未着手', assignee: '---', exam_date_written: '', exam_date_practical: '' }) as OperationData,
+            kikouStatus: (typeof w.kikou_status === 'object' && w.kikou_status
+                ? w.kikou_status
+                : { type: '---', progress: '未着手', assignee: '---', construction_type: '---', construction_assignee: '---', application_date: '' }) as OperationData,
+            nyukanStatus: (typeof w.nyukan_status === 'object' && w.nyukan_status
+                ? w.nyukan_status
+                : { type: '---', progress: '未着手', assignee: '---', application_date: '', agent: '', receipt_number: '' }) as OperationData,
         };
     });
 
+    // ── State ────────────────────────────────────────────────────
     const [workers, setWorkers] = useState(mappedWorkers);
-    const [selectedIds, setSelectedIds] = useState<string[]>([]);
-
-    type StatusTabKey = 'waiting' | 'active' | 'closed'
-    const STATUS_TAB_GROUPS: { key: StatusTabKey; label: string; statuses: string[]; icon: React.ReactNode; color: string }[] = [
-        { key: 'waiting', label: '未入国', statuses: ['未入国'], icon: <Clock size={13} />, color: 'amber' },
-        { key: 'active', label: '就業中・対応中', statuses: ['就業中', '対応中'], icon: <Briefcase size={13} />, color: 'emerald' },
-        { key: 'closed', label: '失踪・帰国・転籍済', statuses: ['失踪', '帰国', '転籍済'], icon: <AlertTriangle size={13} />, color: 'rose' },
-    ];
-    const [activeStatusTab, setActiveStatusTab] = useState<StatusTabKey>('active');
-
-    const countByStatusTab = (key: StatusTabKey) => {
-        const group = STATUS_TAB_GROUPS.find(g => g.key === key)!;
-        return workers.filter(w => group.statuses.includes(w.status)).length;
-    };
-
-    const [filterSystem, setFilterSystem] = useState('すべて');
+    const [activeSystemTab, setActiveSystemTab] = useState('ginou_jisshu');
+    const [activeSubTab, setActiveSubTab] = useState('all');
     const [filterCompany, setFilterCompany] = useState('すべて');
     const [filterOccupation, setFilterOccupation] = useState('すべて');
-    const [filterBatch, setFilterBatch] = useState('すべて');
-    const [filterVisaStatus, setFilterVisaStatus] = useState('すべて');
-    const [sortOrder, setSortOrder] = useState('在留期限(近い順)');
+    const [filterEntryBatch, setFilterEntryBatch] = useState('すべて');
+    const [searchQuery, setSearchQuery] = useState('');
+    const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+    const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+    const [cmdSearch, setCmdSearch] = useState('');
+    const [editingId, setEditingId] = useState<string | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 20;
+    const [sortBy, setSortBy] = useState<'none' | 'visaExpiry' | 'certEnd' | 'entryDate'>('none');
+    const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+    const [batchForm, setBatchForm] = useState<{
+        worker_status: string;
+        kikou_type: string; kikou_assignee: string; kikou_application_date: string; kikou_progress: string;
+        nyukan_type: string; nyukan_assignee: string; nyukan_application_date: string; nyukan_progress: string;
+        nyukan_receipt: string; nyukan_agent: string;
+        cert_start_date: string; cert_end_date: string;
+    }>({
+        worker_status: '',
+        kikou_type: '', kikou_assignee: '', kikou_application_date: '', kikou_progress: '',
+        nyukan_type: '', nyukan_assignee: '', nyukan_application_date: '', nyukan_progress: '',
+        nyukan_receipt: '', nyukan_agent: '',
+        cert_start_date: '', cert_end_date: '',
+    });
+    const itemsPerPage = 15;
 
-    React.useEffect(() => { setCurrentPage(1); }, [activeStatusTab, filterSystem, filterCompany, filterOccupation, filterBatch, filterVisaStatus, sortOrder]);
+    const companyOptions = useMemo(() => Array.from(new Set(workers.map(w => w.company))).filter(Boolean), [workers]);
+    const occupationOptions = useMemo(() => Array.from(new Set(workers.map(w => w.occupation))).filter(Boolean), [workers]);
+    const entryBatchOptions = useMemo(() => Array.from(new Set(workers.map(w => w.entryBatch).filter(Boolean))).sort(), [workers]);
 
-    const STATUS_CARDS = ['すべて', '未入国', '対応中', '就業中', '失踪', '帰国', '転籍済'];
-    const systemOptions = ['すべて', '育成就労', '技能実習', '特定技能'];
-    const companyOptions = ['すべて', ...Array.from(new Set(workers.map(w => w.company)))].filter(Boolean);
-    const occupationOptions = ['すべて', ...Array.from(new Set(workers.map(w => w.occupation)))].filter(Boolean);
-    const getBatchString = (entryDate: string) => {
-        if (!entryDate) return '不明';
-        const d = new Date(entryDate);
-        return `${d.getFullYear()}年${String(d.getMonth() + 1).padStart(2, '0')}月生`;
+    // ── Filtered workers ─────────────────────────────────────────
+    const processedWorkers = useMemo(() => {
+        const subTab = STATUS_SEG_TABS.find(t => t.key === activeSubTab)!;
+        const sortFn = (a: any, b: any) => {
+            if (sortBy === 'none') return 0;
+            const key = sortBy === 'visaExpiry' ? 'visaExpiry'
+                : sortBy === 'certEnd' ? 'cert_end_date'
+                    : 'entryDate';
+            const va = a[key] || '9999-99-99';
+            const vb = b[key] || '9999-99-99';
+            return sortDir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va);
+        };
+        return workers
+            .filter(w => {
+                if (activeSystemTab === 'exam') return true;
+                if (activeSystemTab === 'ginou_jisshu') return !['tokuteigino', 'ikusei'].includes(w.systemType);
+                return w.systemType === activeSystemTab;
+            })
+            .filter(w => subTab.statuses.includes(w.status))
+            .filter(w => filterCompany === 'すべて' || w.company === filterCompany)
+            .filter(w => filterOccupation === 'すべて' || w.occupation === filterOccupation)
+            .filter(w => filterEntryBatch === 'すべて' || w.entryBatch === filterEntryBatch)
+            .filter(w => {
+                if (!searchQuery) return true;
+                const q = searchQuery.toLowerCase();
+                return w.name.toLowerCase().includes(q) || w.furigana.toLowerCase().includes(q) || w.company.toLowerCase().includes(q);
+            })
+            .sort(sortFn);
+    }, [workers, activeSystemTab, activeSubTab, filterCompany, filterOccupation, filterEntryBatch, searchQuery, sortBy, sortDir]);
+
+    const handleSort = (key: typeof sortBy) => {
+        if (sortBy === key) setSortDir(d => d === 'asc' ? 'desc' : 'asc');
+        else { setSortBy(key); setSortDir('asc'); }
+        setCurrentPage(1);
     };
-    const batchOptions = ['すべて', ...Array.from(new Set(workers.map(w => getBatchString(w.entryDate))))].filter(Boolean);
-    const visaOptions = ['すべて', ...Array.from(new Set(workers.map(w => w.visaStatus)))].filter(Boolean);
-    const sortOptions = ['在留期限(近い順)', '認定終了日(近い順)', '入国期生(近い順)'];
-
-    const processedWorkers = workers
-        .filter(w => { const g = STATUS_TAB_GROUPS.find(g => g.key === activeStatusTab)!; return g.statuses.includes(w.status); })
-        .filter(w => filterSystem === 'すべて' || w.systemCategory === filterSystem)
-        .filter(w => filterCompany === 'すべて' || w.company === filterCompany)
-        .filter(w => filterOccupation === 'すべて' || w.occupation === filterOccupation)
-        .filter(w => filterBatch === 'すべて' || getBatchString(w.entryDate) === filterBatch)
-        .filter(w => filterVisaStatus === 'すべて' || w.visaStatus === filterVisaStatus)
-        .sort((a, b) => {
-            if (sortOrder === '認定終了日(近い順)') {
-                const cA = a.certEndDate && a.certEndDate !== '---' ? new Date(a.certEndDate).getTime() : Infinity;
-                const cB = b.certEndDate && b.certEndDate !== '---' ? new Date(b.certEndDate).getTime() : Infinity;
-                return cA - cB;
-            }
-            if (sortOrder === '入国期生(近い順)') {
-                return (b.entryDate ? new Date(b.entryDate).getTime() : 0) - (a.entryDate ? new Date(a.entryDate).getTime() : 0);
-            }
-            const expA = a.visaExpiry && a.visaExpiry !== '---' ? new Date(a.visaExpiry).getTime() : Infinity;
-            const expB = b.visaExpiry && b.visaExpiry !== '---' ? new Date(b.visaExpiry).getTime() : Infinity;
-            return expA - expB;
-        });
 
     const totalPages = Math.ceil(processedWorkers.length / itemsPerPage);
-    const paginatedWorkers = processedWorkers.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+    const paginatedWorkers = useMemo(() => {
+        const start = (currentPage - 1) * itemsPerPage;
+        return processedWorkers.slice(start, start + itemsPerPage);
+    }, [processedWorkers, currentPage]);
 
+    // Reset to page 1 when filters change
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [activeSystemTab, activeSubTab, filterCompany, filterOccupation, filterEntryBatch, searchQuery, sortBy]);
+
+    // ── Command Palette Listener ─────────────────────────────────
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault();
+                setIsCommandPaletteOpen(prev => !prev);
+            }
+            if (e.key === 'Escape') setIsCommandPaletteOpen(false);
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, []);
+
+    const cmdResults = useMemo(() => {
+        if (!cmdSearch) return [];
+        const q = cmdSearch.toLowerCase();
+        return workers.filter(w =>
+            w.name.toLowerCase().includes(q) ||
+            w.company.toLowerCase().includes(q) ||
+            w.furigana.toLowerCase().includes(q)
+        ).slice(0, 8);
+    }, [cmdSearch, workers]);
+
+    const countBySubTab = (key: string) => {
+        const t = STATUS_SEG_TABS.find(t => t.key === key)!;
+        return workers.filter(w => {
+            const sys = activeSystemTab === 'exam' ? true :
+                activeSystemTab === 'ginou_jisshu' ? !['tokuteigino', 'ikusei'].includes(w.systemType) : w.systemType === activeSystemTab;
+            return sys && t.statuses.includes(w.status);
+        }).length;
+    };
+
+    const countBySystemTab = (key: string) => {
+        if (key === 'exam') return workers.length;
+        if (key === 'ginou_jisshu') return workers.filter(w => !['tokuteigino', 'ikusei'].includes(w.systemType)).length;
+        return workers.filter(w => w.systemType === key).length;
+    };
+
+    // ── Handlers ─────────────────────────────────────────────────
     const handleChange = async (id: string, field: WorkerField, value: string) => {
-        setWorkers(workers.map(w => w.id === id ? { ...w, [field]: value } : w));
-        try { await updateWorkerStatus(id, field, value); } catch { alert("更新エラーが発生しました"); }
+        setWorkers(prev => prev.map(w => w.id === id ? { ...w, [field]: value } : w));
+        try { await updateWorkerStatus(id, field, value); } catch { alert('更新エラー'); }
     };
-    const handleOperationChange = async (id: string, field: 'kentei_status' | 'kikou_status' | 'nyukan_status', subField: keyof OperationData, value: string) => {
-        const workerIndex = workers.findIndex(w => w.id === id);
-        if (workerIndex === -1) return;
-        const worker = workers[workerIndex];
-        const stateField = field === 'kentei_status' ? 'kenteiStatus' : field === 'kikou_status' ? 'kikouStatus' : 'nyukanStatus';
-        const newOpData = { ...worker[stateField], [subField]: value };
-        setWorkers(prev => prev.map(w => w.id === id ? { ...w, [stateField]: newOpData } : w));
-        try { await updateOperationData(id, field, newOpData); } catch { alert("更新エラーが発生しました"); }
-    };
-    const handleRemarksBlur = async (id: string) => {
+
+    const handleOperationChange = async (
+        id: string,
+        field: 'kentei_status' | 'kikou_status' | 'nyukan_status',
+        subField: keyof OperationData,
+        value: string,
+    ) => {
         const worker = workers.find(w => w.id === id);
         if (!worker) return;
-        try { await updateWorkerStatus(id, 'remarks', worker.remarks); } catch { alert("備考の更新に失敗しました"); }
+        const sf = field === 'kentei_status' ? 'kenteiStatus' : field === 'kikou_status' ? 'kikouStatus' : 'nyukanStatus';
+        const newData = { ...worker[sf], [subField]: value };
+        setWorkers(prev => prev.map(w => w.id === id ? { ...w, [sf]: newData } : w));
+        try { await updateOperationData(id, field, newData); } catch { alert('更新エラー'); }
     };
-    const handleBulkChange = async (field: WorkerField | 'remarks', value: string) => {
-        setWorkers(workers.map(w => selectedIds.includes(w.id) ? { ...w, [field]: value } : w));
-        try { for (const id of selectedIds) { await updateWorkerStatus(id, field, value); } }
-        catch { alert("一部の更新に失敗しました。ページをリロードしてください。"); }
+
+    const handleRemarksBlur = async (id: string) => {
+        const w = workers.find(w => w.id === id);
+        if (!w) return;
+        try { await updateWorkerStatus(id, 'remarks', w.remarks); } catch { alert('備考の更新に失敗しました'); }
     };
-    const handleBulkOperationChange = async (field: 'kentei_status' | 'kikou_status' | 'nyukan_status', subField: keyof OperationData, value: string) => {
-        const stateField = field === 'kentei_status' ? 'kenteiStatus' : field === 'kikou_status' ? 'kikouStatus' : 'nyukanStatus';
-        setWorkers(prev => prev.map(w => selectedIds.includes(w.id) ? { ...w, [stateField]: { ...w[stateField], [subField]: value } } : w));
-        try {
-            for (const id of selectedIds) {
-                const worker = workers.find(w => w.id === id);
-                if (worker) { await updateOperationData(id, field, { ...worker[stateField], [subField]: value }); }
-            }
-        } catch { alert("一部の更新に失敗しました。ページをリロードしてください。"); }
+
+    const toggleSelect = (id: string) =>
+        setSelectedIds(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
+
+    const toggleSelectAll = () =>
+        setSelectedIds(selectedIds.size === paginatedWorkers.length ? new Set() : new Set(paginatedWorkers.map(w => w.id)));
+
+    const applyBatch = async () => {
+        const ids = Array.from(selectedIds);
+        for (const id of ids) {
+            const worker = workers.find(w => w.id === id);
+            if (!worker) continue;
+            const updates: Promise<unknown>[] = [];
+            // 機構業務
+            const newKikou = {
+                ...worker.kikouStatus,
+                ...(batchForm.kikou_type ? { type: batchForm.kikou_type } : {}),
+                ...(batchForm.kikou_assignee ? { assignee: batchForm.kikou_assignee } : {}),
+                ...(batchForm.kikou_application_date ? { application_date: batchForm.kikou_application_date } : {}),
+                ...(batchForm.kikou_progress ? { progress: batchForm.kikou_progress } : {}),
+            };
+            // 入管業務
+            const newNyukan = {
+                ...worker.nyukanStatus,
+                ...(batchForm.nyukan_type ? { type: batchForm.nyukan_type } : {}),
+                ...(batchForm.nyukan_assignee ? { assignee: batchForm.nyukan_assignee } : {}),
+                ...(batchForm.nyukan_application_date ? { application_date: batchForm.nyukan_application_date } : {}),
+                ...(batchForm.nyukan_progress ? { progress: batchForm.nyukan_progress } : {}),
+                ...(batchForm.nyukan_receipt ? { receipt_number: batchForm.nyukan_receipt } : {}),
+                ...(batchForm.nyukan_agent ? { agent: batchForm.nyukan_agent } : {}),
+            };
+            updates.push(updateOperationData(id, 'kikou_status', newKikou));
+            updates.push(updateOperationData(id, 'nyukan_status', newNyukan));
+            if (batchForm.cert_start_date) updates.push(updateWorkerStatus(id, 'cert_start_date', batchForm.cert_start_date));
+            if (batchForm.cert_end_date) updates.push(updateWorkerStatus(id, 'cert_end_date', batchForm.cert_end_date));
+            if (batchForm.worker_status) updates.push(updateWorkerStatus(id, 'status', batchForm.worker_status));
+            setWorkers(prev => prev.map(w => w.id === id ? {
+                ...w,
+                kikouStatus: newKikou,
+                nyukanStatus: newNyukan,
+                ...(batchForm.cert_start_date ? { cert_start_date: batchForm.cert_start_date } : {}),
+                ...(batchForm.cert_end_date ? { cert_end_date: batchForm.cert_end_date } : {}),
+                ...(batchForm.worker_status ? { status: batchForm.worker_status } : {}),
+            } : w));
+            try { await Promise.all(updates); } catch { alert('一括更新エラー'); }
+        }
+        setSelectedIds(new Set());
+        setBatchForm({ worker_status: '', kikou_type: '', kikou_assignee: '', kikou_application_date: '', kikou_progress: '', nyukan_type: '', nyukan_assignee: '', nyukan_application_date: '', nyukan_progress: '', nyukan_receipt: '', nyukan_agent: '', cert_start_date: '', cert_end_date: '' });
     };
-    const toggleSelectAll = () => { selectedIds.length === workers.length ? setSelectedIds([]) : setSelectedIds(workers.map(w => w.id)); };
-    const toggleSelect = (id: string) => { selectedIds.includes(id) ? setSelectedIds(selectedIds.filter(s => s !== id)) : setSelectedIds([...selectedIds, id]); };
 
-    const [activeTab, setActiveTab] = useState<'overview' | 'exam'>('overview');
+    const currentSystemTab = SYSTEM_TABS.find(t => t.key === activeSystemTab);
 
-    // ── Status badge ──────────────────────────────────────────
-    const statusBadgeCls = (s: string) => {
-        if (s === '就業中') return 'bg-emerald-100 text-emerald-800 border-emerald-200'
-        if (s === '対応中') return 'bg-amber-100 text-amber-800 border-amber-200'
-        if (s === '失踪') return 'bg-rose-100 text-rose-800 border-rose-200'
-        if (s === '帰国') return 'bg-slate-100 text-slate-700 border-slate-200'
-        return 'bg-blue-100 text-blue-800 border-blue-200'
-    }
-
+    // ── Render ───────────────────────────────────────────────────
     return (
-        <div className="bg-slate-50 min-h-full">
+        <div className="bg-[#f8f9fa] min-h-full flex flex-col relative">
+            {/* Micro-Dot Grid (Blue on Light Base) */}
+            <div className="absolute inset-0 pointer-events-none opacity-[0.08] z-0"
+                style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, #0067b8 1px, transparent 0)', backgroundSize: '32px 32px' }} />
+            {/* ══ STICKY HEADER: Responsive wrapping bar ══ */}
+            <div className="sticky top-0 z-[100] bg-white border-b border-gray-200 shadow-sm px-6 min-h-[52px] py-2 flex flex-wrap items-center gap-x-6 gap-y-3">
 
-            {/* ════════════════════════════════════════════════════
-                MAIN TAB BAR
-            ════════════════════════════════════════════════════ */}
-            <div className="flex px-6 pt-0 space-x-0 border-b border-slate-200 bg-white">
-                {(['overview', 'exam'] as const).map(tab => (
-                    <button key={tab} onClick={() => setActiveTab(tab)}
-                        className={`px-6 py-3 text-sm font-bold transition-all whitespace-nowrap border-b-2 -mb-[1px] ${activeTab === tab
-                            ? 'text-slate-800 border-slate-800'
-                            : 'text-slate-400 border-transparent hover:text-slate-600'}`}>
-                        {tab === 'overview' ? '総括一覧 (Overview)' : '検定・試験 (Exams)'}
-                    </button>
-                ))}
-            </div>
+                {/* Left: System Tabs (pill style) */}
+                <div className="flex items-center gap-1 shrink-0">
+                    {SYSTEM_TABS.map((tab) => {
+                        const isActive = activeSystemTab === tab.key;
+                        return (
+                            <button key={tab.key}
+                                onClick={() => { setActiveSystemTab(tab.key); setActiveSubTab('all'); }}
+                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[12px] font-bold transition-all whitespace-nowrap
+                                    ${isActive ? 'bg-blue-50 text-[#0067b8]' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'}`}>
+                                {tab.label}
+                                <span className={`text-[10px] font-black px-1.5 py-0.5 rounded-full ${isActive ? 'bg-[#0067b8] text-white' : 'bg-gray-100 text-gray-400'}`}>
+                                    {countBySystemTab(tab.key)}
+                                </span>
+                            </button>
+                        );
+                    })}
+                </div>
 
-            {activeTab === 'overview' && (
-                <div className="w-full min-[720px]:w-[1500px] mx-auto">
+                <div className="w-px h-5 bg-gray-200 shrink-0" />
 
-                    {/* ── Status Sub-Tabs ── */}
-                    <div className="flex px-6 pt-0 border-b border-slate-200 overflow-x-auto no-scrollbar bg-white">
-                        {STATUS_TAB_GROUPS.map((tab) => {
-                            const isActive = activeStatusTab === tab.key;
-                            const count = countByStatusTab(tab.key);
-                            const colorMap: Record<string, string> = {
-                                waiting: 'border-amber-500 text-amber-700',
-                                active: 'border-emerald-500 text-emerald-700',
-                                closed: 'border-rose-500 text-rose-700',
-                            };
-                            const countMap: Record<string, string> = {
-                                waiting: 'bg-amber-100 text-amber-700',
-                                active: 'bg-emerald-100 text-emerald-700',
-                                closed: 'bg-rose-100 text-rose-700',
-                            };
-                            return (
-                                <button key={tab.key} onClick={() => setActiveStatusTab(tab.key)}
-                                    className={`flex items-center gap-2 px-5 py-3 text-sm font-bold transition-all whitespace-nowrap border-b-2 -mb-[1px]
-                                        ${isActive ? colorMap[tab.key] : 'text-slate-400 border-transparent hover:text-slate-600'}`}>
-                                    {tab.icon}
-                                    <span>{tab.label}</span>
-                                    <span className={`text-[10px] font-black min-w-[20px] h-[18px] inline-flex items-center justify-center px-1.5 rounded-full
-                                        ${isActive ? countMap[tab.key] : 'bg-slate-100 text-slate-400'}`}>{count}</span>
-                                </button>
-                            );
-                        })}
-                    </div>
-
-                    {/* ── Filter Bar ── */}
-                    <div className="px-4 md:px-6 py-3 bg-white border-b border-slate-200">
-                        <div className="flex flex-wrap items-center justify-between gap-3">
-                            <div className="flex flex-wrap items-center gap-2">
-                                <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest mr-1">絞り込み</span>
-                                {[
-                                    { v: filterSystem, s: setFilterSystem, opts: systemOptions, placeholder: 'すべて (区分)' },
-                                    { v: filterCompany, s: setFilterCompany, opts: companyOptions, placeholder: 'すべて (企業)' },
-                                    { v: filterOccupation, s: setFilterOccupation, opts: occupationOptions, placeholder: 'すべて (職種)' },
-                                    { v: filterBatch, s: setFilterBatch, opts: batchOptions, placeholder: 'すべて (期生)' },
-                                    { v: filterVisaStatus, s: setFilterVisaStatus, opts: visaOptions, placeholder: 'すべて (資格)' },
-                                ].map(({ v, s, opts, placeholder }, i) => (
-                                    <select key={i} value={v} onChange={e => s(e.target.value)}
-                                        className="text-xs py-1.5 px-2.5 border border-slate-200 rounded-lg outline-none focus:border-slate-400 bg-white cursor-pointer text-slate-700 font-medium transition-colors hover:border-slate-300">
-                                        <option value="すべて" disabled>{placeholder}</option>
-                                        {opts.map(o => <option key={o} value={o}>{o === 'すべて' ? placeholder : o}</option>)}
-                                    </select>
-                                ))}
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">並び順</span>
-                                <select value={sortOrder} onChange={e => setSortOrder(e.target.value)}
-                                    className="text-xs py-1.5 px-2.5 border border-slate-200 rounded-lg outline-none focus:border-slate-400 bg-white cursor-pointer text-slate-700 font-medium">
-                                    {sortOptions.map(o => <option key={o} value={o}>{o}</option>)}
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* ── Bulk Edit Bar ── */}
-                    {selectedIds.length > 0 && (
-                        <div className="mx-4 md:mx-6 mt-4 bg-white border border-emerald-200 rounded-2xl p-4 shadow-sm">
-                            <div className="text-sm font-black text-slate-700 flex items-center gap-2 pb-3 mb-3 border-b border-slate-100">
-                                <span className="inline-flex items-center gap-1.5 bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full text-xs font-black">🛠 {selectedIds.length} 件選択中</span>
-                                <span className="text-[11px] text-slate-400 font-normal">一括変更 — 変更後に選択中すべての行に即時反映</span>
-                            </div>
-                            <div className="flex flex-wrap gap-3">
-                                {/* Basic */}
-                                <div className="flex flex-wrap items-center gap-1.5 bg-slate-50 rounded-xl px-3 py-2 border border-slate-200">
-                                    <span className="text-[10px] text-slate-500 font-black w-[45px] shrink-0">基本管理</span>
-                                    <select onChange={e => handleBulkChange('status', e.target.value)} className={SEL + ' w-[90px]'} defaultValue=""><option value="" disabled>ステータス</option>{STATUS_CARDS.filter(s => s !== 'すべて').map(s => <option key={s} value={s}>{s}</option>)}</select>
-                                    <input type="text" placeholder="備考一括上書き..." onBlur={e => handleBulkChange('remarks', e.target.value)} onKeyDown={e => { if (e.key === 'Enter') handleBulkChange('remarks', e.currentTarget.value) }} className="text-xs py-0.5 px-1.5 border border-slate-200 rounded-lg outline-none text-slate-700 bg-white w-[120px] focus:border-slate-400" />
-                                </div>
-                                {/* Kentei */}
-                                <div className="flex flex-wrap items-center gap-1.5 bg-amber-50 rounded-xl px-3 py-2 border border-amber-200">
-                                    <span className="text-[10px] text-amber-600 font-black w-[45px] shrink-0">検定業務</span>
-                                    <select onChange={e => handleBulkOperationChange('kentei_status', 'type', e.target.value)} className={SEL + ' w-[80px] focus:ring-amber-300'} defaultValue=""><option value="" disabled>業務</option>{KENTEI_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}</select>
-                                    <select onChange={e => handleBulkOperationChange('kentei_status', 'assignee', e.target.value)} className={SEL + ' w-[80px] focus:ring-amber-300'} defaultValue=""><option value="" disabled>担当</option>{STAFF_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}</select>
-                                    <input type="date" onChange={e => handleBulkOperationChange('kentei_status', 'exam_date_written', e.target.value)} className="text-xs py-0.5 px-1.5 border border-slate-200 rounded-lg outline-none text-slate-700 bg-white w-[105px]" />
-                                    <input type="date" onChange={e => handleBulkOperationChange('kentei_status', 'exam_date_practical', e.target.value)} className="text-xs py-0.5 px-1.5 border border-slate-200 rounded-lg outline-none text-slate-700 bg-white w-[105px]" />
-                                    <select onChange={e => handleBulkOperationChange('kentei_status', 'progress', e.target.value)} className={SEL + ' w-[80px] focus:ring-amber-300'} defaultValue=""><option value="" disabled>進捗</option>{PROGRESS_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}</select>
-                                </div>
-                                {/* Kikou */}
-                                <div className="flex flex-wrap items-center gap-1.5 bg-indigo-50 rounded-xl px-3 py-2 border border-indigo-200">
-                                    <span className="text-[10px] text-indigo-600 font-black shrink-0 w-[45px] leading-[1.2]">機構 / 建設</span>
-                                    <select onChange={e => handleBulkOperationChange('kikou_status', 'type', e.target.value)} className={SEL + ' w-[80px] focus:ring-indigo-300'} defaultValue=""><option value="" disabled>機構業務</option>{KIKOU_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}</select>
-                                    <select onChange={e => handleBulkOperationChange('kikou_status', 'assignee', e.target.value)} className={SEL + ' w-[80px] focus:ring-indigo-300'} defaultValue=""><option value="" disabled>機構担当</option>{STAFF_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}</select>
-                                    <select onChange={e => handleBulkOperationChange('kikou_status', 'construction_type', e.target.value)} className={SEL + ' w-[80px] focus:ring-indigo-300'} defaultValue=""><option value="" disabled>建設業務</option>{CONSTRUCTION_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}</select>
-                                    <select onChange={e => handleBulkOperationChange('kikou_status', 'construction_assignee', e.target.value)} className={SEL + ' w-[80px] focus:ring-indigo-300'} defaultValue=""><option value="" disabled>建担当</option>{STAFF_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}</select>
-                                    <select onChange={e => handleBulkOperationChange('kikou_status', 'progress', e.target.value)} className={SEL + ' w-[80px] focus:ring-indigo-300'} defaultValue=""><option value="" disabled>進捗</option>{PROGRESS_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}</select>
-                                </div>
-                                {/* Nyukan */}
-                                <div className="flex flex-wrap items-center gap-1.5 bg-blue-50 rounded-xl px-3 py-2 border border-blue-200">
-                                    <span className="text-[10px] text-blue-600 font-black shrink-0 w-[45px]">入管業務</span>
-                                    <select onChange={e => handleBulkOperationChange('nyukan_status', 'type', e.target.value)} className={SEL + ' w-[80px] focus:ring-blue-300'} defaultValue=""><option value="" disabled>業務</option>{NYUKAN_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}</select>
-                                    <select onChange={e => handleBulkOperationChange('nyukan_status', 'assignee', e.target.value)} className={SEL + ' w-[80px] focus:ring-blue-300'} defaultValue=""><option value="" disabled>担当</option>{STAFF_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}</select>
-                                    <input type="date" onChange={e => handleBulkOperationChange('nyukan_status', 'application_date', e.target.value)} className="text-xs py-0.5 px-1.5 border border-slate-200 rounded-lg outline-none text-slate-700 bg-white w-[110px]" />
-                                    <input type="text" placeholder="取次者..." onBlur={e => handleBulkOperationChange('nyukan_status', 'agent', e.target.value)} onKeyDown={e => { if (e.key === 'Enter') handleBulkOperationChange('nyukan_status', 'agent', e.currentTarget.value) }} className="text-xs py-0.5 px-1.5 border border-slate-200 rounded-lg outline-none text-slate-700 bg-white w-[90px] focus:border-blue-400" />
-                                    <input type="text" placeholder="受理番号..." onBlur={e => handleBulkOperationChange('nyukan_status', 'receipt_number', e.target.value)} onKeyDown={e => { if (e.key === 'Enter') handleBulkOperationChange('nyukan_status', 'receipt_number', e.currentTarget.value) }} className="text-xs py-0.5 px-1.5 border border-slate-200 rounded-lg outline-none text-slate-700 bg-white w-[100px] focus:border-blue-400" />
-                                    <select onChange={e => handleBulkOperationChange('nyukan_status', 'progress', e.target.value)} className={SEL + ' w-[80px] focus:ring-blue-300'} defaultValue=""><option value="" disabled>進捗</option>{PROGRESS_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}</select>
-                                </div>
-                            </div>
+                {/* Center: Status sub-tabs + filters + sort + search */}
+                <div className="flex flex-wrap items-center gap-3 gap-y-2">
+                    {activeSystemTab !== 'exam' && (
+                        <div className="flex bg-gray-100 border border-gray-200 rounded-md p-0.5 shrink-0">
+                            {STATUS_SEG_TABS.map((tab) => {
+                                const isActive = activeSubTab === tab.key;
+                                return (
+                                    <button key={tab.key} onClick={() => setActiveSubTab(tab.key)}
+                                        className={`px-3 py-1 rounded-sm text-[11px] font-black transition-all whitespace-nowrap
+                                            ${isActive ? 'bg-white text-[#0067b8] shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>
+                                        {tab.label}
+                                        <span className="ml-1 opacity-60 tabular-nums">{countBySubTab(tab.key)}</span>
+                                    </button>
+                                );
+                            })}
                         </div>
                     )}
 
-                    {/* ════════════════════════════════════════════════════
-                        WORKER LIST
-                    ════════════════════════════════════════════════════ */}
-                    <div className="flex flex-col gap-6 p-4 md:p-6 pb-10">
-                        {paginatedWorkers.length > 0 && (
-                            <div className="flex items-center gap-2 px-1">
-                                <input type="checkbox" checked={selectedIds.length === workers.length && workers.length > 0} onChange={toggleSelectAll} className="w-4 h-4 rounded border-slate-300 cursor-pointer accent-slate-700" />
-                                <span className="text-xs font-bold text-slate-500">すべて選択 (Select All)</span>
+                    {activeSystemTab !== 'exam' && (
+                        <>
+                            <div className="w-px h-5 bg-gray-200 shrink-0" />
+                            <select value={filterCompany} onChange={e => setFilterCompany(e.target.value)}
+                                className="text-[11px] border border-gray-200 rounded-md px-2.5 py-1.5 bg-gray-50 outline-none focus:border-[#0067b8] cursor-pointer transition-colors font-bold text-gray-600 h-8 shrink-0 hover:bg-white">
+                                <option value="すべて">企業: すべて</option>
+                                {companyOptions.map(c => <option key={c} value={c}>{c}</option>)}
+                            </select>
+                            <select value={filterOccupation} onChange={e => setFilterOccupation(e.target.value)}
+                                className="text-[11px] border border-gray-200 rounded-md px-2.5 py-1.5 bg-gray-50 outline-none focus:border-[#0067b8] cursor-pointer transition-colors font-bold text-gray-600 h-8 shrink-0 hover:bg-white">
+                                <option value="すべて">職種: すべて</option>
+                                {occupationOptions.map(o => <option key={o} value={o}>{o}</option>)}
+                            </select>
+                            <select value={filterEntryBatch} onChange={e => setFilterEntryBatch(e.target.value)}
+                                className="text-[11px] border border-gray-200 rounded-md px-2.5 py-1.5 bg-gray-50 outline-none focus:border-[#0067b8] cursor-pointer transition-colors font-bold text-gray-600 h-8 shrink-0 hover:bg-white">
+                                <option value="すべて">入国期生: すべて</option>
+                                {entryBatchOptions.map(b => <option key={String(b)} value={String(b)}>{b}</option>)}
+                            </select>
+
+                            <div className="w-px h-5 bg-gray-200 shrink-0" />
+
+                            {/* Sort buttons */}
+                            {([
+                                { key: 'visaExpiry', label: '在留期限' },
+                                { key: 'certEnd', label: '修了日' },
+                                { key: 'entryDate', label: '入国日' },
+                            ] as const).map(({ key, label }) => {
+                                const isActive = sortBy === key;
+                                const Icon = !isActive ? ArrowUpDown : sortDir === 'asc' ? ArrowUp : ArrowDown;
+                                return (
+                                    <button key={key}
+                                        onClick={() => handleSort(key)}
+                                        className={`flex items-center gap-1 h-8 px-2.5 rounded-md text-[11px] font-bold border transition-all shrink-0
+                                            ${isActive
+                                                ? 'bg-blue-50 border-[#0067b8] text-[#0067b8]'
+                                                : 'bg-gray-50 border-gray-200 text-gray-500 hover:border-gray-300 hover:text-gray-700'}`}>
+                                        <Icon size={11} strokeWidth={2.5} />
+                                        {label}
+                                    </button>
+                                );
+                            })}
+                            <div className="w-px h-5 bg-gray-200 shrink-0" />
+
+                            {/* Search bar grouped with filters/sort */}
+                            <div className="relative shrink-0">
+                                <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                                <input type="text" placeholder="名前・企業名で検索..."
+                                    value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
+                                    className="pl-8 pr-3 py-1.5 bg-gray-50 border border-gray-200 rounded-md text-[12px] w-[200px] h-8 outline-none focus:bg-white focus:border-[#0067b8] transition-all" />
                             </div>
-                        )}
-
-                        {Object.entries(
-                            paginatedWorkers.reduce((acc, worker) => {
-                                const key = `${worker.company}:::${worker.entryDate || '未定'}`;
-                                if (!acc[key]) acc[key] = [];
-                                acc[key].push(worker);
-                                return acc;
-                            }, {} as Record<string, typeof paginatedWorkers>)
-                        ).map(([groupKey, group]) => (
-                            <div key={groupKey} className="flex flex-col gap-2">
-
-                                {/* ── Group Header ── */}
-                                <div className="flex items-center gap-3 px-1 mb-1">
-                                    <div className="flex items-center gap-2 border-l-4 border-slate-700 pl-3">
-                                        <span className="font-black text-[14px] text-slate-800">{group[0].company}</span>
-                                    </div>
-                                    <span className="text-[11px] text-slate-400 font-semibold">
-                                        入国日: <span className="text-slate-600 font-bold">{group[0].entryDate || '未定'}</span>
-                                    </span>
-                                    <span className="text-[11px] text-slate-400 font-semibold ml-auto">
-                                        <span className="text-slate-700 font-black">{group.length}</span>名
-                                    </span>
-                                </div>
-
-                                {/* ── Worker Cards ── */}
-                                {group.map((worker) => (
-                                    <div key={worker.id}
-                                        className={`flex flex-col min-[720px]:flex-row overflow-hidden rounded-2xl shadow-sm transition-all duration-200 border bg-white
-                                            ${selectedIds.includes(worker.id)
-                                                ? 'border-slate-400 shadow-md ring-1 ring-slate-300'
-                                                : 'border-slate-200 hover:border-slate-300 hover:shadow-md'}`}>
-
-                                        {/* Mobile header */}
-                                        <div className="flex items-center justify-between min-[720px]:hidden font-bold text-sm text-slate-700 border-b border-slate-100 px-4 py-2 bg-slate-50">
-                                            <div className="flex items-center gap-2">
-                                                <input type="checkbox" checked={selectedIds.includes(worker.id)} onChange={() => toggleSelect(worker.id)} className="w-4 h-4 rounded border-slate-300 cursor-pointer accent-slate-700" />
-                                                <span className="text-xs text-slate-500">選択</span>
-                                            </div>
-                                        </div>
-
-
-                                        {/* ══════════════════════════════════════════════
-                                            AVATAR COLUMN — portrait rectangle, far left
-                                        ══════════════════════════════════════════════ */}
-                                        <div className="hidden min-[720px]:block w-[96px] shrink-0 self-stretch relative overflow-hidden">
-                                            {worker.photoUrl ? (
-                                                <img
-                                                    src={worker.photoUrl}
-                                                    alt={worker.name}
-                                                    className="absolute inset-0 w-full h-full object-cover object-top"
-                                                />
-                                            ) : (
-                                                <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-slate-600 via-slate-700 to-slate-900 select-none gap-1">
-                                                    <span className="text-white font-black text-3xl leading-none tracking-tight">{worker.avatar}</span>
-                                                    <span className="text-slate-500 text-[7px] font-black tracking-[0.2em] uppercase">PHOTO</span>
-                                                </div>
-                                            )}
-                                            {/* bottom fade */}
-                                            <div className="absolute bottom-0 inset-x-0 h-8 bg-gradient-to-t from-black/25 to-transparent pointer-events-none" />
-                                        </div>
-
-                                        {/* ──────────────────────────────────────────────
-                                            COL 1 — Worker Info (no accent color)
-                                        ────────────────────────────────────────────── */}
-                                        <div className="flex-[1.3] flex flex-col p-4 min-w-0 bg-white">
-                                            {/* ─ Name row ─ */}
-                                            <div className="flex items-start gap-2.5">
-                                                {/* Avatar circle/image — mobile only */}
-                                                <div className="min-[720px]:hidden w-9 h-9 shrink-0 rounded-xl bg-slate-700 border border-slate-600 overflow-hidden flex items-center justify-center shadow-sm">
-                                                    {worker.photoUrl ? (
-                                                        <img src={worker.photoUrl} className="w-full h-full object-cover" />
-                                                    ) : (
-                                                        <span className="text-white font-black text-[13px]">{worker.avatar}</span>
-                                                    )}
-                                                </div>
-                                                <div className="flex flex-col gap-0 min-w-0 flex-1">
-                                                    <div className="flex items-baseline gap-2 min-w-0">
-                                                        <input type="checkbox" checked={selectedIds.includes(worker.id)} onChange={() => toggleSelect(worker.id)} className="w-3.5 h-3.5 rounded border-slate-300 cursor-pointer accent-slate-700 hidden min-[720px]:block shrink-0" />
-                                                        <Link href={`/workers/${worker.id}`} target="_blank" rel="noopener noreferrer"
-                                                            className="font-black text-slate-900 hover:text-slate-600 hover:underline truncate text-[14px] leading-tight shrink-0">
-                                                            {worker.name}
-                                                        </Link>
-                                                        {worker.furigana && (
-                                                            <span className="text-[10px] text-slate-400 truncate font-medium min-w-0">{worker.furigana}</span>
-                                                        )}
-                                                    </div>
-                                                    {/* ─ Address ─ */}
-                                                    {worker.address ? (
-                                                        <div className="flex items-start gap-1 mt-1.5 min-w-0">
-                                                            <MapPin size={10} className="text-slate-300 shrink-0 mt-[1px]" />
-                                                            <span className="text-[10px] text-slate-400 font-medium leading-snug line-clamp-2">{worker.address}</span>
-                                                        </div>
-                                                    ) : (
-                                                        <div className="flex items-center gap-1 mt-1.5">
-                                                            <MapPin size={10} className="text-slate-200 shrink-0" />
-                                                            <span className="text-[10px] text-slate-300 font-medium">社宅未登録</span>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </div>
-
-                                            {/* ─ Memo — pushed to bottom ─ */}
-                                            <textarea
-                                                className="mt-auto pt-3 w-full text-[11px] border-t border-slate-100 rounded-none outline-none focus:border-t-slate-200 resize-none h-14 bg-transparent placeholder-slate-300 text-slate-500 font-medium transition-all"
-                                                placeholder="メモ・備考..."
-                                                value={worker.remarks || ''}
-                                                onChange={(e) => setWorkers(workers.map(w => w.id === worker.id ? { ...w, remarks: e.target.value } : w))}
-                                                onBlur={() => handleRemarksBlur(worker.id)}
-                                            />
-                                        </div>
-
-                                        {/* ──────────────────────────────────────────────
-                                            COL 2 — 在留情報 (blue accent)
-                                        ────────────────────────────────────────────── */}
-                                        <div className={`flex-1 min-[720px]:flex-none min-[720px]:w-[190px] flex flex-col min-w-0 border-t min-[720px]:border-t-0 min-[720px]:border-l border-slate-100 ${C.zairyu.border}`}>
-                                            <div className={`px-3 py-1.5 flex items-center justify-between gap-1.5 border-b ${C.zairyu.divider} bg-slate-50/50`}>
-                                                <span className={`text-[11px] font-black uppercase tracking-wider ${C.zairyu.label}`}>在留情報</span>
-                                                <select value={worker.status} onChange={e => handleChange(worker.id, 'status', e.target.value)}
-                                                    className={`appearance-none text-[10px] px-2 py-0.5 rounded-full font-black outline-none cursor-pointer border ${statusBadgeCls(worker.status)}`}
-                                                    style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2.5'%3E%3Cpath d='M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9'/%3E%3C/svg%3E")`, backgroundPosition: 'right 0.25rem center', backgroundRepeat: 'no-repeat', backgroundSize: '0.75em' }}>
-                                                    {STATUS_CARDS.filter(s => s !== 'すべて').map(s => <option key={s} value={s}>{s}</option>)}
-                                                </select>
-                                            </div>
-                                            <div className="flex-1 flex flex-col gap-1 p-3">
-                                                {[
-                                                    { label: '資格', value: worker.visaStatus },
-                                                    { label: '期限', value: worker.visaExpiry },
-                                                    { label: '認定', value: `${worker.certStartDate !== '---' ? worker.certStartDate : '---'} 〜 ${worker.certEndDate !== '---' ? worker.certEndDate : '---'}` },
-                                                    { label: '職種', value: worker.occupation || '---' },
-                                                ].map(({ label, value }) => (
-                                                    <div key={label} className="text-[11px] flex justify-between items-start gap-1">
-                                                        <span className={`shrink-0 font-bold ${C.zairyu.label}`}>{label}:</span>
-                                                        <span className="text-slate-700 font-semibold text-right line-clamp-2 leading-[1.3]">{value}</span>
-                                                    </div>
-                                                ))}
-
-
-                                            </div>
-                                        </div>
-
-                                        {/* ──────────────────────────────────────────────
-                                            COL 3 — 検定業務 (amber accent)
-                                        ────────────────────────────────────────────── */}
-                                        <div className={`flex-1 flex flex-col min-w-0 border-t min-[720px]:border-t-0 min-[720px]:border-l border-slate-100 ${C.kentei.border}`}>
-                                            <div className={`px-3 py-1.5 flex items-center justify-between gap-1.5 border-b ${C.kentei.divider} bg-slate-50/50`}>
-                                                <span className={`text-[11px] font-black uppercase tracking-wider ${C.kentei.label}`}>検定業務</span>
-                                                <div
-                                                    onClick={() => handleOperationChange(worker.id, 'kentei_status', 'progress', cycleProgress(worker.kenteiStatus.progress))}
-                                                    className={`text-[9px] px-2 py-0.5 rounded-full font-black cursor-pointer select-none transition-all active:scale-95 ${progressCls(worker.kenteiStatus.progress, 'kentei')}`}>
-                                                    {worker.kenteiStatus.progress}
-                                                </div>
-                                            </div>
-                                            <div className="flex-1 flex flex-col gap-2 p-3">
-                                                <div className="flex gap-1.5">
-                                                    <select value={worker.kenteiStatus.type} onChange={e => handleOperationChange(worker.id, 'kentei_status', 'type', e.target.value)} className={SEL + ' flex-1'}>
-                                                        {KENTEI_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
-                                                    </select>
-                                                    <select value={worker.kenteiStatus.assignee} onChange={e => handleOperationChange(worker.id, 'kentei_status', 'assignee', e.target.value)} className={SEL + ' flex-1'}>
-                                                        {STAFF_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
-                                                    </select>
-                                                </div>
-                                                <div className="flex flex-col gap-1 rounded-lg bg-amber-50/60 border border-amber-100 p-2">
-                                                    <div className="flex items-center gap-1.5">
-                                                        <span className={`text-[9px] font-black rounded px-1 py-px shrink-0 ${C.kentei.subchip}`}>学科</span>
-                                                        <input type="date" value={worker.kenteiStatus.exam_date_written || ''} onChange={e => handleOperationChange(worker.id, 'kentei_status', 'exam_date_written', e.target.value)} className="text-[11px] flex-1 bg-transparent outline-none text-slate-700 cursor-pointer font-medium" />
-                                                    </div>
-                                                    <div className="flex items-center gap-1.5">
-                                                        <span className={`text-[9px] font-black rounded px-1 py-px shrink-0 ${C.kentei.subchip}`}>実技</span>
-                                                        <input type="date" value={worker.kenteiStatus.exam_date_practical || ''} onChange={e => handleOperationChange(worker.id, 'kentei_status', 'exam_date_practical', e.target.value)} className="text-[11px] flex-1 bg-transparent outline-none text-slate-700 cursor-pointer font-medium" />
-                                                    </div>
-                                                </div>
-
-                                            </div>
-                                        </div>
-
-                                        {/* ──────────────────────────────────────────────
-                                            COL 4 — 機構業務 (violet accent)
-                                        ────────────────────────────────────────────── */}
-                                        <div className={`flex-1 flex flex-col min-w-0 border-t min-[720px]:border-t-0 min-[720px]:border-l border-slate-100 ${C.kikou.border}`}>
-                                            <div className={`px-3 py-1.5 flex items-center justify-between gap-1.5 border-b ${C.kikou.divider} bg-slate-50/50`}>
-                                                <span className={`text-[11px] font-black uppercase tracking-wider ${C.kikou.label}`}>機構 / 建設</span>
-                                                <div
-                                                    onClick={() => handleOperationChange(worker.id, 'kikou_status', 'progress', cycleProgress(worker.kikouStatus.progress))}
-                                                    className={`text-[9px] px-2 py-0.5 rounded-full font-black cursor-pointer select-none transition-all active:scale-95 ${progressCls(worker.kikouStatus.progress, 'kikou')}`}>
-                                                    {worker.kikouStatus.progress}
-                                                </div>
-                                            </div>
-                                            <div className="flex-1 flex flex-col gap-2 p-3">
-                                                <div className="flex gap-1.5">
-                                                    <select value={worker.kikouStatus.type} onChange={e => handleOperationChange(worker.id, 'kikou_status', 'type', e.target.value)} className={SEL + ' flex-1'}>
-                                                        {KIKOU_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
-                                                    </select>
-                                                    <select value={worker.kikouStatus.assignee} onChange={e => handleOperationChange(worker.id, 'kikou_status', 'assignee', e.target.value)} className={SEL + ' flex-1'}>
-                                                        {STAFF_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
-                                                    </select>
-                                                </div>
-                                                <div className="flex flex-col gap-1 rounded-lg bg-violet-50/60 border border-violet-100 p-2">
-                                                    <div className="flex items-center gap-1.5">
-                                                        <span className={`text-[9px] font-black rounded px-1 py-px shrink-0 ${C.kikou.subchip}`}>業務</span>
-                                                        <select value={worker.kikouStatus.construction_type || '---'} onChange={e => handleOperationChange(worker.id, 'kikou_status', 'construction_type', e.target.value)} className="text-[11px] flex-1 bg-transparent outline-none text-slate-700 cursor-pointer font-medium">
-                                                            {CONSTRUCTION_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
-                                                        </select>
-                                                    </div>
-                                                    <div className="flex items-center gap-1.5">
-                                                        <span className={`text-[9px] font-black rounded px-1 py-px shrink-0 ${C.kikou.subchip}`}>担当</span>
-                                                        <select value={worker.kikouStatus.construction_assignee || '---'} onChange={e => handleOperationChange(worker.id, 'kikou_status', 'construction_assignee', e.target.value)} className="text-[11px] flex-1 bg-transparent outline-none text-slate-700 cursor-pointer font-medium">
-                                                            {STAFF_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
-                                                        </select>
-                                                    </div>
-                                                </div>
-
-                                            </div>
-                                        </div>
-
-                                        {/* ──────────────────────────────────────────────
-                                            COL 5 — 入管業務 (teal accent)
-                                        ────────────────────────────────────────────── */}
-                                        <div className={`flex-1 flex flex-col min-w-0 border-t min-[720px]:border-t-0 min-[720px]:border-l border-slate-100 ${C.nyukan.border}`}>
-                                            <div className={`px-3 py-1.5 flex items-center justify-between gap-1.5 border-b ${C.nyukan.divider} bg-slate-50/50`}>
-                                                <span className={`text-[11px] font-black uppercase tracking-wider ${C.nyukan.label}`}>入管業務</span>
-                                                <div
-                                                    onClick={() => handleOperationChange(worker.id, 'nyukan_status', 'progress', cycleProgress(worker.nyukanStatus.progress))}
-                                                    className={`text-[9px] px-2 py-0.5 rounded-full font-black cursor-pointer select-none transition-all active:scale-95 ${progressCls(worker.nyukanStatus.progress, 'nyukan')}`}>
-                                                    {worker.nyukanStatus.progress}
-                                                </div>
-                                            </div>
-                                            <div className="flex-1 flex flex-col gap-2 p-3">
-                                                <div className="flex gap-1.5">
-                                                    <select value={worker.nyukanStatus.type} onChange={e => handleOperationChange(worker.id, 'nyukan_status', 'type', e.target.value)} className={SEL + ' flex-1'}>
-                                                        {NYUKAN_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
-                                                    </select>
-                                                    <select value={worker.nyukanStatus.assignee} onChange={e => handleOperationChange(worker.id, 'nyukan_status', 'assignee', e.target.value)} className={SEL + ' flex-1'}>
-                                                        {STAFF_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
-                                                    </select>
-                                                </div>
-                                                <div className="flex flex-col gap-1.5 rounded-lg bg-blue-50/60 border border-blue-100 p-2">
-                                                    <div className="flex items-center gap-1.5">
-                                                        <span className={`text-[9px] font-black rounded px-1 py-px shrink-0 ${C.nyukan.subchip}`}>申請</span>
-                                                        <input type="date" value={worker.nyukanStatus.application_date || ''} onChange={e => handleOperationChange(worker.id, 'nyukan_status', 'application_date', e.target.value)} className="text-[11px] flex-1 bg-transparent outline-none text-slate-700 cursor-pointer font-medium" />
-                                                        <span className={`text-[9px] font-black rounded px-1 py-px shrink-0 ${C.nyukan.subchip}`}>取次者</span>
-                                                        <input type="text" placeholder="---" value={worker.nyukanStatus.agent || ''} onChange={e => handleOperationChange(worker.id, 'nyukan_status', 'agent', e.target.value)} className="text-[11px] w-[80px] bg-transparent outline-none text-slate-600 placeholder-slate-300 font-medium" />
-                                                    </div>
-                                                    <div className="flex items-center gap-1.5">
-                                                        <span className={`text-[9px] font-black rounded px-1 py-px shrink-0 ${C.nyukan.subchip}`}>受理番号</span>
-                                                        <input type="text" placeholder="---" value={worker.nyukanStatus.receipt_number || ''} onChange={e => handleOperationChange(worker.id, 'nyukan_status', 'receipt_number', e.target.value)} className="text-[11px] flex-1 bg-transparent outline-none text-slate-600 placeholder-slate-300 font-medium" />
-                                                    </div>
-                                                </div>
-
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                ))}
-                            </div>
-                        ))}
-
-                        {processedWorkers.length === 0 && (
-                            <div className="text-center py-16 text-slate-400 text-sm bg-white rounded-2xl border border-dashed border-slate-200">
-                                データがありません。
-                            </div>
-                        )}
-
-                        {/* ── Pagination ── */}
-                        {totalPages > 1 && (
-                            <div className="flex items-center justify-between px-4 py-3 bg-white rounded-2xl border border-slate-200 shadow-sm">
-                                <div className="text-sm text-slate-400">
-                                    全 <span className="font-black text-slate-700">{processedWorkers.length}</span> 件中&nbsp;
-                                    <span className="font-black text-slate-700">{(currentPage - 1) * itemsPerPage + 1}</span> -&nbsp;
-                                    <span className="font-black text-slate-700">{Math.min(currentPage * itemsPerPage, processedWorkers.length)}</span> 件を表示
-                                </div>
-                                <div className="flex gap-1">
-                                    <button onClick={() => setCurrentPage(1)} disabled={currentPage === 1} className="px-3 py-1.5 border border-slate-200 rounded-lg text-xs font-bold disabled:opacity-30 hover:bg-slate-50 text-slate-600 bg-white">最初へ</button>
-                                    <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="px-3 py-1.5 border border-slate-200 rounded-lg text-xs font-bold disabled:opacity-30 hover:bg-slate-50 text-slate-600 bg-white">&lsaquo;</button>
-                                    {Array.from({ length: totalPages }, (_, i) => i + 1)
-                                        .filter(p => p === 1 || p === totalPages || Math.abs(p - currentPage) <= 2)
-                                        .map((p, i, arr) => (
-                                            <React.Fragment key={p}>
-                                                {i > 0 && arr[i - 1] !== p - 1 && <span className="px-2 py-1 flex items-center text-slate-300">...</span>}
-                                                <button onClick={() => setCurrentPage(p)}
-                                                    className={`px-3 py-1.5 border rounded-lg text-xs font-bold min-w-[32px] transition-all ${currentPage === p ? 'bg-slate-800 text-white border-slate-800' : 'border-slate-200 hover:bg-slate-50 text-slate-600 bg-white'}`}>
-                                                    {p}
-                                                </button>
-                                            </React.Fragment>
-                                        ))}
-                                    <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="px-3 py-1.5 border border-slate-200 rounded-lg text-xs font-bold disabled:opacity-30 hover:bg-slate-50 text-slate-600 bg-white">&rsaquo;</button>
-                                    <button onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages} className="px-3 py-1.5 border border-slate-200 rounded-lg text-xs font-bold disabled:opacity-30 hover:bg-slate-50 text-slate-600 bg-white">最後へ</button>
-                                </div>
-                            </div>
-                        )}
-                    </div>
+                        </>
+                    )}
                 </div>
-            )}
 
-            {activeTab === 'exam' && (
-                <div className="w-full min-[720px]:w-[1500px] mx-auto p-6 print-target print:w-full print:mx-0 print:p-0">
+            </div>
+
+
+            {/* ── Exam tab ─────────────────────────────────────── */}
+            {activeSystemTab === 'exam' ? (
+                <div className="flex-1 p-4">
                     <ExamTab workers={workers} onUpdate={handleOperationChange} staff={staff} />
                 </div>
+            ) : (
+                <div className="flex flex-col flex-1">
+
+
+                    {/* ── Select-all + count ── */}
+                    <div className="max-w-[1440px] mx-auto w-full flex justify-between items-center px-4 mb-3 text-[12px] text-gray-500 font-medium">
+                        <label className="flex items-center gap-2 cursor-pointer select-none">
+                            <input type="checkbox"
+                                checked={paginatedWorkers.length > 0 && paginatedWorkers.every(w => selectedIds.has(w.id))}
+                                onChange={toggleSelectAll}
+                                className="rounded border-gray-300 text-[#0067b8] focus:ring-[#0067b8]" />
+                            すべて選択
+                        </label>
+                        <span>{processedWorkers.length} 名の{currentSystemTab?.label} (ページ {currentPage} / {totalPages || 1})</span>
+                    </div>
+
+
+                    {/* ════ 一括操作 RIGHT SIDEBAR (Fixed) ════ */}
+                    <div className={`fixed top-[53px] right-0 h-[calc(100vh-53px)] z-[200] transition-transform duration-300 ease-in-out ${selectedIds.size > 0 ? 'translate-x-0' : 'translate-x-full'}`}
+                        style={{ width: '300px' }}>
+                        <div className="h-full bg-white border-l border-gray-200 flex flex-col shadow-2xl">
+
+                            {/* Header */}
+                            <div className="px-5 py-4 border-b border-gray-100 bg-gray-50 flex items-center justify-between shrink-0">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-8 h-8 rounded-full bg-[#0067b8] flex items-center justify-center text-[15px] font-black text-white">{selectedIds.size}</div>
+                                    <div>
+                                        <div className="text-[15px] font-black text-gray-900 leading-none">一括操作</div>
+                                        <div className="text-[11px] text-gray-400 mt-0.5">空欄はスキップされます</div>
+                                    </div>
+                                </div>
+                                <button onClick={() => setSelectedIds(new Set())}
+                                    className="text-gray-400 hover:text-gray-700 transition-colors p-1 rounded hover:bg-gray-100">
+                                    <X size={18} />
+                                </button>
+                            </div>
+
+                            {/* Fields */}
+                            <div className="flex-1 px-4 py-4 space-y-5 overflow-y-auto">
+
+                                {/* 在籍状況 */}
+                                <div>
+                                    <div className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2.5">在籍状況</div>
+                                    <div>
+                                        <div className="text-[12px] text-gray-500 font-medium mb-1">進捗更新</div>
+                                        <select value={batchForm.worker_status} onChange={e => setBatchForm(p => ({ ...p, worker_status: e.target.value }))}
+                                            className="w-full text-[13px] rounded-md bg-white text-gray-800 border border-gray-200 py-1.5 px-2.5 outline-none focus:border-[#0067b8] focus:ring-1 focus:ring-[#0067b8]/20 transition-colors">
+                                            <option value="">---</option>
+                                            {['未入国', '対応中', '就業中', '失踪', '帰国', '転籍済'].map(s => (
+                                                <option key={s} value={s}>{s}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div className="border-t border-gray-100" />
+
+                                {/* 機構業務 */}
+                                <div>
+                                    <div className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2.5">機構業務</div>
+                                    <div className="space-y-3">
+                                        {[
+                                            { label: '申請内容', el: <select value={batchForm.kikou_type} onChange={e => setBatchForm(p => ({ ...p, kikou_type: e.target.value }))} className="w-full text-[13px] rounded-md bg-white text-gray-800 border border-gray-200 py-1.5 px-2.5 outline-none focus:border-[#0067b8] transition-colors"><option value="">---</option>{KIKOU_OPTIONS.slice(1).map(o => <option key={o} value={o}>{o}</option>)}</select> },
+                                            { label: '進捗', el: <select value={batchForm.kikou_progress} onChange={e => setBatchForm(p => ({ ...p, kikou_progress: e.target.value }))} className="w-full text-[13px] rounded-md bg-white text-gray-800 border border-gray-200 py-1.5 px-2.5 outline-none focus:border-[#0067b8] transition-colors"><option value="">---</option>{PROGRESS_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}</select> },
+                                            { label: '申請日', el: <input type="date" value={batchForm.kikou_application_date} onChange={e => setBatchForm(p => ({ ...p, kikou_application_date: e.target.value }))} className="w-full text-[13px] rounded-md bg-white text-gray-800 border border-gray-200 py-1.5 px-2.5 outline-none focus:border-[#0067b8] transition-colors" /> },
+                                            { label: '担当者', el: <select value={batchForm.kikou_assignee} onChange={e => setBatchForm(p => ({ ...p, kikou_assignee: e.target.value }))} className="w-full text-[13px] rounded-md bg-white text-gray-800 border border-gray-200 py-1.5 px-2.5 outline-none focus:border-[#0067b8] transition-colors"><option value="">---</option>{staff.map(s => <option key={s.id} value={s.full_name}>{s.full_name}</option>)}</select> },
+                                            { label: '認定開始', el: <input type="date" value={batchForm.cert_start_date} onChange={e => setBatchForm(p => ({ ...p, cert_start_date: e.target.value }))} className="w-full text-[13px] rounded-md bg-white text-gray-800 border border-gray-200 py-1.5 px-2.5 outline-none focus:border-[#0067b8] transition-colors" /> },
+                                            { label: '認定終了', el: <input type="date" value={batchForm.cert_end_date} onChange={e => setBatchForm(p => ({ ...p, cert_end_date: e.target.value }))} className="w-full text-[13px] rounded-md bg-white text-gray-800 border border-gray-200 py-1.5 px-2.5 outline-none focus:border-[#0067b8] transition-colors" /> },
+                                        ].map(({ label, el }) => (
+                                            <div key={label}>
+                                                <div className="text-[12px] text-gray-500 font-medium mb-1">{label}</div>
+                                                {el}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="border-t border-gray-100" />
+
+                                {/* 入管業務 */}
+                                <div>
+                                    <div className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2.5">入管業務</div>
+                                    <div className="space-y-3">
+                                        {[
+                                            { label: '申請内容', el: <select value={batchForm.nyukan_type} onChange={e => setBatchForm(p => ({ ...p, nyukan_type: e.target.value }))} className="w-full text-[13px] rounded-md bg-white text-gray-800 border border-gray-200 py-1.5 px-2.5 outline-none focus:border-[#0067b8] transition-colors"><option value="">---</option>{NYUKAN_OPTIONS.slice(1).map(o => <option key={o} value={o}>{o}</option>)}</select> },
+                                            { label: '進捗', el: <select value={batchForm.nyukan_progress} onChange={e => setBatchForm(p => ({ ...p, nyukan_progress: e.target.value }))} className="w-full text-[13px] rounded-md bg-white text-gray-800 border border-gray-200 py-1.5 px-2.5 outline-none focus:border-[#0067b8] transition-colors"><option value="">---</option>{PROGRESS_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}</select> },
+                                            { label: '申請日', el: <input type="date" value={batchForm.nyukan_application_date} onChange={e => setBatchForm(p => ({ ...p, nyukan_application_date: e.target.value }))} className="w-full text-[13px] rounded-md bg-white text-gray-800 border border-gray-200 py-1.5 px-2.5 outline-none focus:border-[#0067b8] transition-colors" /> },
+                                            { label: '担当者', el: <select value={batchForm.nyukan_assignee} onChange={e => setBatchForm(p => ({ ...p, nyukan_assignee: e.target.value }))} className="w-full text-[13px] rounded-md bg-white text-gray-800 border border-gray-200 py-1.5 px-2.5 outline-none focus:border-[#0067b8] transition-colors"><option value="">---</option>{staff.map(s => <option key={s.id} value={s.full_name}>{s.full_name}</option>)}</select> },
+                                            { label: '受理番号', el: <input type="text" placeholder="番号を入力" value={batchForm.nyukan_receipt} onChange={e => setBatchForm(p => ({ ...p, nyukan_receipt: e.target.value }))} className="w-full text-[13px] rounded-md bg-white text-gray-800 placeholder-gray-300 border border-gray-200 py-1.5 px-2.5 outline-none focus:border-[#0067b8] transition-colors" /> },
+                                            { label: '取次者', el: <select value={batchForm.nyukan_agent} onChange={e => setBatchForm(p => ({ ...p, nyukan_agent: e.target.value }))} className="w-full text-[13px] rounded-md bg-white text-gray-800 border border-gray-200 py-1.5 px-2.5 outline-none focus:border-[#0067b8] transition-colors"><option value="">---</option>{staff.map(s => <option key={s.id} value={s.full_name}>{s.full_name}</option>)}</select> },
+                                        ].map(({ label, el }) => (
+                                            <div key={label}>
+                                                <div className="text-[12px] text-gray-500 font-medium mb-1">{label}</div>
+                                                {el}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Apply button */}
+                            <div className="px-4 py-4 border-t border-gray-100 bg-gray-50 shrink-0">
+                                <button onClick={applyBatch}
+                                    className="w-full bg-[#0067b8] text-white py-3 rounded-lg text-[14px] font-black hover:bg-blue-700 transition-all flex items-center justify-center gap-2 shadow-sm">
+                                    <CheckCircle2 size={16} />
+                                    {selectedIds.size}名に一括適用
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* ════════════════════════════════════════════
+                        WORKER ROWS
+                    ════════════════════════════════════════════ */}
+                    <div className="max-w-[1440px] mx-auto w-full px-4 pb-4 overflow-x-auto">
+                        <div className="w-full min-w-[1100px] space-y-3">
+                            {paginatedWorkers.length === 0 && (
+                                <div className="bg-white border border-gray-200 rounded-md p-16 text-center text-gray-400 text-sm">
+                                    データがありません。
+                                </div>
+                            )}
+
+                            {paginatedWorkers.map(worker => {
+                                const visaDays = daysUntil(worker.visaExpiry);
+                                const isSel = selectedIds.has(worker.id);
+                                const elapsed = elapsedTime(worker.entryDate);
+
+                                return (
+                                    <div key={worker.id}
+                                        className={`bg-white border rounded-md flex transition-all
+                                        ${isSel ? 'border-[#0067b8] bg-blue-50/10' : 'border-gray-200'}`}>
+
+                                        {/* ══ COL 1 — Worker Info (380px) ═══════════════ */}
+                                        <div className="w-[380px] shrink-0 border-r border-gray-100 p-3 flex gap-3 relative">
+                                            <input type="checkbox" checked={isSel} onChange={() => toggleSelect(worker.id)}
+                                                className="mt-1 rounded border-gray-300 text-[#0067b8] cursor-pointer shrink-0 focus:ring-0 w-4 h-4" />
+
+                                            {/* Status badges — top right */}
+                                            <div className="absolute top-4 right-4 flex gap-1 flex-wrap justify-end">
+                                                <span className={`px-2 py-0.5 text-[10px] font-bold rounded-full border ${statusBadgeCls(worker.status)}`}>
+                                                    {worker.status}
+                                                </span>
+                                                {visaDays !== null && visaDays <= 30 && (
+                                                    <span className="px-2 py-0.5 bg-red-100 text-red-700 text-[10px] font-bold rounded-full border border-red-200">
+                                                        期限まで{visaDays}日
+                                                    </span>
+                                                )}
+                                            </div>
+
+                                            <div className="flex-1 min-w-0">
+                                                {/* Avatar + name */}
+                                                <div className="flex items-center gap-3 mb-2">
+                                                    <div className="w-10 h-10 rounded-full border border-gray-200 overflow-hidden flex items-center justify-center bg-gray-100 shrink-0">
+                                                        {worker.photoUrl
+                                                            ? <img src={worker.photoUrl} alt={worker.name} className="w-full h-full object-cover" />
+                                                            : <span className="text-gray-400 font-bold text-[18px]">{worker.avatar}</span>}
+                                                    </div>
+                                                    {/* ── Enhanced Action Board (Slide-out) ── */}
+
+                                                    <div className="min-w-0 pr-12">
+                                                        <div className="text-[10px] text-gray-400 font-medium truncate">{worker.furigana}</div>
+                                                        <Link href={`/workers/${worker.id}`} target="_blank" rel="noopener noreferrer"
+                                                            className="text-[15px] font-bold text-gray-900 hover:text-[#0067b8] leading-tight block truncate">
+                                                            {worker.name}
+                                                        </Link>
+                                                        <div className="text-[12px] text-[#0067b8] font-semibold truncate mt-0.5">{worker.company}</div>
+                                                    </div>
+                                                </div>
+
+                                                {/* Key field grid */}
+                                                <div className="grid grid-cols-2 gap-y-1">
+                                                    <div>
+                                                        <span className="text-gray-400 text-[10px]">資格: </span>
+                                                        <span className="font-semibold text-gray-700 text-[11px]">{worker.entryBatch !== '---' ? worker.entryBatch : worker.visaStatus}</span>
+                                                    </div>
+                                                    <div>
+                                                        <span className="text-gray-400 text-[10px]">期限: </span>
+                                                        <span className={`font-bold text-[11px] font-mono ${visaDays !== null && visaDays <= 90 ? 'text-red-600' : 'text-gray-700'}`}>
+                                                            {worker.visaExpiry !== '---' ? worker.visaExpiry : '---'}
+                                                        </span>
+                                                    </div>
+                                                    <div>
+                                                        <span className="text-gray-400 text-[10px]">入国: </span>
+                                                        <span className="font-medium text-gray-600 text-[11px] font-mono">{worker.entryDate || '---'}</span>
+                                                    </div>
+                                                    {elapsed && (
+                                                        <div>
+                                                            <span className="text-gray-400 text-[10px]">滞在: </span>
+                                                            <span className="text-emerald-600 font-bold text-[11px]">{elapsed}</span>
+                                                        </div>
+                                                    )}
+                                                    {worker.address && (
+                                                        <div className="col-span-2 flex items-center gap-1 mt-0.5 text-gray-400">
+                                                            <MapPin size={10} className="shrink-0" />
+                                                            <span className="truncate text-[10px]">{worker.address}</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* ══ COL 2 — 機構業務 (260px) ═════════════════ */}
+                                        <div className="w-[260px] shrink-0 border-r border-gray-100 p-3 hover:bg-gray-50 transition-colors">
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <ProgressIcon p={worker.kikouStatus.progress} />
+                                                <span className="text-[12px] font-bold text-gray-800">機構業務</span>
+                                                <button
+                                                    onClick={() => handleOperationChange(worker.id, 'kikou_status', 'progress', cycleProgress(worker.kikouStatus.progress))}
+                                                    className={`ml-auto px-2 py-0.5 text-[10px] rounded-full border ${progressBadgeCls(worker.kikouStatus.progress)}`}>
+                                                    {worker.kikouStatus.progress}
+                                                </button>
+                                            </div>
+                                            <div className="space-y-1 text-[11px]">
+                                                <div className="flex justify-between items-center h-5">
+                                                    <span className="text-gray-400 text-[10px]">申請内容:</span>
+                                                    {editingId === worker.id ? (
+                                                        <select
+                                                            value={worker.kikouStatus.type}
+                                                            onChange={(e) => handleOperationChange(worker.id, 'kikou_status', 'type', e.target.value)}
+                                                            className={SEL + " !w-32"}
+                                                        >
+                                                            {KIKOU_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                                        </select>
+                                                    ) : (
+                                                        <span className="text-gray-800 font-semibold text-[11px]">{worker.kikouStatus.type}</span>
+                                                    )}
+                                                </div>
+                                                <div className="flex justify-between items-center h-5">
+                                                    <span className="text-gray-400 text-[10px]">申請日:</span>
+                                                    {editingId === worker.id ? (
+                                                        <input
+                                                            type="date"
+                                                            value={worker.kikouStatus.application_date || ''}
+                                                            onChange={(e) => handleOperationChange(worker.id, 'kikou_status', 'application_date', e.target.value)}
+                                                            className={SEL + " !w-32"}
+                                                        />
+                                                    ) : (
+                                                        <span className="text-gray-700 font-medium text-[11px] font-mono">{worker.kikouStatus.application_date || '---'}</span>
+                                                    )}
+                                                </div>
+                                                <div className="flex justify-between items-center h-5">
+                                                    <span className="text-gray-400 text-[10px]">担当者:</span>
+                                                    {editingId === worker.id ? (
+                                                        <select
+                                                            value={worker.kikouStatus.assignee}
+                                                            onChange={(e) => handleOperationChange(worker.id, 'kikou_status', 'assignee', e.target.value)}
+                                                            className={SEL + " !w-32"}
+                                                        >
+                                                            {STAFF_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                                        </select>
+                                                    ) : (
+                                                        <span className="text-gray-700 font-medium text-[11px]">{worker.kikouStatus.assignee}</span>
+                                                    )}
+                                                </div>
+                                                <div className="flex justify-between items-center h-5">
+                                                    <span className="text-gray-400 text-[10px]">認定開始:</span>
+                                                    {editingId === worker.id ? (
+                                                        <input
+                                                            type="date"
+                                                            value={worker.cert_start_date}
+                                                            onChange={(e) => handleChange(worker.id, 'cert_start_date', e.target.value)}
+                                                            className={SEL + " !w-32"}
+                                                        />
+                                                    ) : (
+                                                        <span className="text-gray-700 font-medium text-[11px] font-mono">{worker.cert_start_date || '---'}</span>
+                                                    )}
+                                                </div>
+                                                <div className="flex justify-between items-center h-5 border-t border-gray-100 pt-0.5">
+                                                    <span className="text-gray-400 text-[10px]">認定終了:</span>
+                                                    {editingId === worker.id ? (
+                                                        <input
+                                                            type="date"
+                                                            value={worker.cert_end_date}
+                                                            onChange={(e) => handleChange(worker.id, 'cert_end_date', e.target.value)}
+                                                            className={SEL + " !w-32"}
+                                                        />
+                                                    ) : (
+                                                        <span className="text-gray-700 font-medium text-[11px] font-mono">{worker.cert_end_date || '---'}</span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* ══ COL 3 — 入管業務 (260px) ═════════════════ */}
+                                        <div className="w-[260px] shrink-0 border-r border-gray-100 p-3 hover:bg-gray-50 transition-colors">
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <ProgressIcon p={worker.nyukanStatus.progress} />
+                                                <span className="text-[12px] font-bold text-gray-800">入管業務</span>
+                                                <button
+                                                    onClick={() => handleOperationChange(worker.id, 'nyukan_status', 'progress', cycleProgress(worker.nyukanStatus.progress))}
+                                                    className={`ml-auto px-2 py-0.5 text-[10px] rounded-full border ${progressBadgeCls(worker.nyukanStatus.progress)}`}>
+                                                    {worker.nyukanStatus.progress}
+                                                </button>
+                                            </div>
+                                            <div className="space-y-1 text-[11px]">
+                                                <div className="flex justify-between items-center h-5">
+                                                    <span className="text-gray-400 text-[10px]">申請内容:</span>
+                                                    {editingId === worker.id ? (
+                                                        <select
+                                                            value={worker.nyukanStatus.type}
+                                                            onChange={(e) => handleOperationChange(worker.id, 'nyukan_status', 'type', e.target.value)}
+                                                            className={SEL + " !w-32"}
+                                                        >
+                                                            {NYUKAN_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                                        </select>
+                                                    ) : (
+                                                        <span className="text-blue-600 font-semibold text-[11px] underline decoration-blue-200 underline-offset-2">{worker.nyukanStatus.type}</span>
+                                                    )}
+                                                </div>
+                                                <div className="flex justify-between items-center h-5">
+                                                    <span className="text-gray-400 text-[10px]">申請日:</span>
+                                                    {editingId === worker.id ? (
+                                                        <input
+                                                            type="date"
+                                                            value={worker.nyukanStatus.application_date || ''}
+                                                            onChange={(e) => handleOperationChange(worker.id, 'nyukan_status', 'application_date', e.target.value)}
+                                                            className={SEL + " !w-32"}
+                                                        />
+                                                    ) : (
+                                                        <span className="text-gray-700 font-medium text-[11px] font-mono">{worker.nyukanStatus.application_date || '---'}</span>
+                                                    )}
+                                                </div>
+                                                <div className="flex justify-between items-center h-5">
+                                                    <span className="text-gray-400 text-[10px]">担当者:</span>
+                                                    {editingId === worker.id ? (
+                                                        <select
+                                                            value={worker.nyukanStatus.assignee}
+                                                            onChange={(e) => handleOperationChange(worker.id, 'nyukan_status', 'assignee', e.target.value)}
+                                                            className={SEL + " !w-32"}
+                                                        >
+                                                            {STAFF_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                                        </select>
+                                                    ) : (
+                                                        <span className="text-gray-700 font-medium text-[11px]">{worker.nyukanStatus.assignee}</span>
+                                                    )}
+                                                </div>
+                                                <div className="flex justify-between items-center h-5">
+                                                    <span className="text-gray-400 text-[10px]">受理番号:</span>
+                                                    {editingId === worker.id ? (
+                                                        <input
+                                                            type="text"
+                                                            value={worker.nyukanStatus.receipt_number || ''}
+                                                            onChange={(e) => handleOperationChange(worker.id, 'nyukan_status', 'receipt_number', e.target.value)}
+                                                            className={SEL + " !w-32 px-1"}
+                                                        />
+                                                    ) : (
+                                                        <span className="text-gray-800 font-bold font-mono tracking-tight text-[11px]">{worker.nyukanStatus.receipt_number || '---'}</span>
+                                                    )}
+                                                </div>
+                                                <div className="flex justify-between items-center h-5">
+                                                    <span className="text-gray-400 text-[10px]">取次者:</span>
+                                                    {editingId === worker.id ? (
+                                                        <select
+                                                            value={worker.nyukanStatus.agent || '---'}
+                                                            onChange={(e) => handleOperationChange(worker.id, 'nyukan_status', 'agent', e.target.value)}
+                                                            className={SEL + " !w-32"}
+                                                        >
+                                                            {STAFF_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                                        </select>
+                                                    ) : (
+                                                        <span className="text-gray-700 font-medium text-[11px]">{worker.nyukanStatus.agent || '---'}</span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* ══ COL 4 — メモ (flex-1) ═════════════════════ */}
+                                        <div className="flex-1 p-3 bg-gray-50/10 min-w-[200px]">
+                                            <div className="flex justify-between items-center mb-1">
+                                                <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">メモ (Memo)</span>
+                                                <button
+                                                    onClick={() => setEditingId(editingId === worker.id ? null : worker.id)}
+                                                    className={`p-1 rounded-full transition-all ${editingId === worker.id ? 'bg-[#0067b8] text-white' : 'text-gray-300 hover:text-[#0067b8]'}`}
+                                                >
+                                                    {editingId === worker.id ? <CheckCircle2 size={12} /> : <Pencil size={12} />}
+                                                </button>
+                                            </div>
+                                            <textarea
+                                                value={worker.remarks}
+                                                onChange={(e) => setWorkers(prev => prev.map(w => w.id === worker.id ? { ...w, remarks: e.target.value } : w))}
+                                                onBlur={() => handleRemarksBlur(worker.id)}
+                                                className="w-full h-24 p-2 text-[12px] bg-white border border-gray-200 rounded-md text-gray-700 leading-relaxed outline-none focus:border-[#0067b8] transition-all resize-none"
+                                                placeholder="メモを入力..."
+                                            />
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+
+                    {/* ── Pagination UI ── */}
+                    {
+                        totalPages > 1 && (
+                            <div className="max-w-[1440px] mx-auto w-full px-4 pb-12 flex items-center justify-center gap-2">
+                                <button
+                                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                                    disabled={currentPage === 1}
+                                    className="px-3 py-1.5 rounded-md border border-gray-200 bg-white text-[12px] font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                >
+                                    前へ
+                                </button>
+                                <div className="flex items-center gap-1">
+                                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
+                                        <button
+                                            key={p}
+                                            onClick={() => setCurrentPage(p)}
+                                            className={`w-8 h-8 flex items-center justify-center rounded-md text-[12px] font-bold transition-colors
+                                            ${currentPage === p
+                                                    ? 'bg-[#0067b8] text-white'
+                                                    : 'text-gray-500 hover:bg-gray-100'}`}
+                                        >
+                                            {p}
+                                        </button>
+                                    ))}
+                                </div>
+                                <button
+                                    onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                                    disabled={currentPage === totalPages}
+                                    className="px-3 py-1.5 rounded-md border border-gray-200 bg-white text-[12px] font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                >
+                                    次へ
+                                </button>
+                            </div>
+                        )
+                    }
+                </div >
             )}
-        </div>
-    )
+
+
+            {/* ── Infinite Command Palette (Ctrl + K) ── */}
+            {
+                isCommandPaletteOpen && (
+                    <div className="fixed inset-0 z-[100] flex items-start justify-center pt-[15vh] px-4 backdrop-blur-sm bg-gray-900/20">
+                        <div className="w-full max-w-2xl bg-white rounded-xl border border-gray-200 overflow-hidden animate-in zoom-in-95 duration-200">
+                            <div className="relative">
+                                <Search className="absolute left-5 top-5 text-gray-400" size={20} />
+                                <input
+                                    autoFocus
+                                    type="text"
+                                    placeholder="人材名、受入企業、またはコマンドを入力... (例: '田中', '報告書')"
+                                    className="w-full pl-14 pr-6 py-5 text-[16px] font-bold text-gray-900 outline-none border-b border-gray-100 placeholder:text-gray-300 placeholder:font-normal"
+                                    value={cmdSearch}
+                                    onChange={e => setCmdSearch(e.target.value)}
+                                />
+                            </div>
+
+                            <div className="max-h-[400px] overflow-y-auto p-2 no-scrollbar">
+                                {cmdResults.length > 0 ? (
+                                    <div className="space-y-1">
+                                        <p className="px-3 py-2 text-[10px] font-black text-gray-400 uppercase tracking-widest">Top Search Results</p>
+                                        {cmdResults.map(w => (
+                                            <Link key={w.id} href={`/workers/${w.id}`}
+                                                onClick={() => setIsCommandPaletteOpen(false)}
+                                                className="flex items-center justify-between p-3 rounded-md hover:bg-gray-50 group transition-colors">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-8 h-8 rounded-full bg-blue-50 text-[#0067b8] flex items-center justify-center font-black text-[12px] border border-blue-100">
+                                                        {w.avatar}
+                                                    </div>
+                                                    <div>
+                                                        <div className="text-[13px] font-bold text-gray-900 group-hover:text-[#0067b8]">{w.name}</div>
+                                                        <div className="text-[10px] text-gray-400 font-bold uppercase">{w.company}</div>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <span className={`px-2 py-0.5 text-[9px] font-black rounded border ${statusBadgeCls(w.status)}`}>{w.status}</span>
+                                                    <ChevronRight size={14} className="text-gray-300" />
+                                                </div>
+                                            </Link>
+                                        ))}
+                                    </div>
+                                ) : cmdSearch ? (
+                                    <div className="py-12 text-center text-gray-400 text-[13px] font-bold uppercase tracking-widest">No matching records found</div>
+                                ) : (
+                                    <div className="p-4 space-y-6">
+                                        <div className="space-y-2">
+                                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">クイックアクション</p>
+                                            <div className="grid grid-cols-2 gap-2">
+                                                <button className="flex items-center gap-3 p-3 rounded-md border border-gray-100 hover:border-[#0067b8] hover:bg-blue-50/50 transition-all text-left">
+                                                    <Plus size={16} className="text-[#0067b8]" />
+                                                    <span className="text-[12px] font-bold text-gray-700">新規人材登録</span>
+                                                </button>
+                                                <button className="flex items-center gap-3 p-3 rounded-md border border-gray-100 hover:border-[#0067b8] hover:bg-blue-50/50 transition-all text-left">
+                                                    <Loader2 size={16} className="text-[#0067b8]" />
+                                                    <span className="text-[12px] font-bold text-gray-700">統合レポート出力</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">最近のコンテキスト</p>
+                                            <p className="text-[11px] text-gray-400 italic px-1">入力を開始してデータベースを検索...</p>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="px-5 py-3 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
+                                <div className="flex gap-4">
+                                    <div className="flex items-center gap-1.5">
+                                        <kbd className="px-1.5 py-0.5 text-[10px] bg-white border border-gray-300 rounded font-bold">↑↓</kbd>
+                                        <span className="text-[10px] text-gray-500 font-bold uppercase">Navigate</span>
+                                    </div>
+                                    <div className="flex items-center gap-1.5">
+                                        <kbd className="px-1.5 py-0.5 text-[10px] bg-white border border-gray-300 rounded font-bold">↵</kbd>
+                                        <span className="text-[10px] text-gray-500 font-bold uppercase">Select</span>
+                                    </div>
+                                </div>
+                                <span className="text-[10px] font-black text-[#0067b8] uppercase tracking-widest">KikanCloud Console</span>
+                            </div>
+                        </div>
+                    </div>
+                )
+            }
+        </div >
+    );
 }

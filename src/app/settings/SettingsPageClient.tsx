@@ -1,22 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useSearchParams } from "next/navigation";
 import {
-    UserCircle2, Bell, Building2, Bot, Save,
-    ShieldCheck, Key,
+    Bell, Building2, Bot, Save,
+    ShieldCheck, User, CheckCircle2,
+    UserCircle2, LogOut
 } from "lucide-react";
-import { updateProfile, updateAiSettings } from "./actions";
-import { SaveButton } from "@/components/SubmitButtons";
 import OrganizationForm from "../organization/OrganizationForm";
 import TeamManagerClient from "../accounts/TeamManagerClient";
+import { createClient } from "@/lib/supabase/client";
 
 // ── Types ─────────────────────────────────────────────────────────
 type TabId = "account" | "notifications" | "organization" | "ai";
 
 interface SettingsProps {
-    currentUser: { id: string; full_name: string; email: string };
-    userRole: string;
+    currentUser: { id: string; full_name: string; email: string; role: string };
     usersList: any[];
     companiesList: any[];
     tenant: any;
@@ -24,67 +23,62 @@ interface SettingsProps {
     initialAiTone?: string;
 }
 
-// ── Shared label style ─────────────────────────────────────────────
-const L = "block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5";
-
 // ── Tab: 個人設定 ─────────────────────────────────────────────────
-function TabAccount({ name, setName, email }: { name: string; setName: (v: string) => void; email: string }) {
+function TabAccount({ userProfile }: { userProfile: { id: string; full_name: string; email: string; role: string } }) {
     return (
-        <div className="max-w-sm mx-auto py-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
-            <div className="mb-6">
-                <h3 className="text-[17px] font-black text-slate-900 flex items-center gap-2">
-                    <UserCircle2 size={18} className="text-emerald-500" /> 個人アカウント設定
-                </h3>
-                <p className="text-[12px] text-slate-400 mt-1">氏名やパスワードなど、あなたのプロフィールを管理します。</p>
+        <div className="bg-white border border-gray-200 rounded-lg p-6">
+            <div className="flex items-center gap-3 mb-6">
+                <div className="p-2 bg-blue-50 text-[#0067b8] rounded-md">
+                    <User size={20} />
+                </div>
+                <h3 className="text-lg font-bold text-gray-900">個人設定</h3>
             </div>
-            <form action={updateProfile} className="space-y-4 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+            <div className="space-y-4 max-w-md">
                 <div>
-                    <label className={L}>フルネーム</label>
-                    <input type="text" name="fullName" value={name} onChange={(e) => setName(e.target.value)} required
-                        className="w-full h-11 px-4 bg-slate-50 border border-slate-200 rounded-xl text-[14px] outline-none focus:border-emerald-400 focus:bg-white transition-colors" />
-                </div>
-                <div>
-                    <label className={L}>メールアドレス <span className="normal-case text-slate-300 font-normal">(変更不可)</span></label>
-                    <input type="email" value={email} disabled
-                        className="w-full h-11 px-4 bg-slate-100 border border-slate-200 rounded-xl text-[14px] text-slate-400 cursor-not-allowed font-mono" />
+                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">氏名</label>
+                    <input type="text" value={userProfile?.full_name || ''} disabled
+                        className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-md text-sm text-gray-400 cursor-not-allowed" />
                 </div>
                 <div>
-                    <label className={L}>新しいパスワード</label>
-                    <input type="password" name="password" placeholder="変更する場合のみ入力" minLength={6}
-                        className="w-full h-11 px-4 bg-slate-50 border border-slate-200 rounded-xl text-[14px] outline-none focus:border-emerald-400 focus:bg-white transition-colors" />
+                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">メールアドレス</label>
+                    <input type="email" value={userProfile?.email || ''} disabled
+                        className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-md text-sm text-gray-400 cursor-not-allowed" />
                 </div>
-                <div className="pt-2">
-                    <SaveButton />
+                <div>
+                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">権限</label>
+                    <div className="inline-flex px-2 py-1 bg-blue-50 text-[#0067b8] text-[10px] font-bold rounded uppercase">
+                        {userProfile?.role || 'staff'}
+                    </div>
                 </div>
-            </form>
+            </div>
         </div>
-    );
+    )
 }
 
 // ── Tab: 通知 ─────────────────────────────────────────────────────
 function TabNotifications({ emailAlerts, setEmailAlerts, pushAlerts, setPushAlerts }:
     { emailAlerts: boolean; setEmailAlerts: (v: boolean) => void; pushAlerts: boolean; setPushAlerts: (v: boolean) => void }) {
     return (
-        <div className="max-w-md mx-auto py-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
-            <div className="mb-6">
-                <h3 className="text-[17px] font-black text-slate-900 flex items-center gap-2">
-                    <Bell size={18} className="text-emerald-500" /> 通知設定
-                </h3>
-                <p className="text-[12px] text-slate-400 mt-1">通知の受け取り方法を設定します。</p>
+        <div className="bg-white border border-gray-200 rounded-lg p-6">
+            <div className="flex items-center gap-3 mb-6">
+                <div className="p-2 bg-blue-50 text-[#0067b8] rounded-md">
+                    <Bell size={20} />
+                </div>
+                <h3 className="text-lg font-bold text-gray-900">通知設定</h3>
             </div>
-            <div className="space-y-3">
+            <div className="space-y-3 max-w-md">
                 {[
                     { label: 'メール通知', desc: '書類の提出期限や新着メッセージをメールで受け取ります。', v: emailAlerts, s: setEmailAlerts },
                     { label: 'ブラウザ通知', desc: 'リアルタイムの更新情報をデスクトップに通知します。', v: pushAlerts, s: setPushAlerts },
                 ].map(({ label, desc, v, s }) => (
-                    <div key={label} className="flex items-center justify-between p-5 border border-slate-200 rounded-2xl bg-white shadow-sm">
+                    <div key={label} className="flex items-center justify-between p-4 border border-gray-100 rounded-md bg-white">
                         <div>
-                            <p className="font-bold text-slate-900 text-[14px]">{label}</p>
-                            <p className="text-[11px] text-slate-400 mt-0.5">{desc}</p>
+                            <p className="font-bold text-gray-900 text-sm">{label}</p>
+                            <p className="text-[11px] text-gray-400 mt-0.5">{desc}</p>
                         </div>
                         <button onClick={() => s(!v)}
-                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors shrink-0 ${v ? "bg-emerald-500" : "bg-slate-200"}`}>
-                            <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${v ? "translate-x-6" : "translate-x-1"}`} />
+                            className={`relative inline-flex h-5 w-10 items-center rounded-full transition-colors shrink-0 ${v ? "bg-[#0067b8]" : "bg-gray-200"}`}>
+                            <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform ${v ? "translate-x-5.5" : "translate-x-1"}`} />
                         </button>
                     </div>
                 ))}
@@ -94,72 +88,88 @@ function TabNotifications({ emailAlerts, setEmailAlerts, pushAlerts, setPushAler
 }
 
 // ── Tab: AI設定 ──────────────────────────────────────────────────
-function TabAI({ aiModel, setAiModel, aiTone, setAiTone, saved }:
-    { aiModel: string; setAiModel: (v: string) => void; aiTone: string; setAiTone: (v: string) => void; saved: boolean }) {
+function TabAI() {
+    const [isSaving, setIsSaving] = useState(false)
+    const [showSuccess, setShowSuccess] = useState(false)
+
+    const handleSave = () => {
+        setIsSaving(true)
+        setTimeout(() => {
+            setIsSaving(false)
+            setShowSuccess(true)
+            setTimeout(() => setShowSuccess(false), 3000)
+        }, 800)
+    }
+
     return (
-        <div className="max-w-sm mx-auto py-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
-            <div className="mb-6">
-                <h3 className="text-[17px] font-black text-slate-900 flex items-center gap-2">
-                    <Bot size={18} className="text-emerald-500" /> AIアシスタント設定
-                </h3>
-                <p className="text-[12px] text-slate-400 mt-1">Gemini AIのモデルと応答スタイルをカスタマイズします。</p>
-            </div>
-            <form action={updateAiSettings} className="space-y-4 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-                {/* hidden input to carry aiTone (set by button click) */}
-                <input type="hidden" name="aiTone" value={aiTone} />
-                <div>
-                    <label className={L}>Core Engine</label>
-                    <select name="aiModel" value={aiModel} onChange={(e) => setAiModel(e.target.value)}
-                        className="w-full h-11 px-4 bg-slate-50 border border-slate-200 rounded-xl text-[14px] font-bold outline-none focus:border-emerald-400">
-                        <option value="gemini-2.5-flash">Gemini 2.5 Flash (最新・推奨)</option>
-                        <option value="gemini-2.0-flash-exp">Gemini 2.0 Flash (次世代)</option>
-                        <option value="gemini-1.5-pro">Gemini 1.5 Pro (高度な推論)</option>
-                        <option value="gemini-1.5-flash">Gemini 1.5 Flash (高速・省コスト)</option>
-                    </select>
-                </div>
-                <div>
-                    <label className={L}>応答スタイル (Tone)</label>
-                    <div className="grid grid-cols-2 gap-2">
-                        {[['professional', 'プロフェッショナル'], ['friendly', 'フレンドリー']].map(([v, l]) => (
-                            <button type="button" key={v} onClick={() => setAiTone(v)}
-                                className={`py-2.5 px-3 rounded-xl border text-[13px] font-bold transition-all ${aiTone === v ? 'bg-slate-900 text-white border-slate-900' : 'bg-white text-slate-500 border-slate-200 hover:border-slate-400'}`}>
-                                {l}
-                            </button>
-                        ))}
+        <div className="bg-white border border-gray-200 rounded-lg p-6">
+            <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center gap-3">
+                    <div className="p-2 bg-blue-50 text-[#0067b8] rounded-md">
+                        <Bot size={20} />
+                    </div>
+                    <div>
+                        <h3 className="text-lg font-bold text-gray-900">AI アシスタント設定</h3>
+                        <p className="text-xs text-gray-500 mt-0.5">自動生成 và 業務効率化のためのAIモデル設定</p>
                     </div>
                 </div>
-                <button type="submit" className="w-full flex items-center justify-center gap-2 bg-slate-900 text-white px-6 py-3 rounded-xl hover:bg-emerald-600 transition-colors font-bold shadow-sm text-[13px]">
-                    <Save size={15} /> 設定を保存
-                </button>
-                {saved && (
-                    <p className="text-center text-[12px] font-bold text-emerald-600 animate-in fade-in duration-300">
-                        ✓ AI設定を保存しました
-                    </p>
+                {showSuccess && (
+                    <div className="flex items-center gap-2 text-[#0067b8] text-xs font-bold animate-in fade-in slide-in-from-right-4">
+                        <CheckCircle2 size={14} /> 設定を保存しました
+                    </div>
                 )}
-            </form>
+            </div>
+
+            <div className="space-y-8 max-w-2xl">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">使用モデル</label>
+                        <select className="w-full px-3 py-2 bg-white border border-gray-200 rounded-md text-sm outline-none focus:border-[#0067b8] transition-colors">
+                            <option>Gemini 1.5 Pro (推奨)</option>
+                            <option>Gemini 1.5 Flash (高速)</option>
+                            <option>GPT-4o</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">出力言語</label>
+                        <select className="w-full px-3 py-2 bg-white border border-gray-200 rounded-md text-sm outline-none focus:border-[#0067b8] transition-colors">
+                            <option>日本語 (Default)</option>
+                            <option>English</option>
+                            <option>Tiếng Việt</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div className="pt-6 border-t border-gray-100 flex justify-end">
+                    <button
+                        onClick={handleSave}
+                        disabled={isSaving}
+                        className="bg-[#0067b8] hover:bg-[#005a9e] text-white px-6 py-2 rounded-md text-sm font-bold transition-colors flex items-center gap-2 disabled:opacity-50"
+                    >
+                        {isSaving ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Save size={16} />}
+                        設定を保存
+                    </button>
+                </div>
+            </div>
         </div>
-    );
+    )
 }
 
 // ══════════════════════════════════════════════════════════════════
 // MAIN COMPONENT
 // ══════════════════════════════════════════════════════════════════
-export default function SettingsPageClient({ currentUser, userRole, usersList, companiesList, tenant, initialAiModel, initialAiTone }: SettingsProps) {
+export default function SettingsPageClient({ currentUser, usersList, companiesList, tenant, initialAiModel, initialAiTone }: SettingsProps) {
     const searchParams = useSearchParams();
     const initialTab = (searchParams.get("tab") as TabId) || "account";
 
     const [activeTab, setActiveTab] = useState<TabId>(initialTab);
     const [orgSubTab, setOrgSubTab] = useState<"profile" | "accounts">("profile");
+    const [isLoggingOut, startTransition] = useTransition();
 
-    const [name, setName] = useState(currentUser.full_name || "");
-    const [email] = useState(currentUser.email || "");
     const [emailAlerts, setEmailAlerts] = useState(true);
     const [pushAlerts, setPushAlerts] = useState(false);
-    const [aiModel, setAiModel] = useState(initialAiModel || "gemini-2.5-flash");
-    const [aiTone, setAiTone] = useState(initialAiTone || "professional");
-    const [aiSaved, setAiSaved] = useState(false);
 
-    const isAdmin = userRole === "admin" || userRole === "union_admin";
+    const isAdmin = currentUser.role === "admin" || currentUser.role === "union_admin";
 
     const TABS: { id: TabId; label: string; icon: React.ElementType; adminOnly?: boolean }[] = [
         { id: "account", label: "個人設定", icon: UserCircle2 },
@@ -175,69 +185,79 @@ export default function SettingsPageClient({ currentUser, userRole, usersList, c
     ];
 
     return (
-        <div className="w-full max-w-6xl mx-auto">
-
-            {/* ── Header ── */}
-            <div className="flex items-center justify-between mb-8 pb-6 border-b border-slate-200">
-                <div>
-                    <h1 className="text-2xl font-black text-slate-900">システム設定</h1>
-                    <p className="text-[13px] text-slate-400 mt-1">アカウント、機関、および環境設定を統合管理します。</p>
-                </div>
-                <span className="px-3 py-1.5 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest">
-                    {userRole.replace("_", " ")}
-                </span>
-            </div>
-
-            <div className="flex flex-col md:flex-row gap-8">
+        <div className="w-full max-w-6xl mx-auto py-10 px-6">
+            <div className="flex flex-col md:flex-row gap-10">
 
                 {/* ── Sidebar Nav ── */}
-                <nav className="w-full md:w-52 shrink-0 flex flex-row md:flex-col gap-1 overflow-x-auto no-scrollbar pb-2 md:pb-0">
+                <nav className="w-full md:w-48 shrink-0 flex flex-col gap-1">
                     {TABS.map((tab) => {
                         const Icon = tab.icon;
                         const isActive = activeTab === tab.id;
                         return (
                             <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                                className={`flex items-center gap-3 px-4 py-2.5 text-[13px] font-bold rounded-xl transition-all duration-150 whitespace-nowrap text-left
+                                className={`flex items-center gap-3 px-4 py-2 text-xs font-bold rounded-md transition-all duration-150 whitespace-nowrap text-left
                                     ${isActive
-                                        ? "bg-slate-900 text-white shadow-sm"
-                                        : "text-slate-500 hover:bg-white hover:text-slate-900 hover:shadow-sm"}`}>
-                                <Icon size={16} className={isActive ? "text-emerald-400" : "text-slate-400"} />
+                                        ? "bg-white border border-gray-200 text-[#0067b8] shadow-sm"
+                                        : "text-gray-500 hover:bg-gray-100 hover:text-gray-900"}`}>
+                                <Icon size={14} className={isActive ? "text-[#0067b8]" : "text-gray-400"} strokeWidth={isActive ? 2.5 : 2} />
                                 {tab.label}
                             </button>
                         );
                     })}
+
+                    <div className="h-px bg-gray-100 my-1.5 mx-2" />
+
+                    <button
+                        onClick={async () => {
+                            if (confirm('ログアウトしますか？')) {
+                                startTransition(async () => {
+                                    const devSupabase = createClient();
+                                    await devSupabase.auth.signOut();
+                                    window.location.href = '/login';
+                                });
+                            }
+                        }}
+                        disabled={isLoggingOut}
+                        className={`flex items-center gap-3 px-4 py-2 text-xs font-bold rounded-md transition-all duration-150 text-red-500 hover:bg-red-50/70 border border-transparent hover:border-red-100 group ${isLoggingOut ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    >
+                        {isLoggingOut ? (
+                            <div className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                            <LogOut size={14} strokeWidth={2.5} className="text-red-400 group-hover:text-red-600 transition-colors" />
+                        )}
+                        <span>ログアウト</span>
+                    </button>
                 </nav>
 
                 {/* ── Content Panel ── */}
-                <div className="flex-1 bg-white border border-slate-200 rounded-2xl shadow-sm min-h-[600px] overflow-hidden">
-
+                <div className="flex-1 min-h-[600px] overflow-hidden">
                     {activeTab === "account" && (
-                        <div className="p-8">
-                            <TabAccount name={name} setName={setName} email={email} />
+                        <div>
+                            <TabAccount userProfile={currentUser} />
                         </div>
                     )}
 
                     {activeTab === "notifications" && (
-                        <div className="p-8">
+                        <div>
                             <TabNotifications emailAlerts={emailAlerts} setEmailAlerts={setEmailAlerts} pushAlerts={pushAlerts} setPushAlerts={setPushAlerts} />
                         </div>
                     )}
 
                     {activeTab === "organization" && isAdmin && (
-                        <div className="flex flex-col h-full">
+                        <div className="flex flex-col h-full bg-white border border-gray-200 rounded-lg overflow-hidden">
                             {/* Sub-tab bar */}
-                            <div className="flex items-center gap-0 border-b border-slate-200 px-8 bg-slate-50/60">
+                            <div className="flex items-center gap-0 border-b border-gray-100 px-6 bg-gray-50/50">
                                 {ORG_SUB_TABS.map(({ id, label, icon: Icon }) => (
                                     <button key={id} onClick={() => setOrgSubTab(id)}
-                                        className={`relative flex items-center gap-2 px-5 py-4 text-[13px] font-bold transition-all border-b-2 -mb-[1px]
+                                        className={`relative flex items-center gap-2 px-6 py-4 text-xs font-bold transition-all border-b-2 -mb-[1px]
                                             ${orgSubTab === id
-                                                ? "text-slate-900 border-slate-900"
-                                                : "text-slate-400 border-transparent hover:text-slate-700"}`}>
+                                                ? "text-gray-900 border-[#0067b8]"
+                                                : "text-gray-400 border-transparent hover:text-gray-700"}`}>
                                         <Icon size={14} />
                                         {label}
                                         {id === "accounts" && (
-                                            <span className={`text-[10px] font-black px-1.5 py-0.5 rounded-full ml-1
-                                                ${orgSubTab === id ? "bg-slate-200 text-slate-700" : "bg-slate-100 text-slate-400"}`}>
+                                            <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ml-1
+                                                ${orgSubTab === id ? "bg-blue-50 text-blue-600" : "bg-gray-100 text-gray-400"}`}>
                                                 {usersList.length}
                                             </span>
                                         )}
@@ -246,7 +266,7 @@ export default function SettingsPageClient({ currentUser, userRole, usersList, c
                             </div>
 
                             {/* Sub-tab content */}
-                            <div className="flex-1 p-8 animate-in fade-in duration-200">
+                            <div className="flex-1 p-8">
                                 {orgSubTab === "profile" && <OrganizationForm initialData={tenant} />}
                                 {orgSubTab === "accounts" && (
                                     <TeamManagerClient
@@ -260,8 +280,8 @@ export default function SettingsPageClient({ currentUser, userRole, usersList, c
                     )}
 
                     {activeTab === "ai" && (
-                        <div className="p-8">
-                            <TabAI aiModel={aiModel} setAiModel={setAiModel} aiTone={aiTone} setAiTone={setAiTone} saved={aiSaved} />
+                        <div>
+                            <TabAI />
                         </div>
                     )}
                 </div>

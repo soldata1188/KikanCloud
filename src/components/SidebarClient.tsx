@@ -8,25 +8,21 @@ import {
     Map, Sparkles, MessageSquare, ClipboardList, Route,
     MoreHorizontal, X, ChevronRight, Settings,
 } from "lucide-react";
-import { SidebarLogo } from "./SidebarLogo";
 import { SidebarAvatar } from "./SidebarAvatar";
 
-// ── Nav item definitions ────────────────────────────────────────
 const ALL_NAV_ITEMS = [
     { id: "dashboard", name: "ホーム", href: "/", icon: LayoutDashboard },
     { id: "operations", name: "業務管理", href: "/operations", icon: ClipboardList },
-    { id: "workers", name: "実習生一覧", href: "/workers", icon: Users },
-    { id: "companies", name: "受入企業一覧", href: "/companies", icon: Building2 },
+    { id: "workers", name: "外国人材", href: "/workers", icon: Users },
+    { id: "companies", name: "受入企業", href: "/companies", icon: Building2 },
     { id: "audits", name: "監査・訪問", href: "/audits", icon: ShieldCheck },
     { id: "workflows", name: "業務フロー", href: "/workflows", icon: GitMerge },
-    { id: "routing", name: "ルート最適化", href: "/routing", icon: Map },
+    { id: "routing", name: "位置情報マップ", href: "/routing", icon: Map },
     { id: "roadmap", name: "制度ロードマップ", href: "/roadmap", icon: Route },
     { id: "chat", name: "AIチャット", href: "/chat", icon: Sparkles },
     { id: "b2b-chat", name: "企業連絡", href: "/b2b-chat", icon: MessageSquare },
-    { id: "settings", name: "システム設定", href: "/settings", icon: Settings },
 ];
 
-// Bottom bar shows 4 primary items + "More" button
 const BOTTOM_PRIMARY = ["dashboard", "workers", "companies", "operations"];
 
 interface SidebarClientProps {
@@ -36,13 +32,9 @@ interface SidebarClientProps {
 }
 
 export function SidebarClient({ active, userRole, userProfile }: SidebarClientProps) {
-    // Desktop sidebar
-    const [isHovered, setIsHovered] = useState(false);
-    // Mobile More drawer
     const [moreOpen, setMoreOpen] = useState(false);
     const pathname = usePathname();
 
-    // Close drawer on route change
     useEffect(() => { setMoreOpen(false); }, [pathname]);
 
     const primaryItems = ALL_NAV_ITEMS.filter(i => BOTTOM_PRIMARY.includes(i.id));
@@ -51,150 +43,120 @@ export function SidebarClient({ active, userRole, userProfile }: SidebarClientPr
     return (
         <>
             {/* ══════════════════════════════════════════════════
-                DESKTOP SIDEBAR (hidden on mobile)
+                DESKTOP SIDEBAR — Tech-Infused Enterprise Theme
             ══════════════════════════════════════════════════ */}
-            <div
-                className="hidden md:block w-[72px] shrink-0 h-screen relative z-[100]"
-                onMouseEnter={() => setIsHovered(true)}
-                onMouseLeave={() => setIsHovered(false)}
-            >
-                <aside className={`absolute top-0 left-0 h-full bg-[#f1f5f9] border-r border-slate-200 flex flex-col pt-4 pb-6 transition-all duration-300 ease-in-out ${isHovered ? 'w-[280px]' : 'w-[72px]'}`}>
-                    {/* Avatar / User */}
-                    <div className={`w-full flex items-center mb-10 transition-all duration-300 ${isHovered ? 'justify-start px-5' : 'justify-center'}`}>
-                        <div className="shrink-0 w-11 h-11 flex items-center justify-center">
-                            <SidebarAvatar userProfile={userProfile} />
-                        </div>
-                        {isHovered && (
-                            <div className="ml-3 flex flex-col overflow-hidden animate-in fade-in slide-in-from-left-2 duration-300">
-                                <span className="text-sm font-bold text-[#1f1f1f] truncate">
-                                    {userProfile?.full_name || "Guest User"}
-                                </span>
-                                <span className="text-[10px] text-[#737373] font-medium uppercase tracking-wider">
-                                    {userRole || "Administrator"}
-                                </span>
-                            </div>
-                        )}
-                    </div>
+            <aside className="hidden md:flex w-52 shrink-0 h-full flex-col bg-[#00213d] border-r border-[#00335c] overflow-y-auto relative shadow-2xl">
+                {/* Tech Pattern Overlay - High Visibility (White) */}
+                <div className="absolute inset-0 pointer-events-none opacity-15"
+                    style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '20px 20px' }} />
+                <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-blue-500/5 via-transparent to-transparent" />
 
-                    {/* Nav */}
-                    <nav className="flex-1 flex flex-col gap-2 w-full px-0 overflow-y-auto no-scrollbar items-center">
-                        {ALL_NAV_ITEMS.map((item) => {
-                            const isActive = active === item.id;
-                            const Icon = item.icon;
-                            return (
-                                <Link key={item.href} href={item.href}
-                                    className={`group relative flex items-center h-11 transition-all duration-300 rounded-full
-                                        ${isHovered ? 'w-[calc(100%-24px)] px-4' : 'w-14 justify-center'}
-                                        ${isActive ? 'bg-[#24b47e] text-white shadow-[0_8px_20px_rgba(36,180,126,0.3)]'
-                                            : 'hover:bg-black/5 text-[#737373] hover:text-[#1f1f1f]'}`}
-                                >
-                                    <div className={`flex items-center justify-center shrink-0 transition-all duration-300 ${isActive ? "scale-110" : "group-hover:scale-110"}`}>
-                                        <Icon strokeWidth={isActive ? 2.5 : 2} className="w-[20px] h-[20px]" />
-                                    </div>
-                                    {isHovered && (
-                                        <span className="ml-3 text-[14px] font-bold whitespace-nowrap overflow-hidden animate-in fade-in slide-in-from-left-2 duration-300">
-                                            {item.name}
-                                        </span>
-                                    )}
-                                    {!isHovered && (
-                                        <div className="absolute left-full ml-4 px-2 py-1 bg-slate-800 text-white text-[10px] font-bold rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-200 whitespace-nowrap z-[110] shadow-sm pointer-events-none">
-                                            {item.name}
-                                        </div>
-                                    )}
-                                </Link>
-                            );
-                        })}
-                    </nav>
-                </aside>
-            </div>
+                {/* User / Org header */}
+                <Link href="/settings" className="p-5 block hover:bg-[#00315c] transition-all border-b border-[#00335c] group relative z-10">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-[#0067b8] text-white flex items-center justify-center text-[13px] font-bold shadow-lg shrink-0 border-2 border-[#00335c] group-hover:scale-105 transition-transform">
+                            {userProfile?.full_name?.charAt(0) || "SC"}
+                        </div>
+                        <div className="min-w-0">
+                            <div className="font-bold text-[14px] text-white truncate group-hover:text-blue-300 transition-colors">
+                                {userProfile?.full_name || "ソリューション協同組合"}
+                            </div>
+                        </div>
+                    </div>
+                </Link>
+
+                {/* Nav */}
+                <nav className="flex-1 py-4 px-2.5 space-y-1 relative z-10">
+                    {ALL_NAV_ITEMS.map((item) => {
+                        const isActive = active === item.id;
+                        const Icon = item.icon;
+                        return (
+                            <Link key={item.href} href={item.href}
+                                className={`group relative flex items-center gap-3 px-3.5 py-2.5 rounded-md text-[13px] transition-all duration-200
+                                    ${isActive
+                                        ? 'bg-[#0067b8] text-white shadow-lg shadow-blue-900/40 font-bold border border-white/10'
+                                        : 'text-blue-100/60 font-medium hover:bg-[#00315c] hover:text-white'}`}
+                            >
+                                <Icon size={16} strokeWidth={isActive ? 2.5 : 2} className={`shrink-0 transition-colors ${isActive ? 'text-white' : 'text-blue-400 group-hover:text-blue-200'}`} />
+                                <span>{item.name}</span>
+                                {isActive && (
+                                    <div className="absolute right-2 w-1 h-3 bg-white/40 rounded-full" />
+                                )}
+                            </Link>
+                        );
+                    })}
+                </nav>
+            </aside>
 
             {/* ══════════════════════════════════════════════════
-                MOBILE BOTTOM NAV BAR (hidden on md+)
+                MOBILE BOTTOM NAV BAR
             ══════════════════════════════════════════════════ */}
-            <nav className="md:hidden fixed bottom-0 left-0 right-0 z-[200] bg-white border-t border-slate-200"
-                style={{ boxShadow: '0 -4px 20px rgba(0,0,0,0.06)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
-                <div className="flex items-stretch justify-around h-16">
+            <nav className="md:hidden fixed bottom-0 left-0 right-0 z-[200] bg-white border-t border-gray-200"
+                style={{ boxShadow: '0 -2px 8px rgba(0,0,0,0.06)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
+                <div className="flex items-stretch justify-around h-14">
                     {primaryItems.map(item => {
                         const isActive = active === item.id;
                         const Icon = item.icon;
                         return (
                             <Link key={item.href} href={item.href}
-                                className={`flex flex-col items-center gap-0.5 px-3 py-2 rounded-full transition-all duration-200 min-w-0 flex-1
-                                    ${isActive ? 'text-[#24b47e]' : 'text-slate-400 hover:text-slate-600'}`}>
-                                <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${isActive ? 'bg-[#24b47e]/10 shadow-inner shadow-emerald-500/10' : ''}`}>
-                                    <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
-                                </div>
-                                <span className={`text-[9px] font-bold truncate ${isActive ? 'text-[#24b47e]' : 'text-slate-400'}`}>
+                                className={`flex flex-col items-center justify-center gap-0.5 px-3 py-2 flex-1
+                                    ${isActive ? 'text-[#0067b8]' : 'text-gray-400 hover:text-gray-600'}`}>
+                                <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
+                                <span className={`text-[9px] font-bold truncate ${isActive ? 'text-[#0067b8]' : 'text-gray-400'}`}>
                                     {item.name}
                                 </span>
                             </Link>
                         );
                     })}
-
-                    {/* More button */}
                     <button onClick={() => setMoreOpen(true)}
-                        className={`flex flex-col items-center justify-center gap-0.5 py-2 transition-all duration-200 flex-1 ${moreOpen ? 'text-[#24b47e]' : 'text-slate-400 active:text-slate-600'}`}>
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${moreOpen ? 'bg-[#24b47e]/10 shadow-inner shadow-emerald-500/10' : ''}`}>
-                            <MoreHorizontal size={21} strokeWidth={2} />
-                        </div>
-                        <span className="text-[9px] font-bold tracking-tight text-slate-400">もっと</span>
+                        className={`flex flex-col items-center justify-center gap-0.5 py-2 flex-1 ${moreOpen ? 'text-[#0067b8]' : 'text-gray-400'}`}>
+                        <MoreHorizontal size={20} strokeWidth={2} />
+                        <span className="text-[9px] font-bold text-gray-400">もっと</span>
                     </button>
                 </div>
             </nav>
 
-            {/* ══════════════════════════════════════════════════
-                MOBILE: Slide-up "More" drawer
-            ══════════════════════════════════════════════════ */}
-            {/* Backdrop */}
+            {/* ── Mobile More drawer ──────────────────────────── */}
             {moreOpen && (
                 <div className="md:hidden fixed inset-0 z-[300] bg-black/30 backdrop-blur-sm"
-                    onClick={() => setMoreOpen(false)}
-                />
+                    onClick={() => setMoreOpen(false)} />
             )}
-            {/* Drawer */}
-            <div className={`md:hidden fixed bottom-0 left-0 right-0 z-[400] bg-white rounded-t-3xl transition-transform duration-300 ease-out
+            <div className={`md:hidden fixed bottom-0 left-0 right-0 z-[400] bg-white rounded-t-2xl transition-transform duration-300 ease-out
                 ${moreOpen ? 'translate-y-0' : 'translate-y-full'}`}
-                style={{ boxShadow: '0 -8px 40px rgba(0,0,0,0.12)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
-                {/* Handle */}
+                style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
                 <div className="flex justify-center pt-3 pb-2">
-                    <div className="w-10 h-1 bg-slate-200 rounded-full" />
+                    <div className="w-10 h-1 bg-gray-200 rounded-full" />
                 </div>
-
-                {/* Header */}
-                <div className="flex items-center justify-between px-5 pb-3 border-b border-slate-100">
+                <div className="flex items-center justify-between px-5 pb-3 border-b border-gray-100">
                     <div className="flex items-center gap-2.5">
                         <SidebarAvatar userProfile={userProfile} />
                         <div>
-                            <p className="text-[13px] font-bold text-slate-800">{userProfile?.full_name || 'User'}</p>
-                            <p className="text-[10px] text-slate-400 uppercase tracking-wider">{userRole}</p>
+                            <p className="text-[13px] font-bold text-gray-800">{userProfile?.full_name || 'User'}</p>
+                            <p className="text-[10px] text-gray-400 uppercase tracking-wider">{userRole}</p>
                         </div>
                     </div>
                     <button onClick={() => setMoreOpen(false)}
-                        className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200 shadow-sm transition-all">
-                        <X size={16} />
+                        className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 transition-all">
+                        <X size={15} />
                     </button>
                 </div>
-
-                {/* More nav items */}
                 <div className="px-4 py-3 grid grid-cols-2 gap-2">
                     {moreItems.map(item => {
                         const isActive = active === item.id;
                         const Icon = item.icon;
                         return (
                             <Link key={item.href} href={item.href}
-                                className={`flex items-center gap-3 p-4 rounded-[32px] border transition-all
+                                className={`flex items-center gap-3 p-3 rounded-sm border transition-all
                                     ${isActive
-                                        ? 'bg-[#24b47e] text-white border-[#24b47e] shadow-lg shadow-emerald-500/25'
-                                        : 'bg-slate-50 text-slate-600 border-slate-100 hover:border-slate-200 hover:bg-slate-100'}`}>
-                                <Icon size={18} strokeWidth={isActive ? 2.5 : 2} />
+                                        ? 'bg-[#0067b8] text-white border-[#0067b8]'
+                                        : 'bg-gray-50 text-gray-600 border-gray-100 hover:border-gray-200 hover:bg-gray-100'}`}>
+                                <Icon size={16} strokeWidth={isActive ? 2.5 : 2} />
                                 <span className="text-[12px] font-bold leading-tight">{item.name}</span>
-                                {!isActive && <ChevronRight size={12} className="ml-auto text-slate-300" />}
+                                {!isActive && <ChevronRight size={11} className="ml-auto text-gray-300" />}
                             </Link>
                         );
                     })}
                 </div>
-
-                {/* Extra padding so content clears bottom bar */}
                 <div className="h-4" />
             </div>
         </>

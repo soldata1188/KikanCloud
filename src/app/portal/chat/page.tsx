@@ -16,7 +16,7 @@ export default async function ClientChatPage() {
     const { data: messages } = await supabase.from('messages').select('*').eq('company_id', userProfile.company_id).order('created_at', { ascending: true })
 
     return (
-        <div className="w-full max-w-[1200px] mx-auto h-[calc(100vh-140px)] flex flex-col bg-white border border-[#ededed] rounded-2xl shadow-sm overflow-hidden animate-in fade-in duration-700">
+        <div className="w-full max-w-[1200px] mx-auto h-[calc(100vh-140px)] flex flex-col bg-white border border-[#ededed] rounded-2xl shadow-sm overflow-hidden">
             <div className="p-4 md:p-6 border-b border-[#ededed] bg-[#fbfcfd] shrink-0">
                 <h2 className="text-xl md:text-2xl font-bold tracking-tight text-[#1f1f1f] flex items-center gap-3">
                     <MessageCircle className="text-[#1a73e8]" size={24} /> 監理団体とのメッセージ (Chat)

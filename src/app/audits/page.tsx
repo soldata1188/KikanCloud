@@ -131,8 +131,12 @@ export default async function AuditsPage({ searchParams }: { searchParams: Promi
             <Sidebar active="audits" />
             <div className="flex-1 flex flex-col relative min-w-0">
                 <TopNav title="監査・訪問指導" role={userProfile?.role} />
-                <main className="flex-1 overflow-y-auto p-6 md:p-10">
-                    <div className="max-w-[1400px] mx-auto">
+                <main className="flex-1 overflow-y-auto p-0 relative bg-[#f8f9fa]">
+                    {/* Micro-Dot Grid Overlay */}
+                    <div className="absolute inset-0 pointer-events-none opacity-[0.08] z-0"
+                        style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, #0067b8 1px, transparent 0)', backgroundSize: '32px 32px' }} />
+
+                    <div className="min-h-full relative z-10">
                         <AuditsClient
                             matrixData={matrixData}
                             filterMonth={filterMonth}

@@ -16,13 +16,13 @@ const COMPANY_DOC_TYPES = [
 ];
 
 // ── Section card ──────────────────────────────────────────────
-const SectionCard = ({ icon, iconColor, title, children }: {
-    icon: React.ReactNode; iconColor: string; title: string; children: React.ReactNode;
+const SectionCard = ({ icon, title, children }: {
+    icon: React.ReactNode; title: string; children: React.ReactNode;
 }) => (
-    <div className="bg-white border border-slate-200 overflow-hidden rounded-2xl shadow-sm">
-        <div className="px-5 py-3 border-b border-slate-700 flex items-center gap-2.5 bg-slate-800">
-            <span className={iconColor}>{icon}</span>
-            <h3 className="text-[11px] font-bold text-white uppercase tracking-widest">{title}</h3>
+    <div className="bg-white border border-gray-200 overflow-hidden rounded-md shadow-sm">
+        <div className="px-5 py-2.5 border-b border-[#005a9e] flex items-center gap-2.5 bg-[#0067b8]">
+            <span className="text-white">{icon}</span>
+            <h3 className="text-[11px] font-black text-white uppercase tracking-widest">{title}</h3>
         </div>
         <div className="flex flex-col">{children}</div>
     </div>
@@ -32,14 +32,14 @@ const SectionCard = ({ icon, iconColor, title, children }: {
 const FormRow = ({ label, required, children, isLast = false }: {
     label: string; required?: boolean; children: React.ReactNode; isLast?: boolean;
 }) => (
-    <div className={`flex flex-col sm:flex-row ${!isLast ? 'border-b border-slate-100' : ''} hover:bg-slate-50/40 transition-colors`}>
-        <div className="w-full sm:w-[190px] px-5 py-2.5 flex items-center border-b sm:border-b-0 sm:border-r border-slate-100 shrink-0 bg-slate-50/60">
-            <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">
+    <div className={`flex flex-col sm:flex-row ${!isLast ? 'border-b border-gray-100' : ''} hover:bg-gray-50/50 transition-colors group`}>
+        <div className="w-full sm:w-[160px] lg:w-[180px] px-5 py-3 flex items-start border-b sm:border-b-0 sm:border-r border-gray-100 shrink-0 bg-gray-50/30 group-hover:bg-gray-100/30 transition-colors">
+            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1 flex flex-wrap items-center gap-1">
                 {label}
-                {required && <span className="ml-1.5 text-red-500 font-black">*</span>}
+                {required && <span className="text-rose-500 font-black">*</span>}
             </label>
         </div>
-        <div className="flex-1 px-4 py-1.5 flex items-center">
+        <div className="flex-1 px-5 py-3 flex items-center min-h-[44px]">
             <div className="w-full">{children}</div>
         </div>
     </div>
@@ -82,7 +82,12 @@ export default function EditCompanyClient({ company }: { company: any }) {
     });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-        setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
+        const { name, value } = e.target;
+        if (name === 'corporate_number') {
+            setForm(prev => ({ ...prev, [name]: value.replace(/\D/g, '') }));
+        } else {
+            setForm(prev => ({ ...prev, [name]: value }));
+        }
     };
 
     // ── Document panel ──
@@ -147,15 +152,15 @@ export default function EditCompanyClient({ company }: { company: any }) {
         });
     };
 
-    const inputCls = 'w-full bg-transparent focus:bg-slate-50 border-none rounded-lg px-3 py-1.5 text-[13px] outline-none text-slate-800 transition-all focus:ring-1 focus:ring-[#24b47e]/30';
+    const inputCls = 'w-full bg-white/50 focus:bg-white border border-gray-200 focus:border-[#0067b8] rounded px-3 py-1.5 text-[13px] font-bold outline-none text-gray-900 transition-all placeholder:text-gray-300 placeholder:font-normal';
 
     return (
-        <div className="flex-1 flex flex-col h-full bg-slate-50 relative">
+        <div className="flex-1 flex flex-col h-full bg-gray-50 relative overflow-hidden">
 
             {/* Toast */}
             {toastError && (
                 <div className="fixed top-4 right-4 z-50 animate-in fade-in slide-in-from-top-3">
-                    <div className="flex items-center gap-3 bg-white border border-red-200 shadow-xl px-4 py-3 rounded-2xl text-red-700">
+                    <div className="flex items-center gap-3 bg-white border border-red-200 shadow-xl px-4 py-3 rounded-md text-red-700">
                         <X className="w-4 h-4 text-red-400 shrink-0 cursor-pointer" onClick={() => setToastError(null)} />
                         <span className="text-[13px] font-bold">{toastError}</span>
                     </div>
@@ -163,42 +168,39 @@ export default function EditCompanyClient({ company }: { company: any }) {
             )}
 
             {/* ── Top Bar ── */}
-            <div className="flex items-center justify-between px-6 py-3.5 border-b border-slate-200 bg-white shrink-0 shadow-sm">
+            <div className="flex items-center justify-between px-6 h-[57px] border-b border-gray-200 bg-white shrink-0 z-20">
                 <div className="flex items-center gap-3">
                     <Link href={`/companies/${company.id}`}
-                        className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 transition-colors text-slate-500">
+                        className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-gray-100 transition-colors text-gray-500 hover:text-gray-700 border border-transparent">
                         <ArrowLeft size={18} strokeWidth={2} />
                     </Link>
-                    <div className="w-px h-5 bg-slate-200" />
+                    <div className="w-px h-5 bg-gray-200" />
                     <div>
-                        <h2 className="text-[15px] font-bold text-slate-900 leading-tight tracking-tight">受入企業 編集</h2>
-                        <span className="text-[10px] font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full mt-0.5 inline-block">
-                            {company.name_jp}
-                        </span>
+                        <h2 className="text-[15px] font-bold text-gray-900 leading-tight tracking-tight uppercase">受入企業 編集</h2>
                     </div>
                 </div>
                 <div className="flex items-center gap-2">
                     <Link href={`/companies/${company.id}`}
-                        className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white border border-slate-200 text-slate-600 text-[12px] font-bold rounded-lg hover:bg-slate-50 transition-colors">
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-300 text-gray-700 text-[11px] font-bold rounded-md hover:bg-gray-50 transition-colors">
                         キャンセル
                     </Link>
                     <button type="button" onClick={handleSubmit} disabled={isPending}
-                        className="inline-flex items-center gap-1.5 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white text-[12px] font-bold rounded-lg transition-colors disabled:opacity-50 shadow-sm">
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#0067b8] hover:bg-[#005a9e] text-white text-[11px] font-bold rounded-md transition-colors disabled:opacity-50 shadow-sm uppercase tracking-widest">
                         {isPending ? <Loader2 size={13} className="animate-spin" /> : <Save size={13} />}
-                        {isPending ? '保存中...' : '保存'}
+                        {isPending ? '保存中...' : '記録を保存'}
                     </button>
                 </div>
             </div>
 
             {/* ── Body ── */}
-            <div className="flex flex-1 overflow-hidden">
+            <div className="flex-1 flex flex-row overflow-hidden bg-gray-50">
 
                 {/* LEFT: Form */}
-                <div className="flex-1 h-full overflow-y-auto p-6 no-scrollbar pb-24">
-                    <div className="space-y-5 max-w-2xl mx-auto">
+                <div className="flex-1 h-full overflow-y-auto no-scrollbar pb-32">
+                    <div className="w-full max-w-[1200px] mx-auto p-8 space-y-8">
 
                         {/* 法人基本情報 */}
-                        <SectionCard icon={<Building2 size={13} />} iconColor="text-emerald-400" title="法人基本情報">
+                        <SectionCard icon={<Building2 size={13} />} title="法人基本情報">
                             <FormRow label="企業名" required>
                                 <input name="name_jp" value={form.name_jp} onChange={handleChange} className={inputCls} placeholder="例：株式会社ミライ" />
                             </FormRow>
@@ -226,7 +228,7 @@ export default function EditCompanyClient({ company }: { company: any }) {
                         </SectionCard>
 
                         {/* 連絡先・所在地 */}
-                        <SectionCard icon={<MapPin size={13} />} iconColor="text-blue-400" title="連絡先・所在地">
+                        <SectionCard icon={<MapPin size={13} />} title="連絡先・所在地">
                             <FormRow label="郵便番号">
                                 <input name="postal_code" value={form.postal_code} onChange={handleChange} className={inputCls} placeholder="例：160-0022" />
                             </FormRow>
@@ -245,7 +247,7 @@ export default function EditCompanyClient({ company }: { company: any }) {
                         </SectionCard>
 
                         {/* 担当者情報 */}
-                        <SectionCard icon={<Users size={13} />} iconColor="text-violet-400" title="担当者情報（監査用）">
+                        <SectionCard icon={<Users size={13} />} title="担当者情報（監査用）">
                             <FormRow label="代表者名">
                                 <input name="representative" value={form.representative} onChange={handleChange} className={inputCls} placeholder="例：山田 太郎" />
                             </FormRow>
@@ -267,7 +269,7 @@ export default function EditCompanyClient({ company }: { company: any }) {
                         </SectionCard>
 
                         {/* 保険・登録・費用 */}
-                        <SectionCard icon={<Briefcase size={13} />} iconColor="text-amber-400" title="保険・登録・費用情報">
+                        <SectionCard icon={<Briefcase size={13} />} title="保険・登録・費用情報">
                             <FormRow label="労働保険番号">
                                 <input name="labor_insurance_number" value={form.labor_insurance_number} onChange={handleChange} className={inputCls + ' font-mono'} placeholder="例：12-345-678901-234" />
                             </FormRow>
@@ -292,41 +294,38 @@ export default function EditCompanyClient({ company }: { company: any }) {
                         </SectionCard>
 
                         {/* 備考 */}
-                        <div className="bg-white border border-slate-200 overflow-hidden rounded-2xl shadow-sm">
-                            <div className="px-5 py-3 border-b border-slate-700 bg-slate-800">
-                                <h3 className="text-[11px] font-bold text-white uppercase tracking-widest">備考・特記事項</h3>
-                            </div>
+                        <SectionCard icon={<FileText size={13} />} title="備考・特記事項">
                             <div className="px-5 py-3">
                                 <textarea name="remarks" value={form.remarks} onChange={handleChange} rows={4}
                                     placeholder="企業に関する特記事項やメモを自由に入力してください..."
-                                    className="w-full bg-transparent focus:bg-slate-50 border border-slate-200 focus:border-[#24b47e] rounded-xl px-3 py-2.5 text-[13px] outline-none text-slate-800 transition-all resize-y min-h-[90px] focus:ring-1 focus:ring-[#24b47e]/20" />
+                                    className="w-full bg-white/50 focus:bg-white border border-gray-200 focus:border-[#0067b8] rounded px-3 py-2.5 text-[13px] font-bold outline-none text-gray-900 transition-all resize-y min-h-[90px] placeholder:text-gray-300 placeholder:font-normal" />
                             </div>
-                        </div>
+                        </SectionCard>
 
                     </div>
                 </div>
 
-                {/* RIGHT: Document Panel — same as EditWorkerClient */}
-                <div className="w-[300px] shrink-0 h-full flex flex-col bg-white border-l border-slate-200">
-                    <div className="flex items-center justify-between px-5 py-4 border-b border-slate-200 bg-slate-800">
+                {/* RIGHT: Document Panel */}
+                <div className="w-[300px] shrink-0 h-full flex flex-col bg-white border-l border-gray-200 overflow-hidden">
+                    <div className="px-5 py-4 border-b border-[#005a9e] flex items-center justify-between bg-[#0067b8]">
                         <div className="flex items-center gap-2">
-                            <UploadCloud size={15} className="text-blue-400" />
-                            <h3 className="text-[13px] font-bold text-white">書類関係</h3>
+                            <UploadCloud size={15} className="text-white" />
+                            <h3 className="text-[13px] font-black text-white uppercase tracking-widest">書類関係</h3>
                         </div>
                         {Object.values(files).reduce((a, arr) => a + arr.length, 0) > 0 && (
-                            <span className="bg-white/10 text-slate-300 px-2 py-0.5 rounded-full text-[10px] font-bold border border-white/10">
-                                {Object.values(files).reduce((a, arr) => a + arr.length, 0)} 件
+                            <span className="bg-white/20 text-white px-2 py-0.5 rounded-full text-[10px] font-black border border-white/20">
+                                {Object.values(files).reduce((a, arr) => a + arr.length, 0)}
                             </span>
                         )}
                     </div>
-                    <div className="flex-1 overflow-y-auto p-4 no-scrollbar pb-24 space-y-5 bg-slate-50/40">
+                    <div className="flex-1 overflow-y-auto p-4 no-scrollbar pb-24 space-y-6 bg-gray-50/30">
 
                         {/* 1. Staging */}
                         <div>
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 px-1">1. ファイルを追加</p>
+                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3 px-1">1. ファイルを追加</p>
                             <div
-                                className={`cursor-pointer w-full h-[110px] border-2 border-dashed rounded-xl flex flex-col items-center justify-center p-3 transition-all
-                                    ${stagedFile ? 'border-emerald-400 bg-emerald-50' : 'border-slate-300 bg-white hover:border-slate-500 hover:bg-slate-50'}`}
+                                className={`cursor-pointer w-full h-[110px] border-2 border-dashed rounded-md flex flex-col items-center justify-center p-3 transition-all
+                                    ${stagedFile ? 'border-emerald-400 bg-emerald-50' : 'border-gray-200 bg-white hover:border-[#0067b8] hover:bg-gray-50'}`}
                                 onDragOver={e => e.preventDefault()}
                                 onDrop={handleFileDrop}
                                 onClick={() => mainFileInputRef.current?.click()}
@@ -335,38 +334,40 @@ export default function EditCompanyClient({ company }: { company: any }) {
                                 {stagedFile ? (
                                     <div className="flex flex-col items-center">
                                         <FileText size={28} className="text-emerald-500 mb-1.5" />
-                                        <div className="text-[12px] font-bold text-emerald-700 text-center truncate w-full px-2">{stagedFile.name}</div>
-                                        <div className="text-[9px] text-emerald-500 mt-1 font-bold bg-emerald-100 px-2 py-0.5 rounded-full">受信済み</div>
+                                        <div className="text-[12px] font-black text-emerald-700 text-center truncate w-full px-2 uppercase tracking-tight">{stagedFile.name}</div>
+                                        <div className="text-[9px] text-white mt-1 font-black bg-emerald-500 px-2.5 py-1 rounded-full uppercase tracking-widest shadow-sm">受信済み</div>
                                     </div>
                                 ) : (
                                     <div className="flex flex-col items-center">
-                                        <UploadCloud size={24} className="text-slate-400 mb-1.5" />
-                                        <div className="text-[12px] font-bold text-slate-600">ドロップまたはクリック</div>
-                                        <div className="text-[10px] text-slate-400 mt-0.5">PDF / 画像 対応</div>
+                                        <UploadCloud size={24} className="text-gray-300 mb-1.5" />
+                                        <div className="text-[11px] font-black text-gray-400 uppercase tracking-widest">ドロップまたはクリック</div>
+                                        <div className="text-[9px] text-gray-300 mt-1 font-bold uppercase">PDF / IMAGE Format</div>
                                     </div>
                                 )}
                             </div>
 
                             {stagedFile && (
-                                <div className="mt-2.5 p-3 bg-white border border-slate-200 rounded-xl shadow-sm">
-                                    <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">カテゴリー指定</label>
-                                    <select value={stagedTargetDoc} onChange={e => setStagedTargetDoc(e.target.value)}
-                                        className="w-full bg-slate-50 border border-slate-200 focus:border-[#24b47e] rounded-lg pl-3 pr-2 py-2 text-[12px] mb-2.5 font-medium outline-none appearance-none cursor-pointer">
-                                        <option value="">-- 種類を選択 --</option>
-                                        {allDocTypes.map(d => (
-                                            <option key={d.id} value={d.id}>
-                                                {d.label}{files[d.id]?.length > 0 ? ` (${files[d.id].length}件)` : ''}
-                                            </option>
-                                        ))}
-                                        <option value="new_custom">➕ 新規カテゴリー</option>
-                                    </select>
+                                <div className="mt-4 p-4 bg-white border border-gray-200 rounded-md shadow-sm animate-in fade-in slide-in-from-top-2 duration-200">
+                                    <label className="block text-[9px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">カテゴリー指定</label>
+                                    <div className="relative">
+                                        <select value={stagedTargetDoc} onChange={e => setStagedTargetDoc(e.target.value)}
+                                            className="w-full bg-gray-50 border border-gray-200 focus:border-[#0067b8] rounded pl-3 pr-8 py-2 text-[12px] mb-3 font-bold outline-none appearance-none cursor-pointer transition-colors text-gray-900">
+                                            <option value="">-- 種類を選択 --</option>
+                                            {allDocTypes.map(d => (
+                                                <option key={d.id} value={d.id}>
+                                                    {d.label}{files[d.id]?.length > 0 ? ` (${files[d.id].length}件)` : ''}
+                                                </option>
+                                            ))}
+                                            <option value="new_custom">➕ 新規カテゴリー</option>
+                                        </select>
+                                    </div>
                                     {stagedTargetDoc === 'new_custom' && (
                                         <input type="text" placeholder="カテゴリー名..." value={newCustomCategory} onChange={e => setNewCustomCategory(e.target.value)}
-                                            className="w-full bg-white border border-slate-200 focus:border-[#24b47e] rounded-lg px-3 py-2 text-[12px] mb-2.5 outline-none" />
+                                            className="w-full bg-white border border-gray-200 focus:border-[#0067b8] rounded px-3 py-2 text-[12px] mb-3 font-bold outline-none" />
                                     )}
                                     <button type="button" onClick={stageToStorage}
                                         disabled={!stagedTargetDoc || (stagedTargetDoc === 'new_custom' && !newCustomCategory.trim())}
-                                        className="w-full py-2 bg-slate-800 hover:bg-slate-700 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed text-white text-[12px] font-bold rounded-lg transition-colors">
+                                        className="w-full py-2 bg-[#0067b8] hover:bg-[#005a9e] disabled:bg-gray-100 disabled:text-gray-300 disabled:cursor-not-allowed text-white text-[11px] font-black rounded-md transition-all uppercase tracking-widest shadow-sm">
                                         ストレージへ保存
                                     </button>
                                 </div>
@@ -375,12 +376,12 @@ export default function EditCompanyClient({ company }: { company: any }) {
 
                         {/* 2. Storage */}
                         <div>
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 px-1">2. ストレージ</p>
-                            <div className="space-y-2 min-h-[120px] rounded-xl border border-slate-200 bg-white p-2">
+                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3 px-1">2. ストレージ</p>
+                            <div className="space-y-2.5 min-h-[140px] rounded-md border border-gray-200 bg-white p-3 shadow-inner overflow-hidden">
                                 {Object.keys(files).length === 0 && (
                                     <div className="h-[100px] flex flex-col items-center justify-center text-center">
-                                        <FileText size={22} className="text-slate-200 mb-1.5" />
-                                        <span className="text-[11px] text-slate-300 font-medium">空のストレージです</span>
+                                        <FileText size={22} className="text-gray-100 mb-1.5" />
+                                        <span className="text-[10px] text-gray-300 font-black uppercase tracking-widest">空のストレージです</span>
                                     </div>
                                 )}
                                 {allDocTypes.map(doc => {
@@ -389,19 +390,19 @@ export default function EditCompanyClient({ company }: { company: any }) {
                                     return (
                                         <React.Fragment key={doc.id}>
                                             {arr.map((f, idx) => (
-                                                <div key={f.id} className="p-2 bg-slate-50 border border-slate-100 rounded-lg flex items-center justify-between group animate-in fade-in zoom-in-95 duration-200">
-                                                    <div className="flex items-center gap-2 overflow-hidden flex-1">
-                                                        <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 bg-white border border-slate-200 text-slate-500">
-                                                            {doc.id === 'kigyo_shashin' ? <ImageIcon size={13} /> : <FileText size={13} />}
+                                                <div key={f.id} className="p-2.5 bg-gray-50 border border-gray-100 rounded-md flex items-center justify-between group animate-in fade-in zoom-in-95 duration-200 hover:border-[#0067b8] transition-colors">
+                                                    <div className="flex items-center gap-2.5 overflow-hidden flex-1">
+                                                        <div className="w-8 h-8 rounded shrink-0 flex items-center justify-center bg-white border border-gray-200 text-gray-400 group-hover:bg-[#0067b8] group-hover:text-white group-hover:border-[#0067b8] transition-all shadow-sm">
+                                                            {doc.id === 'kigyo_shashin' ? <ImageIcon size={14} /> : <FileText size={14} />}
                                                         </div>
                                                         <div className="truncate flex-1">
-                                                            <div className="text-[11px] font-bold text-slate-700 truncate">{doc.label}{arr.length > 1 ? ` #${idx + 1}` : ''}</div>
-                                                            <div className="text-[9px] text-slate-400 font-mono truncate">{f.file.name}</div>
+                                                            <div className="text-[11px] font-black text-gray-700 truncate uppercase tracking-tight">{doc.label}{arr.length > 1 ? ` #${idx + 1}` : ''}</div>
+                                                            <div className="text-[9px] text-gray-400 font-mono truncate">{f.file.name}</div>
                                                         </div>
                                                     </div>
                                                     <button type="button" onClick={() => removeFile(doc.id, f.id)}
-                                                        className="w-6 h-6 flex items-center justify-center rounded-lg text-slate-300 hover:text-white hover:bg-red-500 transition-colors opacity-0 group-hover:opacity-100 shrink-0 ml-1">
-                                                        <X size={11} strokeWidth={2.5} />
+                                                        className="w-7 h-7 flex items-center justify-center rounded text-gray-300 hover:text-white hover:bg-rose-500 transition-all opacity-0 group-hover:opacity-100 shrink-0 ml-1.5 border border-transparent hover:shadow-md">
+                                                        <X size={12} strokeWidth={2.5} />
                                                     </button>
                                                 </div>
                                             ))}

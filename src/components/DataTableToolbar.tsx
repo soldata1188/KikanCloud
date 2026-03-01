@@ -23,28 +23,26 @@ export function DataTableToolbar<T>({ data, filename, searchPlaceholder, onSearc
 
     return (
         <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between mb-4 gap-4 w-full">
-            <div className="flex items-center gap-2 w-full xl:w-auto flex-wrap">
+            <div className="flex items-center gap-2 w-full xl:w-auto flex-wrap px-4 xl:px-8">
                 <div className="relative w-full sm:w-[280px] shrink-0">
-                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#878787]" size={16} />
-                    <input type="text" value={searchTerm} onChange={handleSearch} placeholder={searchPlaceholder} className="w-full h-[40px] bg-white border border-slate-200 rounded-[32px] pl-10 pr-4 text-[13px] outline-none focus:border-[#24b47e] transition-colors text-[#1f1f1f] placeholder:text-[#878787] shadow-sm" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={14} />
+                    <input type="text" value={searchTerm} onChange={handleSearch} placeholder={searchPlaceholder} className="w-full h-[36px] bg-white border border-gray-200 rounded-md pl-9 pr-4 text-[12px] outline-none focus:border-blue-600 transition-colors text-gray-800 placeholder:text-gray-400 shadow-sm" />
                 </div>
                 {filterNode}
             </div>
 
-            <div className="flex items-center gap-3 w-full sm:w-auto overflow-x-auto no-scrollbar justify-end">
+            <div className="flex items-center gap-3 w-full sm:w-auto overflow-x-auto no-scrollbar justify-end px-4 xl:px-8">
                 {layout && onLayoutChange ? (
-                    <div className="flex items-center bg-white border border-slate-200 rounded-full p-1 shadow-sm">
-                        <button onClick={() => onLayoutChange('grid')} className={`p-1.5 rounded-full transition-all ${layout === 'grid' ? 'bg-slate-800 text-white shadow-sm' : 'text-[#878787] hover:text-[#1f1f1f] hover:bg-slate-50'}`}><Grid size={16} /></button>
-                        <button onClick={() => onLayoutChange('list')} className={`p-1.5 rounded-full transition-all ${layout === 'list' ? 'bg-slate-800 text-white shadow-sm' : 'text-[#878787] hover:text-[#1f1f1f] hover:bg-slate-50'}`}><List size={16} /></button>
+                    <div className="flex items-center bg-white border border-gray-200 rounded-md p-1 shadow-sm">
+                        <button onClick={() => onLayoutChange('grid')} className={`p-1 rounded-md transition-all ${layout === 'grid' ? 'bg-blue-600 text-white shadow-sm' : 'text-gray-400 hover:text-gray-700 hover:bg-gray-50'}`}><Grid size={15} /></button>
+                        <button onClick={() => onLayoutChange('list')} className={`p-1 rounded-md transition-all ${layout === 'list' ? 'bg-blue-600 text-white shadow-sm' : 'text-gray-400 hover:text-gray-700 hover:bg-gray-50'}`}><List size={15} /></button>
                     </div>
                 ) : null}
                 {importNode}
                 {addLink && (role === 'admin' || role === 'staff') && (
-                    <Link href={addLink} className="group relative h-[40px] w-[40px] flex items-center justify-center bg-[#24b47e] hover:bg-[#1e9a6a] text-white rounded-full transition-all shadow-md shadow-[#24b47e]/20 active:scale-95 shrink-0">
-                        <Plus size={20} />
-                        <div className="absolute top-full mt-2 px-2 py-1 bg-[#1f1f1f] text-white text-[11px] font-medium rounded-lg opacity-0 invisible translate-y-[-5px] group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all duration-200 whitespace-nowrap z-[60] pointer-events-none">
-                            新規登録
-                        </div>
+                    <Link href={addLink} className="group relative h-[36px] px-4 flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-all shadow-sm active:scale-95 shrink-0 gap-2 font-bold text-[12px]">
+                        <Plus size={16} />
+                        <span>新規登録</span>
                     </Link>
                 )}
             </div>

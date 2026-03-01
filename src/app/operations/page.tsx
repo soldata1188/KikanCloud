@@ -18,12 +18,12 @@ export default async function OperationsPage() {
     const { workers, companies, visas, exams, transfers, staff } = await getOperationsData()
 
     return (
-        <div className="flex h-screen bg-slate-50 font-sans text-gray-900 overflow-hidden selection:bg-primary-700/20">
+        <div className="flex h-screen bg-white font-sans text-gray-900 overflow-hidden selection:bg-primary-700/20">
             <Sidebar active="operations" />
             <div className="flex-1 flex flex-col relative min-w-0">
-                <TopNav title="業務管理 (Operations)" role={userProfile?.role} />
-                <main className="flex-1 overflow-y-auto p-0">
-                    <div className="max-w-[1500px] mx-auto">
+                <TopNav title="業務管理" role={userProfile?.role} />
+                <main className="flex-1 overflow-y-auto p-0 relative">
+                    <div className="min-h-full bg-white">
                         <OperationsClient
                             initialWorkers={workers}
                             companies={companies}

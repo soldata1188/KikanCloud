@@ -283,7 +283,7 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
                     <h2 className="text-[24px] font-medium tracking-tight text-[#1f1f1f] flex items-center gap-2">
                         外国人材新規追加
                         <span className="text-xs bg-[#24b47e]/10 text-[#24b47e] px-2 py-1 rounded-none border border-[#24b47e]/20 flex items-center gap-1 font-bold">
-                            <Sparkles size={12} /> AI Workspace
+                            <Sparkles size={12} /> AI ワークスペース
                         </span>
                     </h2>
                 </div>

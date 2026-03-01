@@ -21,7 +21,7 @@ export default async function PortalDashboard() {
     const workers = workersListRes.data || []
 
     return (
-        <div className="max-w-[1200px] mx-auto space-y-8 animate-in fade-in duration-700">
+        <div className="max-w-[1200px] mx-auto space-y-8">
             {/* ELEGANT GREETING (TRUST BLUE) */}
             <section className="bg-white border border-[#ededed] rounded-[24px] p-8 md:p-10 shadow-sm relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-[#1a73e8]/5 to-transparent rounded-bl-full pointer-events-none"></div>

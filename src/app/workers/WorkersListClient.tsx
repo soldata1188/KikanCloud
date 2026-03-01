@@ -5,13 +5,13 @@ import Link from 'next/link'
 import {
     Search, Clock, Briefcase, AlertTriangle, ChevronLeft, ChevronRight,
     Sparkles, Building2, Landmark, Calendar, ExternalLink, User,
-    CheckCircle2, Circle
+    CheckCircle2, Circle, Plus, X
 } from 'lucide-react'
 import { bulkDeleteWorkers } from '@/app/actions/operations'
 import { updateWorkerStatus } from '@/app/operations/actions'
 import { ImportModal } from './ImportModal'
 import { BulkEditModal } from './BulkEditModal'
-import { DataTableToolbar } from '@/components/DataTableToolbar'
+
 
 // ── Tab Config — Matching Companies Style ────────────────────────────
 const TAB_CONFIG: Record<string, {
@@ -20,25 +20,25 @@ const TAB_CONFIG: Record<string, {
     tabBg: string; tabText: string; tabBorder: string
     badgeBg: string; badgeText: string
 }> = {
-    waiting: {
-        label: '未入国',
-        icon: <Clock size={13} />,
-        tabActiveBg: 'bg-amber-500', tabActiveText: 'text-white', tabActiveBorder: 'border-amber-500',
-        tabBg: 'bg-white', tabText: 'text-amber-600', tabBorder: 'border-amber-200',
-        badgeBg: 'bg-amber-50', badgeText: 'text-amber-600'
-    },
     active: {
         label: '就業中・対応中',
         icon: <CheckCircle2 size={13} />,
-        tabActiveBg: 'bg-emerald-500', tabActiveText: 'text-white', tabActiveBorder: 'border-emerald-500',
-        tabBg: 'bg-white', tabText: 'text-emerald-600', tabBorder: 'border-emerald-200',
-        badgeBg: 'bg-emerald-50', badgeText: 'text-emerald-600'
+        tabActiveBg: 'bg-white', tabActiveText: 'text-gray-900', tabActiveBorder: 'border-[#0067b8]',
+        tabBg: 'bg-white', tabText: 'text-gray-500', tabBorder: 'border-transparent',
+        badgeBg: 'bg-blue-50', badgeText: 'text-[#0067b8]'
+    },
+    waiting: {
+        label: '未入国',
+        icon: <Clock size={13} />,
+        tabActiveBg: 'bg-white', tabActiveText: 'text-gray-900', tabActiveBorder: 'border-[#0067b8]',
+        tabBg: 'bg-white', tabText: 'text-gray-500', tabBorder: 'border-transparent',
+        badgeBg: 'bg-gray-100', badgeText: 'text-gray-600'
     },
     closed: {
         label: '失踪・帰国・転籍済',
         icon: <AlertTriangle size={13} />,
-        tabActiveBg: 'bg-rose-500', tabActiveText: 'text-white', tabActiveBorder: 'border-rose-500',
-        tabBg: 'bg-white', tabText: 'text-rose-600', tabBorder: 'border-rose-200',
+        tabActiveBg: 'bg-white', tabActiveText: 'text-gray-900', tabActiveBorder: 'border-[#0067b8]',
+        tabBg: 'bg-white', tabText: 'text-gray-500', tabBorder: 'border-transparent',
         badgeBg: 'bg-rose-50', badgeText: 'text-rose-600'
     },
 }
@@ -78,6 +78,19 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
     const [filterEntryBatch, setFilterEntryBatch] = useState('all')
     const [currentPage, setCurrentPage] = useState(1)
     const [isBulkEditModalOpen, setIsBulkEditModalOpen] = useState(false)
+    const [batchForm, setBatchForm] = useState({
+        worker_status: '',
+        sending_org: '',
+        nationality: '',
+        entry_batch: '',
+        entry_date: '',
+        visa_status: '',
+        zairyu_exp: '',
+        cert_start_date: '',
+        cert_end_date: '',
+        passport_exp: '',
+        insurance_exp: '',
+    })
 
     // Derived filter lists
     const companiesList = Array.from(new Set(workers.map(w => w.companies?.name_jp).filter(Boolean))) as string[]
@@ -151,6 +164,43 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
         })
     }
 
+    const applyBatch = async () => {
+        const ids = selectedIds;
+        for (const id of ids) {
+            const updates: Promise<unknown>[] = [];
+            if (batchForm.worker_status) updates.push(updateWorkerStatus(id, 'status', batchForm.worker_status));
+            if (batchForm.sending_org) updates.push(updateWorkerStatus(id, 'sending_org', batchForm.sending_org));
+            if (batchForm.nationality) updates.push(updateWorkerStatus(id, 'nationality', batchForm.nationality));
+            if (batchForm.entry_batch) updates.push(updateWorkerStatus(id, 'entry_batch', batchForm.entry_batch));
+            if (batchForm.entry_date) updates.push(updateWorkerStatus(id, 'entry_date', batchForm.entry_date));
+            if (batchForm.visa_status) updates.push(updateWorkerStatus(id, 'visa_status', batchForm.visa_status));
+            if (batchForm.zairyu_exp) updates.push(updateWorkerStatus(id, 'zairyu_exp', batchForm.zairyu_exp));
+            if (batchForm.cert_start_date) updates.push(updateWorkerStatus(id, 'cert_start_date', batchForm.cert_start_date));
+            if (batchForm.cert_end_date) updates.push(updateWorkerStatus(id, 'cert_end_date', batchForm.cert_end_date));
+            if (batchForm.passport_exp) updates.push(updateWorkerStatus(id, 'passport_exp', batchForm.passport_exp));
+            if (batchForm.insurance_exp) updates.push(updateWorkerStatus(id, 'insurance_exp', batchForm.insurance_exp));
+            if (updates.length > 0) {
+                setWorkers(prev => prev.map(w => w.id === id ? {
+                    ...w,
+                    ...(batchForm.worker_status ? { status: batchForm.worker_status } : {}),
+                    ...(batchForm.sending_org ? { sending_org: batchForm.sending_org } : {}),
+                    ...(batchForm.nationality ? { nationality: batchForm.nationality } : {}),
+                    ...(batchForm.entry_batch ? { entry_batch: batchForm.entry_batch } : {}),
+                    ...(batchForm.entry_date ? { entry_date: batchForm.entry_date } : {}),
+                    ...(batchForm.visa_status ? { visa_status: batchForm.visa_status } : {}),
+                    ...(batchForm.zairyu_exp ? { zairyu_exp: batchForm.zairyu_exp } : {}),
+                    ...(batchForm.cert_start_date ? { cert_start_date: batchForm.cert_start_date } : {}),
+                    ...(batchForm.cert_end_date ? { cert_end_date: batchForm.cert_end_date } : {}),
+                    ...(batchForm.passport_exp ? { passport_exp: batchForm.passport_exp } : {}),
+                    ...(batchForm.insurance_exp ? { insurance_exp: batchForm.insurance_exp } : {}),
+                } : w));
+                try { await Promise.all(updates); } catch { alert('一括更新エラー'); }
+            }
+        }
+        setSelectedIds([]);
+        setBatchForm({ worker_status: '', sending_org: '', nationality: '', entry_batch: '', entry_date: '', visa_status: '', zairyu_exp: '', cert_start_date: '', cert_end_date: '', passport_exp: '', insurance_exp: '' });
+    };
+
     const toggleSelect = (id: string) => {
         if (selectedIds.includes(id)) setSelectedIds(selectedIds.filter(i => i !== id))
         else setSelectedIds([...selectedIds, id])
@@ -167,284 +217,309 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
     }
 
     const Pagination = () => totalPages > 1 ? (
-        <div className="flex justify-center items-center gap-2 mt-8 pb-8 overflow-x-auto no-scrollbar max-w-full px-4">
+        <div className="max-w-[1440px] mx-auto w-full flex justify-center items-center gap-2 mt-8 pb-4">
             <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}
-                className="w-10 h-10 flex items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed transition-all shrink-0">
-                <ChevronLeft size={16} />
+                className="w-8 h-8 flex items-center justify-center rounded-md border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 focus:border-[#0067b8] transition-all disabled:opacity-30 disabled:cursor-not-allowed">
+                <ChevronLeft size={14} />
             </button>
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1">
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => {
-                    // Mobile strategy: show limited pages
-                    if (window.innerWidth < 640) {
-                        if (page !== 1 && page !== totalPages && Math.abs(page - currentPage) > 1) {
-                            if (page === 2 || page === totalPages - 1) return <span key={page} className="text-slate-300">...</span>;
-                            return null;
-                        }
-                    }
+                    const isSelected = currentPage === page
                     return (
                         <button key={page} onClick={() => setCurrentPage(page)}
-                            className={`w-10 h-10 rounded-full text-sm font-bold transition-all shrink-0 ${currentPage === page ? 'bg-slate-800 text-white shadow-md scale-105' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'}`}>
+                            className={`w-8 h-8 rounded-md text-[12px] font-bold transition-all ${isSelected ? 'bg-[#0067b8] text-white' : 'bg-white text-gray-600 border border-gray-200 hover:border-blue-300 hover:bg-blue-50/50'}`}>
                             {page}
-                        </button>
-                    );
-                })}
-            </div>
-            <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}
-                className="w-10 h-10 flex items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed transition-all shrink-0">
-                <ChevronRight size={16} />
-            </button>
-        </div>
-    ) : null
-
-    const advancedFilters = (
-        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 w-full md:w-auto">
-            <select
-                value={filterCompany}
-                onChange={(e) => setFilterCompany(e.target.value)}
-                className="h-[40px] w-[140px] bg-white border border-slate-200 hover:bg-slate-50 rounded-[32px] px-4 text-[13px] outline-none focus:border-emerald-500 transition-colors text-slate-700 cursor-pointer truncate"
-            >
-                <option value="all">企業 (すべて)</option>
-                {companiesList.sort().map(c => <option key={c} value={c}>{c}</option>)}
-            </select>
-            <select
-                value={filterIndustry}
-                onChange={(e) => setFilterIndustry(e.target.value)}
-                className="h-[40px] w-[140px] bg-white border border-slate-200 hover:bg-slate-50 rounded-[32px] px-4 text-[13px] font-bold outline-none focus:border-emerald-500 transition-colors text-slate-700 cursor-pointer truncate"
-            >
-                <option value="all">職種 (すべて)</option>
-                {industryList.sort().map(i => <option key={i} value={i}>{i}</option>)}
-            </select>
-            <select
-                value={filterVisaStatus}
-                onChange={(e) => setFilterVisaStatus(e.target.value)}
-                className="h-[40px] w-[140px] bg-white border border-slate-200 hover:bg-slate-50 rounded-[32px] px-4 text-[13px] font-bold outline-none focus:border-emerald-500 transition-colors text-slate-700 cursor-pointer truncate"
-            >
-                <option value="all">在留資格 (すべて)</option>
-                {visaStatusList.sort().map(v => <option key={v} value={v}>{v}</option>)}
-            </select>
-            <select
-                value={filterNationality}
-                onChange={(e) => setFilterNationality(e.target.value)}
-                className="h-[40px] w-[140px] bg-white border border-slate-200 hover:bg-slate-50 rounded-[32px] px-4 text-[13px] font-bold outline-none focus:border-emerald-500 transition-colors text-slate-700 cursor-pointer truncate"
-            >
-                <option value="all">国籍 (すべて)</option>
-                {nationalityList.sort().map(n => <option key={n} value={n}>{n}</option>)}
-            </select>
-            <select
-                value={filterEntryBatch}
-                onChange={(e) => setFilterEntryBatch(e.target.value)}
-                className="h-[40px] w-[140px] bg-white border border-slate-200 hover:bg-slate-50 rounded-[32px] px-4 text-[13px] font-bold outline-none focus:border-emerald-500 transition-colors text-slate-700 cursor-pointer truncate"
-            >
-                <option value="all">入国期生 (すべて)</option>
-                {entryBatchList.sort((a, b) => b.localeCompare(a, undefined, { numeric: true })).map(b => <option key={b} value={b}>{b}</option>)}
-            </select>
-            {(filterCompany !== 'all' || filterIndustry !== 'all' || filterVisaStatus !== 'all' || filterNationality !== 'all' || filterEntryBatch !== 'all') && (
-                <button
-                    onClick={() => {
-                        setFilterCompany('all');
-                        setFilterIndustry('all');
-                        setFilterVisaStatus('all');
-                        setFilterNationality('all');
-                        setFilterEntryBatch('all');
-                    }}
-                    className="text-[12px] text-emerald-600 hover:text-emerald-700 font-bold ml-1 transition-colors">
-                    クリア
-                </button>
-            )}
-        </div>
-    )
-
-    return (
-        <div className="flex flex-col gap-5 bg-white min-h-screen">
-            {/* Tab Bar — Matches Companies Design */}
-            <div className="flex items-center gap-2 px-4 md:px-6 pt-2 overflow-x-auto no-scrollbar whitespace-nowrap">
-                {TAB_KEYS.map(key => {
-                    const cfg = TAB_CONFIG[key]
-                    const count = countByTab(key)
-                    const isActive = activeTab === key
-                    return (
-                        <button key={key} onClick={() => setActiveTab(key)}
-                            className={`relative inline-flex items-center gap-2 px-5 md:px-6 py-2 md:py-2.5 rounded-full border text-[13px] md:text-[14px] font-bold transition-all duration-200 select-none shrink-0
-                                ${isActive ? `${cfg.tabActiveBg} ${cfg.tabActiveText} ${cfg.tabActiveBorder} shadow-md -translate-y-0.5` : `${cfg.tabBg} ${cfg.tabText} ${cfg.tabBorder} hover:bg-slate-50 hover:-translate-y-0.5`}`}
-                        >
-                            <span className="flex items-center gap-1.5">{cfg.icon}{cfg.label}</span>
-                            <span className={`text-[10px] md:text-[12px] font-bold min-w-[18px] h-4.5 md:h-5 inline-flex items-center justify-center px-1.5 rounded-full ${isActive ? 'bg-white/20 text-white' : `${cfg.badgeBg} ${cfg.badgeText}`}`}>
-                                {count}
-                            </span>
                         </button>
                     )
                 })}
             </div>
+            <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}
+                className="w-8 h-8 flex items-center justify-center rounded-md border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 focus:border-[#0067b8] transition-all disabled:opacity-30 disabled:cursor-not-allowed">
+                <ChevronRight size={14} />
+            </button>
+            <span className="text-[11px] font-bold text-gray-400 ml-3 uppercase tracking-wider">
+                {filtered.length}名中 {(currentPage - 1) * PAGE_SIZE + 1}–{Math.min(currentPage * PAGE_SIZE, filtered.length)}表示
+            </span>
+        </div>
+    ) : null
 
-            <div className="px-4 md:px-6">
-                <DataTableToolbar
-                    data={filtered} filename="外国人材リスト" searchPlaceholder="氏名、企業名で検索..."
-                    onSearch={(term) => setSearchTerm(term)} type="workers" role={role}
-                    addLink="/workers/new"
-                    importNode={(role === 'admin' || role === 'staff') && (
-                        <div className="flex items-center gap-2">
-                            <ImportModal />
-                        </div>
-                    )}
-                    filterNode={advancedFilters}
-                    layout={layout} onLayoutChange={setLayout}
-                />
-            </div>
 
-            {/* Bulk Actions Bar */}
-            {selectedIds.length > 0 && (
-                <div className="fixed bottom-20 md:bottom-10 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-bottom duration-300 w-[calc(100%-32px)] md:w-auto">
-                    <div className="bg-slate-900/95 backdrop-blur shadow-2xl rounded-[32px] px-4 md:px-8 py-3.5 border border-white/10 flex items-center justify-between md:justify-start gap-4 md:gap-8 overflow-x-auto no-scrollbar">
-                        <div className="flex items-center gap-4">
-                            <span className="text-[12px] font-black text-emerald-400 whitespace-nowrap">{selectedIds.length} 名選択中</span>
-                            <div className="w-px h-3 bg-slate-600 hidden md:block" />
-                            <button onClick={() => setIsBulkEditModalOpen(true)} className="text-[11px] font-black hover:text-emerald-400 transition-colors uppercase tracking-wider whitespace-nowrap">一括編集</button>
-                            <button onClick={handleBulkDelete} className="text-[11px] font-black text-rose-400 hover:text-rose-300 transition-colors uppercase tracking-wider whitespace-nowrap">削除</button>
-                        </div>
-                        <button onClick={() => setSelectedIds([])} className="ml-auto text-[10px] font-black text-slate-400 hover:text-white uppercase px-2 whitespace-nowrap">解除</button>
+    return (
+        <div className="flex flex-col min-h-screen">
+            {/* ══ STICKY HEADER: Responsive wrapping bar ══ */}
+            <div className="sticky top-0 z-40 bg-white border-b border-gray-200 shadow-sm px-6 min-h-[52px] py-2 flex flex-wrap items-center gap-x-6 gap-y-3">
+
+                {/* Left: Status Tabs */}
+                <div className="flex items-center gap-1 shrink-0">
+                    {TAB_KEYS.map((key) => {
+                        const cfg = TAB_CONFIG[key]
+                        const count = countByTab(key)
+                        const isActive = activeTab === key
+                        return (
+                            <button key={key} onClick={() => setActiveTab(key)}
+                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[12px] font-bold transition-all whitespace-nowrap
+                                    ${isActive ? 'bg-blue-50 text-[#0067b8]' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'}`}>
+                                <span className={isActive ? 'text-[#0067b8]' : 'text-gray-400'}>{cfg.icon}</span>
+                                {cfg.label}
+                                <span className={`text-[10px] font-black px-1.5 py-0.5 rounded-full ${isActive ? 'bg-[#0067b8] text-white' : 'bg-gray-100 text-gray-400'}`}>{count}</span>
+                            </button>
+                        )
+                    })}
+                </div>
+
+                <div className="w-px h-5 bg-gray-200 shrink-0" />
+
+                {/* Center: Filters + Search */}
+                <div className="flex flex-wrap items-center gap-2 gap-y-2">
+                    <select value={filterCompany} onChange={e => setFilterCompany(e.target.value)}
+                        className="text-[11px] border border-gray-200 rounded-md px-2.5 py-1.5 bg-gray-50 outline-none focus:border-[#0067b8] cursor-pointer transition-colors font-bold text-gray-600 h-8 shrink-0 hover:bg-white">
+                        <option value="all">企業: すべて</option>
+                        {companiesList.sort().map(c => <option key={c} value={c}>{c}</option>)}
+                    </select>
+                    <select value={filterVisaStatus} onChange={e => setFilterVisaStatus(e.target.value)}
+                        className="text-[11px] border border-gray-200 rounded-md px-2.5 py-1.5 bg-gray-50 outline-none focus:border-[#0067b8] cursor-pointer transition-colors font-bold text-gray-600 h-8 shrink-0 hover:bg-white">
+                        <option value="all">在留資格: すべて</option>
+                        {visaStatusList.sort().map(v => <option key={v} value={v}>{v}</option>)}
+                    </select>
+                    <select value={filterNationality} onChange={e => setFilterNationality(e.target.value)}
+                        className="text-[11px] border border-gray-200 rounded-md px-2.5 py-1.5 bg-gray-50 outline-none focus:border-[#0067b8] cursor-pointer transition-colors font-bold text-gray-600 h-8 shrink-0 hover:bg-white">
+                        <option value="all">国籍: すべて</option>
+                        {nationalityList.sort().map(n => <option key={n} value={n}>{n}</option>)}
+                    </select>
+
+                    <div className="w-px h-5 bg-gray-200 shrink-0" />
+
+                    {/* Layout toggle */}
+                    <div className="flex items-center bg-gray-100 p-0.5 rounded-md border border-gray-200 shrink-0 uppercase tracking-wider">
+                        <button onClick={() => setLayout('list')} className={`p-1 rounded ${layout === 'list' ? 'bg-white shadow-sm' : 'text-gray-400 hover:text-gray-600'}`} title="リスト表示"><div className="w-3.5 h-3.5 border-2 border-current rounded-sm opacity-60" /></button>
+                        <button onClick={() => setLayout('grid')} className={`p-1 rounded ${layout === 'grid' ? 'bg-white shadow-sm' : 'text-gray-400 hover:text-gray-600'}`} title="グリッド表示"><div className="w-3.5 h-3.5 grid grid-cols-2 gap-0.5"><div className="bg-current rounded-sm opacity-40" /><div className="bg-current rounded-sm opacity-40" /><div className="bg-current rounded-sm opacity-40" /><div className="bg-current rounded-sm opacity-40" /></div></button>
+                    </div>
+
+                    <div className="w-px h-5 bg-gray-200 shrink-0" />
+
+                    {/* Search box moved here */}
+                    <div className="relative">
+                        <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                        <input type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
+                            placeholder="名前・企業名で検索..."
+                            className="pl-8 pr-3 py-1.5 bg-gray-50 border border-gray-200 rounded-md text-[12px] w-[200px] focus:bg-white focus:border-[#0067b8] outline-none transition-all h-8" />
                     </div>
                 </div>
-            )}
 
-            <div className="px-4 md:px-6 pb-20">
-                {layout === 'grid' ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                        {paginated.map((worker, index) => (
-                            <div key={worker.id} className="group relative bg-white border border-slate-200 hover:border-[#24b47e] rounded-[32px] p-6 transition-all duration-300 hover:-translate-y-1 shadow-sm hover:shadow-md">
-                                <div className="absolute top-4 right-4 text-[10px] font-mono text-slate-300">#{(currentPage - 1) * PAGE_SIZE + index + 1}</div>
-                                <div className="flex items-start gap-4 mb-4">
-                                    <div className="w-16 h-16 rounded-full border-2 border-slate-100 bg-slate-50 overflow-hidden flex items-center justify-center shrink-0 shadow-sm">
-                                        {worker.avatar_url ? (
-                                            <img src={worker.avatar_url} className="w-full h-full object-cover" />
-                                        ) : (
-                                            <User size={32} className="text-slate-300" />
-                                        )}
-                                    </div>
-                                    <div className="min-w-0">
-                                        <Link href={`/workers/${worker.id}`} className="font-bold text-slate-800 hover:text-[#24b47e] transition-colors truncate block text-[15px]">{worker.full_name_romaji}</Link>
-                                        <div className="text-[11px] text-indigo-600 font-extrabold truncate mt-0.5">{worker.companies?.name_jp || '未所属'}</div>
-                                    </div>
+                {/* Right: Actions */}
+                <div className="flex items-center gap-2 shrink-0 ml-auto">
+                    {role !== 'client' && (
+                        <>
+                            <ImportModal />
+                            <Link href="/workers/new"
+                                className="bg-[#0067b8] hover:bg-blue-700 text-white text-[11px] px-3 py-1.5 rounded-md font-bold transition-all flex items-center gap-1.5 h-8 shrink-0">
+                                <Plus size={13} /> 新規登録
+                            </Link>
+                        </>
+                    )}
+                </div>
+            </div>
+
+
+            {/* ════ 一括操作 RIGHT SIDEBAR (Fixed) ════ */}
+            <div className={`fixed top-[53px] right-0 h-[calc(100vh-53px)] z-[200] transition-transform duration-300 ease-in-out ${selectedIds.length > 0 ? 'translate-x-0' : 'translate-x-full'}`}
+                style={{ width: '300px' }}>
+                <div className="h-full bg-white border-l border-gray-200 flex flex-col shadow-2xl">
+                    {/* Header */}
+                    <div className="px-5 py-4 border-b border-gray-100 bg-gray-50 flex items-center justify-between shrink-0">
+                        <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-[#0067b8] flex items-center justify-center text-[15px] font-black text-white">{selectedIds.length}</div>
+                            <div>
+                                <div className="text-[15px] font-black text-gray-900 leading-none">一括操作</div>
+                                <div className="text-[11px] text-gray-400 mt-0.5">空欄はスキップされます</div>
+                            </div>
+                        </div>
+                        <button onClick={() => setSelectedIds([])}
+                            className="text-gray-400 hover:text-gray-700 transition-colors p-1 rounded hover:bg-gray-100">
+                            <X size={18} />
+                        </button>
+                    </div>
+
+                    {/* Fields */}
+                    <div className="flex-1 px-4 py-4 overflow-y-auto">
+                        <div className="space-y-3">
+                            {[
+                                { label: '状態', el: <select value={batchForm.worker_status} onChange={e => setBatchForm(p => ({ ...p, worker_status: e.target.value }))} className="w-full text-[13px] rounded-md bg-white text-gray-800 border border-gray-200 py-1.5 px-2.5 outline-none focus:border-[#0067b8] focus:ring-1 focus:ring-[#0067b8]/20 transition-colors"><option value="">---</option>{['waiting', 'standby', 'working', 'missing', 'returned'].map(s => (<option key={s} value={s}>{reverseStatusMap[s]}</option>))}</select> },
+                                { label: '送出機関', el: <input type="text" placeholder="送出機関名" value={batchForm.sending_org} onChange={e => setBatchForm(p => ({ ...p, sending_org: e.target.value }))} className="w-full text-[13px] rounded-md bg-white text-gray-800 placeholder-gray-300 border border-gray-200 py-1.5 px-2.5 outline-none focus:border-[#0067b8] transition-colors" /> },
+                                { label: '国籍', el: <input type="text" placeholder="例: ベトナム" value={batchForm.nationality} onChange={e => setBatchForm(p => ({ ...p, nationality: e.target.value }))} className="w-full text-[13px] rounded-md bg-white text-gray-800 placeholder-gray-300 border border-gray-200 py-1.5 px-2.5 outline-none focus:border-[#0067b8] transition-colors" /> },
+                                { label: '入国期生', el: <input type="text" placeholder="例: 第10期生" value={batchForm.entry_batch} onChange={e => setBatchForm(p => ({ ...p, entry_batch: e.target.value }))} className="w-full text-[13px] rounded-md bg-white text-gray-800 placeholder-gray-300 border border-gray-200 py-1.5 px-2.5 outline-none focus:border-[#0067b8] transition-colors" /> },
+                                { label: '入国日', el: <input type="date" value={batchForm.entry_date} onChange={e => setBatchForm(p => ({ ...p, entry_date: e.target.value }))} className="w-full text-[13px] rounded-md bg-white text-gray-800 border border-gray-200 py-1.5 px-2.5 outline-none focus:border-[#0067b8] transition-colors" /> },
+                                { label: '在留資格', el: <input type="text" placeholder="例: 技能実習1年" value={batchForm.visa_status} onChange={e => setBatchForm(p => ({ ...p, visa_status: e.target.value }))} className="w-full text-[13px] rounded-md bg-white text-gray-800 placeholder-gray-300 border border-gray-200 py-1.5 px-2.5 outline-none focus:border-[#0067b8] transition-colors" /> },
+                                { label: '在留期限', el: <input type="date" value={batchForm.zairyu_exp} onChange={e => setBatchForm(p => ({ ...p, zairyu_exp: e.target.value }))} className="w-full text-[13px] rounded-md bg-white text-gray-800 border border-gray-200 py-1.5 px-2.5 outline-none focus:border-[#0067b8] transition-colors" /> },
+                                { label: '認定開始日', el: <input type="date" value={batchForm.cert_start_date} onChange={e => setBatchForm(p => ({ ...p, cert_start_date: e.target.value }))} className="w-full text-[13px] rounded-md bg-white text-gray-800 border border-gray-200 py-1.5 px-2.5 outline-none focus:border-[#0067b8] transition-colors" /> },
+                                { label: '修了日', el: <input type="date" value={batchForm.cert_end_date} onChange={e => setBatchForm(p => ({ ...p, cert_end_date: e.target.value }))} className="w-full text-[13px] rounded-md bg-white text-gray-800 border border-gray-200 py-1.5 px-2.5 outline-none focus:border-[#0067b8] transition-colors" /> },
+                                { label: '旅券期限', el: <input type="date" value={batchForm.passport_exp} onChange={e => setBatchForm(p => ({ ...p, passport_exp: e.target.value }))} className="w-full text-[13px] rounded-md bg-white text-gray-800 border border-gray-200 py-1.5 px-2.5 outline-none focus:border-[#0067b8] transition-colors" /> },
+                                { label: '保険期限', el: <input type="date" value={batchForm.insurance_exp} onChange={e => setBatchForm(p => ({ ...p, insurance_exp: e.target.value }))} className="w-full text-[13px] rounded-md bg-white text-gray-800 border border-gray-200 py-1.5 px-2.5 outline-none focus:border-[#0067b8] transition-colors" /> },
+                            ].map(({ label, el }) => (
+                                <div key={label}>
+                                    <div className="text-[11px] text-gray-400 font-bold mb-1 uppercase tracking-wider">{label}</div>
+                                    {el}
                                 </div>
-                                <div className="space-y-2 mb-4 text-[11px]">
-                                    <div className="flex justify-between"><span className="text-slate-400 font-bold">国籍</span><span className="font-medium text-slate-700">{worker.nationality || '---'}</span></div>
-                                    <div className="flex justify-between"><span className="text-slate-400 font-bold">在留資格</span><span className="font-medium text-slate-700 truncate max-w-[120px]">{worker.visa_status || '---'}</span></div>
-                                    <div className="flex justify-between">
-                                        <span className="text-slate-400 font-bold">職種区分</span>
-                                        <span className="font-bold text-slate-700">{worker.industry_field || '---'}</span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                        <span className="text-slate-400 font-bold">送出機関</span>
-                                        <span className="font-bold text-slate-700">{worker.sending_org || '---'}</span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                        <span className="text-slate-400 font-bold">旅券/保険期限</span>
-                                        <div className="flex flex-col items-end">
-                                            <span className="font-mono font-bold text-slate-700">{(worker.passport_exp || '---').replace(/-/g, '/')}</span>
-                                            <span className="font-mono text-[9px] text-slate-400 font-bold">{(worker.insurance_exp || '---').replace(/-/g, '/')}</span>
+                            ))}
+                        </div>
+                    </div>
+
+
+                    {/* Apply button */}
+                    <div className="px-4 py-4 border-t border-gray-100 bg-gray-50 shrink-0">
+                        <button onClick={applyBatch}
+                            className="w-full bg-[#0067b8] text-white py-3 rounded-lg text-[14px] font-black hover:bg-blue-700 transition-all flex items-center justify-center gap-2 shadow-sm">
+                            <CheckCircle2 size={16} />
+                            {selectedIds.length}名に一括適用
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div className="max-w-[1440px] mx-auto w-full pb-20 pt-8">
+                {/* ── Results Info ── */}
+                <div className="flex justify-between items-center px-4 mb-4 text-[12px] text-gray-500 font-medium tracking-tight">
+                    <div className="flex items-center gap-4">
+                        <label className="flex items-center gap-2 cursor-pointer select-none">
+                            <input type="checkbox"
+                                checked={paginated.length > 0 && paginated.every(w => selectedIds.includes(w.id))}
+                                onChange={toggleSelectAll}
+                                className="rounded border-gray-300 text-[#0067b8] focus:ring-[#0067b8]" />
+                            すべて選択
+                        </label>
+                    </div>
+                    <span>{filtered.length} 名中 {Math.min(filtered.length, (currentPage - 1) * PAGE_SIZE + 1)}–{Math.min(currentPage * PAGE_SIZE, filtered.length)}を表示</span>
+                </div>
+                {layout === 'grid' ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 px-4 pb-4">
+                        {paginated.map((worker, index) => {
+                            const absIndex = (currentPage - 1) * PAGE_SIZE + index
+                            return (
+                                <div key={worker.id} className="group relative bg-white border border-gray-200 hover:border-blue-600 rounded-md p-5 transition-all duration-200">
+                                    <div className="absolute top-4 right-4 text-[9px] font-mono text-gray-300">#{absIndex + 1}</div>
+                                    <div className="flex items-start gap-3 mb-4">
+                                        <div className="w-14 h-14 rounded-full border border-gray-100 bg-gray-50 overflow-hidden flex items-center justify-center shrink-0">
+                                            {worker.avatar_url ? (
+                                                <img src={worker.avatar_url} className="w-full h-full object-cover" />
+                                            ) : (
+                                                <User size={28} className="text-gray-300" />
+                                            )}
+                                        </div>
+                                        <div className="min-w-0">
+                                            <Link href={`/workers/${worker.id}`} className="font-bold text-gray-900 hover:text-blue-600 transition-colors truncate block text-sm">{worker.full_name_romaji}</Link>
+                                            <div className="text-[10px] text-blue-600 font-bold truncate mt-0.5">{worker.companies?.name_jp || '未所属'}</div>
+                                            <div className="text-[9px] text-gray-400 truncate uppercase tracking-tight">{worker.nationality || '---'}</div>
                                         </div>
                                     </div>
+                                    <div className="space-y-1.5 mb-4 text-[11px]">
+                                        <div className="flex justify-between border-b border-gray-50 pb-1"><span className="text-gray-400 font-bold uppercase tracking-wider">在留資格</span><span className="font-bold text-gray-700 truncate max-w-[120px]">{worker.visa_status || '---'}</span></div>
+                                        <div className="flex justify-between border-b border-gray-50 pb-1"><span className="text-gray-400 font-bold uppercase tracking-wider">職種区分</span><span className="font-bold text-gray-700 truncate">{worker.industry_field || '---'}</span></div>
+                                        <div className="flex justify-between border-b border-gray-50 pb-1"><span className="text-gray-400 font-bold uppercase tracking-wider">送出機関</span><span className="font-bold text-gray-700 truncate max-w-[120px]">{worker.sending_org || '---'}</span></div>
+                                        <div className="flex justify-between"><span className="text-gray-400 font-bold uppercase tracking-wider">旅券期限</span><span className="font-mono font-bold text-gray-700">{(worker.passport_exp || '---').replace(/-/g, '/')}</span></div>
+                                    </div>
+                                    <div className="pt-3 border-t border-gray-100 flex items-center justify-between">
+                                        <select
+                                            value={worker.status}
+                                            onChange={e => handleChange(worker.id, 'status', e.target.value)}
+                                            className="text-[10px] font-bold px-2 py-1 rounded-md border border-gray-100 bg-gray-50 text-gray-600 hover:bg-gray-100 transition-colors outline-none cursor-pointer">
+                                            {Object.entries(reverseStatusMap).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+                                        </select>
+                                        <Link href={`/workers/${worker.id}`} className="text-xs font-bold text-blue-600 hover:underline transition-colors px-2 py-1 rounded hover:bg-blue-50">詳細</Link>
+                                    </div>
                                 </div>
-                                <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
-                                    <select
-                                        value={worker.status}
-                                        onChange={e => handleChange(worker.id, 'status', e.target.value)}
-                                        className="text-[10px] font-black px-3 py-1.5 rounded-full border-none bg-slate-100/50 text-slate-600 hover:bg-slate-100 transition-colors outline-none cursor-pointer">
-                                        {Object.entries(reverseStatusMap).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-                                    </select>
-                                    <Link href={`/workers/${worker.id}`} className="text-xs font-bold text-[#24b47e] hover:underline px-2 py-1">詳細</Link>
-                                </div>
-                            </div>
-                        ))}
+                            )
+                        })}
                     </div>
                 ) : (
-                    <div className="overflow-x-auto border border-slate-200 rounded-[32px] overflow-hidden shadow-sm max-w-full">
-                        <table className="w-full border-collapse text-sm text-left whitespace-nowrap">
-                            <thead>
-                                <tr className="bg-slate-800 shadow-sm border-b border-slate-700">
-                                    <th className="px-4 py-3.5 w-[50px] text-center"><input type="checkbox" checked={selectedIds.length === paginated.length && paginated.length > 0} onChange={toggleSelectAll} className="w-4 h-4 rounded border-slate-600 accent-emerald-500" /></th>
-                                    <th className="px-4 py-3.5 font-bold text-[13px] uppercase tracking-wider text-slate-200 min-w-[50px]">No.</th>
-                                    <th className="px-4 py-3.5 font-bold text-[13px] uppercase tracking-wider text-slate-200 min-w-[180px]">人材名 / 会社</th>
-                                    <th className="px-4 py-3.5 font-bold text-[13px] uppercase tracking-wider text-slate-200 min-w-[160px]">フリガナ / 送出機関</th>
-                                    <th className="px-4 py-3.5 font-bold text-[13px] uppercase tracking-wider text-slate-200 min-w-[120px]">国籍 / 生年月日</th>
-                                    <th className="px-4 py-3.5 font-bold text-[13px] uppercase tracking-wider text-slate-200 min-w-[180px]">在留資格 / 職種区分</th>
-                                    <th className="px-4 py-3.5 font-bold text-[13px] uppercase tracking-wider text-slate-200 min-w-[140px]">在留期限</th>
-                                    <th className="px-4 py-3.5 font-bold text-[13px] uppercase tracking-wider text-slate-200 min-w-[140px]">旅券 / 保険期限</th>
-                                    <th className="px-4 py-3.5 font-bold text-[13px] uppercase tracking-wider text-slate-200 min-w-[100px]">状態</th>
-                                    <th className="px-4 py-3.5 w-[40px]"></th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-200">
-                                {paginated.length === 0 && (
-                                    <tr><td colSpan={10} className="px-5 py-20 text-center text-slate-400 font-medium">データがありません。</td></tr>
-                                )}
-                                {paginated.map((worker, index) => {
-                                    const absIndex = (currentPage - 1) * PAGE_SIZE + index + 1
-                                    return (
-                                        <tr key={worker.id} className={`transition-all duration-150 ${index % 2 === 0 ? 'bg-white hover:bg-slate-50/80' : 'bg-slate-50/40 hover:bg-slate-50/80'}`}>
-                                            <td className="px-4 py-3.5 text-center"><input type="checkbox" checked={selectedIds.includes(worker.id)} onChange={() => toggleSelect(worker.id)} className="w-4 h-4 rounded border-slate-300 accent-slate-800" /></td>
-                                            <td className="px-4 py-3.5 font-mono text-slate-400 text-xs font-bold">{absIndex}</td>
-                                            <td className="px-4 py-3.5">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-12 h-12 shrink-0 rounded-full border border-slate-200 bg-slate-100 overflow-hidden flex items-center justify-center shadow-sm">
-                                                        {worker.avatar_url ? <img src={worker.avatar_url} className="w-full h-full object-cover" /> : <User size={24} className="text-slate-400" />}
+                    <div className="mx-4 overflow-hidden border border-gray-200 rounded-md bg-white mb-4">
+                        <div className="overflow-x-auto">
+                            <table className="w-full min-w-[1200px] border-collapse text-left">
+                                <thead className="bg-[#0067b8] border-b border-white/20 text-white">
+                                    <tr>
+                                        <th className="px-4 py-3 w-[40px] border-r border-white/10 text-center">
+                                            <input type="checkbox" checked={selectedIds.length === paginated.length && paginated.length > 0} onChange={toggleSelectAll} className="w-4 h-4 rounded border-white/30 bg-transparent accent-[#24b47e]" />
+                                        </th>
+                                        <th className="px-4 py-3 font-bold text-[11px] uppercase tracking-wider w-[40px] border-r border-white/10 text-white/90">No.</th>
+                                        <th className="px-4 py-3 font-bold text-[11px] uppercase tracking-wider w-[240px] border-r border-white/10 text-white/90">人材名 (氏名/カナ)</th>
+                                        <th className="px-4 py-3 font-bold text-[11px] uppercase tracking-wider w-[180px] border-r border-white/10 text-white/90">受入企業 / 職種</th>
+                                        <th className="px-4 py-3 font-bold text-[11px] uppercase tracking-wider w-[180px] border-r border-white/10 text-white/90">送出機関 / 国籍</th>
+                                        <th className="px-4 py-3 font-bold text-[11px] uppercase tracking-wider w-[140px] border-r border-white/10 text-white/90">入国期生 / 入国日</th>
+                                        <th className="px-4 py-3 font-bold text-[11px] uppercase tracking-wider w-[140px] border-r border-white/10 text-white/90">在留資格</th>
+                                        <th className="px-4 py-3 font-bold text-[11px] uppercase tracking-wider w-[140px] border-r border-white/10 text-white/90">在留期限 / 修了日</th>
+                                        <th className="px-4 py-3 font-bold text-[11px] uppercase tracking-wider w-[130px] border-r border-white/10 text-white/90">旅券 / 保険</th>
+                                        <th className="px-4 py-3 font-bold text-[11px] uppercase tracking-wider w-[100px] border-r border-white/10 text-white/90">状態</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-100">
+                                    {paginated.length === 0 && (
+                                        <tr><td colSpan={10} className="px-5 py-20 text-center text-gray-400 font-medium bg-white">データがありません。</td></tr>
+                                    )}
+                                    {paginated.map((worker, index) => {
+                                        const absIndex = (currentPage - 1) * PAGE_SIZE + index + 1
+                                        return (
+                                            <tr key={worker.id} className={`transition-all duration-150 border-b border-gray-100 last:border-0 ${index % 2 === 0 ? 'bg-white hover:bg-blue-50/20' : 'bg-gray-50/30 hover:bg-blue-50/20'}`}>
+                                                <td className="px-4 py-3 text-center border-r border-gray-100/50">
+                                                    <input type="checkbox" checked={selectedIds.includes(worker.id)} onChange={() => toggleSelect(worker.id)} className="w-4 h-4 rounded border-gray-300 accent-[#0067b8]" />
+                                                </td>
+                                                <td className="px-4 py-3 font-mono text-[#0067b8] text-[11px] font-bold border-r border-gray-100/50 text-center">{absIndex}</td>
+                                                <td className="px-4 py-3 border-r border-gray-100/50">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-10 h-10 shrink-0 rounded-full border border-gray-100 bg-gray-50 overflow-hidden flex items-center justify-center">
+                                                            {worker.avatar_url ? <img src={worker.avatar_url} className="w-full h-full object-cover" /> : <User size={20} className="text-gray-300" />}
+                                                        </div>
+                                                        <div className="min-w-0">
+                                                            <Link href={`/workers/${worker.id}`} className="font-bold text-[14px] text-gray-900 hover:text-[#0067b8] transition-colors block truncate">{worker.full_name_romaji}</Link>
+                                                            <div className="text-[10px] text-gray-400 uppercase tracking-tight mt-0.5 truncate">{worker.full_name_kana || '---'}</div>
+                                                        </div>
                                                     </div>
-                                                    <div className="min-w-0">
-                                                        <Link href={`/workers/${worker.id}`} className="font-bold text-[17px] text-slate-800 hover:text-[#24b47e] transition-colors block">{worker.full_name_romaji}</Link>
-                                                        <div className="text-[12px] text-indigo-600 font-extrabold mt-0.5">{worker.companies?.name_jp || '未所属'}</div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td className="px-4 py-3.5">
-                                                <div className="text-[13px] font-bold text-slate-400">{worker.full_name_kana || '---'}</div>
-                                                <div className="text-[14px] font-black text-slate-800 mt-0.5">{worker.sending_org || '---'}</div>
-                                            </td>
-                                            <td className="px-4 py-3.5">
-                                                <div className="text-[14px] font-bold text-slate-700">{worker.nationality || '---'}</div>
-                                                <div className="text-[11px] text-slate-400 mt-0.5">{(worker.dob || '---').replace(/-/g, '/')}</div>
-                                            </td>
-                                            <td className="px-4 py-3.5">
-                                                <div className="text-[12px] font-bold text-slate-800">{worker.visa_status || '---'}</div>
-                                                <div className="mt-1">
-                                                    <span className="text-[10px] font-black text-slate-700">{worker.industry_field || '---'}</span>
-                                                </div>
-                                            </td>
-                                            <td className="px-4 py-3.5">
-                                                <div className="flex items-center gap-2">
-                                                    <Calendar size={13} className={worker.zairyu_exp && worker.zairyu_exp <= next90DaysStr ? 'text-rose-500' : 'text-slate-300'} />
+                                                </td>
+                                                <td className="px-4 py-3 border-r border-gray-100/50">
+                                                    <div className="text-[12px] font-bold text-[#0067b8] truncate">{worker.companies?.name_jp || '---'}</div>
+                                                    <div className="text-[10px] text-gray-500 font-bold mt-0.5 truncate">{worker.industry_field || '---'}</div>
+                                                </td>
+                                                <td className="px-4 py-3 border-r border-gray-100/50">
+                                                    <div className="text-[11px] font-bold text-gray-700">{worker.nationality || '---'}</div>
+                                                    <div className="text-[10px] text-gray-500 font-bold mt-0.5 truncate" title={worker.sending_org || ''}>{worker.sending_org || '---'}</div>
+                                                </td>
+                                                <td className="px-4 py-3 border-r border-gray-100/50">
+                                                    <div className="text-[11px] font-bold text-gray-700">{worker.entry_batch || '---'}</div>
+                                                    <div className="text-[10px] text-gray-400 mt-0.5 font-mono">{worker.entry_date ? worker.entry_date.replace(/-/g, '/') : '---'}</div>
+                                                </td>
+                                                <td className="px-4 py-3 border-r border-gray-100/50">
+                                                    <div className="text-[11px] font-bold text-gray-700 truncate" title={worker.visa_status || ''}>{worker.visa_status || '---'}</div>
+                                                </td>
+                                                <td className="px-4 py-3 border-r border-gray-100/50">
                                                     <div className="flex flex-col">
-                                                        <span className={`text-[13px] font-black leading-tight ${worker.zairyu_exp && worker.zairyu_exp <= next90DaysStr ? 'text-rose-600' : 'text-slate-700'}`}>
-                                                            {(worker.zairyu_exp || '---').replace(/-/g, '/')}
+                                                        <span className={`text-[11px] font-bold font-mono leading-tight ${worker.zairyu_exp && worker.zairyu_exp <= next90DaysStr ? 'text-rose-600' : 'text-gray-700'}`}>
+                                                            {worker.zairyu_exp ? worker.zairyu_exp.replace(/-/g, '/') : '---'}
                                                         </span>
-                                                        {worker.entry_date && (
-                                                            <span className="text-[10px] text-slate-400 font-bold mt-0.5 whitespace-nowrap">入国: {worker.entry_date.replace(/-/g, '/')}</span>
-                                                        )}
+                                                        <div className="text-[10px] text-gray-400 font-bold mt-0.5">
+                                                            <span className="font-mono">{worker.cert_end_date ? worker.cert_end_date.replace(/-/g, '/') : '---'}</span>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </td>
-                                            <td className="px-4 py-3.5">
-                                                <div className="flex flex-col">
-                                                    <span className="text-[12px] font-black text-slate-700 leading-tight">{(worker.passport_exp || '---').replace(/-/g, '/')}</span>
-                                                    <span className="text-[10px] text-slate-400 font-bold mt-0.5 whitespace-nowrap">保険: {(worker.insurance_exp || '---').replace(/-/g, '/')}</span>
-                                                </div>
-                                            </td>
-                                            <td className="px-4 py-3.5">
-                                                <select
-                                                    value={worker.status}
-                                                    onChange={e => handleChange(worker.id, 'status', e.target.value)}
-                                                    className="appearance-none text-[10px] px-2.5 py-1 rounded-lg font-black bg-slate-100/50 text-slate-600 hover:bg-slate-100 transition-colors w-[80px] text-center cursor-pointer outline-none">
-                                                    {Object.entries(reverseStatusMap).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-                                                </select>
-                                            </td>
-                                            <td className="px-4 py-3.5">
-                                                <Link href={`/workers/${worker.id}`} className="p-2 text-slate-400 hover:text-slate-900 rounded-full hover:bg-slate-100 transition-all block">
-                                                    <ExternalLink size={20} />
-                                                </Link>
-                                            </td>
-                                        </tr>
-                                    )
-                                })}
-                            </tbody>
-                        </table>
+                                                </td>
+                                                <td className="px-4 py-3 border-r border-gray-100/50">
+                                                    <div className="flex flex-col">
+                                                        <span className="text-[11px] font-bold text-gray-700 font-mono leading-tight">{worker.passport_exp ? worker.passport_exp.replace(/-/g, '/') : '---'}</span>
+                                                        <div className="text-[10px] text-gray-400 font-bold mt-0.5">
+                                                            <span className="font-mono">{worker.insurance_exp ? worker.insurance_exp.replace(/-/g, '/') : '---'}</span>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td className="px-4 py-3 border-r border-gray-100/50">
+                                                    <select
+                                                        value={worker.status}
+                                                        onChange={e => handleChange(worker.id, 'status', e.target.value)}
+                                                        className="appearance-none text-[10px] px-2 py-1 rounded-md font-bold bg-gray-50 border border-gray-100 text-gray-600 hover:bg-gray-100 transition-colors w-full text-center cursor-pointer outline-none">
+                                                        {Object.entries(reverseStatusMap).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                        )
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 )}
                 <Pagination />

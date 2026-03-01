@@ -244,16 +244,34 @@ export default function RoutingClient({ initialLocations, filterCompanies, googl
     return (
         <APIProvider apiKey={googleMapsKey}>
             {/* ── Full layout ── */}
-            <div className="flex h-[calc(100vh-56px)] w-full overflow-hidden relative">
+            <div className="flex flex-col md:flex-row h-[calc(100vh-56px)] w-full overflow-hidden relative">
 
                 {/* ══════════════ SIDEBAR ══════════════ */}
+                {/* Mobile: fixed bottom sheet | Desktop: left sidebar */}
+                {/* Mobile backdrop */}
+                {isSidebarOpen && (
+                    <div
+                        className="md:hidden fixed inset-0 bg-black/40 z-30"
+                        onClick={() => setIsSidebarOpen(false)}
+                    />
+                )}
                 <div className={`
-                    flex flex-col bg-white border-r border-slate-200 h-full z-20 shadow-lg
-                    transition-all duration-300 ease-in-out shrink-0
-                    ${isSidebarOpen ? 'w-[340px]' : 'w-0 overflow-hidden border-r-0'}
+                    flex flex-col bg-white border-slate-200 z-40
+                    transition-all duration-300 ease-in-out
+                    fixed md:static bottom-0 left-0 right-0
+                    md:h-full md:border-r md:shadow-lg md:shrink-0
+                    rounded-t-2xl md:rounded-none
+                    ${isSidebarOpen
+                        ? 'md:w-[340px] translate-y-0 h-[65vh] shadow-2xl border border-slate-200'
+                        : 'md:w-0 md:overflow-hidden md:border-r-0 translate-y-full md:translate-y-0 h-[65vh]'
+                    }
                 `}>
+                    {/* Mobile drag handle */}
+                    <div className="md:hidden flex justify-center pt-2.5 pb-1 shrink-0">
+                        <div className="w-8 h-1 bg-slate-300 rounded-full" />
+                    </div>
                     {/* Sidebar header */}
-                    <div className="px-4 pt-4 pb-3 border-b border-slate-100 shrink-0">
+                    <div className="px-4 pt-3 pb-3 border-b border-slate-100 shrink-0">
                         <div className="flex items-center justify-between mb-3">
                             <div className="flex items-center gap-2">
                                 <div className="w-7 h-7 rounded-lg bg-slate-800 flex items-center justify-center">
@@ -489,7 +507,7 @@ export default function RoutingClient({ initialLocations, filterCompanies, googl
                 </div>
 
                 {/* ══════════════ MAP ══════════════ */}
-                <div className="flex-1 h-full relative bg-slate-200">
+                <div className="flex-1 h-full relative bg-slate-200 order-first md:order-none">
                     <Map
                         mapId="KIKANCLOUD_MAP"
                         defaultCenter={defaultCenter}
@@ -574,12 +592,37 @@ export default function RoutingClient({ initialLocations, filterCompanies, googl
                     </Map>
 
                     {/* ── Sidebar toggle button ── */}
+                    {/* Desktop: top-left | Mobile: bottom-right floating button */}
                     <button
                         onClick={() => setIsSidebarOpen(v => !v)}
-                        className="absolute top-3 left-3 z-30 w-9 h-9 bg-white rounded-xl shadow-md border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50 transition-all"
+                        className="hidden md:flex absolute top-3 left-3 z-30 w-9 h-9 bg-white rounded-xl shadow-md border border-slate-200 items-center justify-center text-slate-600 hover:bg-slate-50 transition-all"
                         title={isSidebarOpen ? 'サイドバーを隠す' : 'サイドバーを表示'}
                     >
                         <List size={16} />
+                    </button>
+                    {/* Mobile toggle — floating pill chip */}
+                    <button
+                        onClick={() => setIsSidebarOpen(v => !v)}
+                        className="md:hidden fixed bottom-20 right-4 z-50 flex items-center gap-2 px-4 py-2.5 rounded-full transition-all active:scale-95"
+                        style={{
+                            background: 'rgba(255,255,255,0.95)',
+                            backdropFilter: 'blur(12px)',
+                            WebkitBackdropFilter: 'blur(12px)',
+                            border: '1px solid rgba(0,103,184,0.2)',
+                            boxShadow: '0 4px 20px rgba(0,0,0,0.18), 0 1px 4px rgba(0,103,184,0.15)',
+                        }}
+                    >
+                        {isSidebarOpen ? (
+                            <>
+                                <X size={15} className="text-slate-500 shrink-0" />
+                                <span className="text-[12px] font-black text-slate-600 whitespace-nowrap">閉じる</span>
+                            </>
+                        ) : (
+                            <>
+                                <MapPinIcon size={15} className="text-[#0067b8] shrink-0" />
+                                <span className="text-[12px] font-black text-[#0067b8] whitespace-nowrap">一覧を開く</span>
+                            </>
+                        )}
                     </button>
 
 

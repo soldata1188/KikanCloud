@@ -76,6 +76,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
     const [filterVisaStatus, setFilterVisaStatus] = useState('all')
     const [filterNationality, setFilterNationality] = useState('all')
     const [filterEntryBatch, setFilterEntryBatch] = useState('all')
+    const [filterEntryYear, setFilterEntryYear] = useState('all')
     const [currentPage, setCurrentPage] = useState(1)
     const [isBulkEditModalOpen, setIsBulkEditModalOpen] = useState(false)
     const [batchForm, setBatchForm] = useState({
@@ -98,6 +99,12 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
     const visaStatusList = Array.from(new Set(workers.map(w => (w as any).visa_status).filter(Boolean))) as string[]
     const nationalityList = Array.from(new Set(workers.map(w => (w as any).nationality).filter(Boolean))) as string[]
     const entryBatchList = Array.from(new Set(workers.map(w => (w as any).entry_batch).filter(Boolean))) as string[]
+    const entryYearList = Array.from(new Set(
+        workers
+            .map(w => (w as any).entry_date)
+            .filter(Boolean)
+            .map((d: string) => d.substring(0, 4))
+    )).sort().reverse() as string[]
 
     useEffect(() => { setWorkers(initialWorkers); }, [initialWorkers])
 
@@ -136,6 +143,10 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
             result = result.filter(w => (w as any).entry_batch === filterEntryBatch)
         }
 
+        if (filterEntryYear !== 'all') {
+            result = result.filter(w => ((w as any).entry_date || '').startsWith(filterEntryYear))
+        }
+
         // Sort by entry_date DESC (Latest first)
         result.sort((a, b) => {
             const dateA = (a.entry_date || '0000-00-00')
@@ -146,7 +157,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
         setFiltered(result)
         setSelectedIds([])
         setCurrentPage(1)
-    }, [searchTerm, filterCompany, filterIndustry, filterVisaStatus, filterNationality, filterEntryBatch, activeTab, workers])
+    }, [searchTerm, filterCompany, filterIndustry, filterVisaStatus, filterNationality, filterEntryBatch, filterEntryYear, activeTab, workers])
 
     const totalPages = Math.ceil(filtered.length / PAGE_SIZE)
     const paginated = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
@@ -313,6 +324,18 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                         className="text-[11px] border border-gray-200 rounded-md px-2 py-1.5 bg-gray-50 outline-none focus:border-[#0067b8] cursor-pointer font-bold text-gray-600 h-8 shrink-0 hidden sm:block">
                         <option value="all">国籍: 全て</option>
                         {nationalityList.sort().map(n => <option key={n} value={n}>{n}</option>)}
+                    </select>
+                    {/* 入国日フィルター */}
+                    <select value={filterEntryYear} onChange={e => setFilterEntryYear(e.target.value)}
+                        className="text-[11px] border border-gray-200 rounded-md px-2 py-1.5 bg-gray-50 outline-none focus:border-[#0067b8] cursor-pointer font-bold text-gray-600 h-8 shrink-0 max-w-[110px]">
+                        <option value="all">入国日: 全て</option>
+                        {entryYearList.map(y => <option key={y} value={y}>{y}年入国</option>)}
+                    </select>
+                    {/* 入国期生フィルター */}
+                    <select value={filterEntryBatch} onChange={e => setFilterEntryBatch(e.target.value)}
+                        className="text-[11px] border border-gray-200 rounded-md px-2 py-1.5 bg-gray-50 outline-none focus:border-[#0067b8] cursor-pointer font-bold text-gray-600 h-8 shrink-0 max-w-[110px]">
+                        <option value="all">期生: 全て</option>
+                        {entryBatchList.sort().map(b => <option key={b} value={b}>{b}期生</option>)}
                     </select>
                 </div>
             </div>

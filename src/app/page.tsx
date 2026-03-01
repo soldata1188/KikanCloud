@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import { headers } from 'next/headers'
 import { Sidebar } from '@/components/Sidebar'
 import { TopNav } from '@/components/TopNav'
 import DashboardClient from './DashboardClient'
@@ -13,6 +14,13 @@ export default async function DashboardPage() {
 
     const { data: userProfile } = await supabase.from('users').select('full_name, role, tenant_id').eq('id', user.id).single()
     if (userProfile?.role === 'company_admin') redirect('/portal')
+
+    // ── Mobile redirect ──────────────────────────────────────
+    const headersList = await headers()
+    const ua = headersList.get('user-agent') || ''
+    const isMobile = /android|iphone|ipad|ipod|mobile|tablet/i.test(ua)
+    if (isMobile) redirect('/workers')
+    // ─────────────────────────────────────────────────────────
 
     const tenantId = userProfile?.tenant_id
 

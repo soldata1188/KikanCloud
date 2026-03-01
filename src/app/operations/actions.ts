@@ -85,7 +85,7 @@ export async function updateWorkerStatus(workerId: string, column: string, value
         const statusMap: Record<string, string> = {
             '未入国': 'waiting',
             '対応中': 'standby',
-            '就業中': 'working',
+            '在籍中': 'working',
             '失踪': 'missing',
             '帰国': 'returned'
         }

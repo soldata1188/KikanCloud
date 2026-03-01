@@ -40,9 +40,8 @@ const SYSTEM_TABS = [
 ];
 
 const STATUS_SEG_TABS = [
-    { key: 'all', label: 'すべて', statuses: ['未入国', '対応中', '就業中', '失踪', '帰国', '転籍済'] },
     { key: 'waiting', label: '未入国', statuses: ['未入国'] },
-    { key: 'active', label: '在籍中', statuses: ['対応中', '就業中'] },
+    { key: 'active', label: '在籍中', statuses: ['対応中', '在籍中'] },
     { key: 'working', label: '処理中', statuses: ['失踪', '帰国', '転籍済'] },
 ];
 
@@ -53,10 +52,21 @@ const cycleProgress = (current: string) => {
 
 // ── Badge helpers ────────────────────────────────────────────────
 const statusBadgeCls = (s: string) => {
-    if (s === '就業中' || s === '在籍中' || s === '在留中') return 'bg-emerald-50 text-emerald-700 border-emerald-200 uppercase font-bold'
+    if (s === '在籍中' || s === '在留中') return 'bg-emerald-50 text-emerald-700 border-emerald-200 uppercase font-bold'
     if (s === '対応中') return 'bg-blue-50 text-[#0067b8] border-blue-200 font-bold'
     if (s === '失踪') return 'bg-rose-50 text-rose-700 border-rose-200 font-bold'
     return 'bg-gray-100 text-gray-500 border-gray-200 font-medium' // 帰国, 転籍済, 未入国
+}
+
+// ── Card color by status ──────────────────────────────────────────
+const workerCardCls = (s: string) => {
+    if (s === '在籍中' || s === '在留中')
+        return 'bg-emerald-50/40 border-l-[3px] border-l-emerald-400'
+    if (s === '対応中')
+        return 'bg-blue-50/40 border-l-[3px] border-l-[#0067b8]'
+    if (s === '失踪')
+        return 'bg-rose-50/40 border-l-[3px] border-l-rose-400'
+    return 'bg-white/20 border-l-[3px] border-l-gray-300' // 帰国, 転籍済, 未入国
 }
 
 const progressBadgeCls = (p: string) => {
@@ -131,7 +141,7 @@ export default function OperationsClient({
 
     const mappedWorkers = initialWorkers.map(w => {
         const reverseStatusMap: Record<string, string> = {
-            'waiting': '未入国', 'standby': '対応中', 'working': '就業中', 'missing': '失踪', 'returned': '帰国'
+            'waiting': '未入国', 'standby': '対応中', 'working': '在籍中', 'missing': '失踪', 'returned': '帰国'
         };
         return {
             id: w.id,
@@ -150,7 +160,7 @@ export default function OperationsClient({
             cert_end_date: w.cert_end_date || '',
             remarks: w.remarks || '',
             address: w.address || '',
-            status: reverseStatusMap[w.status] || '未入国',
+            status: (reverseStatusMap[w.status] || '未入国'),
             kenteiStatus: (typeof w.kentei_status === 'object' && w.kentei_status
                 ? w.kentei_status
                 : { type: '---', progress: '未着手', assignee: '---', exam_date_written: '', exam_date_practical: '' }) as OperationData,
@@ -166,7 +176,7 @@ export default function OperationsClient({
     // ── State ────────────────────────────────────────────────────
     const [workers, setWorkers] = useState(mappedWorkers);
     const [activeSystemTab, setActiveSystemTab] = useState('ginou_jisshu');
-    const [activeSubTab, setActiveSubTab] = useState('all');
+    const [activeSubTab, setActiveSubTab] = useState('active');
     const [filterCompany, setFilterCompany] = useState('すべて');
     const [filterOccupation, setFilterOccupation] = useState('すべて');
     const [filterEntryBatch, setFilterEntryBatch] = useState('すべて');
@@ -361,12 +371,16 @@ export default function OperationsClient({
 
     // ── Render ───────────────────────────────────────────────────
     return (
-        <div className="bg-[#f8f9fa] min-h-full flex flex-col relative">
-            {/* Micro-Dot Grid (Blue on Light Base) */}
-            <div className="absolute inset-0 pointer-events-none opacity-[0.08] z-0"
-                style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, #0067b8 1px, transparent 0)', backgroundSize: '32px 32px' }} />
+        <div className="min-h-full flex flex-col relative">
+            {/* ── Micro-Dot Grid overlay ── */}
+            <div className="fixed inset-0 pointer-events-none z-0"
+                style={{
+                    backgroundImage: 'radial-gradient(circle at 1px 1px, #0067b8 1px, transparent 0)',
+                    backgroundSize: '28px 28px',
+                    opacity: 0.07,
+                }} />
             {/* ══ STICKY HEADER: Responsive wrapping bar ══ */}
-            <div className="sticky top-0 z-[100] bg-white border-b border-gray-200 shadow-sm px-6 min-h-[52px] py-2 flex flex-wrap items-center gap-x-6 gap-y-3">
+            <div className="sticky top-0 z-[100] bg-white/80 backdrop-blur-md border-b border-gray-200/70 shadow-sm px-6 min-h-[52px] py-2 flex flex-wrap items-center gap-x-6 gap-y-3">
 
                 {/* Left: System Tabs (pill style) */}
                 <div className="flex items-center gap-1 shrink-0">
@@ -374,7 +388,7 @@ export default function OperationsClient({
                         const isActive = activeSystemTab === tab.key;
                         return (
                             <button key={tab.key}
-                                onClick={() => { setActiveSystemTab(tab.key); setActiveSubTab('all'); }}
+                                onClick={() => { setActiveSystemTab(tab.key); setActiveSubTab('waiting'); }}
                                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[12px] font-bold transition-all whitespace-nowrap
                                     ${isActive ? 'bg-blue-50 text-[#0067b8]' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'}`}>
                                 {tab.label}
@@ -407,56 +421,16 @@ export default function OperationsClient({
                     )}
 
                     {activeSystemTab !== 'exam' && (
-                        <>
+                        <div className="flex items-center gap-3">
                             <div className="w-px h-5 bg-gray-200 shrink-0" />
-                            <select value={filterCompany} onChange={e => setFilterCompany(e.target.value)}
-                                className="text-[11px] border border-gray-200 rounded-md px-2.5 py-1.5 bg-gray-50 outline-none focus:border-[#0067b8] cursor-pointer transition-colors font-bold text-gray-600 h-8 shrink-0 hover:bg-white">
-                                <option value="すべて">企業: すべて</option>
-                                {companyOptions.map(c => <option key={c} value={c}>{c}</option>)}
-                            </select>
-                            <select value={filterOccupation} onChange={e => setFilterOccupation(e.target.value)}
-                                className="text-[11px] border border-gray-200 rounded-md px-2.5 py-1.5 bg-gray-50 outline-none focus:border-[#0067b8] cursor-pointer transition-colors font-bold text-gray-600 h-8 shrink-0 hover:bg-white">
-                                <option value="すべて">職種: すべて</option>
-                                {occupationOptions.map(o => <option key={o} value={o}>{o}</option>)}
-                            </select>
-                            <select value={filterEntryBatch} onChange={e => setFilterEntryBatch(e.target.value)}
-                                className="text-[11px] border border-gray-200 rounded-md px-2.5 py-1.5 bg-gray-50 outline-none focus:border-[#0067b8] cursor-pointer transition-colors font-bold text-gray-600 h-8 shrink-0 hover:bg-white">
-                                <option value="すべて">入国期生: すべて</option>
-                                {entryBatchOptions.map(b => <option key={String(b)} value={String(b)}>{b}</option>)}
-                            </select>
-
-                            <div className="w-px h-5 bg-gray-200 shrink-0" />
-
-                            {/* Sort buttons */}
-                            {([
-                                { key: 'visaExpiry', label: '在留期限' },
-                                { key: 'certEnd', label: '修了日' },
-                                { key: 'entryDate', label: '入国日' },
-                            ] as const).map(({ key, label }) => {
-                                const isActive = sortBy === key;
-                                const Icon = !isActive ? ArrowUpDown : sortDir === 'asc' ? ArrowUp : ArrowDown;
-                                return (
-                                    <button key={key}
-                                        onClick={() => handleSort(key)}
-                                        className={`flex items-center gap-1 h-8 px-2.5 rounded-md text-[11px] font-bold border transition-all shrink-0
-                                            ${isActive
-                                                ? 'bg-blue-50 border-[#0067b8] text-[#0067b8]'
-                                                : 'bg-gray-50 border-gray-200 text-gray-500 hover:border-gray-300 hover:text-gray-700'}`}>
-                                        <Icon size={11} strokeWidth={2.5} />
-                                        {label}
-                                    </button>
-                                );
-                            })}
-                            <div className="w-px h-5 bg-gray-200 shrink-0" />
-
-                            {/* Search bar grouped with filters/sort */}
+                            {/* Search bar stays in the sticky header as it is a primary tool */}
                             <div className="relative shrink-0">
                                 <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
                                 <input type="text" placeholder="名前・企業名で検索..."
                                     value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-                                    className="pl-8 pr-3 py-1.5 bg-gray-50 border border-gray-200 rounded-md text-[12px] w-[200px] h-8 outline-none focus:bg-white focus:border-[#0067b8] transition-all" />
+                                    className="pl-8 pr-3 py-1.5 bg-gray-50 border border-gray-200 rounded-md text-[12px] w-[220px] h-8 outline-none focus:bg-white focus:border-[#0067b8] transition-all" />
                             </div>
-                        </>
+                        </div>
                     )}
                 </div>
 
@@ -469,123 +443,80 @@ export default function OperationsClient({
                     <ExamTab workers={workers} onUpdate={handleOperationChange} staff={staff} />
                 </div>
             ) : (
-                <div className="flex flex-col flex-1">
+                <div className="flex flex-col flex-1 relative z-10">
+
+                    {/* ── Filter & Sort Bar (Background Area) ── */}
+                    {activeSystemTab !== 'exam' && (
+                        <div className="max-w-[1440px] mx-auto w-full px-6 pt-6 flex flex-wrap items-center gap-x-4 gap-y-3">
+                            {/* Filter Selects */}
+                            <div className="flex items-center gap-2">
+                                <select value={filterCompany} onChange={e => setFilterCompany(e.target.value)}
+                                    className="text-[12px] border border-gray-200 rounded-md px-3 py-2 bg-white outline-none focus:border-[#0067b8] cursor-pointer shadow-sm transition-all font-bold text-gray-700 hover:border-gray-300">
+                                    <option value="すべて">企業: すべて</option>
+                                    {companyOptions.map(c => <option key={c} value={c}>{c}</option>)}
+                                </select>
+                                <select value={filterOccupation} onChange={e => setFilterOccupation(e.target.value)}
+                                    className="text-[12px] border border-gray-200 rounded-md px-3 py-2 bg-white outline-none focus:border-[#0067b8] cursor-pointer shadow-sm transition-all font-bold text-gray-700 hover:border-gray-300">
+                                    <option value="すべて">職種: すべて</option>
+                                    {occupationOptions.map(o => <option key={o} value={o}>{o}</option>)}
+                                </select>
+                                <select value={filterEntryBatch} onChange={e => setFilterEntryBatch(e.target.value)}
+                                    className="text-[12px] border border-gray-200 rounded-md px-3 py-2 bg-white outline-none focus:border-[#0067b8] cursor-pointer shadow-sm transition-all font-bold text-gray-700 hover:border-gray-300">
+                                    <option value="すべて">入国期生: すべて</option>
+                                    {entryBatchOptions.map(b => <option key={String(b)} value={String(b)}>{b}</option>)}
+                                </select>
+                            </div>
+
+                            <div className="hidden md:block w-px h-6 bg-gray-300/50" />
+
+                            {/* Sort Buttons */}
+                            <div className="flex items-center gap-2">
+                                <span className="text-[11px] font-black text-gray-400 uppercase tracking-widest mr-1">並び替え:</span>
+                                {([
+                                    { key: 'visaExpiry', label: '在留期限' },
+                                    { key: 'certEnd', label: '修了日' },
+                                    { key: 'entryDate', label: '入国日' },
+                                ] as const).map(({ key, label }) => {
+                                    const isActive = sortBy === key;
+                                    const Icon = !isActive ? ArrowUpDown : sortDir === 'asc' ? ArrowUp : ArrowDown;
+                                    return (
+                                        <button key={key}
+                                            onClick={() => handleSort(key)}
+                                            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-[12px] font-bold border transition-all shadow-sm
+                                                ${isActive
+                                                    ? 'bg-[#0067b8] border-[#0067b8] text-white'
+                                                    : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50'}`}>
+                                            <Icon size={13} strokeWidth={isActive ? 3 : 2} />
+                                            {label}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    )}
 
 
                     {/* ── Select-all + count ── */}
-                    <div className="max-w-[1440px] mx-auto w-full flex justify-between items-center px-4 mb-3 text-[12px] text-gray-500 font-medium">
-                        <label className="flex items-center gap-2 cursor-pointer select-none">
+                    <div className="max-w-[1440px] mx-auto w-full flex justify-between items-center px-6 mb-3 text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                        <label className="flex items-center gap-2 cursor-pointer select-none hover:text-gray-600 transition-colors">
                             <input type="checkbox"
                                 checked={paginatedWorkers.length > 0 && paginatedWorkers.every(w => selectedIds.has(w.id))}
                                 onChange={toggleSelectAll}
-                                className="rounded border-gray-300 text-[#0067b8] focus:ring-[#0067b8]" />
+                                className="w-3.5 h-3.5 rounded border-gray-300 text-[#0067b8] focus:ring-[#0067b8]" />
                             すべて選択
                         </label>
-                        <span>{processedWorkers.length} 名の{currentSystemTab?.label} (ページ {currentPage} / {totalPages || 1})</span>
+                        <span className="tabular-nums">{currentPage} / {totalPages || 1} ページ — {processedWorkers.length}名</span>
                     </div>
 
 
-                    {/* ════ 一括操作 RIGHT SIDEBAR (Fixed) ════ */}
-                    <div className={`fixed top-[53px] right-0 h-[calc(100vh-53px)] z-[200] transition-transform duration-300 ease-in-out ${selectedIds.size > 0 ? 'translate-x-0' : 'translate-x-full'}`}
-                        style={{ width: '300px' }}>
-                        <div className="h-full bg-white border-l border-gray-200 flex flex-col shadow-2xl">
-
-                            {/* Header */}
-                            <div className="px-5 py-4 border-b border-gray-100 bg-gray-50 flex items-center justify-between shrink-0">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 rounded-full bg-[#0067b8] flex items-center justify-center text-[15px] font-black text-white">{selectedIds.size}</div>
-                                    <div>
-                                        <div className="text-[15px] font-black text-gray-900 leading-none">一括操作</div>
-                                        <div className="text-[11px] text-gray-400 mt-0.5">空欄はスキップされます</div>
-                                    </div>
-                                </div>
-                                <button onClick={() => setSelectedIds(new Set())}
-                                    className="text-gray-400 hover:text-gray-700 transition-colors p-1 rounded hover:bg-gray-100">
-                                    <X size={18} />
-                                </button>
-                            </div>
-
-                            {/* Fields */}
-                            <div className="flex-1 px-4 py-4 space-y-5 overflow-y-auto">
-
-                                {/* 在籍状況 */}
-                                <div>
-                                    <div className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2.5">在籍状況</div>
-                                    <div>
-                                        <div className="text-[12px] text-gray-500 font-medium mb-1">進捗更新</div>
-                                        <select value={batchForm.worker_status} onChange={e => setBatchForm(p => ({ ...p, worker_status: e.target.value }))}
-                                            className="w-full text-[13px] rounded-md bg-white text-gray-800 border border-gray-200 py-1.5 px-2.5 outline-none focus:border-[#0067b8] focus:ring-1 focus:ring-[#0067b8]/20 transition-colors">
-                                            <option value="">---</option>
-                                            {['未入国', '対応中', '就業中', '失踪', '帰国', '転籍済'].map(s => (
-                                                <option key={s} value={s}>{s}</option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div className="border-t border-gray-100" />
-
-                                {/* 機構業務 */}
-                                <div>
-                                    <div className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2.5">機構業務</div>
-                                    <div className="space-y-3">
-                                        {[
-                                            { label: '申請内容', el: <select value={batchForm.kikou_type} onChange={e => setBatchForm(p => ({ ...p, kikou_type: e.target.value }))} className="w-full text-[13px] rounded-md bg-white text-gray-800 border border-gray-200 py-1.5 px-2.5 outline-none focus:border-[#0067b8] transition-colors"><option value="">---</option>{KIKOU_OPTIONS.slice(1).map(o => <option key={o} value={o}>{o}</option>)}</select> },
-                                            { label: '進捗', el: <select value={batchForm.kikou_progress} onChange={e => setBatchForm(p => ({ ...p, kikou_progress: e.target.value }))} className="w-full text-[13px] rounded-md bg-white text-gray-800 border border-gray-200 py-1.5 px-2.5 outline-none focus:border-[#0067b8] transition-colors"><option value="">---</option>{PROGRESS_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}</select> },
-                                            { label: '申請日', el: <input type="date" value={batchForm.kikou_application_date} onChange={e => setBatchForm(p => ({ ...p, kikou_application_date: e.target.value }))} className="w-full text-[13px] rounded-md bg-white text-gray-800 border border-gray-200 py-1.5 px-2.5 outline-none focus:border-[#0067b8] transition-colors" /> },
-                                            { label: '担当者', el: <select value={batchForm.kikou_assignee} onChange={e => setBatchForm(p => ({ ...p, kikou_assignee: e.target.value }))} className="w-full text-[13px] rounded-md bg-white text-gray-800 border border-gray-200 py-1.5 px-2.5 outline-none focus:border-[#0067b8] transition-colors"><option value="">---</option>{staff.map(s => <option key={s.id} value={s.full_name}>{s.full_name}</option>)}</select> },
-                                            { label: '認定開始', el: <input type="date" value={batchForm.cert_start_date} onChange={e => setBatchForm(p => ({ ...p, cert_start_date: e.target.value }))} className="w-full text-[13px] rounded-md bg-white text-gray-800 border border-gray-200 py-1.5 px-2.5 outline-none focus:border-[#0067b8] transition-colors" /> },
-                                            { label: '認定終了', el: <input type="date" value={batchForm.cert_end_date} onChange={e => setBatchForm(p => ({ ...p, cert_end_date: e.target.value }))} className="w-full text-[13px] rounded-md bg-white text-gray-800 border border-gray-200 py-1.5 px-2.5 outline-none focus:border-[#0067b8] transition-colors" /> },
-                                        ].map(({ label, el }) => (
-                                            <div key={label}>
-                                                <div className="text-[12px] text-gray-500 font-medium mb-1">{label}</div>
-                                                {el}
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                <div className="border-t border-gray-100" />
-
-                                {/* 入管業務 */}
-                                <div>
-                                    <div className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2.5">入管業務</div>
-                                    <div className="space-y-3">
-                                        {[
-                                            { label: '申請内容', el: <select value={batchForm.nyukan_type} onChange={e => setBatchForm(p => ({ ...p, nyukan_type: e.target.value }))} className="w-full text-[13px] rounded-md bg-white text-gray-800 border border-gray-200 py-1.5 px-2.5 outline-none focus:border-[#0067b8] transition-colors"><option value="">---</option>{NYUKAN_OPTIONS.slice(1).map(o => <option key={o} value={o}>{o}</option>)}</select> },
-                                            { label: '進捗', el: <select value={batchForm.nyukan_progress} onChange={e => setBatchForm(p => ({ ...p, nyukan_progress: e.target.value }))} className="w-full text-[13px] rounded-md bg-white text-gray-800 border border-gray-200 py-1.5 px-2.5 outline-none focus:border-[#0067b8] transition-colors"><option value="">---</option>{PROGRESS_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}</select> },
-                                            { label: '申請日', el: <input type="date" value={batchForm.nyukan_application_date} onChange={e => setBatchForm(p => ({ ...p, nyukan_application_date: e.target.value }))} className="w-full text-[13px] rounded-md bg-white text-gray-800 border border-gray-200 py-1.5 px-2.5 outline-none focus:border-[#0067b8] transition-colors" /> },
-                                            { label: '担当者', el: <select value={batchForm.nyukan_assignee} onChange={e => setBatchForm(p => ({ ...p, nyukan_assignee: e.target.value }))} className="w-full text-[13px] rounded-md bg-white text-gray-800 border border-gray-200 py-1.5 px-2.5 outline-none focus:border-[#0067b8] transition-colors"><option value="">---</option>{staff.map(s => <option key={s.id} value={s.full_name}>{s.full_name}</option>)}</select> },
-                                            { label: '受理番号', el: <input type="text" placeholder="番号を入力" value={batchForm.nyukan_receipt} onChange={e => setBatchForm(p => ({ ...p, nyukan_receipt: e.target.value }))} className="w-full text-[13px] rounded-md bg-white text-gray-800 placeholder-gray-300 border border-gray-200 py-1.5 px-2.5 outline-none focus:border-[#0067b8] transition-colors" /> },
-                                            { label: '取次者', el: <select value={batchForm.nyukan_agent} onChange={e => setBatchForm(p => ({ ...p, nyukan_agent: e.target.value }))} className="w-full text-[13px] rounded-md bg-white text-gray-800 border border-gray-200 py-1.5 px-2.5 outline-none focus:border-[#0067b8] transition-colors"><option value="">---</option>{staff.map(s => <option key={s.id} value={s.full_name}>{s.full_name}</option>)}</select> },
-                                        ].map(({ label, el }) => (
-                                            <div key={label}>
-                                                <div className="text-[12px] text-gray-500 font-medium mb-1">{label}</div>
-                                                {el}
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Apply button */}
-                            <div className="px-4 py-4 border-t border-gray-100 bg-gray-50 shrink-0">
-                                <button onClick={applyBatch}
-                                    className="w-full bg-[#0067b8] text-white py-3 rounded-lg text-[14px] font-black hover:bg-blue-700 transition-all flex items-center justify-center gap-2 shadow-sm">
-                                    <CheckCircle2 size={16} />
-                                    {selectedIds.size}名に一括適用
-                                </button>
-                            </div>
-                        </div>
-                    </div>
 
                     {/* ════════════════════════════════════════════
                         WORKER ROWS
                     ════════════════════════════════════════════ */}
                     <div className="max-w-[1440px] mx-auto w-full px-4 pb-4 overflow-x-auto">
-                        <div className="w-full min-w-[1100px] space-y-3">
+                        <div className="w-full min-w-[1100px] divide-y divide-gray-300/80 border border-gray-300/80 rounded-md overflow-hidden">
                             {paginatedWorkers.length === 0 && (
-                                <div className="bg-white border border-gray-200 rounded-md p-16 text-center text-gray-400 text-sm">
+                                <div className="bg-white/40 backdrop-blur-sm border border-gray-200/60 rounded-md p-16 text-center text-gray-400 text-sm">
                                     データがありません。
                                 </div>
                             )}
@@ -597,11 +528,13 @@ export default function OperationsClient({
 
                                 return (
                                     <div key={worker.id}
-                                        className={`bg-white border rounded-md flex transition-all
-                                        ${isSel ? 'border-[#0067b8] bg-blue-50/10' : 'border-gray-200'}`}>
+                                        className={`flex transition-all
+                                        ${isSel
+                                                ? 'bg-blue-50/20 outline outline-1 outline-[#0067b8]'
+                                                : workerCardCls(worker.status)}`}>
 
                                         {/* ══ COL 1 — Worker Info (380px) ═══════════════ */}
-                                        <div className="w-[380px] shrink-0 border-r border-gray-100 p-3 flex gap-3 relative">
+                                        <div className="w-[380px] shrink-0 border-r border-gray-200 p-3 flex gap-3 relative bg-white">
                                             <input type="checkbox" checked={isSel} onChange={() => toggleSelect(worker.id)}
                                                 className="mt-1 rounded border-gray-300 text-[#0067b8] cursor-pointer shrink-0 focus:ring-0 w-4 h-4" />
 
@@ -670,7 +603,7 @@ export default function OperationsClient({
                                         </div>
 
                                         {/* ══ COL 2 — 機構業務 (260px) ═════════════════ */}
-                                        <div className="w-[260px] shrink-0 border-r border-gray-100 p-3 hover:bg-gray-50 transition-colors">
+                                        <div className="w-[260px] shrink-0 border-r border-gray-100 p-3 hover:bg-white/20 transition-colors">
                                             <div className="flex items-center gap-2 mb-2">
                                                 <ProgressIcon p={worker.kikouStatus.progress} />
                                                 <span className="text-[12px] font-bold text-gray-800">機構業務</span>
@@ -752,7 +685,7 @@ export default function OperationsClient({
                                         </div>
 
                                         {/* ══ COL 3 — 入管業務 (260px) ═════════════════ */}
-                                        <div className="w-[260px] shrink-0 border-r border-gray-100 p-3 hover:bg-gray-50 transition-colors">
+                                        <div className="w-[260px] shrink-0 border-r border-gray-100 p-3 hover:bg-white/20 transition-colors">
                                             <div className="flex items-center gap-2 mb-2">
                                                 <ProgressIcon p={worker.nyukanStatus.progress} />
                                                 <span className="text-[12px] font-bold text-gray-800">入管業務</span>
@@ -835,7 +768,7 @@ export default function OperationsClient({
                                         </div>
 
                                         {/* ══ COL 4 — メモ (flex-1) ═════════════════════ */}
-                                        <div className="flex-1 p-3 bg-gray-50/10 min-w-[200px]">
+                                        <div className="flex-1 p-3 min-w-[200px]">
                                             <div className="flex justify-between items-center mb-1">
                                                 <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">メモ (Memo)</span>
                                                 <button
@@ -849,7 +782,7 @@ export default function OperationsClient({
                                                 value={worker.remarks}
                                                 onChange={(e) => setWorkers(prev => prev.map(w => w.id === worker.id ? { ...w, remarks: e.target.value } : w))}
                                                 onBlur={() => handleRemarksBlur(worker.id)}
-                                                className="w-full h-24 p-2 text-[12px] bg-white border border-gray-200 rounded-md text-gray-700 leading-relaxed outline-none focus:border-[#0067b8] transition-all resize-none"
+                                                className="w-full h-24 p-2 text-[12px] bg-white/50 border border-gray-200/70 rounded-md text-gray-700 leading-relaxed outline-none focus:border-[#0067b8] focus:bg-white/80 transition-all resize-none"
                                                 placeholder="メモを入力..."
                                             />
                                         </div>
@@ -875,10 +808,10 @@ export default function OperationsClient({
                                         <button
                                             key={p}
                                             onClick={() => setCurrentPage(p)}
-                                            className={`w-8 h-8 flex items-center justify-center rounded-md text-[12px] font-bold transition-colors
+                                            className={`w-7 h-7 flex items-center justify-center rounded-md text-[11px] font-black transition-colors
                                             ${currentPage === p
-                                                    ? 'bg-[#0067b8] text-white'
-                                                    : 'text-gray-500 hover:bg-gray-100'}`}
+                                                    ? 'bg-[#0067b8] text-white shadow-sm'
+                                                    : 'text-gray-400 hover:bg-gray-100 hover:text-gray-700'}`}
                                         >
                                             {p}
                                         </button>
@@ -981,6 +914,104 @@ export default function OperationsClient({
                     </div>
                 )
             }
-        </div >
+            {/* ════ 一括操作 RIGHT SIDEBAR (Fixed & Top-most) ════ */}
+            <div className={`fixed top-0 right-0 h-full z-[800] transition-transform duration-300 ease-in-out ${selectedIds.size > 0 ? 'translate-x-0' : 'translate-x-full'}`}
+                style={{ width: '320px' }}>
+                <div className="h-full bg-white border-l border-gray-200 flex flex-col shadow-2xl">
+
+                    {/* Header */}
+                    <div className="px-5 py-4 border-b border-gray-100 bg-gray-50 flex items-center justify-between shrink-0">
+                        <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-[#0067b8] flex items-center justify-center text-[15px] font-black text-white">{selectedIds.size}</div>
+                            <div className="text-[15px] font-black text-gray-900 leading-none">一括操作</div>
+                        </div>
+                        <button onClick={() => setSelectedIds(new Set())}
+                            className="text-gray-400 hover:text-gray-700 transition-colors p-1 rounded-full hover:bg-gray-100">
+                            <X size={18} />
+                        </button>
+                    </div>
+
+                    {/* Fields */}
+                    <div className="flex-1 px-4 py-4 space-y-6 overflow-y-auto no-scrollbar">
+
+                        {/* Status Select */}
+                        <div className="space-y-4">
+                            <div>
+                                <div className="text-[11px] text-gray-500 font-bold mb-1.5 ml-1 uppercase">進捗更新</div>
+                                <select value={batchForm.worker_status} onChange={e => setBatchForm(p => ({ ...p, worker_status: e.target.value }))}
+                                    className="w-full text-[13px] rounded-lg bg-gray-50 text-gray-800 border border-gray-200 py-2.5 px-3 outline-none focus:bg-white focus:border-[#0067b8] focus:ring-1 focus:ring-[#0067b8]/20 transition-all font-bold">
+                                    <option value="">変更なし</option>
+                                    {['未入国', '対応中', '就業中', '失踪', '帰国', '転籍済'].map(s => (
+                                        <option key={s} value={s}>{s}</option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <div className="h-px bg-gray-100 mx-2" />
+
+                            {[
+                                { label: '機構：申請内容', key: 'kikou_type', options: KIKOU_OPTIONS.slice(1) },
+                                { label: '機構：進捗', key: 'kikou_progress', options: PROGRESS_OPTIONS },
+                                { label: '機構：申請日', key: 'kikou_application_date', type: 'date' },
+                                { label: '機構：担当者', key: 'kikou_assignee', options: staff.map(s => s.full_name) },
+                                { label: '機構：認定開始', key: 'cert_start_date', type: 'date' },
+                                { label: '機構：認定終了', key: 'cert_end_date', type: 'date' },
+                            ].map((field) => (
+                                <div key={field.key}>
+                                    <div className="text-[11px] text-gray-500 font-bold mb-1.5 ml-1 uppercase">{field.label}</div>
+                                    {field.type === 'date' ? (
+                                        <input type="date" value={(batchForm as any)[field.key]} onChange={e => setBatchForm(p => ({ ...p, [field.key]: e.target.value }))}
+                                            className="w-full text-[13px] rounded-lg bg-gray-50 text-gray-800 border border-gray-200 py-2.5 px-3 outline-none focus:bg-white focus:border-[#0067b8] transition-all font-bold" />
+                                    ) : (
+                                        <select value={(batchForm as any)[field.key]} onChange={e => setBatchForm(p => ({ ...p, [field.key]: e.target.value }))}
+                                            className="w-full text-[13px] rounded-lg bg-gray-50 text-gray-800 border border-gray-200 py-2.5 px-3 outline-none focus:bg-white focus:border-[#0067b8] transition-all font-bold">
+                                            <option value="">変更なし</option>
+                                            {field.options?.map((o: any) => <option key={o} value={o}>{o}</option>)}
+                                        </select>
+                                    )}
+                                </div>
+                            ))}
+
+                            <div className="h-px bg-gray-100 mx-2" />
+
+                            {[
+                                { label: '入管：申請内容', key: 'nyukan_type', options: NYUKAN_OPTIONS.slice(1) },
+                                { label: '入管：進捗', key: 'nyukan_progress', options: PROGRESS_OPTIONS },
+                                { label: '入管：申請日', key: 'nyukan_application_date', type: 'date' },
+                                { label: '入管：担当者', key: 'nyukan_assignee', options: staff.map(s => s.full_name) },
+                                { label: '入管：受理番号', key: 'nyukan_receipt', type: 'text', placeholder: '番号を入力' },
+                                { label: '入管：取次者', key: 'nyukan_agent', options: staff.map(s => s.full_name) },
+                            ].map((field) => (
+                                <div key={field.key}>
+                                    <div className="text-[11px] text-gray-500 font-bold mb-1.5 ml-1 uppercase">{field.label}</div>
+                                    {field.type === 'date' ? (
+                                        <input type="date" value={(batchForm as any)[field.key]} onChange={e => setBatchForm(p => ({ ...p, [field.key]: e.target.value }))}
+                                            className="w-full text-[13px] rounded-lg bg-gray-50 text-gray-800 border border-gray-200 py-2.5 px-3 outline-none focus:bg-white focus:border-[#0067b8] transition-all font-bold" />
+                                    ) : field.type === 'text' ? (
+                                        <input type="text" placeholder={field.placeholder} value={(batchForm as any)[field.key]} onChange={e => setBatchForm(p => ({ ...p, [field.key]: e.target.value }))}
+                                            className="w-full text-[13px] rounded-lg bg-gray-50 text-gray-800 border border-gray-200 py-2.5 px-3 outline-none focus:bg-white focus:border-[#0067b8] transition-all font-bold placeholder:font-normal placeholder:text-gray-300" />
+                                    ) : (
+                                        <select value={(batchForm as any)[field.key]} onChange={e => setBatchForm(p => ({ ...p, [field.key]: e.target.value }))}
+                                            className="w-full text-[13px] rounded-lg bg-gray-50 text-gray-800 border border-gray-200 py-2.5 px-3 outline-none focus:bg-white focus:border-[#0067b8] transition-all font-bold">
+                                            <option value="">変更なし</option>
+                                            {field.options?.map((o: any) => <option key={o} value={o}>{o}</option>)}
+                                        </select>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Footer Apply Button */}
+                    <div className="px-5 py-5 border-t border-gray-100 bg-gray-50/80 backdrop-blur-md shrink-0">
+                        <button onClick={applyBatch}
+                            className="w-full bg-[#0067b8] text-white py-4 rounded-xl text-[14px] font-black hover:bg-blue-700 transition-all flex items-center justify-center gap-3 shadow-xl active:scale-95">
+                            <CheckCircle2 size={18} />
+                            {selectedIds.size}名に一括適用
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     );
 }

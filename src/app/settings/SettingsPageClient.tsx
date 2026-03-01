@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import {
     Bell, Building2, Bot, Save,
@@ -10,6 +10,7 @@ import {
 import OrganizationForm from "../organization/OrganizationForm";
 import TeamManagerClient from "../accounts/TeamManagerClient";
 import { createClient } from "@/lib/supabase/client";
+import { logout } from "../login/actions";
 
 // ── Types ─────────────────────────────────────────────────────────
 type TabId = "account" | "notifications" | "organization" | "ai";
@@ -164,7 +165,6 @@ export default function SettingsPageClient({ currentUser, usersList, companiesLi
 
     const [activeTab, setActiveTab] = useState<TabId>(initialTab);
     const [orgSubTab, setOrgSubTab] = useState<"profile" | "accounts">("profile");
-    const [isLoggingOut, startTransition] = useTransition();
 
     const [emailAlerts, setEmailAlerts] = useState(true);
     const [pushAlerts, setPushAlerts] = useState(false);
@@ -209,22 +209,13 @@ export default function SettingsPageClient({ currentUser, usersList, companiesLi
 
                     <button
                         onClick={async () => {
-                            if (confirm('ログアウトしますか？')) {
-                                startTransition(async () => {
-                                    const devSupabase = createClient();
-                                    await devSupabase.auth.signOut();
-                                    window.location.href = '/login';
-                                });
+                            if (window.confirm('ログアウトしますか？')) {
+                                await logout();
                             }
                         }}
-                        disabled={isLoggingOut}
-                        className={`flex items-center gap-3 px-4 py-2 text-xs font-bold rounded-md transition-all duration-150 text-red-500 hover:bg-red-50/70 border border-transparent hover:border-red-100 group ${isLoggingOut ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        className="flex items-center gap-3 px-4 py-2 text-xs font-bold rounded-md transition-all duration-300 text-red-600 bg-red-50 hover:bg-red-100 shadow-sm active:scale-95 group w-full"
                     >
-                        {isLoggingOut ? (
-                            <div className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                        ) : (
-                            <LogOut size={14} strokeWidth={2.5} className="text-red-400 group-hover:text-red-600 transition-colors" />
-                        )}
+                        <LogOut size={14} strokeWidth={2.5} className="group-hover:rotate-12 transition-transform" />
                         <span>ログアウト</span>
                     </button>
                 </nav>

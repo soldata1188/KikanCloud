@@ -83,11 +83,11 @@ export default async function DashboardPage() {
     }
 
     return (
-        <div className="flex h-screen bg-white font-sans text-slate-900 overflow-hidden selection:bg-emerald-500/20">
+        <div className="flex h-screen font-sans text-slate-900 overflow-hidden selection:bg-emerald-500/20">
             <Sidebar active="dashboard" />
             <div className="flex-1 flex flex-col relative min-w-0">
                 <TopNav title="ホーム" role={userProfile?.role} />
-                <main className="flex-1 overflow-y-auto p-6 md:p-8 relative bg-[#f8f9fa]">
+                <main className="flex-1 overflow-y-auto p-6 md:p-8 relative">
                     {/* Micro-Dot Grid Overlay */}
                     <div className="absolute inset-0 pointer-events-none opacity-[0.08] z-0"
                         style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, #0067b8 1px, transparent 0)', backgroundSize: '32px 32px' }} />

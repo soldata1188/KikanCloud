@@ -155,7 +155,7 @@ export default function EditCompanyClient({ company }: { company: any }) {
     const inputCls = 'w-full bg-white/50 focus:bg-white border border-gray-200 focus:border-[#0067b8] rounded px-3 py-1.5 text-[13px] font-bold outline-none text-gray-900 transition-all placeholder:text-gray-300 placeholder:font-normal';
 
     return (
-        <div className="flex-1 flex flex-col h-full bg-gray-50 relative overflow-hidden">
+        <div className="flex-1 flex flex-col h-full bg-transparent relative overflow-hidden">
 
             {/* Toast */}
             {toastError && (
@@ -176,7 +176,7 @@ export default function EditCompanyClient({ company }: { company: any }) {
                     </Link>
                     <div className="w-px h-5 bg-gray-200" />
                     <div>
-                        <h2 className="text-[15px] font-bold text-gray-900 leading-tight tracking-tight uppercase">受入企業 編集</h2>
+                        <h2 className="text-[15px] font-bold text-gray-900 leading-tight tracking-tight uppercase">受入企業編集</h2>
                     </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -193,7 +193,7 @@ export default function EditCompanyClient({ company }: { company: any }) {
             </div>
 
             {/* ── Body ── */}
-            <div className="flex-1 flex flex-row overflow-hidden bg-gray-50">
+            <div className="flex-1 flex flex-row overflow-hidden bg-transparent">
 
                 {/* LEFT: Form */}
                 <div className="flex-1 h-full overflow-y-auto no-scrollbar pb-32">

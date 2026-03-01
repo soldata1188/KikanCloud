@@ -6,8 +6,9 @@ import Link from "next/link";
 import {
     LayoutDashboard, Users, Building2, ShieldCheck, GitMerge,
     Map, Sparkles, MessageSquare, ClipboardList, Route,
-    MoreHorizontal, X, ChevronRight, Settings,
+    MoreHorizontal, X, ChevronRight, Settings, LogOut
 } from "lucide-react";
+import { logout } from "@/app/login/actions";
 import { SidebarAvatar } from "./SidebarAvatar";
 
 const ALL_NAV_ITEMS = [
@@ -23,7 +24,7 @@ const ALL_NAV_ITEMS = [
     { id: "b2b-chat", name: "企業連絡", href: "/b2b-chat", icon: MessageSquare },
 ];
 
-const BOTTOM_PRIMARY = ["dashboard", "workers", "companies", "operations"];
+const BOTTOM_PRIMARY = ["workers", "routing", "companies"];
 
 interface SidebarClientProps {
     active: string;
@@ -45,16 +46,17 @@ export function SidebarClient({ active, userRole, userProfile }: SidebarClientPr
             {/* ══════════════════════════════════════════════════
                 DESKTOP SIDEBAR — Tech-Infused Enterprise Theme
             ══════════════════════════════════════════════════ */}
-            <aside className="hidden md:flex w-52 shrink-0 h-full flex-col bg-[#00213d] border-r border-[#00335c] overflow-y-auto relative shadow-2xl">
-                {/* Tech Pattern Overlay - High Visibility (White) */}
-                <div className="absolute inset-0 pointer-events-none opacity-15"
-                    style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '20px 20px' }} />
-                <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-blue-500/5 via-transparent to-transparent" />
+            <aside className="hidden md:flex w-52 shrink-0 h-full flex-col bg-[var(--brand-primary)] border-r border-[var(--brand-primary-dark)] overflow-y-auto relative shadow-2xl">
+                {/* Vi điểm (Micro-dot Pattern) Overlay */}
+                <div className="absolute inset-0 pointer-events-none opacity-[0.07]"
+                    style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '16px 16px' }} />
+                {/* Subtle Glow Overlay */}
+                <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-white/10 to-transparent pointer-events-none" />
 
                 {/* User / Org header */}
-                <Link href="/settings" className="p-5 block hover:bg-[#00315c] transition-all border-b border-[#00335c] group relative z-10">
+                <Link href="/settings" className="p-5 block hover:bg-white/10 transition-all border-b border-white/10 group relative z-10">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-[#0067b8] text-white flex items-center justify-center text-[13px] font-bold shadow-lg shrink-0 border-2 border-[#00335c] group-hover:scale-105 transition-transform">
+                        <div className="w-10 h-10 rounded-full bg-white text-[var(--brand-primary)] flex items-center justify-center text-[13px] font-black shadow-lg shrink-0 border-2 border-white/20 group-hover:scale-105 transition-transform">
                             {userProfile?.full_name?.charAt(0) || "SC"}
                         </div>
                         <div className="min-w-0">
@@ -74,13 +76,13 @@ export function SidebarClient({ active, userRole, userProfile }: SidebarClientPr
                             <Link key={item.href} href={item.href}
                                 className={`group relative flex items-center gap-3 px-3.5 py-2.5 rounded-md text-[13px] transition-all duration-200
                                     ${isActive
-                                        ? 'bg-[#0067b8] text-white shadow-lg shadow-blue-900/40 font-bold border border-white/10'
-                                        : 'text-blue-100/60 font-medium hover:bg-[#00315c] hover:text-white'}`}
+                                        ? 'bg-white text-[var(--brand-primary)] shadow-lg shadow-blue-900/10 font-black'
+                                        : 'text-white/80 font-bold hover:bg-white/10 hover:text-white'}`}
                             >
-                                <Icon size={16} strokeWidth={isActive ? 2.5 : 2} className={`shrink-0 transition-colors ${isActive ? 'text-white' : 'text-blue-400 group-hover:text-blue-200'}`} />
+                                <Icon size={16} strokeWidth={isActive ? 3 : 2} className={`shrink-0 transition-colors ${isActive ? 'text-[var(--brand-primary)]' : 'text-blue-100 group-hover:text-white'}`} />
                                 <span>{item.name}</span>
                                 {isActive && (
-                                    <div className="absolute right-2 w-1 h-3 bg-white/40 rounded-full" />
+                                    <div className="absolute right-2 w-1 h-3 bg-[var(--brand-primary)]/40 rounded-full" />
                                 )}
                             </Link>
                         );
@@ -108,11 +110,7 @@ export function SidebarClient({ active, userRole, userProfile }: SidebarClientPr
                             </Link>
                         );
                     })}
-                    <button onClick={() => setMoreOpen(true)}
-                        className={`flex flex-col items-center justify-center gap-0.5 py-2 flex-1 ${moreOpen ? 'text-[#0067b8]' : 'text-gray-400'}`}>
-                        <MoreHorizontal size={20} strokeWidth={2} />
-                        <span className="text-[9px] font-bold text-gray-400">もっと</span>
-                    </button>
+
                 </div>
             </nav>
 
@@ -157,7 +155,20 @@ export function SidebarClient({ active, userRole, userProfile }: SidebarClientPr
                         );
                     })}
                 </div>
-                <div className="h-4" />
+                <div className="px-5 py-4 border-t border-gray-100 flex flex-col gap-2">
+                    <button
+                        onClick={async () => {
+                            if (window.confirm('ログアウトしますか？')) {
+                                await logout();
+                            }
+                        }}
+                        className="flex items-center gap-3 w-full p-3 rounded-xl bg-red-50 text-red-600 font-bold text-[13px] active:scale-95 transition-all"
+                    >
+                        <LogOut size={16} />
+                        ログアウト
+                    </button>
+                </div>
+                <div className="h-2" />
             </div>
         </>
     );

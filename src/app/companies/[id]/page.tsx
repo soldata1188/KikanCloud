@@ -2,7 +2,6 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import CompanyDetailClient from './CompanyDetailClient'
 import { Sidebar } from '@/components/Sidebar'
-import { TopNav } from '@/components/TopNav'
 
 export default async function CompanyDetailPage(props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
@@ -44,11 +43,10 @@ export default async function CompanyDetailPage(props: { params: Promise<{ id: s
     company.workers = workers || [];
 
     return (
-        <div className="flex h-screen bg-white font-sans text-[#1f1f1f] overflow-hidden selection:bg-[#24b47e]/20">
+        <div className="flex h-screen font-sans text-[#1f1f1f] overflow-hidden selection:bg-[#24b47e]/20">
             <Sidebar active="companies" />
             <div className="flex-1 flex flex-col relative min-w-0">
-                <TopNav title="受入企業詳細" role={userProfile?.role} />
-                <main className="flex-1 overflow-y-auto relative bg-slate-50">
+                <main className="flex-1 overflow-y-auto relative">
                     <CompanyDetailClient company={company} documents={documents} />
                 </main>
             </div>

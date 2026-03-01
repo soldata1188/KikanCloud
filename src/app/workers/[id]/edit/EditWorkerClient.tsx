@@ -268,7 +268,7 @@ export default function EditWorkerClient({ companies, worker }: EditWorkerProps)
     };
 
     return (
-        <div className="flex-1 flex flex-col h-full bg-gray-50 relative overflow-hidden">
+        <div className="flex-1 flex flex-col h-full bg-transparent relative overflow-hidden">
             {/* Toast */}
             {toastError && (
                 <div className="fixed top-4 right-4 z-50 animate-in fade-in slide-in-from-top-3">
@@ -279,7 +279,7 @@ export default function EditWorkerClient({ companies, worker }: EditWorkerProps)
                 </div>
             )}
 
-            <div className="flex-1 flex flex-row overflow-hidden bg-gray-50">
+            <div className="flex-1 flex flex-row overflow-hidden bg-transparent">
                 {/* ── LEFT: Content Wrapper ── */}
                 <div className="flex-1 flex flex-col overflow-hidden">
                     {/* ── Top Action Bar ── */}

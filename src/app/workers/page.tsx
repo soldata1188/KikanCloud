@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { Sidebar } from '@/components/Sidebar'
-import { TopNav } from '@/components/TopNav'
+
 import WorkersListClient from './WorkersListClient'
 
 export const dynamic = 'force-dynamic';
@@ -19,11 +19,11 @@ export default async function WorkersPage() {
     const next90DaysStr = next90Days.toISOString().split('T')[0];
 
     return (
-        <div className="flex h-screen bg-white font-sans text-[#1f1f1f] overflow-hidden selection:bg-[#24b47e]/20">
+        <div className="flex h-screen font-sans text-[#1f1f1f] overflow-hidden selection:bg-[#24b47e]/20">
             <Sidebar active="workers" />
             <div className="flex-1 flex flex-col relative min-w-0">
-                <TopNav title="実習生一覧" role={userProfile?.role} />
-                <main className="flex-1 overflow-y-auto relative bg-[#f8f9fa]">
+
+                <main className="flex-1 overflow-y-auto relative">
                     {/* Micro-Dot Grid Overlay */}
                     <div className="absolute inset-0 pointer-events-none opacity-[0.08] z-0"
                         style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, #0067b8 1px, transparent 0)', backgroundSize: '32px 32px' }} />

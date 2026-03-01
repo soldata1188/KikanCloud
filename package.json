@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:eco": "cross-env NODE_OPTIONS=--max-old-space-size=512 next dev --webpack",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
@@ -33,7 +34,7 @@
     "@types/papaparse": "^5.5.2",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@types/uuid": "^10.0.0",
+    "cross-env": "^10.1.0",
     "eslint": "^9",
     "eslint-config-next": "^16.1.6",
     "eslint-plugin-unused-imports": "^4.4.1",

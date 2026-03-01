@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react';
-import { ArrowLeft, User, FileText, X, ExternalLink, IdCard, Briefcase, FileBadge2, DownloadCloud, Trash2, Pencil, ChevronRight } from 'lucide-react';
+import { ArrowLeft, User, FileText, X, ExternalLink, IdCard, Briefcase, FileBadge2, DownloadCloud, Trash2, Pencil, ChevronRight, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import { deleteWorker } from '@/app/workers/actions';
 
@@ -72,23 +72,22 @@ function getDocName(filename: string) {
 
 const DataRow = ({ label, value, isLast = false }: { label: React.ReactNode; value: React.ReactNode; isLast?: boolean }) => (
     <div className={`flex flex-col sm:flex-row ${!isLast ? 'border-b border-gray-100' : ''} hover:bg-gray-50/50 transition-colors`}>
-        <div className="w-full sm:w-[160px] lg:w-[180px] px-5 py-3 flex items-start border-b sm:border-b-0 sm:border-r border-gray-100 shrink-0 bg-gray-50/30">
-            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">{label}</span>
+        <div className="w-full sm:w-[140px] lg:w-[160px] px-4 py-2.5 flex items-start border-b sm:border-b-0 sm:border-r border-gray-100 shrink-0 bg-gray-50/30">
+            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-0.5">{label}</span>
         </div>
-        <div className="flex-1 px-5 py-3 flex items-center min-h-[44px] text-[13px] text-gray-900 font-bold break-words leading-relaxed">
+        <div className="flex-1 px-4 py-2.5 flex items-center min-h-[40px] text-[13px] text-gray-900 font-bold break-words leading-relaxed">
             {value || <span className="text-gray-300 font-normal">—</span>}
         </div>
     </div>
 );
 
-// ── Pulse Timeline Helper — Detail Page Version ───────────────────
+// ── Pulse Timeline Helper ─────────────────────────────────────────
 const DetailPulse = ({ date, label, color = "bg-[#0067b8]" }: { date: string, label: string, color?: string }) => {
     if (!date || date === '---') return null;
     const now = Date.now();
-    const futureLimit = now + (180 * 86400000); // 6 months
+    const futureLimit = now + (180 * 86400000);
     const target = new Date(date).getTime();
     if (target < now || target > futureLimit) return null;
-
     const percent = ((target - now) / (futureLimit - now)) * 100;
     return (
         <div className="flex flex-col items-center absolute -top-1" style={{ left: `${percent}%` }}>
@@ -100,6 +99,7 @@ const DetailPulse = ({ date, label, color = "bg-[#0067b8]" }: { date: string, la
 
 export default function WorkerDetailClient({ worker, documents }: { worker: Worker; documents: DocumentFile[] }) {
     const [previewDoc, setPreviewDoc] = useState<DocumentFile | null>(null);
+    const [docsOpen, setDocsOpen] = useState(false); // mobile doc drawer
 
     const formatSystemType = (sys: string) => {
         if (sys === 'ikusei_shuro') return '育成就労';
@@ -119,7 +119,7 @@ export default function WorkerDetailClient({ worker, documents }: { worker: Work
 
     const SectionCard = ({ icon, iconColor, title, children }: { icon: React.ReactNode; iconColor: string; title: string; children: React.ReactNode }) => (
         <div className="bg-white border border-gray-200 overflow-hidden rounded-md">
-            <div className={`px-5 py-2.5 border-b border-[#005a9e] flex items-center gap-2.5 bg-[#0067b8]`}>
+            <div className={`px-4 py-2.5 border-b border-[#005a9e] flex items-center gap-2.5 bg-[#0067b8]`}>
                 <span className="text-white">{icon}</span>
                 <h3 className="text-[11px] font-black text-white uppercase tracking-widest">{title}</h3>
             </div>
@@ -127,99 +127,147 @@ export default function WorkerDetailClient({ worker, documents }: { worker: Work
         </div>
     );
 
-    return (
-        <div className="flex-1 flex flex-col h-full bg-gray-50 relative overflow-hidden">
-            <div className="flex-1 flex flex-row overflow-hidden bg-gray-50">
-                {/* ── LEFT: Content Wrapper ── */}
-                <div className="flex-1 flex flex-col overflow-hidden border-r border-gray-200">
-                    {/* ── Top Action Bar ── */}
-                    <div className="flex items-center justify-between px-6 h-[57px] border-b border-gray-200 bg-white shrink-0 z-20">
-                        <div className="flex items-center gap-3">
-                            <Link href="/workers"
-                                className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-gray-100 transition-colors text-gray-500 hover:text-gray-700">
-                                <ArrowLeft size={18} strokeWidth={2} />
-                            </Link>
-                            <div className="w-px h-5 bg-gray-200" />
-                            <div>
-                                <h2 className="text-[15px] font-bold tracking-tight text-gray-900 leading-tight">
-                                    {worker.full_name_romaji || '氏名未登録'}
-                                </h2>
+    // ── Document list component (reused on desktop sidebar + mobile drawer)
+    const DocumentList = () => (
+        <div className="flex-1 overflow-y-auto p-4 space-y-2 no-scrollbar">
+            {documents.length === 0 ? (
+                <div className="py-16 flex flex-col items-center justify-center text-center border-2 border-dashed border-gray-100 rounded-md bg-gray-50/30">
+                    <DownloadCloud size={24} className="text-gray-200 mb-2" />
+                    <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest">添付書類なし</span>
+                </div>
+            ) : (
+                <div className="space-y-2">
+                    {documents.map((doc, idx) => (
+                        <div key={idx} onClick={() => setPreviewDoc(doc)}
+                            className="group relative flex items-center gap-3 p-3 rounded-md border border-gray-200 bg-white hover:border-[#0067b8] cursor-pointer transition-all active:scale-[0.99]">
+                            <div className="w-9 h-9 shrink-0 bg-gray-50 text-gray-400 rounded flex items-center justify-center border border-gray-200 group-hover:bg-[#0067b8] group-hover:text-white group-hover:border-[#0067b8] transition-all">
+                                <FileText size={16} strokeWidth={2} />
                             </div>
+                            <div className="flex-1 min-w-0">
+                                <h4 className="text-[11px] font-black text-gray-900 truncate uppercase leading-tight group-hover:text-[#0067b8] transition-colors">{getDocName(doc.name)}</h4>
+                                <p className="text-[9px] text-gray-400 mt-1 truncate font-mono uppercase tracking-tight">{doc.name}</p>
+                            </div>
+                            <ChevronRight size={12} className="text-gray-300 shrink-0 group-hover:text-[#0067b8]" />
                         </div>
-                        <div className="flex items-center gap-2">
-                            <Link href={`/workers/${worker.id}/edit`}
-                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-300 text-gray-700 text-[11px] font-bold rounded-md hover:bg-gray-50 transition-colors">
-                                <Pencil size={12} strokeWidth={2} /> 編集
-                            </Link>
-                            <form action={deleteWorker} onSubmit={e => { if (!window.confirm('本当に削除いたしますか？')) e.preventDefault(); }}>
-                                <input type="hidden" name="id" value={worker.id} />
-                                <button type="submit"
-                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-rose-600 text-[11px] bg-white font-bold hover:bg-rose-50 border border-rose-200 transition-colors rounded-md">
-                                    <Trash2 size={12} strokeWidth={2} /> 削除
-                                </button>
-                            </form>
-                        </div>
-                    </div>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
 
-                    {/* ── Body ── */}
-                    <div className="flex-1 overflow-y-auto no-scrollbar pb-32">
-                        <div className="w-full max-w-[1200px] mx-auto p-8 space-y-8">
+    return (
+        <div className="flex-1 flex flex-col h-full bg-transparent relative overflow-hidden">
 
-                            {/* ── Enhanced Hero Section ── */}
-                            <div className="bg-white border border-gray-200 rounded-md overflow-hidden flex flex-col md:flex-row">
-                                <div className="w-[200px] p-8 border-b md:border-b-0 md:border-r border-gray-100 flex flex-col items-center justify-center bg-gray-50/30">
-                                    <div className="w-28 h-28 rounded-md bg-white border border-gray-200 overflow-hidden transition-shadow">
+            {/* ── Top Action Bar ── */}
+            <div className="flex items-center justify-between px-3 sm:px-6 h-[52px] border-b border-gray-200 bg-white shrink-0 z-20">
+                <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                    <Link href="/workers"
+                        className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-gray-100 transition-colors text-gray-500 hover:text-gray-700 shrink-0">
+                        <ArrowLeft size={18} strokeWidth={2} />
+                    </Link>
+                    <div className="w-px h-5 bg-gray-200 shrink-0" />
+                    <h2 className="text-[13px] sm:text-[15px] font-bold tracking-tight text-gray-900 leading-tight truncate">
+                        {worker.full_name_romaji || '氏名未登録'}
+                    </h2>
+                </div>
+                <div className="hidden sm:flex items-center gap-1.5 shrink-0">
+                    {/* Document toggle — sm to lg only */}
+                    <button onClick={() => setDocsOpen(v => !v)}
+                        className="lg:hidden inline-flex items-center gap-1 px-2.5 py-1.5 bg-white border border-gray-200 text-gray-600 text-[11px] font-bold rounded-md hover:bg-gray-50 transition-colors">
+                        <FileBadge2 size={12} />
+                        <span className="text-[10px]">{documents.length}</span>
+                    </button>
+                    <Link href={`/workers/${worker.id}/edit`}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-300 text-gray-700 text-[11px] font-bold rounded-md hover:bg-gray-50 transition-colors">
+                        <Pencil size={12} strokeWidth={2} /> 編集
+                    </Link>
+                    <form action={deleteWorker} onSubmit={e => { if (!window.confirm('本当に削除いたしますか？')) e.preventDefault(); }}>
+                        <input type="hidden" name="id" value={worker.id} />
+                        <button type="submit"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-rose-600 text-[11px] bg-white font-bold hover:bg-rose-50 border border-rose-200 transition-colors rounded-md">
+                            <Trash2 size={12} strokeWidth={2} /> 削除
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            {/* ── Main Layout: flex-row on lg+, flex-col on mobile ── */}
+            <div className="flex-1 flex flex-col lg:flex-row overflow-hidden bg-transparent">
+
+                {/* ── Content body (scrollable) ── */}
+                <div className="flex-1 flex flex-col overflow-hidden lg:border-r border-gray-200">
+                    <div className="flex-1 overflow-y-auto no-scrollbar pb-24">
+                        <div className="w-full max-w-[1200px] mx-auto p-4 sm:p-6 space-y-5">
+
+                            {/* ── Hero Card ── */}
+                            <div className="bg-white border border-gray-200 rounded-md overflow-hidden flex flex-col sm:flex-row">
+                                {/* Avatar block */}
+                                <div className="flex-row sm:flex-col w-full sm:w-[160px] px-5 py-4 sm:py-6 flex items-center sm:justify-center gap-4 sm:gap-0 border-b sm:border-b-0 sm:border-r border-gray-100 bg-gray-50/30">
+                                    <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-md bg-white border border-gray-200 overflow-hidden flex-shrink-0">
                                         {worker.avatar_url ? (
                                             <img src={worker.avatar_url} alt="avatar" className="w-full h-full object-cover" />
                                         ) : (
                                             <div className="w-full h-full flex items-center justify-center text-gray-200 bg-gray-50">
-                                                <User size={56} strokeWidth={1} />
+                                                <User size={40} strokeWidth={1} />
                                             </div>
                                         )}
                                     </div>
-                                    <div className="mt-5 flex flex-col items-center">
-                                        <span className={`px-3 py-1.5 rounded-full text-[10px] font-black border tracking-[0.1em] uppercase ${cfg.bg} ${cfg.text} ${cfg.border}`}>
+                                    <div className="sm:mt-4 flex flex-col items-start sm:items-center gap-1.5">
+                                        <span className={`px-3 py-1 rounded-full text-[10px] font-black border tracking-[0.1em] uppercase ${cfg.bg} ${cfg.text} ${cfg.border}`}>
                                             {cfg.label}
                                         </span>
+                                        <span className="text-[11px] font-bold text-gray-500 sm:hidden">{worker.nationality || ''}</span>
                                     </div>
                                 </div>
 
-                                <div className="flex-1 p-10 flex flex-col justify-center bg-white relative">
-                                    <div className="text-[10px] text-[#0067b8] font-black uppercase tracking-[0.3em] mb-4">人材情報管理記録</div>
-                                    <h3 className="text-[32px] font-black text-gray-900 tracking-tighter leading-none uppercase mb-6">
+                                {/* Info block */}
+                                <div className="flex-1 p-5 sm:p-8 flex flex-col justify-center bg-white relative">
+                                    <div className="text-[9px] sm:text-[10px] text-[#0067b8] font-black uppercase tracking-[0.3em] mb-2">人材情報管理記録</div>
+                                    <h3 className="text-[22px] sm:text-[28px] font-black text-gray-900 tracking-tighter leading-none uppercase mb-4">
                                         {worker.full_name_romaji || '—'}
                                     </h3>
-
-                                    <div className="flex flex-wrap gap-4">
-                                        <div className="inline-flex items-center gap-2.5 px-4 py-2 bg-gray-50 text-gray-900 text-[11px] font-black rounded border border-gray-200 uppercase tracking-widest">
-                                            <Briefcase size={12} className="text-[#0067b8]" />
+                                    <div className="flex flex-wrap gap-2 sm:gap-3">
+                                        <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-50 text-gray-900 text-[11px] font-black rounded border border-gray-200 uppercase tracking-widest">
+                                            <Briefcase size={11} className="text-[#0067b8]" />
                                             {worker.companies?.name_jp || '未配属'}
                                         </div>
-                                        <div className="inline-flex items-center gap-2.5 px-4 py-2 bg-gray-50 text-gray-900 text-[11px] font-black rounded border border-gray-200 uppercase tracking-widest">
-                                            <FileBadge2 size={12} className="text-[#0067b8]" />
+                                        <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-50 text-gray-900 text-[11px] font-black rounded border border-gray-200 uppercase tracking-widest">
+                                            <FileBadge2 size={11} className="text-[#0067b8]" />
                                             {formatSystemType(worker.system_type)}
                                         </div>
                                     </div>
-
-                                    {/* "The Pulse" Mini Integrated Timeline */}
-                                    <div className="mt-12 pt-6 border-t border-gray-100">
+                                    {/* Pulse Timeline */}
+                                    <div className="mt-6 pt-4 border-t border-gray-100">
                                         <div className="flex justify-between items-center mb-3">
-                                            <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">手続き状況パルス (今後6ヶ月)</span>
+                                            <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">手続きパルス (今後6ヶ月)</span>
                                         </div>
                                         <div className="h-1 bg-gray-100 rounded-full relative overflow-visible">
                                             <DetailPulse date={worker.zairyu_exp} label="在留" color="bg-rose-500" />
                                             <DetailPulse date={worker.cert_end_date} label="認定" color="bg-amber-500" />
-                                            {/* Exam dates are deeper in kentei_status, adding placeholders if available */}
                                             {worker.kentei_status?.exam_date_written && <DetailPulse date={worker.kentei_status.exam_date_written} label="検定" />}
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-                                {/* LEFT COLUMN */}
-                                <div className="space-y-8">
-                                    {/* 基本情報 */}
+                            {/* ── Mobile Document Drawer ── */}
+                            {docsOpen && (
+                                <div className="lg:hidden bg-white border border-gray-200 rounded-md overflow-hidden">
+                                    <div className="flex items-center justify-between px-4 py-2.5 bg-[#0067b8]">
+                                        <div className="flex items-center gap-2">
+                                            <FileBadge2 size={14} className="text-white" />
+                                            <h3 className="text-[11px] font-black text-white uppercase tracking-widest">ドキュメント保管</h3>
+                                        </div>
+                                        <span className="text-[10px] font-black text-blue-100">{documents.length} 個</span>
+                                    </div>
+                                    <DocumentList />
+                                </div>
+                            )}
+
+                            {/* ── Section Grid ── */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-start">
+                                {/* LEFT */}
+                                <div className="space-y-5">
                                     <SectionCard icon={<User size={14} />} iconColor="text-[#0067b8]" title="基本情報">
                                         <DataRow label="氏名（ローマ字）" value={worker.full_name_romaji} />
                                         <DataRow label="氏名（カナ）" value={worker.full_name_kana} />
@@ -234,18 +282,17 @@ export default function WorkerDetailClient({ worker, documents }: { worker: Work
                                     </SectionCard>
 
                                     <div className="bg-white border border-gray-200 overflow-hidden rounded-md">
-                                        <div className="px-5 py-2.5 border-b border-[#005a9e] bg-[#0067b8]">
+                                        <div className="px-4 py-2.5 border-b border-[#005a9e] bg-[#0067b8]">
                                             <h3 className="text-[11px] font-black text-white uppercase tracking-widest">備考・特記事項</h3>
                                         </div>
-                                        <div className="px-5 py-5 text-[13px] text-gray-700 leading-relaxed whitespace-pre-wrap min-h-[120px]">
+                                        <div className="px-4 py-4 text-[13px] text-gray-700 leading-relaxed whitespace-pre-wrap min-h-[100px]">
                                             {worker.remarks || <span className="text-gray-300">特記事項はございません</span>}
                                         </div>
                                     </div>
                                 </div>
 
-                                {/* RIGHT COLUMN */}
-                                <div className="space-y-8">
-                                    {/* 管理情報 */}
+                                {/* RIGHT */}
+                                <div className="space-y-5">
                                     <SectionCard icon={<Briefcase size={14} />} iconColor="text-[#0067b8]" title="管理情報">
                                         <DataRow label="職種区分" value={worker.industry_field} />
                                         <DataRow label="配属先企業" value={worker.companies?.name_jp} />
@@ -254,7 +301,6 @@ export default function WorkerDetailClient({ worker, documents }: { worker: Work
                                         <DataRow label="入国日" value={worker.entry_date} isLast />
                                     </SectionCard>
 
-                                    {/* 証明書・期限 */}
                                     <SectionCard icon={<IdCard size={14} />} iconColor="text-[#0067b8]" title="証明書・期限">
                                         <DataRow label="在留資格" value={worker.visa_status} />
                                         <DataRow label="在留カード番号" value={worker.zairyu_no} />
@@ -275,9 +321,9 @@ export default function WorkerDetailClient({ worker, documents }: { worker: Work
                     </div>
                 </div>
 
-                {/* ── RIGHT: Related Documents (Full Height Sidebar) ── */}
-                <div className="w-[380px] shrink-0 bg-white flex flex-col overflow-hidden">
-                    <div className="flex items-center justify-between px-5 h-[57px] border-b border-[#005a9e] bg-[#0067b8] shrink-0">
+                {/* ── RIGHT: Document Sidebar — Desktop only ── */}
+                <div className="hidden lg:flex w-[340px] shrink-0 bg-white flex-col overflow-hidden">
+                    <div className="flex items-center justify-between px-5 h-[52px] border-b border-[#005a9e] bg-[#0067b8] shrink-0">
                         <div className="flex items-center gap-2.5">
                             <FileBadge2 size={16} className="text-white" />
                             <h3 className="text-[12px] font-black text-white uppercase tracking-widest">ドキュメント保管</h3>
@@ -286,52 +332,26 @@ export default function WorkerDetailClient({ worker, documents }: { worker: Work
                             {documents.length} 個のファイル
                         </span>
                     </div>
-
-                    <div className="flex-1 overflow-y-auto p-5 space-y-3 no-scrollbar">
-                        {documents.length === 0 ? (
-                            <div className="py-24 flex flex-col items-center justify-center text-center border-2 border-dashed border-gray-100 rounded-md bg-gray-50/30">
-                                <DownloadCloud size={24} className="text-gray-200 mb-2" />
-                                <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest uppercase">添付書類なし</span>
-                            </div>
-                        ) : (
-                            <div className="space-y-2">
-                                {documents.map((doc, idx) => (
-                                    <div key={idx} onClick={() => setPreviewDoc(doc)}
-                                        className="group relative flex items-center gap-3 p-3 rounded-md border border-gray-200 bg-white hover:border-[#0067b8] cursor-pointer transition-all">
-                                        <div className="w-9 h-9 shrink-0 bg-gray-50 text-gray-400 rounded flex items-center justify-center border border-gray-200 group-hover:bg-[#0067b8] group-hover:text-white group-hover:border-[#0067b8] transition-all">
-                                            <FileText size={16} strokeWidth={2} />
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <h4 className="text-[11px] font-black text-gray-900 truncate uppercase leading-tight group-hover:text-[#0067b8] transition-colors">{getDocName(doc.name)}</h4>
-                                            <p className="text-[9px] text-gray-400 mt-1 truncate font-mono uppercase tracking-tight">{doc.name}</p>
-                                        </div>
-                                        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <ChevronRight size={12} className="text-[#0067b8]" />
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
+                    <DocumentList />
                 </div>
             </div>
 
-            {/* Document Preview Overlay */}
+            {/* ── Document Preview Overlay ── */}
             {previewDoc && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-gray-900/60 backdrop-blur-[2px]"
+                <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-6 bg-gray-900/60 backdrop-blur-[2px]"
                     onClick={e => { if (e.target === e.currentTarget) setPreviewDoc(null); }}>
-                    <div className="bg-white rounded-md w-full max-w-5xl h-[90vh] flex flex-col overflow-hidden border border-gray-200">
-                        <div className="flex items-center justify-between px-5 py-2.5 border-b border-gray-200 bg-gray-50">
-                            <div className="flex items-center gap-3">
-                                <div className="p-1.5 bg-[#0067b8] text-white rounded">
+                    <div className="bg-white rounded-t-xl sm:rounded-md w-full sm:max-w-5xl h-[85vh] sm:h-[90vh] flex flex-col overflow-hidden border border-gray-200">
+                        <div className="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-gray-200 bg-gray-50 shrink-0">
+                            <div className="flex items-center gap-3 min-w-0">
+                                <div className="p-1.5 bg-[#0067b8] text-white rounded shrink-0">
                                     <FileText size={14} />
                                 </div>
-                                <div>
-                                    <h3 className="font-black text-[12px] text-gray-900 leading-none uppercase tracking-tight">{getDocName(previewDoc.name)}</h3>
-                                    <p className="text-[9px] text-gray-400 mt-1 font-mono uppercase tracking-wider">{previewDoc.name}</p>
+                                <div className="min-w-0">
+                                    <h3 className="font-black text-[12px] text-gray-900 leading-none uppercase tracking-tight truncate">{getDocName(previewDoc.name)}</h3>
+                                    <p className="text-[9px] text-gray-400 mt-1 font-mono uppercase tracking-wider truncate">{previewDoc.name}</p>
                                 </div>
                             </div>
-                            <div className="flex items-center gap-1">
+                            <div className="flex items-center gap-1 shrink-0">
                                 <a href={previewDoc.url} target="_blank" rel="noreferrer"
                                     className="p-2 text-gray-400 hover:text-[#0067b8] hover:bg-white transition-colors rounded" title="新しいタブで開く">
                                     <ExternalLink size={16} />

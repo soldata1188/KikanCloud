@@ -1,7 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { Sidebar } from '@/components/Sidebar'
-import { TopNav } from '@/components/TopNav'
 import RoutingClient from './RoutingClient'
 import type { RawLocation } from './RoutingClient'
 
@@ -76,7 +75,6 @@ export default async function RoutingPage() {
         <div className="flex h-screen bg-slate-50 font-sans text-slate-900">
             <Sidebar active="routing" />
             <div className="flex-1 flex flex-col relative min-w-0 overflow-hidden">
-                <TopNav title="位置情報マップ" role={userProfile?.role} />
                 <main className="flex-1 relative overflow-hidden pb-14 md:pb-0">
                     <RoutingClient
                         initialLocations={initialLocations}

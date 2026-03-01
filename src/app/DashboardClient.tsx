@@ -65,7 +65,7 @@ export default function DashboardClient({ userName, dashboardData }: { userName:
                         <Link
                             key={item.id}
                             href={item.href}
-                            className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm hover:shadow-xl hover:border-blue-100 hover:-translate-y-1 transition-all duration-300 flex flex-col items-center text-center gap-4 group relative overflow-hidden"
+                            className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-xl hover:border-blue-400 hover:-translate-y-1 transition-all duration-300 flex flex-col items-center text-center gap-4 group relative overflow-hidden"
                         >
                             <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-white/0 to-gray-50/50 -rotate-45 translate-x-8 -translate-y-8" />
                             <div className={`w-14 h-14 rounded-2xl ${item.color} text-white flex items-center justify-center transition-all duration-500 group-hover:scale-110 group-hover:rotate-3 shadow-lg shadow-gray-200 group-hover:shadow-blue-200`}>
@@ -88,7 +88,7 @@ export default function DashboardClient({ userName, dashboardData }: { userName:
                     <h2 className="text-[16px] font-bold text-gray-800 uppercase tracking-wider">最近の活動</h2>
                 </div>
 
-                <div className="bg-white rounded-sm border border-gray-100 shadow-sm overflow-hidden">
+                <div className="bg-white rounded-md border border-gray-200 shadow-sm overflow-hidden">
                     <div className="divide-y divide-gray-100">
                         {dashboardData.alerts.length === 0 ? (
                             <div className="p-12 text-center text-gray-400 text-sm">現在、新しい活動はありません。</div>
@@ -96,7 +96,7 @@ export default function DashboardClient({ userName, dashboardData }: { userName:
                             dashboardData.alerts.slice(0, 5).map((alert: any) => (
                                 <div key={alert.id} className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors group cursor-pointer">
                                     <div className="flex items-center gap-4">
-                                        <div className={`w-10 h-10 rounded-sm flex items-center justify-center border ${alert.daysLeft <= 30 ? 'bg-blue-50 border-blue-100 text-blue-600' : 'bg-gray-50 border-gray-100 text-gray-500'}`}>
+                                        <div className={`w-10 h-10 rounded-md flex items-center justify-center border ${alert.daysLeft <= 30 ? 'bg-blue-50 border-blue-200 text-blue-600' : 'bg-gray-50 border-gray-200 text-gray-500'}`}>
                                             <ClipboardList size={18} />
                                         </div>
                                         <div className="space-y-0.5">
@@ -121,7 +121,7 @@ export default function DashboardClient({ userName, dashboardData }: { userName:
 
             {/* Bottom Info Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="bg-white p-8 rounded-sm border border-gray-100 shadow-sm space-y-4 hover:border-blue-200 transition-colors">
+                <div className="bg-white p-8 rounded-md border border-gray-200 shadow-sm space-y-4 hover:border-blue-400 transition-colors">
                     <h3 className="text-[16px] font-bold text-gray-800">今月の巡回報告</h3>
                     <p className="text-[13px] text-gray-500 leading-relaxed">
                         未提出の定期訪問報告書が <span className="text-orange-600 font-bold">4件</span> あります。期限内に作成してください。
@@ -132,7 +132,7 @@ export default function DashboardClient({ userName, dashboardData }: { userName:
                     </Link>
                 </div>
 
-                <div className={`p-8 rounded-sm border border-gray-100 bg-white shadow-sm space-y-4 hover:border-blue-200 transition-colors`}>
+                <div className={`p-8 rounded-md border border-gray-200 bg-white shadow-sm space-y-4 hover:border-blue-400 transition-colors`}>
                     <h3 className="text-[16px] font-bold text-gray-800">新しい特定技能求人</h3>
                     <p className="text-[13px] text-gray-500 leading-relaxed">
                         受入企業から新しい特定技能求人依頼が届いています。内容を確認してください。

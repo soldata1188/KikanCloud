@@ -33,7 +33,7 @@ export default async function PortalLayout({ children }: { children: React.React
                     </Link>
                     <div className="flex items-center gap-3 px-3 py-2 text-[#878787] hover:bg-[#fbfcfd] hover:text-[#1f1f1f] rounded-md transition-colors cursor-not-allowed opacity-60">
                         <Users size={16} />
-                        <span className="text-[13px] font-medium hidden md:block">実習生一覧 (Workers)</span>
+                        <span className="text-[13px] font-medium hidden md:block">外国人材 (Workers)</span>
                     </div>
                     <div className="flex items-center gap-3 px-3 py-2 text-[#878787] hover:bg-[#fbfcfd] hover:text-[#1f1f1f] rounded-md transition-colors cursor-not-allowed opacity-60">
                         <FileText size={16} />

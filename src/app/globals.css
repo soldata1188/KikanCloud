@@ -2,8 +2,15 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f8f9fa;
+  --background: #ffffff;
   --foreground: #1a1a1a;
+  --brand-primary: #0067B8;
+  --brand-primary-dark: #0059a1;
+  /* Standard app background: white base + micro-dot grid */
+  --app-bg-color: #ffffff;
+  --app-bg-dot-color: #0067b8;
+  --app-bg-dot-size: 32px;
+  --app-bg-dot-opacity: 0.18;
   /* Mobile bottom nav height — used for padding content */
   --mobile-nav-h: 64px;
 }
@@ -31,15 +38,38 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #f8f9fa;
+    --background: #ffffff;
     --foreground: #171717;
   }
 }
 
 body {
-  background: var(--background);
+  background-color: var(--app-bg-color);
+  background-image: radial-gradient(circle at 1px 1px,
+      var(--app-bg-dot-color) 1px,
+      transparent 0);
+  background-size: var(--app-bg-dot-size) var(--app-bg-dot-size);
   color: var(--foreground);
   font-family: var(--font-sans);
+}
+
+/* Dot grid opacity wrapper — applied via pseudo-element trick on body */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image: radial-gradient(circle at 1px 1px,
+      var(--app-bg-dot-color) 1px,
+      transparent 0);
+  background-size: var(--app-bg-dot-size) var(--app-bg-dot-size);
+  opacity: var(--app-bg-dot-opacity);
+}
+
+body {
+  background-image: none;
+  /* dots handled via ::before for opacity control */
 }
 
 /* ──────────────────────────────────────────────────────────────

@@ -593,7 +593,7 @@ export function AuditsClient({
     ) : null
 
     return (
-        <div className="bg-[#f8f9fa] min-h-screen flex flex-col">
+        <div className="min-h-screen flex flex-col">
             {showModal && (
                 <AddScheduleModal
                     companies={companies} defaultPicName={defaultPicName}
@@ -614,7 +614,7 @@ export function AuditsClient({
             )}
 
             {/* ══ STICKY HEADER: Responsive wrapping bar ══ */}
-            <div className="sticky top-0 z-[100] bg-white border-b border-gray-200 shadow-sm px-6 min-h-[52px] py-2 flex flex-wrap items-center gap-x-6 gap-y-3">
+            <div className="sticky top-0 z-[100] bg-white/80 backdrop-blur-md border-b border-gray-200/70 shadow-sm px-6 min-h-[52px] py-2 flex flex-wrap items-center gap-x-6 gap-y-3">
 
                 {/* Left: Status Tabs */}
                 <div className="flex items-center gap-1 shrink-0">
@@ -677,7 +677,7 @@ export function AuditsClient({
                 </div>
 
                 {/* ════════ TABLE ════════ */}
-                <div className="mx-0 overflow-hidden border border-gray-200 rounded-md bg-white mb-4">
+                <div className="mx-0 overflow-hidden border border-gray-200 rounded-md bg-transparent mb-4">
                     <div className="overflow-x-auto no-scrollbar">
                         <table className="w-full min-w-[1100px] border-collapse text-left">
                             <thead className="bg-[#0067b8] border-b border-white/20 text-white">
@@ -714,7 +714,7 @@ export function AuditsClient({
 
                                     return (
                                         <tr key={row.company.id}
-                                            className={`transition-all duration-150 border-b border-gray-200 last:border-0 ${absIndex % 2 === 0 ? 'bg-white hover:bg-blue-50/20' : 'bg-gray-50/30 hover:bg-blue-50/20'}`}>
+                                            className={`transition-all duration-150 border-b border-gray-200 last:border-0 bg-white hover:bg-blue-50/40`}>
 
                                             {/* Col 1: No. */}
                                             <td className="px-3 py-4 text-center align-top font-mono text-[#0067b8] text-[12px] font-bold border-r border-gray-100/50">{absIndex + 1}</td>

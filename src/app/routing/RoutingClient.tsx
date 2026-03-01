@@ -244,28 +244,40 @@ export default function RoutingClient({ initialLocations, filterCompanies, googl
     return (
         <APIProvider apiKey={googleMapsKey}>
             {/* ── Full layout ── */}
-            <div className="flex flex-col md:flex-row h-[calc(100vh-56px)] w-full overflow-hidden relative">
+            <div className="flex flex-col md:flex-row h-[100dvh] w-full overflow-hidden relative">
 
                 {/* ══════════════ SIDEBAR ══════════════ */}
                 {/* Mobile: fixed bottom sheet | Desktop: left sidebar */}
-                {/* Mobile backdrop */}
+                {/* Backdrop — mobile AND desktop when open */}
                 {isSidebarOpen && (
                     <div
-                        className="md:hidden fixed inset-0 bg-black/40 z-30"
+                        className="fixed inset-0 z-30"
+                        style={{ background: 'rgba(0,0,0,0.15)' }}
                         onClick={() => setIsSidebarOpen(false)}
                     />
                 )}
                 <div className={`
-                    flex flex-col bg-white border-slate-200 z-40
+                    flex flex-col z-40
                     transition-all duration-300 ease-in-out
-                    fixed md:static bottom-0 left-0 right-0
-                    md:h-full md:border-r md:shadow-lg md:shrink-0
-                    rounded-t-2xl md:rounded-none
+                    fixed bottom-0 left-0 right-0
+                    md:bottom-auto md:right-auto md:top-0 md:left-0 md:h-full
+                    rounded-t-2xl md:rounded-none md:rounded-r-2xl
                     ${isSidebarOpen
-                        ? 'md:w-[340px] translate-y-0 h-[65vh] shadow-2xl border border-slate-200'
-                        : 'md:w-0 md:overflow-hidden md:border-r-0 translate-y-full md:translate-y-0 h-[65vh]'
+                        ? 'md:w-[340px] translate-y-0 h-[68vh] pb-safe md:h-full md:translate-y-0'
+                        : 'md:w-0 md:overflow-hidden translate-y-full md:translate-y-0 h-[68vh]'
                     }
-                `}>
+                `}
+                    style={{
+                        background: 'rgba(255,255,255,0.78)',
+                        backdropFilter: 'blur(24px)',
+                        WebkitBackdropFilter: 'blur(24px)',
+                        borderRight: isSidebarOpen ? '1px solid rgba(255,255,255,0.5)' : 'none',
+                        borderTop: '1px solid rgba(255,255,255,0.6)',
+                        boxShadow: isSidebarOpen
+                            ? '4px 0 32px rgba(0,0,0,0.10), inset -1px 0 0 rgba(255,255,255,0.4), 0 -8px 32px rgba(0,0,0,0.10)'
+                            : undefined,
+                    }}
+                >
                     {/* Mobile drag handle */}
                     <div className="md:hidden flex justify-center pt-2.5 pb-1 shrink-0">
                         <div className="w-8 h-1 bg-slate-300 rounded-full" />
@@ -274,7 +286,7 @@ export default function RoutingClient({ initialLocations, filterCompanies, googl
                     <div className="px-4 pt-3 pb-3 border-b border-slate-100 shrink-0">
                         <div className="flex items-center justify-between mb-3">
                             <div className="flex items-center gap-2">
-                                <div className="w-7 h-7 rounded-lg bg-slate-800 flex items-center justify-center">
+                                <div className="w-7 h-7 rounded-md bg-slate-800 flex items-center justify-center">
                                     <Layers size={13} className="text-white" />
                                 </div>
                                 <div>
@@ -293,7 +305,7 @@ export default function RoutingClient({ initialLocations, filterCompanies, googl
                                     <button
                                         key={type}
                                         onClick={() => toggleLayer(type)}
-                                        className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[11px] font-bold transition-all
+                                        className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md border text-[11px] font-bold transition-all
                                             ${on ? `${cfg.badgeBg} ${cfg.badgeText} border-transparent` : 'bg-white text-slate-400 border-slate-200 opacity-60'}`}
                                     >
                                         {cfg.icon}
@@ -375,14 +387,14 @@ export default function RoutingClient({ initialLocations, filterCompanies, googl
                                 </div>
                             </div>
                             {backfillResult ? (
-                                <p className={`text-[10px] font-bold px-2 py-1.5 rounded-lg ${backfillResult.startsWith('エラー') ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-700'}`}>
+                                <p className={`text-[10px] font-bold px-2 py-1.5 rounded-md ${backfillResult.startsWith('エラー') ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-700'}`}>
                                     {backfillResult}
                                 </p>
                             ) : (
                                 <button
                                     onClick={handleBackfill}
                                     disabled={isBackfilling}
-                                    className="w-full flex items-center justify-center gap-1.5 py-2 bg-amber-500 hover:bg-amber-600 disabled:opacity-60 disabled:cursor-not-allowed text-white text-[11px] font-black rounded-lg transition-colors"
+                                    className="w-full flex items-center justify-center gap-1.5 py-2 bg-amber-500 hover:bg-amber-600 disabled:opacity-60 disabled:cursor-not-allowed text-white text-[11px] font-black rounded-md transition-colors"
                                 >
                                     {isBackfilling ? (
                                         <><Loader2 size={11} className="animate-spin" /> 座標を取得中...</>
@@ -411,7 +423,7 @@ export default function RoutingClient({ initialLocations, filterCompanies, googl
                             const cfg = LAYER_CONFIG[type]
                             return (
                                 <div key={type}>
-                                    <div className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg mx-0.5 mb-0.5 ${cfg.badgeBg}`}>
+                                    <div className={`flex items-center gap-1.5 px-2 py-1.5 rounded-md mx-0.5 mb-0.5 ${cfg.badgeBg}`}>
                                         <span className={cfg.badgeText}>{cfg.icon}</span>
                                         <span className={`text-[10px] font-black uppercase tracking-wider ${cfg.badgeText}`}>{cfg.labelJa}</span>
                                         <span className={`ml-auto text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-white/70 ${cfg.textColor}`}>{group.length}</span>
@@ -428,7 +440,7 @@ export default function RoutingClient({ initialLocations, filterCompanies, googl
                                                     }`}
                                                 onClick={() => flyTo(loc)}
                                             >
-                                                <div className={`w-7 h-7 rounded-lg shrink-0 flex items-center justify-center mt-0.5
+                                                <div className={`w-7 h-7 rounded-md shrink-0 flex items-center justify-center mt-0.5
                                                     ${isActive ? cfg.badgeBg : 'bg-slate-100 group-hover:' + cfg.bg}`}
                                                     style={{ color: cfg.pinColor }}
                                                 >
@@ -472,7 +484,7 @@ export default function RoutingClient({ initialLocations, filterCompanies, googl
                         {/* Unmapped section — shown but not clickable on map */}
                         {filteredUnmapped.length > 0 && (
                             <div>
-                                <div className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg mx-0.5 mb-0.5 bg-amber-50">
+                                <div className="flex items-center gap-1.5 px-2 py-1.5 rounded-md mx-0.5 mb-0.5 bg-amber-50">
                                     <AlertTriangle size={11} className="text-amber-500" />
                                     <span className="text-[10px] font-black uppercase tracking-wider text-amber-600">座標未登録</span>
                                     <span className="ml-auto text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-white/70 text-amber-600">{filteredUnmapped.length}</span>
@@ -485,7 +497,7 @@ export default function RoutingClient({ initialLocations, filterCompanies, googl
                                             className="w-full text-left flex items-start gap-2.5 px-3 py-2.5 rounded-xl opacity-50 mb-0.5"
                                             title="企業フォームで住所を保存すると座標が自動登録されます"
                                         >
-                                            <div className="w-7 h-7 rounded-lg shrink-0 flex items-center justify-center mt-0.5 bg-amber-50"
+                                            <div className="w-7 h-7 rounded-md shrink-0 flex items-center justify-center mt-0.5 bg-amber-50"
                                                 style={{ color: cfg.pinColor }}
                                             >
                                                 {cfg.icon}
@@ -508,6 +520,39 @@ export default function RoutingClient({ initialLocations, filterCompanies, googl
 
                 {/* ══════════════ MAP ══════════════ */}
                 <div className="flex-1 h-full relative bg-slate-200 order-first md:order-none">
+                    {/* ── Active marker clear button ── */}
+                    {activeMarkerId && (() => {
+                        const loc = filteredMappable.find(l => l.id === activeMarkerId)
+                        if (!loc) return null
+                        const cfg = LAYER_CONFIG[loc.type]
+                        return (
+                            <div className="absolute top-4 right-4 z-[201] flex items-center gap-2 rounded-full px-3.5 py-2 transition-all"
+                                style={{
+                                    background: 'rgba(255,255,255,0.92)',
+                                    backdropFilter: 'blur(14px)',
+                                    WebkitBackdropFilter: 'blur(14px)',
+                                    border: `1px solid ${cfg.pinColor}40`,
+                                    boxShadow: `0 4px 20px rgba(0,0,0,0.13), 0 1px 4px ${cfg.pinColor}30`,
+                                }}>
+                                <div className="w-5 h-5 rounded-full flex items-center justify-center shrink-0"
+                                    style={{ backgroundColor: cfg.pinColor + '20', color: cfg.pinColor }}>
+                                    {cfg.icon}
+                                </div>
+                                <span className="text-[12px] font-black text-slate-700 max-w-[160px] truncate">
+                                    {loc.name}
+                                </span>
+                                <button
+                                    onClick={() => { setActiveMarkerId(null); setPanTarget(null) }}
+                                    className="w-6 h-6 rounded-full flex items-center justify-center transition-all hover:scale-110 active:scale-95 shrink-0"
+                                    style={{ background: 'rgba(100,116,139,0.12)', color: '#64748b' }}
+                                    title="選択を解除"
+                                >
+                                    <X size={12} strokeWidth={2.5} />
+                                </button>
+                            </div>
+                        )
+                    })()}
+
                     <Map
                         mapId="KIKANCLOUD_MAP"
                         defaultCenter={defaultCenter}
@@ -557,7 +602,7 @@ export default function RoutingClient({ initialLocations, filterCompanies, googl
                                     <div className="p-2.5 min-w-[220px] max-w-[280px]">
                                         <div className="flex items-center gap-2 mb-2 pb-2 border-b border-slate-100">
                                             <div
-                                                className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
+                                                className="w-7 h-7 rounded-md flex items-center justify-center shrink-0"
                                                 style={{ backgroundColor: cfg.pinColor + '20', color: cfg.pinColor }}
                                             >
                                                 {cfg.icon}
@@ -580,7 +625,7 @@ export default function RoutingClient({ initialLocations, filterCompanies, googl
                                             href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(loc.address || loc.name)}`}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="mt-2.5 w-full flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-[11px] font-bold text-white transition-colors"
+                                            className="mt-2.5 w-full flex items-center justify-center gap-1.5 py-1.5 rounded-md text-[11px] font-bold text-white transition-colors"
                                             style={{ backgroundColor: cfg.pinColor }}
                                         >
                                             <Navigation size={11} /> Googleマップで開く
@@ -593,23 +638,43 @@ export default function RoutingClient({ initialLocations, filterCompanies, googl
 
                     {/* ── Sidebar toggle button ── */}
                     {/* Desktop: top-left | Mobile: bottom-right floating button */}
+                    {/* Desktop toggle — prominent pill top-left */}
                     <button
                         onClick={() => setIsSidebarOpen(v => !v)}
-                        className="hidden md:flex absolute top-3 left-3 z-30 w-9 h-9 bg-white rounded-xl shadow-md border border-slate-200 items-center justify-center text-slate-600 hover:bg-slate-50 transition-all"
+                        className="hidden md:flex absolute top-4 left-4 z-[201] items-center gap-2 px-4 py-2 rounded-full transition-all active:scale-95 hover:scale-105"
                         title={isSidebarOpen ? 'サイドバーを隠す' : 'サイドバーを表示'}
-                    >
-                        <List size={16} />
-                    </button>
-                    {/* Mobile toggle — floating pill chip */}
-                    <button
-                        onClick={() => setIsSidebarOpen(v => !v)}
-                        className="md:hidden fixed bottom-20 right-4 z-50 flex items-center gap-2 px-4 py-2.5 rounded-full transition-all active:scale-95"
                         style={{
-                            background: 'rgba(255,255,255,0.95)',
+                            background: isSidebarOpen ? 'rgba(255,255,255,0.92)' : 'rgba(0,103,184,0.92)',
                             backdropFilter: 'blur(12px)',
                             WebkitBackdropFilter: 'blur(12px)',
-                            border: '1px solid rgba(0,103,184,0.2)',
-                            boxShadow: '0 4px 20px rgba(0,0,0,0.18), 0 1px 4px rgba(0,103,184,0.15)',
+                            border: isSidebarOpen ? '1px solid rgba(0,103,184,0.25)' : '1px solid rgba(255,255,255,0.3)',
+                            boxShadow: '0 4px 20px rgba(0,0,0,0.18), 0 1px 4px rgba(0,103,184,0.2)',
+                        }}
+                    >
+                        {isSidebarOpen ? (
+                            <>
+                                <X size={14} className="text-slate-500 shrink-0" />
+                                <span className="text-[12px] font-black text-slate-600 whitespace-nowrap">閉じる</span>
+                            </>
+                        ) : (
+                            <>
+                                <List size={14} className="text-white shrink-0" />
+                                <span className="text-[12px] font-black text-white whitespace-nowrap">一覧を表示</span>
+                            </>
+                        )}
+                    </button>
+                    {/* Mobile toggle — floating pill */}
+                    <button
+                        onClick={() => setIsSidebarOpen(v => !v)}
+                        className="md:hidden fixed bottom-20 right-4 z-[201] flex items-center gap-2 px-4 py-2.5 rounded-full transition-all active:scale-95"
+                        style={{
+                            background: isSidebarOpen ? 'rgba(255,255,255,0.95)' : 'rgba(0,103,184,0.95)',
+                            backdropFilter: 'blur(14px)',
+                            WebkitBackdropFilter: 'blur(14px)',
+                            border: isSidebarOpen ? '1px solid rgba(0,103,184,0.2)' : '1px solid rgba(255,255,255,0.25)',
+                            boxShadow: isSidebarOpen
+                                ? '0 4px 20px rgba(0,0,0,0.15), 0 1px 4px rgba(0,103,184,0.1)'
+                                : '0 4px 24px rgba(0,103,184,0.45), 0 1px 6px rgba(0,0,0,0.15)',
                         }}
                     >
                         {isSidebarOpen ? (
@@ -619,15 +684,15 @@ export default function RoutingClient({ initialLocations, filterCompanies, googl
                             </>
                         ) : (
                             <>
-                                <MapPinIcon size={15} className="text-[#0067b8] shrink-0" />
-                                <span className="text-[12px] font-black text-[#0067b8] whitespace-nowrap">一覧を開く</span>
+                                <MapPinIcon size={15} className="text-white shrink-0" />
+                                <span className="text-[12px] font-black text-white whitespace-nowrap">一覧を開く</span>
                             </>
                         )}
                     </button>
 
 
                     {/* Powered by */}
-                    <div className="absolute bottom-6 right-3 z-20 bg-white/90 backdrop-blur-sm border border-slate-200 px-3 py-1.5 rounded-xl pointer-events-none shadow-sm">
+                    <div className="hidden md:block absolute bottom-6 right-3 z-20 bg-white/90 backdrop-blur-sm border border-slate-200 px-3 py-1.5 rounded-xl pointer-events-none shadow-sm">
                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
                             <Navigation size={11} className="text-blue-500" /> Powered by Google Maps
                         </p>

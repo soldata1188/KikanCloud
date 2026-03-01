@@ -77,6 +77,8 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
     const [filterNationality, setFilterNationality] = useState('all')
     const [filterEntryBatch, setFilterEntryBatch] = useState('all')
     const [filterEntryYear, setFilterEntryYear] = useState('all')
+    const [sortKey, setSortKey] = useState<'entry_date' | 'zairyu_exp' | 'cert_end_date'>('entry_date')
+    const [sortDir, setSortDir] = useState<'desc' | 'asc'>('desc')
     const [currentPage, setCurrentPage] = useState(1)
     const [isBulkEditModalOpen, setIsBulkEditModalOpen] = useState(false)
     const [batchForm, setBatchForm] = useState({
@@ -147,17 +149,23 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
             result = result.filter(w => ((w as any).entry_date || '').startsWith(filterEntryYear))
         }
 
-        // Sort by entry_date DESC (Latest first)
+        // Dynamic sort
+        const SORT_FIELD_MAP = {
+            entry_date: 'entry_date',
+            zairyu_exp: 'zairyu_exp',
+            cert_end_date: 'cert_end_date',
+        } as const
+        const field = SORT_FIELD_MAP[sortKey]
         result.sort((a, b) => {
-            const dateA = (a.entry_date || '0000-00-00')
-            const dateB = (b.entry_date || '0000-00-00')
-            return dateB.localeCompare(dateA)
+            const va = ((a as any)[field] || '0000-00-00')
+            const vb = ((b as any)[field] || '0000-00-00')
+            return sortDir === 'desc' ? vb.localeCompare(va) : va.localeCompare(vb)
         })
 
         setFiltered(result)
         setSelectedIds([])
         setCurrentPage(1)
-    }, [searchTerm, filterCompany, filterIndustry, filterVisaStatus, filterNationality, filterEntryBatch, filterEntryYear, activeTab, workers])
+    }, [searchTerm, filterCompany, filterIndustry, filterVisaStatus, filterNationality, filterEntryBatch, filterEntryYear, sortKey, sortDir, activeTab, workers])
 
     const totalPages = Math.ceil(filtered.length / PAGE_SIZE)
     const paginated = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
@@ -337,6 +345,27 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                         <option value="all">期生: 全て</option>
                         {entryBatchList.sort().map(b => <option key={b} value={b}>{b}期生</option>)}
                     </select>
+                    {/* 並び替え */}
+                    <div className="flex items-center gap-1 ml-auto shrink-0">
+                        <select
+                            value={sortKey}
+                            onChange={e => setSortKey(e.target.value as typeof sortKey)}
+                            className="text-[11px] border border-gray-200 rounded-md px-2 py-1.5 bg-gray-50 outline-none focus:border-[#0067b8] cursor-pointer font-bold text-gray-600 h-8 max-w-[110px]">
+                            <option value="entry_date">入国日順</option>
+                            <option value="zairyu_exp">在留期限順</option>
+                            <option value="cert_end_date">認修了日順</option>
+                        </select>
+                        <button
+                            onClick={() => setSortDir(d => d === 'desc' ? 'asc' : 'desc')}
+                            className="h-8 w-8 flex items-center justify-center border border-gray-200 rounded-md bg-gray-50 hover:bg-white hover:border-[#0067b8] transition-all text-gray-500 shrink-0"
+                            title={sortDir === 'desc' ? '降順(新しい順)' : '昇順(古い順)'}
+                        >
+                            {sortDir === 'desc'
+                                ? <span className="text-[13px] font-black leading-none">↓</span>
+                                : <span className="text-[13px] font-black leading-none">↑</span>
+                            }
+                        </button>
+                    </div>
                 </div>
             </div>
 

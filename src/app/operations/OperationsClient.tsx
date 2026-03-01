@@ -211,7 +211,14 @@ export default function OperationsClient({
     const processedWorkers = useMemo(() => {
         const subTab = STATUS_SEG_TABS.find(t => t.key === activeSubTab)!;
         const sortFn = (a: any, b: any) => {
-            if (sortBy === 'none') return 0;
+            if (sortBy === 'none') {
+                // デフォルト: 企業名 昇順 → 入国日 昇順
+                const companyCmp = (a.company || '').localeCompare(b.company || '', 'ja');
+                if (companyCmp !== 0) return companyCmp;
+                const ea = a.entryDate || '9999-99-99';
+                const eb = b.entryDate || '9999-99-99';
+                return ea.localeCompare(eb);
+            }
             const key = sortBy === 'visaExpiry' ? 'visaExpiry'
                 : sortBy === 'certEnd' ? 'cert_end_date'
                     : 'entryDate';

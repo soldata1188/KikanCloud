@@ -78,7 +78,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
     const [filterEntryBatch, setFilterEntryBatch] = useState('all')
     const [filterEntryYear, setFilterEntryYear] = useState('all')
     const [sortKey, setSortKey] = useState<'entry_date' | 'zairyu_exp' | 'cert_end_date'>('entry_date')
-    const [sortDir, setSortDir] = useState<'desc' | 'asc'>('desc')
+    const [sortDir, setSortDir] = useState<'desc' | 'asc'>('asc')
     const [currentPage, setCurrentPage] = useState(1)
     const [isBulkEditModalOpen, setIsBulkEditModalOpen] = useState(false)
     const [batchForm, setBatchForm] = useState({
@@ -149,7 +149,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
             result = result.filter(w => ((w as any).entry_date || '').startsWith(filterEntryYear))
         }
 
-        // Dynamic sort
+        // Sort: 企業名 昇順 (主), 選択フィールド (副)
         const SORT_FIELD_MAP = {
             entry_date: 'entry_date',
             zairyu_exp: 'zairyu_exp',
@@ -157,9 +157,15 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
         } as const
         const field = SORT_FIELD_MAP[sortKey]
         result.sort((a, b) => {
-            const va = ((a as any)[field] || '0000-00-00')
-            const vb = ((b as any)[field] || '0000-00-00')
-            return sortDir === 'desc' ? vb.localeCompare(va) : va.localeCompare(vb)
+            // 主キー: 入国日 降順 (新しい順)
+            const ea = ((a as any).entry_date || '0000-00-00')
+            const eb = ((b as any).entry_date || '0000-00-00')
+            const entryCmp = eb.localeCompare(ea)
+            if (entryCmp !== 0) return entryCmp
+            // 副キー: 企業名 昇順
+            return ((a as any).companies?.name_jp || '').localeCompare(
+                (b as any).companies?.name_jp || '', 'ja'
+            )
         })
 
         setFiltered(result)

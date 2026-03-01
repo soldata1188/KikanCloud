@@ -114,6 +114,7 @@ export default function WorkerDetailClient({ worker, documents }: { worker: Work
         'working': { label: '就業中', dot: 'bg-emerald-400', bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200' },
         'missing': { label: '失踪', dot: 'bg-rose-400', bg: 'bg-rose-50', text: 'text-rose-700', border: 'border-rose-200' },
         'returned': { label: '帰国', dot: 'bg-gray-400', bg: 'bg-gray-100', text: 'text-gray-500', border: 'border-gray-200' },
+        'transferred': { label: '転籍済', dot: 'bg-purple-400', bg: 'bg-purple-50', text: 'text-purple-700', border: 'border-purple-200' },
     };
     const cfg = statusCfg[worker.status] || { label: worker.status, dot: 'bg-slate-400', bg: 'bg-slate-50', text: 'text-slate-600', border: 'border-slate-200' };
 

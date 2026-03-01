@@ -1,5 +1,6 @@
 export type SystemType = 'ginou_jisshu' | 'ikusei_shuro' | 'tokuteigino';
-export type WorkerStatus = 'waiting' | 'working' | 'missing' | 'returned' | 'standby';
+export type WorkerStatus = 'waiting' | 'working' | 'missing' | 'returned' | 'standby' | 'transferred';
+
 
 export interface Company {
     id: string;

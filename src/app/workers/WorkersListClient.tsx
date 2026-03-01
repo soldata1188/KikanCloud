@@ -45,7 +45,7 @@ const TAB_CONFIG: Record<string, {
 const TAB_KEYS = ['active', 'waiting', 'closed']
 
 const reverseStatusMap: Record<string, string> = {
-    'waiting': '未入国', 'standby': '対応中', 'working': '在籍中', 'missing': '失踪', 'returned': '帰国'
+    'waiting': '未入国', 'standby': '対応中', 'working': '就業中', 'missing': '失踪', 'returned': '帰国', 'transferred': '転籍済'
 }
 
 const PAGE_SIZE = 50
@@ -432,7 +432,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                     <div className="flex-1 px-4 py-4 overflow-y-auto">
                         <div className="space-y-3">
                             {[
-                                { label: '状態', el: <select value={batchForm.worker_status} onChange={e => setBatchForm(p => ({ ...p, worker_status: e.target.value }))} className="w-full text-[13px] rounded-md bg-white text-gray-800 border border-gray-200 py-1.5 px-2.5 outline-none focus:border-[#0067b8] focus:ring-1 focus:ring-[#0067b8]/20 transition-colors"><option value="">---</option>{['waiting', 'standby', 'working', 'missing', 'returned'].map(s => (<option key={s} value={s}>{reverseStatusMap[s]}</option>))}</select> },
+                                { label: '状態', el: <select value={batchForm.worker_status} onChange={e => setBatchForm(p => ({ ...p, worker_status: e.target.value }))} className="w-full text-[13px] rounded-md bg-white text-gray-800 border border-gray-200 py-1.5 px-2.5 outline-none focus:border-[#0067b8] focus:ring-1 focus:ring-[#0067b8]/20 transition-colors"><option value="">---</option>{['waiting', 'standby', 'working', 'missing', 'returned', 'transferred'].map(s => (<option key={s} value={s}>{reverseStatusMap[s]}</option>))}</select> },
                                 { label: '職種区分', el: <input type="text" placeholder="例: 建設、農業、介護..." value={batchForm.industry_field} onChange={e => setBatchForm(p => ({ ...p, industry_field: e.target.value }))} className="w-full text-[13px] rounded-md bg-white text-gray-800 placeholder-gray-300 border border-gray-200 py-1.5 px-2.5 outline-none focus:border-[#0067b8] transition-colors" /> },
                                 { label: '送出機関', el: <input type="text" placeholder="送出機関名" value={batchForm.sending_org} onChange={e => setBatchForm(p => ({ ...p, sending_org: e.target.value }))} className="w-full text-[13px] rounded-md bg-white text-gray-800 placeholder-gray-300 border border-gray-200 py-1.5 px-2.5 outline-none focus:border-[#0067b8] transition-colors" /> },
                                 { label: '国籍', el: <input type="text" placeholder="例: ベトナム" value={batchForm.nationality} onChange={e => setBatchForm(p => ({ ...p, nationality: e.target.value }))} className="w-full text-[13px] rounded-md bg-white text-gray-800 placeholder-gray-300 border border-gray-200 py-1.5 px-2.5 outline-none focus:border-[#0067b8] transition-colors" /> },

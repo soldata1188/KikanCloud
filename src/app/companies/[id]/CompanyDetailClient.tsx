@@ -33,7 +33,7 @@ export default function CompanyDetailClient({ company, documents }: { company: a
     const [previewDoc, setPreviewDoc] = useState<DocumentFile | null>(null);
     const [docsOpen, setDocsOpen] = useState(false);
 
-    const activeWorkersList = company.workers?.filter((w: any) => w.status === 'working' && w.is_deleted === false) || [];
+    const activeWorkersList = company.workers?.filter((w: any) => ['working', 'standby'].includes(w.status) && w.is_deleted === false) || [];
     const activeWorkers = activeWorkersList.length;
 
     // ── Document List (shared between sidebar and mobile drawer)

@@ -41,7 +41,7 @@ const SYSTEM_TABS = [
 
 const STATUS_SEG_TABS = [
     { key: 'waiting', label: '未入国', statuses: ['未入国'] },
-    { key: 'active', label: '在籍中', statuses: ['対応中', '在籍中'] },
+    { key: 'active', label: '在籍中', statuses: ['対応中', '就業中'] },
     { key: 'working', label: '処理中', statuses: ['失踪', '帰国', '転籍済'] },
 ];
 
@@ -52,21 +52,24 @@ const cycleProgress = (current: string) => {
 
 // ── Badge helpers ────────────────────────────────────────────────
 const statusBadgeCls = (s: string) => {
-    if (s === '在籍中' || s === '在留中') return 'bg-emerald-50 text-emerald-700 border-emerald-200 uppercase font-bold'
+    if (s === '就業中') return 'bg-emerald-50 text-emerald-700 border-emerald-200 uppercase font-bold'
     if (s === '対応中') return 'bg-blue-50 text-[#0067b8] border-blue-200 font-bold'
     if (s === '失踪') return 'bg-rose-50 text-rose-700 border-rose-200 font-bold'
-    return 'bg-gray-100 text-gray-500 border-gray-200 font-medium' // 帰国, 転籍済, 未入国
+    if (s === '転籍済') return 'bg-purple-50 text-purple-700 border-purple-200 font-bold'
+    return 'bg-gray-100 text-gray-500 border-gray-200 font-medium' // 帰国, 未入国
 }
 
 // ── Card color by status ──────────────────────────────────────────
 const workerCardCls = (s: string) => {
-    if (s === '在籍中' || s === '在留中')
+    if (s === '就業中')
         return 'bg-emerald-50/40 border-l-[3px] border-l-emerald-400'
     if (s === '対応中')
         return 'bg-blue-50/40 border-l-[3px] border-l-[#0067b8]'
     if (s === '失踪')
         return 'bg-rose-50/40 border-l-[3px] border-l-rose-400'
-    return 'bg-white/20 border-l-[3px] border-l-gray-300' // 帰国, 転籍済, 未入国
+    if (s === '転籍済')
+        return 'bg-purple-50/40 border-l-[3px] border-l-purple-400'
+    return 'bg-white/20 border-l-[3px] border-l-gray-300' // 帰国, 未入国
 }
 
 const progressBadgeCls = (p: string) => {
@@ -141,7 +144,7 @@ export default function OperationsClient({
 
     const mappedWorkers = initialWorkers.map(w => {
         const reverseStatusMap: Record<string, string> = {
-            'waiting': '未入国', 'standby': '対応中', 'working': '在籍中', 'missing': '失踪', 'returned': '帰国'
+            'waiting': '未入国', 'standby': '対応中', 'working': '就業中', 'missing': '失踪', 'returned': '帰国', 'transferred': '転籍済'
         };
         return {
             id: w.id,
@@ -334,6 +337,11 @@ export default function OperationsClient({
         setSelectedIds(selectedIds.size === paginatedWorkers.length ? new Set() : new Set(paginatedWorkers.map(w => w.id)));
 
     const applyBatch = async () => {
+        // Convert JP label → DB English value before persist
+        const statusToDbMap: Record<string, string> = {
+            '未入国': 'waiting', '対応中': 'standby', '就業中': 'working',
+            '失踪': 'missing', '帰国': 'returned', '転籍済': 'transferred'
+        };
         const ids = Array.from(selectedIds);
         for (const id of ids) {
             const worker = workers.find(w => w.id === id);
@@ -361,7 +369,10 @@ export default function OperationsClient({
             updates.push(updateOperationData(id, 'nyukan_status', newNyukan));
             if (batchForm.cert_start_date) updates.push(updateWorkerStatus(id, 'cert_start_date', batchForm.cert_start_date));
             if (batchForm.cert_end_date) updates.push(updateWorkerStatus(id, 'cert_end_date', batchForm.cert_end_date));
-            if (batchForm.worker_status) updates.push(updateWorkerStatus(id, 'status', batchForm.worker_status));
+            if (batchForm.worker_status) {
+                const dbStatus = statusToDbMap[batchForm.worker_status] || batchForm.worker_status;
+                updates.push(updateWorkerStatus(id, 'status', dbStatus));
+            }
             if (batchForm.occupation) updates.push(updateWorkerStatus(id, 'industry_field', batchForm.occupation));
             setWorkers(prev => prev.map(w => w.id === id ? {
                 ...w,
@@ -369,6 +380,7 @@ export default function OperationsClient({
                 nyukanStatus: newNyukan,
                 ...(batchForm.cert_start_date ? { cert_start_date: batchForm.cert_start_date } : {}),
                 ...(batchForm.cert_end_date ? { cert_end_date: batchForm.cert_end_date } : {}),
+                // Update local state with JP label (display value)
                 ...(batchForm.worker_status ? { status: batchForm.worker_status } : {}),
                 ...(batchForm.occupation ? { occupation: batchForm.occupation } : {}),
             } : w));

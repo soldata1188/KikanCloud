@@ -149,6 +149,7 @@ export default function EditWorkerClient({ companies, worker }: EditWorkerProps)
         'working': { label: '就業中', bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200' },
         'missing': { label: '失踪', bg: 'bg-rose-50', text: 'text-rose-700', border: 'border-rose-200' },
         'returned': { label: '帰国', bg: 'bg-gray-100', text: 'text-gray-500', border: 'border-gray-200' },
+        'transferred': { label: '転籍済', bg: 'bg-purple-50', text: 'text-purple-700', border: 'border-purple-200' },
     };
     const cfg = statusCfg[formData.status] || { label: formData.status, bg: 'bg-slate-50', text: 'text-slate-600', border: 'border-slate-200' };
 
@@ -449,6 +450,7 @@ export default function EditWorkerClient({ companies, worker }: EditWorkerProps)
                                                 <option value="working">就業中</option>
                                                 <option value="missing">失踪</option>
                                                 <option value="returned">帰国</option>
+                                                <option value="transferred">転籍済</option>
                                             </select>
                                         </FormRow>
                                         <FormRow label="送出機関" isLast>

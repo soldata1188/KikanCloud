@@ -395,6 +395,7 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
                                         <option value="working">就業中</option>
                                         <option value="missing">失踪</option>
                                         <option value="returned">帰国</option>
+                                        <option value="transferred">転籍済</option>
                                     </select>
                                 </FormRow>
                                 <FormRow label="送出機関" isLast={true}>

@@ -96,6 +96,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
     const [isBulkEditModalOpen, setIsBulkEditModalOpen] = useState(false)
     const [batchForm, setBatchForm] = useState({
         worker_status: '',
+        industry_field: '',
         sending_org: '',
         nationality: '',
         entry_batch: '',
@@ -224,6 +225,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
         for (const id of ids) {
             const updates: Promise<unknown>[] = [];
             if (batchForm.worker_status) updates.push(updateWorkerStatus(id, 'status', batchForm.worker_status));
+            if (batchForm.industry_field) updates.push(updateWorkerStatus(id, 'industry_field', batchForm.industry_field));
             if (batchForm.sending_org) updates.push(updateWorkerStatus(id, 'sending_org', batchForm.sending_org));
             if (batchForm.nationality) updates.push(updateWorkerStatus(id, 'nationality', batchForm.nationality));
             if (batchForm.entry_batch) updates.push(updateWorkerStatus(id, 'entry_batch', batchForm.entry_batch));
@@ -238,6 +240,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                 setWorkers(prev => prev.map(w => w.id === id ? {
                     ...w,
                     ...(batchForm.worker_status ? { status: batchForm.worker_status } : {}),
+                    ...(batchForm.industry_field ? { industry_field: batchForm.industry_field } : {}),
                     ...(batchForm.sending_org ? { sending_org: batchForm.sending_org } : {}),
                     ...(batchForm.nationality ? { nationality: batchForm.nationality } : {}),
                     ...(batchForm.entry_batch ? { entry_batch: batchForm.entry_batch } : {}),
@@ -253,7 +256,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
             }
         }
         setSelectedIds([]);
-        setBatchForm({ worker_status: '', sending_org: '', nationality: '', entry_batch: '', entry_date: '', visa_status: '', zairyu_exp: '', cert_start_date: '', cert_end_date: '', passport_exp: '', insurance_exp: '' });
+        setBatchForm({ worker_status: '', industry_field: '', sending_org: '', nationality: '', entry_batch: '', entry_date: '', visa_status: '', zairyu_exp: '', cert_start_date: '', cert_end_date: '', passport_exp: '', insurance_exp: '' });
     };
 
     const toggleSelect = (id: string) => {
@@ -430,6 +433,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                         <div className="space-y-3">
                             {[
                                 { label: '状態', el: <select value={batchForm.worker_status} onChange={e => setBatchForm(p => ({ ...p, worker_status: e.target.value }))} className="w-full text-[13px] rounded-md bg-white text-gray-800 border border-gray-200 py-1.5 px-2.5 outline-none focus:border-[#0067b8] focus:ring-1 focus:ring-[#0067b8]/20 transition-colors"><option value="">---</option>{['waiting', 'standby', 'working', 'missing', 'returned'].map(s => (<option key={s} value={s}>{reverseStatusMap[s]}</option>))}</select> },
+                                { label: '職種区分', el: <input type="text" placeholder="例: 建設、農業、介護..." value={batchForm.industry_field} onChange={e => setBatchForm(p => ({ ...p, industry_field: e.target.value }))} className="w-full text-[13px] rounded-md bg-white text-gray-800 placeholder-gray-300 border border-gray-200 py-1.5 px-2.5 outline-none focus:border-[#0067b8] transition-colors" /> },
                                 { label: '送出機関', el: <input type="text" placeholder="送出機関名" value={batchForm.sending_org} onChange={e => setBatchForm(p => ({ ...p, sending_org: e.target.value }))} className="w-full text-[13px] rounded-md bg-white text-gray-800 placeholder-gray-300 border border-gray-200 py-1.5 px-2.5 outline-none focus:border-[#0067b8] transition-colors" /> },
                                 { label: '国籍', el: <input type="text" placeholder="例: ベトナム" value={batchForm.nationality} onChange={e => setBatchForm(p => ({ ...p, nationality: e.target.value }))} className="w-full text-[13px] rounded-md bg-white text-gray-800 placeholder-gray-300 border border-gray-200 py-1.5 px-2.5 outline-none focus:border-[#0067b8] transition-colors" /> },
                                 { label: '入国期生', el: <input type="text" placeholder="例: 第10期生" value={batchForm.entry_batch} onChange={e => setBatchForm(p => ({ ...p, entry_batch: e.target.value }))} className="w-full text-[13px] rounded-md bg-white text-gray-800 placeholder-gray-300 border border-gray-200 py-1.5 px-2.5 outline-none focus:border-[#0067b8] transition-colors" /> },
@@ -531,7 +535,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                                         <th className="px-4 py-3 font-bold text-[11px] uppercase tracking-wider w-[40px] border-r border-white/10 text-white/90">No.</th>
                                         <th className="px-4 py-3 font-bold text-[11px] uppercase tracking-wider w-[240px] border-r border-white/10 text-white/90">人材名 (氏名/カナ)</th>
                                         <th className="px-4 py-3 font-bold text-[11px] uppercase tracking-wider w-[180px] border-r border-white/10 text-white/90">受入企業 / 職種</th>
-                                        <th className="px-4 py-3 font-bold text-[11px] uppercase tracking-wider w-[180px] border-r border-white/10 text-white/90">送出機関 / 国籍</th>
+                                        <th className="px-4 py-3 font-bold text-[11px] uppercase tracking-wider w-[180px] border-r border-white/10 text-white/90">国籍 / 送出機関</th>
                                         <th className="px-4 py-3 font-bold text-[11px] uppercase tracking-wider w-[140px] border-r border-white/10 text-white/90">入国期生 / 入国日</th>
                                         <th className="px-4 py-3 font-bold text-[11px] uppercase tracking-wider w-[140px] border-r border-white/10 text-white/90">在留資格</th>
                                         <th className="px-4 py-3 font-bold text-[11px] uppercase tracking-wider w-[140px] border-r border-white/10 text-white/90">期限 / 修了日</th>

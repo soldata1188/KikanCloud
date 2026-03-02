@@ -569,27 +569,28 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                                         const gColor = GROUP_COLORS[gi % GROUP_COLORS.length]
                                         return (
                                             <React.Fragment key={`${group.label}-${gi}`}>
-                                                {/* 3px gap row between groups */}
+                                                {/* compact group header row */}
                                                 {gi > 0 && (
-                                                    <tr><td colSpan={10} className="p-0" style={{ height: '4px', background: '#f8fafc' }} /></tr>
+                                                    <tr><td colSpan={10} className="p-0" style={{ height: '4px', background: '#f1f5f9' }} /></tr>
                                                 )}
+                                                <tr style={{ borderLeft: `4px solid ${gColor}` }}>
+                                                    <td colSpan={10} className="py-1 px-3 border-b border-gray-100"
+                                                        style={{ background: `${gColor}14` }}>
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="text-[9px] font-black tracking-widest uppercase leading-none" style={{ color: gColor }}>{group.label}</span>
+                                                            <span className="text-[9px] font-bold text-gray-400 leading-none">{group.workers.length}名</span>
+                                                            {group.date && <span className="text-[9px] font-mono text-gray-300 leading-none">{group.date.substring(0, 7).replace(/-/g, '/')}</span>}
+                                                        </div>
+                                                    </td>
+                                                </tr>
                                                 {group.workers.map((worker, wi) => {
                                                     const absIndex = (currentPage - 1) * PAGE_SIZE +
                                                         paginatedGroups.slice(0, gi).reduce((s, g) => s + g.workers.length, 0) + wi + 1
-                                                    const isFirst = wi === 0
                                                     return (
                                                         <tr key={worker.id}
                                                             className="bg-white hover:bg-blue-50/30 transition-all duration-150"
                                                             style={{ borderLeft: `4px solid ${gColor}` }}>
                                                             <td className="px-3 py-3 text-center border-r border-gray-200">
-                                                                {isFirst && (
-                                                                    <div className="flex justify-center mb-1.5">
-                                                                        <span className="text-white text-[8px] font-black px-1.5 py-0.5 rounded leading-none whitespace-nowrap"
-                                                                            style={{ background: gColor }}>
-                                                                            {group.label}
-                                                                        </span>
-                                                                    </div>
-                                                                )}
                                                                 <input type="checkbox" checked={selectedIds.includes(worker.id)} onChange={() => toggleSelect(worker.id)} className="w-4 h-4 rounded border-gray-300 accent-[#0067b8]" />
                                                             </td>
                                                             <td className="px-4 py-3 font-mono text-[#0067b8] text-[11px] font-bold border-r border-gray-200 text-center">{absIndex}</td>

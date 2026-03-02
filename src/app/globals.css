@@ -135,3 +135,216 @@ body {
     background: #94a3b8;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   MICRO-ANIMATION SYSTEM — Option A: Fade + Scale
+   Easing: cubic-bezier(0.16, 1, 0.3, 1) — fast start, soft settle
+   Duration tiers:
+     · xs  120ms — badge, tooltip, inline feedback
+     · sm  180ms — dropdown, popover, row
+     · md  220ms — modal, sidebar, panel
+     · lg  300ms — page transition
+══════════════════════════════════════════════════════════════ */
+
+@keyframes kikan-fade-scale {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes kikan-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes kikan-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes kikan-slide-right {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes kikan-slide-left {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes kikan-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+
+  60% {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@layer utilities {
+
+  /* ── Page / Section entry ────────────────────── */
+  .anim-page {
+    animation: kikan-fade-scale 300ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  /* ── Modal / Sidebar / Panel ─────────────────── */
+  .anim-modal {
+    animation: kikan-fade-scale 220ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  /* ── Card / Row list entry ───────────────────── */
+  .anim-card {
+    animation: kikan-fade-up 180ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  /* ── Dropdown / Popover ──────────────────────── */
+  .anim-dropdown {
+    animation: kikan-fade-scale 150ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    transform-origin: top center;
+  }
+
+  /* ── Badge / Chip / Inline element ──────────── */
+  .anim-badge {
+    animation: kikan-pop 180ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  /* ── Right panel (sidebar) ───────────────────── */
+  .anim-slide-right {
+    animation: kikan-slide-right 220ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  /* ── Left panel ──────────────────────────────── */
+  .anim-slide-left {
+    animation: kikan-slide-left 220ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  /* ── Simple fade ─────────────────────────────── */
+  .anim-fade {
+    animation: kikan-fade-in 200ms ease both;
+  }
+
+  /* ── Stagger helpers (apply to parent) ───────── */
+  .anim-stagger>* {
+    animation: kikan-fade-up 180ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .anim-stagger>*:nth-child(1) {
+    animation-delay: 0ms;
+  }
+
+  .anim-stagger>*:nth-child(2) {
+    animation-delay: 30ms;
+  }
+
+  .anim-stagger>*:nth-child(3) {
+    animation-delay: 60ms;
+  }
+
+  .anim-stagger>*:nth-child(4) {
+    animation-delay: 90ms;
+  }
+
+  .anim-stagger>*:nth-child(5) {
+    animation-delay: 120ms;
+  }
+
+  .anim-stagger>*:nth-child(6) {
+    animation-delay: 150ms;
+  }
+
+  .anim-stagger>*:nth-child(7) {
+    animation-delay: 180ms;
+  }
+
+  .anim-stagger>*:nth-child(8) {
+    animation-delay: 210ms;
+  }
+
+  .anim-stagger>*:nth-child(n+9) {
+    animation-delay: 240ms;
+  }
+
+  /* ── Hover lift — card interactive ───────────── */
+  .hover-lift {
+    transition: box-shadow 160ms ease, transform 160ms ease;
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px -4px rgba(0, 103, 184, 0.12), 0 1px 4px -1px rgba(0, 0, 0, 0.08);
+  }
+
+  /* ── Active press feedback ───────────────────── */
+  .press-effect {
+    transition: transform 80ms ease;
+  }
+
+  .press-effect:active {
+    transform: scale(0.97);
+  }
+
+  /* ── Accessibility: respect reduced motion ───── */
+  @media (prefers-reduced-motion: reduce) {
+
+    .anim-page,
+    .anim-modal,
+    .anim-card,
+    .anim-dropdown,
+    .anim-badge,
+    .anim-slide-right,
+    .anim-slide-left,
+    .anim-fade,
+    .anim-stagger>* {
+      animation: none !important;
+    }
+
+    .hover-lift:hover {
+      transform: none;
+    }
+
+    .press-effect:active {
+      transform: none;
+    }
+  }
+}

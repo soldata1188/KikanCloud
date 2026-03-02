@@ -264,7 +264,7 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
     };
 
     return (
-        <div className="flex-1 flex flex-col h-full bg-white relative">
+        <div className="flex-1 flex flex-col h-full bg-white relative anim-page">
             {/* Red Toast Output */}
             {toastError && (
                 <div className="fixed top-4 right-4 z-50 animate-in fade-in slide-in-from-top-5 duration-300">

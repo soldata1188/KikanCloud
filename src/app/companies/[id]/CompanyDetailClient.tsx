@@ -73,7 +73,7 @@ export default function CompanyDetailClient({ company, documents }: { company: a
     );
 
     return (
-        <div className="flex-1 flex flex-col h-full bg-transparent relative overflow-hidden">
+        <div className="flex-1 flex flex-col h-full bg-transparent relative overflow-hidden anim-page">
 
             {/* ── Top Action Bar ── */}
             <div className="flex items-center justify-between px-3 sm:px-6 h-[52px] border-b border-gray-200 bg-white shrink-0 z-20">

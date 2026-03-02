@@ -394,7 +394,7 @@ export default function OperationsClient({
 
     // ── Render ───────────────────────────────────────────────────
     return (
-        <div className="min-h-full flex flex-col relative">
+        <div className="min-h-full flex flex-col relative anim-page">
             {/* ── Micro-Dot Grid overlay ── */}
             <div className="fixed inset-0 pointer-events-none z-0"
                 style={{
@@ -563,7 +563,7 @@ export default function OperationsClient({
 
                                             {/* Status badges — top right */}
                                             <div className="absolute top-4 right-4 flex gap-1 flex-wrap justify-end">
-                                                <span className={`px-2 py-0.5 text-[10px] font-bold rounded-full border ${statusBadgeCls(worker.status)}`}>
+                                                <span className={`px-2 py-0.5 text-[10px] font-bold rounded-full border anim-badge ${statusBadgeCls(worker.status)}`}>
                                                     {worker.status}
                                                 </span>
                                                 {visaDays !== null && visaDays <= 30 && (
@@ -944,7 +944,7 @@ export default function OperationsClient({
             {/* ════ 一括操作 RIGHT SIDEBAR (Fixed & Top-most) ════ */}
             <div className={`fixed top-0 right-0 h-full z-[800] transition-transform duration-300 ease-in-out ${selectedIds.size > 0 ? 'translate-x-0' : 'translate-x-full'}`}
                 style={{ width: '320px' }}>
-                <div className="h-full bg-white border-l border-gray-200 flex flex-col shadow-2xl">
+                <div className="h-full bg-white border-l border-gray-200 flex flex-col shadow-2xl anim-modal">
 
                     {/* Header */}
                     <div className="px-5 py-4 border-b border-gray-100 bg-gray-50 flex items-center justify-between shrink-0">

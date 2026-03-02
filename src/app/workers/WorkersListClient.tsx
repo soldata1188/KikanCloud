@@ -312,7 +312,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
 
 
     return (
-        <div className="flex flex-col min-h-screen">
+        <div className="flex flex-col min-h-screen anim-page">
             {/* ══ STICKY HEADER: Mobile-first responsive ══ */}
             <div className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-gray-200/70 shadow-sm">
 
@@ -421,7 +421,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
             {/* ════ 一括操作 RIGHT SIDEBAR (Fixed) ════ */}
             <div className={`fixed top-[104px] md:top-[106px] right-0 h-[calc(100vh-104px)] md:h-[calc(100vh-106px)] z-[200] transition-transform duration-300 ease-in-out ${selectedIds.length > 0 ? 'translate-x-0' : 'translate-x-full'}`}
                 style={{ width: 'min(300px, 90vw)' }}>
-                <div className="h-full bg-white/90 backdrop-blur-md border-l border-gray-200 flex flex-col shadow-2xl">
+                <div className="h-full bg-white/90 backdrop-blur-md border-l border-gray-200 flex flex-col shadow-2xl anim-modal">
                     {/* Header */}
                     <div className="px-5 py-4 border-b border-gray-100 bg-transparent flex items-center justify-between shrink-0">
                         <div className="flex items-center gap-3">
@@ -498,7 +498,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                                 <TimelineDivider label={group.label} count={group.workers.length} date={group.date} />
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 px-3 pb-2">
                                     {group.workers.map(worker => (
-                                        <div key={worker.id} className="group relative bg-white border border-gray-200 hover:border-blue-400 rounded-md p-4 transition-all duration-200 shadow-sm active:scale-[0.99]">
+                                        <div key={worker.id} className="group relative bg-white border border-gray-200 hover:border-blue-400 rounded-md p-4 transition-all duration-200 shadow-sm active:scale-[0.99] anim-card hover-lift">
                                             <div className="flex items-start gap-3 mb-4">
                                                 <div className="w-14 h-14 rounded-full border border-gray-100 bg-gray-50 overflow-hidden flex items-center justify-center shrink-0">
                                                     {worker.avatar_url ? (

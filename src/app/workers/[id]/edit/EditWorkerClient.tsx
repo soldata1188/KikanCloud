@@ -269,7 +269,7 @@ export default function EditWorkerClient({ companies, worker }: EditWorkerProps)
     };
 
     return (
-        <div className="flex-1 flex flex-col h-full bg-transparent relative overflow-hidden">
+        <div className="flex-1 flex flex-col h-full bg-transparent relative overflow-hidden anim-page">
             {/* Toast */}
             {toastError && (
                 <div className="fixed top-4 right-4 z-50 animate-in fade-in slide-in-from-top-3">

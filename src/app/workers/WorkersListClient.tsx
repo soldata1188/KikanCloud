@@ -59,18 +59,17 @@ const statusSelectCls = (s: string): string => {
 
 const PAGE_SIZE = 50
 
-// ── Entry batch timeline divider ─────────────────────────────────────────
-const TimelineDivider = ({ label, count, date }: { label: string; count: number; date: string }) => (
-    <div className="flex items-center gap-3 px-4 py-2.5">
-        <div className="w-2.5 h-2.5 rounded-full bg-orange-600 shrink-0 ring-[3px] ring-orange-600/20" />
-        <span className="text-[11px] font-black text-orange-600 tracking-widest uppercase whitespace-nowrap">
-            {label}
-        </span>
-        <div className="flex-1 h-px bg-gradient-to-r from-orange-400/40 to-transparent" />
-        <span className="text-[10px] font-bold text-gray-400 tabular-nums whitespace-nowrap">{count}名</span>
-        {date && <span className="text-[10px] font-mono text-gray-300 whitespace-nowrap ml-1">{date.substring(0, 7).replace(/-/g, '/')}</span>}
-    </div>
-)
+// ── Group color palette (Design A: Left Color Bar) ──────────────────────
+const GROUP_COLORS = [
+    '#0067b8', // brand blue
+    '#059669', // emerald
+    '#d97706', // amber
+    '#7c3aed', // violet
+    '#db2777', // pink
+    '#0891b2', // cyan
+    '#65a30d', // lime
+    '#ea580c', // orange
+]
 
 export default function WorkersListClient({ initialWorkers, role, next90DaysStr }: { initialWorkers: any[], role: string, next90DaysStr: string }) {
     const [workers, setWorkers] = useState(initialWorkers)
@@ -493,44 +492,54 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                         {paginatedGroups.length === 0 && (
                             <div className="p-16 text-center text-gray-400 font-medium">データがありません。</div>
                         )}
-                        {paginatedGroups.map((group, gi) => (
-                            <div key={`${group.label}-${gi}`} className="mb-2">
-                                <TimelineDivider label={group.label} count={group.workers.length} date={group.date} />
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 px-3 pb-2">
-                                    {group.workers.map(worker => (
-                                        <div key={worker.id} className="group relative bg-white border border-gray-200 hover:border-blue-400 rounded-md p-4 transition-all duration-200 shadow-sm active:scale-[0.99] anim-card hover-lift">
-                                            <div className="flex items-start gap-3 mb-4">
-                                                <div className="w-14 h-14 rounded-full border border-gray-100 bg-gray-50 overflow-hidden flex items-center justify-center shrink-0">
-                                                    {worker.avatar_url ? (
-                                                        <img src={worker.avatar_url} className="w-full h-full object-cover" />
-                                                    ) : (
-                                                        <User size={28} className="text-gray-300" />
-                                                    )}
+                        {paginatedGroups.map((group, gi) => {
+                            const gColor = GROUP_COLORS[gi % GROUP_COLORS.length]
+                            return (
+                                <div key={`${group.label}-${gi}`} className={gi > 0 ? 'mt-4' : ''}>
+                                    {/* Group header strip */}
+                                    <div className="flex items-center gap-2 px-3 pb-1.5">
+                                        <div className="w-1 h-4 rounded-full" style={{ background: gColor }} />
+                                        <span className="text-[10px] font-black tracking-widest uppercase" style={{ color: gColor }}>{group.label}</span>
+                                        <span className="text-[10px] font-bold text-gray-400">{group.workers.length}名</span>
+                                        {group.date && <span className="text-[10px] font-mono text-gray-300">{group.date.substring(0, 7).replace(/-/g, '/')}</span>}
+                                    </div>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 px-3 pb-2">
+                                        {group.workers.map(worker => (
+                                            <div key={worker.id} className="group relative bg-white border border-gray-200 hover:border-blue-400 rounded-md p-4 transition-all duration-200 shadow-sm active:scale-[0.99] anim-card hover-lift"
+                                                style={{ borderLeft: `3px solid ${gColor}` }}>
+                                                <div className="flex items-start gap-3 mb-4">
+                                                    <div className="w-14 h-14 rounded-full border border-gray-100 bg-gray-50 overflow-hidden flex items-center justify-center shrink-0">
+                                                        {worker.avatar_url ? (
+                                                            <img src={worker.avatar_url} className="w-full h-full object-cover" />
+                                                        ) : (
+                                                            <User size={28} className="text-gray-300" />
+                                                        )}
+                                                    </div>
+                                                    <div className="min-w-0">
+                                                        <Link href={`/workers/${worker.id}`} className="font-bold text-gray-900 hover:text-blue-600 transition-colors truncate block text-sm">{worker.full_name_romaji}</Link>
+                                                        <div className="text-[10px] text-blue-600 font-bold truncate mt-0.5">{worker.companies?.name_jp || '未所属'}</div>
+                                                        <div className="text-[9px] text-gray-400 truncate uppercase tracking-tight">{worker.nationality || '---'}</div>
+                                                    </div>
                                                 </div>
-                                                <div className="min-w-0">
-                                                    <Link href={`/workers/${worker.id}`} className="font-bold text-gray-900 hover:text-blue-600 transition-colors truncate block text-sm">{worker.full_name_romaji}</Link>
-                                                    <div className="text-[10px] text-blue-600 font-bold truncate mt-0.5">{worker.companies?.name_jp || '未所属'}</div>
-                                                    <div className="text-[9px] text-gray-400 truncate uppercase tracking-tight">{worker.nationality || '---'}</div>
+                                                <div className="space-y-1.5 mb-4 text-[11px]">
+                                                    <div className="flex justify-between border-b border-gray-50 pb-1"><span className="text-gray-400 font-bold uppercase tracking-wider">在留資格</span><span className="font-bold text-gray-700 truncate max-w-[120px]">{worker.visa_status || '---'}</span></div>
+                                                    <div className="flex justify-between border-b border-gray-50 pb-1"><span className="text-gray-400 font-bold uppercase tracking-wider">職種区分</span><span className="font-bold text-gray-700 truncate">{worker.industry_field || '---'}</span></div>
+                                                    <div className="flex justify-between border-b border-gray-50 pb-1"><span className="text-gray-400 font-bold uppercase tracking-wider">在留期限</span><span className={`font-bold font-mono truncate max-w-[120px] ${worker.zairyu_exp && worker.zairyu_exp <= next90DaysStr ? 'text-rose-600' : 'text-gray-700'}`}>{worker.zairyu_exp ? worker.zairyu_exp.replace(/-/g, '/') : '---'}</span></div>
+                                                    <div className="flex justify-between"><span className="text-gray-400 font-bold uppercase tracking-wider">認修了日</span><span className="font-mono font-bold text-gray-700">{worker.cert_end_date ? worker.cert_end_date.replace(/-/g, '/') : '---'}</span></div>
+                                                </div>
+                                                <div className="pt-3 border-t border-gray-100 flex items-center justify-between">
+                                                    <select value={worker.status} onChange={e => handleChange(worker.id, 'status', e.target.value)}
+                                                        className={`text-[10px] px-2 py-1 rounded-md border border-gray-100 bg-gray-50 hover:bg-gray-100 transition-colors outline-none cursor-pointer ${statusSelectCls(worker.status)}`}>
+                                                        {Object.entries(reverseStatusMap).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+                                                    </select>
+                                                    <Link href={`/workers/${worker.id}`} className="text-xs font-bold text-blue-600 hover:underline transition-colors px-2 py-1 rounded hover:bg-blue-50">詳細</Link>
                                                 </div>
                                             </div>
-                                            <div className="space-y-1.5 mb-4 text-[11px]">
-                                                <div className="flex justify-between border-b border-gray-50 pb-1"><span className="text-gray-400 font-bold uppercase tracking-wider">在留資格</span><span className="font-bold text-gray-700 truncate max-w-[120px]">{worker.visa_status || '---'}</span></div>
-                                                <div className="flex justify-between border-b border-gray-50 pb-1"><span className="text-gray-400 font-bold uppercase tracking-wider">職種区分</span><span className="font-bold text-gray-700 truncate">{worker.industry_field || '---'}</span></div>
-                                                <div className="flex justify-between border-b border-gray-50 pb-1"><span className="text-gray-400 font-bold uppercase tracking-wider">在留期限</span><span className={`font-bold font-mono truncate max-w-[120px] ${worker.zairyu_exp && worker.zairyu_exp <= next90DaysStr ? 'text-rose-600' : 'text-gray-700'}`}>{worker.zairyu_exp ? worker.zairyu_exp.replace(/-/g, '/') : '---'}</span></div>
-                                                <div className="flex justify-between"><span className="text-gray-400 font-bold uppercase tracking-wider">認修了日</span><span className="font-mono font-bold text-gray-700">{worker.cert_end_date ? worker.cert_end_date.replace(/-/g, '/') : '---'}</span></div>
-                                            </div>
-                                            <div className="pt-3 border-t border-gray-100 flex items-center justify-between">
-                                                <select value={worker.status} onChange={e => handleChange(worker.id, 'status', e.target.value)}
-                                                    className={`text-[10px] px-2 py-1 rounded-md border border-gray-100 bg-gray-50 hover:bg-gray-100 transition-colors outline-none cursor-pointer ${statusSelectCls(worker.status)}`}>
-                                                    {Object.entries(reverseStatusMap).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-                                                </select>
-                                                <Link href={`/workers/${worker.id}`} className="text-xs font-bold text-blue-600 hover:underline transition-colors px-2 py-1 rounded hover:bg-blue-50">詳細</Link>
-                                            </div>
-                                        </div>
-                                    ))}
+                                        ))}
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            )
+                        })}
                     </div>
                 ) : (
                     <div className="mx-4 overflow-hidden border border-gray-300 rounded-md bg-transparent mb-4">
@@ -556,77 +565,90 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                                     {paginated.length === 0 && (
                                         <tr><td colSpan={10} className="px-5 py-20 text-center text-gray-400 font-medium bg-transparent">データがありません。</td></tr>
                                     )}
-                                    {paginatedGroups.map((group, gi) => (
-                                        <React.Fragment key={`${group.label}-${gi}`}>
-                                            <tr>
-                                                <td colSpan={10} className="px-0 py-0 border-b-0 bg-blue-50/30">
-                                                    <TimelineDivider label={group.label} count={group.workers.length} date={group.date} />
-                                                </td>
-                                            </tr>
-                                            {group.workers.map((worker, wi) => {
-                                                const absIndex = (currentPage - 1) * PAGE_SIZE +
-                                                    paginatedGroups.slice(0, gi).reduce((s, g) => s + g.workers.length, 0) + wi + 1
-                                                return (
-                                                    <tr key={worker.id} className="bg-white hover:bg-blue-50/40 transition-all duration-150">
-                                                        <td className="px-4 py-3 text-center border-r border-gray-300">
-                                                            <input type="checkbox" checked={selectedIds.includes(worker.id)} onChange={() => toggleSelect(worker.id)} className="w-4 h-4 rounded border-gray-300 accent-[#0067b8]" />
-                                                        </td>
-                                                        <td className="px-4 py-3 font-mono text-[#0067b8] text-[11px] font-bold border-r border-gray-300 text-center">{absIndex}</td>
-                                                        <td className="px-4 py-3 border-r border-gray-300">
-                                                            <div className="flex items-center gap-3">
-                                                                <div className="w-10 h-10 shrink-0 rounded-full border border-gray-100 bg-gray-50 overflow-hidden flex items-center justify-center">
-                                                                    {worker.avatar_url ? <img src={worker.avatar_url} className="w-full h-full object-cover" /> : <User size={20} className="text-gray-300" />}
+                                    {paginatedGroups.map((group, gi) => {
+                                        const gColor = GROUP_COLORS[gi % GROUP_COLORS.length]
+                                        return (
+                                            <React.Fragment key={`${group.label}-${gi}`}>
+                                                {/* 3px gap row between groups */}
+                                                {gi > 0 && (
+                                                    <tr><td colSpan={10} className="p-0" style={{ height: '4px', background: '#f8fafc' }} /></tr>
+                                                )}
+                                                {group.workers.map((worker, wi) => {
+                                                    const absIndex = (currentPage - 1) * PAGE_SIZE +
+                                                        paginatedGroups.slice(0, gi).reduce((s, g) => s + g.workers.length, 0) + wi + 1
+                                                    const isFirst = wi === 0
+                                                    return (
+                                                        <tr key={worker.id}
+                                                            className="bg-white hover:bg-blue-50/30 transition-all duration-150"
+                                                            style={{ borderLeft: `4px solid ${gColor}` }}>
+                                                            <td className="px-3 py-3 text-center border-r border-gray-200">
+                                                                {isFirst && (
+                                                                    <div className="flex justify-center mb-1.5">
+                                                                        <span className="text-white text-[8px] font-black px-1.5 py-0.5 rounded leading-none whitespace-nowrap"
+                                                                            style={{ background: gColor }}>
+                                                                            {group.label}
+                                                                        </span>
+                                                                    </div>
+                                                                )}
+                                                                <input type="checkbox" checked={selectedIds.includes(worker.id)} onChange={() => toggleSelect(worker.id)} className="w-4 h-4 rounded border-gray-300 accent-[#0067b8]" />
+                                                            </td>
+                                                            <td className="px-4 py-3 font-mono text-[#0067b8] text-[11px] font-bold border-r border-gray-200 text-center">{absIndex}</td>
+                                                            <td className="px-4 py-3 border-r border-gray-300">
+                                                                <div className="flex items-center gap-3">
+                                                                    <div className="w-10 h-10 shrink-0 rounded-full border border-gray-100 bg-gray-50 overflow-hidden flex items-center justify-center">
+                                                                        {worker.avatar_url ? <img src={worker.avatar_url} className="w-full h-full object-cover" /> : <User size={20} className="text-gray-300" />}
+                                                                    </div>
+                                                                    <div className="min-w-0">
+                                                                        <Link href={`/workers/${worker.id}`} className="font-bold text-[14px] text-gray-900 hover:text-[#0067b8] transition-colors block truncate">{worker.full_name_romaji}</Link>
+                                                                        <div className="text-[10px] text-gray-400 uppercase tracking-tight mt-0.5 truncate">{worker.full_name_kana || '---'}</div>
+                                                                    </div>
                                                                 </div>
-                                                                <div className="min-w-0">
-                                                                    <Link href={`/workers/${worker.id}`} className="font-bold text-[14px] text-gray-900 hover:text-[#0067b8] transition-colors block truncate">{worker.full_name_romaji}</Link>
-                                                                    <div className="text-[10px] text-gray-400 uppercase tracking-tight mt-0.5 truncate">{worker.full_name_kana || '---'}</div>
+                                                            </td>
+                                                            <td className="px-4 py-3 border-r border-gray-300">
+                                                                <div className="text-[12px] font-bold text-[#0067b8] truncate">{worker.companies?.name_jp || '---'}</div>
+                                                                <div className="text-[10px] text-gray-500 font-bold mt-0.5 truncate">{worker.industry_field || '---'}</div>
+                                                            </td>
+                                                            <td className="px-4 py-3 border-r border-gray-300">
+                                                                <div className="text-[11px] font-bold text-gray-700">{worker.nationality || '---'}</div>
+                                                                <div className="text-[10px] text-gray-500 font-bold mt-0.5 truncate" title={worker.sending_org || ''}>{worker.sending_org || '---'}</div>
+                                                            </td>
+                                                            <td className="px-4 py-3 border-r border-gray-300">
+                                                                <div className="text-[11px] font-bold text-gray-700">{worker.entry_batch || '---'}</div>
+                                                                <div className="text-[10px] text-gray-400 mt-0.5 font-mono">{worker.entry_date ? worker.entry_date.replace(/-/g, '/') : '---'}</div>
+                                                            </td>
+                                                            <td className="px-4 py-3 border-r border-gray-300">
+                                                                <div className="text-[11px] font-bold text-gray-700 truncate" title={worker.visa_status || ''}>{worker.visa_status || '---'}</div>
+                                                            </td>
+                                                            <td className="px-4 py-3 border-r border-gray-300">
+                                                                <div className="flex flex-col">
+                                                                    <span className={`text-[11px] font-bold font-mono leading-tight ${worker.zairyu_exp && worker.zairyu_exp <= next90DaysStr ? 'text-rose-600' : 'text-gray-700'}`}>
+                                                                        {worker.zairyu_exp ? worker.zairyu_exp.replace(/-/g, '/') : '---'}
+                                                                    </span>
+                                                                    <div className="text-[10px] text-gray-400 font-bold mt-0.5">
+                                                                        <span className="font-mono">{worker.cert_end_date ? worker.cert_end_date.replace(/-/g, '/') : '---'}</span>
+                                                                    </div>
                                                                 </div>
-                                                            </div>
-                                                        </td>
-                                                        <td className="px-4 py-3 border-r border-gray-300">
-                                                            <div className="text-[12px] font-bold text-[#0067b8] truncate">{worker.companies?.name_jp || '---'}</div>
-                                                            <div className="text-[10px] text-gray-500 font-bold mt-0.5 truncate">{worker.industry_field || '---'}</div>
-                                                        </td>
-                                                        <td className="px-4 py-3 border-r border-gray-300">
-                                                            <div className="text-[11px] font-bold text-gray-700">{worker.nationality || '---'}</div>
-                                                            <div className="text-[10px] text-gray-500 font-bold mt-0.5 truncate" title={worker.sending_org || ''}>{worker.sending_org || '---'}</div>
-                                                        </td>
-                                                        <td className="px-4 py-3 border-r border-gray-300">
-                                                            <div className="text-[11px] font-bold text-gray-700">{worker.entry_batch || '---'}</div>
-                                                            <div className="text-[10px] text-gray-400 mt-0.5 font-mono">{worker.entry_date ? worker.entry_date.replace(/-/g, '/') : '---'}</div>
-                                                        </td>
-                                                        <td className="px-4 py-3 border-r border-gray-300">
-                                                            <div className="text-[11px] font-bold text-gray-700 truncate" title={worker.visa_status || ''}>{worker.visa_status || '---'}</div>
-                                                        </td>
-                                                        <td className="px-4 py-3 border-r border-gray-300">
-                                                            <div className="flex flex-col">
-                                                                <span className={`text-[11px] font-bold font-mono leading-tight ${worker.zairyu_exp && worker.zairyu_exp <= next90DaysStr ? 'text-rose-600' : 'text-gray-700'}`}>
-                                                                    {worker.zairyu_exp ? worker.zairyu_exp.replace(/-/g, '/') : '---'}
-                                                                </span>
-                                                                <div className="text-[10px] text-gray-400 font-bold mt-0.5">
-                                                                    <span className="font-mono">{worker.cert_end_date ? worker.cert_end_date.replace(/-/g, '/') : '---'}</span>
+                                                            </td>
+                                                            <td className="px-4 py-3 border-r border-gray-300">
+                                                                <div className="flex flex-col">
+                                                                    <span className="text-[11px] font-bold text-gray-700 font-mono leading-tight">{worker.passport_exp ? worker.passport_exp.replace(/-/g, '/') : '---'}</span>
+                                                                    <div className="text-[10px] text-gray-400 font-bold mt-0.5">
+                                                                        <span className="font-mono">{worker.insurance_exp ? worker.insurance_exp.replace(/-/g, '/') : '---'}</span>
+                                                                    </div>
                                                                 </div>
-                                                            </div>
-                                                        </td>
-                                                        <td className="px-4 py-3 border-r border-gray-300">
-                                                            <div className="flex flex-col">
-                                                                <span className="text-[11px] font-bold text-gray-700 font-mono leading-tight">{worker.passport_exp ? worker.passport_exp.replace(/-/g, '/') : '---'}</span>
-                                                                <div className="text-[10px] text-gray-400 font-bold mt-0.5">
-                                                                    <span className="font-mono">{worker.insurance_exp ? worker.insurance_exp.replace(/-/g, '/') : '---'}</span>
-                                                                </div>
-                                                            </div>
-                                                        </td>
-                                                        <td className="px-4 py-3 border-r border-gray-300">
-                                                            <select value={worker.status} onChange={e => handleChange(worker.id, 'status', e.target.value)}
-                                                                className={`appearance-none text-[10px] px-2 py-1 rounded-md border border-gray-100 bg-gray-50 hover:bg-gray-100 transition-colors w-full text-center cursor-pointer outline-none ${statusSelectCls(worker.status)}`}>
-                                                                {Object.entries(reverseStatusMap).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-                                                            </select>
-                                                        </td>
-                                                    </tr>
-                                                )
-                                            })}
-                                        </React.Fragment>
-                                    ))}
+                                                            </td>
+                                                            <td className="px-4 py-3 border-r border-gray-200">
+                                                                <select value={worker.status} onChange={e => handleChange(worker.id, 'status', e.target.value)}
+                                                                    className={`appearance-none text-[10px] px-2 py-1 rounded-md border border-gray-100 bg-gray-50 hover:bg-gray-100 transition-colors w-full text-center cursor-pointer outline-none ${statusSelectCls(worker.status)}`}>
+                                                                    {Object.entries(reverseStatusMap).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+                                                                </select>
+                                                            </td>
+                                                        </tr>
+                                                    )
+                                                })}
+                                            </React.Fragment>
+                                        )
+                                    })}
                                 </tbody>
                             </table>
                         </div>

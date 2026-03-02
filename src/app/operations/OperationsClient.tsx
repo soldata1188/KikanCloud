@@ -941,8 +941,8 @@ export default function OperationsClient({
                     </div>
                 )
             }
-            {/* ════ 一括操作 RIGHT SIDEBAR (Fixed & Top-most) ════ */}
-            <div className={`fixed top-0 right-0 h-full z-[800] transition-transform duration-300 ease-in-out ${selectedIds.size > 0 ? 'translate-x-0' : 'translate-x-full'}`}
+            {/* ════ 一括操作 RIGHT SIDEBAR ════ */}
+            <div className={`fixed top-[57px] right-0 h-[calc(100vh-57px)] z-[800] transition-transform duration-300 ease-in-out ${selectedIds.size > 0 ? 'translate-x-0' : 'translate-x-full'}`}
                 style={{ width: '320px' }}>
                 <div className="h-full bg-white border-l border-gray-200 flex flex-col shadow-2xl anim-modal">
 

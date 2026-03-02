@@ -185,10 +185,14 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
             // 同日の場合: 企業名 昇順
             return ((a as any).companies?.name_jp || '').localeCompare((b as any).companies?.name_jp || '', 'ja')
         }))
-        const sortedBatches = Array.from(batchMap.entries()).sort(([, a], [, b]) => {
-            const la = a.reduce((m, w) => ((w as any).entry_date || '') > m ? (w as any).entry_date : m, '')
-            const lb = b.reduce((m, w) => ((w as any).entry_date || '') > m ? (w as any).entry_date : m, '')
-            return lb.localeCompare(la)
+        const sortedBatches = Array.from(batchMap.entries()).sort(([keyA], [keyB]) => {
+            const numA = parseInt(keyA.match(/(\d+)/)?.[1] ?? '0', 10)
+            const numB = parseInt(keyB.match(/(\d+)/)?.[1] ?? '0', 10)
+            // Groups with no numeric value (e.g. "未設定") go to the bottom
+            if (numA === 0 && numB === 0) return keyA.localeCompare(keyB, 'ja')
+            if (numA === 0) return 1
+            if (numB === 0) return -1
+            return numB - numA // Descending: larger number first
         })
         result = sortedBatches.flatMap(([, workers]) => workers)
 

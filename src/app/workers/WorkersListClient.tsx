@@ -542,7 +542,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                         })}
                     </div>
                 ) : (
-                    <div className="mx-4 overflow-hidden border border-gray-300 rounded-md bg-transparent mb-4">
+                    <div className="mx-4 overflow-hidden border border-gray-300 rounded-md bg-white mb-4">
                         <div className="overflow-x-auto">
                             <table className="w-full min-w-[1200px] border-collapse text-left">
                                 <thead className="bg-[#0067b8] border-b border-white/20 text-white">

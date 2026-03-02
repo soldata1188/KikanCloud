@@ -204,7 +204,7 @@ export function CompaniesClient({ companies, userRole }: { companies: any[], use
                         })}
                     </div>
                 ) : (
-                    <div className="mx-0 overflow-hidden border border-gray-300 rounded-md bg-transparent mb-4">
+                    <div className="mx-0 overflow-hidden border border-gray-300 rounded-md bg-white mb-4">
                         <div className="overflow-x-auto">
                             <table className="w-full min-w-[1050px] border-collapse text-left">
                                 <thead className="bg-[#0067b8] border-b border-white/20 text-white">
@@ -221,7 +221,7 @@ export function CompaniesClient({ companies, userRole }: { companies: any[], use
                                 <tbody className="divide-y divide-gray-300">
                                     {paginated.length === 0 && (
                                         <tr>
-                                            <td colSpan={7} className="px-5 py-16 text-center text-gray-400 font-medium bg-transparent">
+                                            <td colSpan={7} className="px-5 py-16 text-center text-gray-400 font-medium bg-white">
                                                 <Search size={24} className="mx-auto mb-2 opacity-30" />
                                                 該当する企業がありません。
                                             </td>

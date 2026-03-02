@@ -677,7 +677,7 @@ export function AuditsClient({
                 </div>
 
                 {/* ════════ TABLE ════════ */}
-                <div className="mx-0 overflow-hidden border border-gray-200 rounded-md bg-transparent mb-4">
+                <div className="mx-0 overflow-hidden border border-gray-200 rounded-md bg-white mb-4">
                     <div className="overflow-x-auto no-scrollbar">
                         <table className="w-full min-w-[1100px] border-collapse text-left">
                             <thead className="bg-[#0067b8] border-b border-white/20 text-white">

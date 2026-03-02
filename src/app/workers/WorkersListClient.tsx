@@ -48,6 +48,15 @@ const reverseStatusMap: Record<string, string> = {
     'waiting': '未入国', 'standby': '対応中', 'working': '就業中', 'missing': '失踪', 'returned': '帰国', 'transferred': '転籍済'
 }
 
+// ステータス別 テキストカラー
+const statusSelectCls = (s: string): string => {
+    if (s === 'working') return 'text-emerald-700 font-black'
+    if (s === 'standby') return 'text-[#0067b8] font-black'
+    if (s === 'missing') return 'text-rose-600 font-black'
+    if (s === 'transferred') return 'text-purple-600 font-black'
+    return 'text-gray-500 font-bold' // waiting, returned
+}
+
 const PAGE_SIZE = 50
 
 // ── Entry batch timeline divider ─────────────────────────────────────────
@@ -512,7 +521,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                                             </div>
                                             <div className="pt-3 border-t border-gray-100 flex items-center justify-between">
                                                 <select value={worker.status} onChange={e => handleChange(worker.id, 'status', e.target.value)}
-                                                    className="text-[10px] font-bold px-2 py-1 rounded-md border border-gray-100 bg-gray-50 text-gray-600 hover:bg-gray-100 transition-colors outline-none cursor-pointer">
+                                                    className={`text-[10px] px-2 py-1 rounded-md border border-gray-100 bg-gray-50 hover:bg-gray-100 transition-colors outline-none cursor-pointer ${statusSelectCls(worker.status)}`}>
                                                     {Object.entries(reverseStatusMap).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
                                                 </select>
                                                 <Link href={`/workers/${worker.id}`} className="text-xs font-bold text-blue-600 hover:underline transition-colors px-2 py-1 rounded hover:bg-blue-50">詳細</Link>
@@ -609,7 +618,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                                                         </td>
                                                         <td className="px-4 py-3 border-r border-gray-300">
                                                             <select value={worker.status} onChange={e => handleChange(worker.id, 'status', e.target.value)}
-                                                                className="appearance-none text-[10px] px-2 py-1 rounded-md font-bold bg-gray-50 border border-gray-100 text-gray-600 hover:bg-gray-100 transition-colors w-full text-center cursor-pointer outline-none">
+                                                                className={`appearance-none text-[10px] px-2 py-1 rounded-md border border-gray-100 bg-gray-50 hover:bg-gray-100 transition-colors w-full text-center cursor-pointer outline-none ${statusSelectCls(worker.status)}`}>
                                                                 {Object.entries(reverseStatusMap).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
                                                             </select>
                                                         </td>

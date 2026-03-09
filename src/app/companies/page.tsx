@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+﻿import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { Sidebar } from '@/components/Sidebar'
 
@@ -19,18 +19,10 @@ export default async function CompaniesPage() {
     return (
         <div className="flex h-screen font-sans text-[#1f1f1f] overflow-hidden selection:bg-[#24b47e]/20">
             <Sidebar active="companies" />
-            <div className="flex-1 flex flex-col relative min-w-0">
-
-                <main className="flex-1 overflow-y-auto relative">
-                    {/* Micro-Dot Grid Overlay */}
-                    <div className="absolute inset-0 pointer-events-none opacity-[0.08] z-0"
-                        style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, #0067b8 1px, transparent 0)', backgroundSize: '32px 32px' }} />
-
-                    <div className="w-full min-h-full relative z-10">
-                        <CompaniesClient companies={companies || []} userRole={userProfile?.role || 'staff'} />
-                    </div>
-                </main>
+            <div className="flex-1 flex flex-col relative min-w-0 overflow-hidden">
+                <CompaniesClient companies={companies || []} userRole={userProfile?.role || 'staff'} />
             </div>
         </div>
     )
 }
+

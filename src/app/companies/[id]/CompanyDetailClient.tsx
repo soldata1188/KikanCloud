@@ -1,9 +1,10 @@
 'use client'
 
 import React, { useState } from 'react';
-import { ArrowLeft, Building2, FileText, X, ExternalLink, Users, Briefcase, DownloadCloud, Trash2, Pencil, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Building2, FileText, X, ExternalLink, Users, Briefcase, DownloadCloud, Trash2, Pencil, ChevronRight, Upload, MoreHorizontal } from 'lucide-react';
 import Link from 'next/link';
 import { deleteCompany } from '@/app/companies/actions';
+import { uploadCompanyGeneralDocument } from '@/app/portal/actions';
 
 interface DocumentFile { name: string; url: string; created_at: string; }
 
@@ -19,10 +20,13 @@ const DataRow = ({ label, value, isLast = false }: { label: React.ReactNode; val
 );
 
 const SectionCard = ({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) => (
-    <div className="bg-white border border-gray-200 overflow-hidden rounded-md">
-        <div className="px-4 py-2.5 border-b border-[#005a9e] flex items-center gap-2.5 bg-[#0067b8]">
-            <span className="text-white">{icon}</span>
-            <h3 className="text-[11px] font-black text-white uppercase tracking-widest">{title}</h3>
+    <div className="app-card overflow-hidden">
+        <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50/30">
+            <div className="flex items-center gap-2.5">
+                <span className="text-blue-600">{icon}</span>
+                <h3 className="text-sm font-bold text-gray-800 tracking-tight">{title}</h3>
+            </div>
+            <button className="text-gray-400 hover:text-gray-600"><MoreHorizontal size={14} /></button>
         </div>
         <div className="flex flex-col">{children}</div>
     </div>
@@ -31,6 +35,26 @@ const SectionCard = ({ icon, title, children }: { icon: React.ReactNode; title: 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function CompanyDetailClient({ company, documents }: { company: any; documents: DocumentFile[] }) {
     const [previewDoc, setPreviewDoc] = useState<DocumentFile | null>(null);
+    const [isUploading, setIsUploading] = useState(false);
+
+    const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setIsUploading(true);
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('company_id', company.id);
+        formData.append('doc_type', 'other');
+        try {
+            await uploadCompanyGeneralDocument(formData);
+            window.location.reload();
+        } catch (err) {
+            alert('アップロードに失敗しました。');
+        } finally {
+            setIsUploading(false);
+        }
+    };
+
     const [docsOpen, setDocsOpen] = useState(false);
 
     const activeWorkersList = company.workers?.filter((w: any) => ['working', 'standby'].includes(w.status) && w.is_deleted === false) || [];
@@ -47,25 +71,25 @@ export default function CompanyDetailClient({ company, documents }: { company: a
             ) : (
                 documents.map((doc, idx) => (
                     <div key={idx} onClick={() => setPreviewDoc(doc)}
-                        className={`group flex items-center gap-3 p-3.5 rounded-md border cursor-pointer transition-all duration-150 active:scale-[0.99]
+                        className={`group flex items-center gap-3 p-3.5 rounded-xl border cursor-pointer transition-all duration-150 active:scale-[0.98]
                             ${previewDoc?.name === doc.name
-                                ? 'border-[#0067b8] bg-[#0067b8] shadow-sm'
-                                : 'border-gray-200 bg-white hover:border-[#0067b8] hover:shadow-sm'}`}>
-                        <div className={`w-9 h-9 shrink-0 flex items-center justify-center rounded-md transition-colors
+                                ? 'border-blue-600 bg-blue-600 shadow-md'
+                                : 'border-gray-200 bg-white hover:border-blue-300 hover:shadow-sm'}`}>
+                        <div className={`w-10 h-10 shrink-0 flex items-center justify-center rounded-lg transition-colors
                             ${previewDoc?.name === doc.name
                                 ? 'bg-white/20 text-white'
-                                : 'bg-gray-100 text-gray-500 group-hover:bg-[#0067b8] group-hover:text-white'}`}>
-                            <FileText size={16} strokeWidth={1.5} />
+                                : 'bg-gray-50 text-gray-400 group-hover:bg-blue-600 group-hover:text-white'}`}>
+                            <FileText size={18} strokeWidth={1.5} />
                         </div>
                         <div className="flex-1 min-w-0">
-                            <h4 className={`text-[12px] font-black truncate ${previewDoc?.name === doc.name ? 'text-white' : 'text-gray-900 group-hover:text-[#0067b8]'}`}>
+                            <h4 className={`text-[12px] font-bold truncate ${previewDoc?.name === doc.name ? 'text-white' : 'text-gray-900 group-hover:text-blue-600'}`}>
                                 {doc.name}
                             </h4>
-                            <p className={`text-[10px] mt-0.5 font-bold ${previewDoc?.name === doc.name ? 'text-blue-200' : 'text-gray-400'}`}>
+                            <p className={`text-[10px] mt-0.5 tracking-tight ${previewDoc?.name === doc.name ? 'text-blue-100' : 'text-gray-400'}`}>
                                 {new Date(doc.created_at).toLocaleDateString('ja-JP')}
                             </p>
                         </div>
-                        <ChevronRight size={13} className={previewDoc?.name === doc.name ? 'text-white' : 'text-gray-300 group-hover:text-[#0067b8]'} />
+                        <ChevronRight size={14} className={previewDoc?.name === doc.name ? 'text-white' : 'text-gray-300 group-hover:text-blue-600'} />
                     </div>
                 ))
             )}
@@ -135,24 +159,24 @@ export default function CompanyDetailClient({ company, documents }: { company: a
                                 </div>
 
                                 {/* Info block */}
-                                <div className="flex-1 p-5 sm:p-8 flex flex-col justify-center bg-white">
-                                    <div className="text-[9px] sm:text-[10px] text-[#0067b8] font-black uppercase tracking-[0.3em] mb-2">企業情報管理記録</div>
-                                    <h3 className="text-[20px] sm:text-[28px] font-black text-gray-900 tracking-tighter leading-none mb-4">
+                                <div className="flex-1 p-6 sm:p-10 flex flex-col justify-center bg-white">
+                                    <div className="text-[10px] text-blue-600 font-black uppercase tracking-widest mb-2 px-2 py-0.5 bg-blue-50 w-fit rounded">企業プロファイル</div>
+                                    <h3 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tighter leading-none mb-6">
                                         {company.name_jp}
                                     </h3>
-                                    <div className="flex flex-wrap gap-2">
+                                    <div className="flex flex-wrap gap-3">
                                         {company.corporate_number && (
-                                            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-50 text-gray-900 text-[11px] font-black rounded border border-gray-200 uppercase tracking-widest">
-                                                <span className="text-[#0067b8] text-[9px] font-black">ID</span>
+                                            <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100/50 text-gray-800 text-[12px] font-bold rounded-lg border border-gray-200/50 hover:bg-white transition-all hover:shadow-sm">
+                                                <span className="text-blue-600 text-[10px] font-black">ID</span>
                                                 {company.corporate_number.replace(/\D/g, '')}
                                             </div>
                                         )}
-                                        <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-50 text-gray-900 text-[11px] font-black rounded border border-gray-200 uppercase tracking-widest">
-                                            <Briefcase size={11} className="text-[#0067b8]" />
+                                        <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100/50 text-gray-800 text-[12px] font-bold rounded-lg border border-gray-200/50 hover:bg-white transition-all hover:shadow-sm">
+                                            <Briefcase size={14} className="text-blue-600" />
                                             {company.industry || '業種未設定'}
                                         </div>
-                                        <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-100 text-[#0067b8] text-[11px] font-black rounded border border-blue-100 uppercase tracking-widest">
-                                            <Users size={11} className="text-[#0067b8]" />
+                                        <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 text-[12px] font-bold rounded-lg border border-blue-100 shadow-sm">
+                                            <Users size={14} />
                                             現在受入 {activeWorkers} 名
                                         </div>
                                     </div>
@@ -243,6 +267,17 @@ export default function CompanyDetailClient({ company, documents }: { company: a
                         <span className="bg-white/20 text-white px-2.5 py-0.5 rounded-full text-[10px] font-black border border-white/20">
                             {documents.length}
                         </span>
+                    </div>
+                    <div className="p-4 border-b border-gray-100">
+                        <label className="flex items-center justify-center gap-2 w-full py-2.5 border-2 border-dashed border-gray-200 rounded-md hover:border-[#0067b8] hover:bg-blue-50 transition-all cursor-pointer group">
+                            {isUploading ? <span className="text-[11px] font-bold text-gray-400">処理中...</span> : (
+                                <>
+                                    <Upload size={14} className="text-gray-400 group-hover:text-[#0067b8]" />
+                                    <span className="text-[11px] font-bold text-gray-400 group-hover:text-[#0067b8]">ファイルをアップロード</span>
+                                </>
+                            )}
+                            <input type="file" className="hidden" onChange={handleFileUpload} disabled={isUploading} />
+                        </label>
                     </div>
                     <DocumentList />
                 </div>

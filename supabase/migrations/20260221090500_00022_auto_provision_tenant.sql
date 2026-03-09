@@ -18,7 +18,8 @@ BEGIN
 
   -- B2. Thêm vào public.users
   INSERT INTO public.users (id, tenant_id, full_name, role)
-  VALUES (NEW.id, new_tenant_id, COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.email, 'Unknown User'), 'admin');
+  VALUES (NEW.id, new_tenant_id, COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.email, 'Unknown User'), 'admin')
+  ON CONFLICT (id) DO NOTHING;
 
   RETURN NEW;
 END;
@@ -44,7 +45,8 @@ BEGIN
     VALUES (new_t_id, COALESCE(orphan_user.raw_user_meta_data->>'full_name', orphan_user.email, 'Workspace'), 'kanri_dantai', 'active');
 
     INSERT INTO public.users (id, tenant_id, full_name, role)
-    VALUES (orphan_user.id, new_t_id, COALESCE(orphan_user.raw_user_meta_data->>'full_name', orphan_user.email, 'User'), 'admin');
+    VALUES (orphan_user.id, new_t_id, COALESCE(orphan_user.raw_user_meta_data->>'full_name', orphan_user.email, 'User'), 'admin')
+    ON CONFLICT (id) DO NOTHING;
   END LOOP;
 END;
 $$;

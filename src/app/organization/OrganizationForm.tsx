@@ -5,9 +5,8 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 // ── Shared styles ──────────────────────────────────────────────────
-// ── Shared styles ──────────────────────────────────────────────────
-const L = "block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5"
-const I = "w-full h-10 pl-10 pr-4 bg-gray-50 border border-gray-200 rounded-md text-sm outline-none focus:border-[#0067b8] focus:bg-white transition-colors placeholder-gray-300 font-medium"
+const L = "block text-[11px] font-black text-gray-500 uppercase tracking-widest mb-2 px-1"
+const I = "w-full h-10 pl-10 pr-4 bg-gray-50 border border-gray-200 rounded-lg text-sm outline-none focus:border-blue-600 focus:bg-white transition-all placeholder:text-gray-300 font-bold"
 
 export default function OrganizationForm({ initialData }: { initialData: any }) {
     const router = useRouter()
@@ -147,13 +146,13 @@ export default function OrganizationForm({ initialData }: { initialData: any }) 
                 {/* ── Actions ── */}
                 <div className="pt-8 flex justify-center border-t border-gray-100">
                     <button type="submit" disabled={isLoading}
-                        className="w-full md:w-[320px] bg-[#0067b8] hover:bg-[#005a9e] text-white rounded-md h-12 font-bold transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                        className="w-full md:w-[320px] bg-blue-700 hover:bg-blue-800 text-white rounded-lg h-12 font-black transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-blue-50">
                         {isLoading
                             ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                             : (
                                 <>
                                     <Save size={18} />
-                                    <span className="text-sm">設定を保存する</span>
+                                    <span className="text-sm uppercase tracking-widest">設定を保存する</span>
                                 </>
                             )}
                     </button>

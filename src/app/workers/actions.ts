@@ -132,10 +132,10 @@ export type ImportWorkerPayload = {
     entry_date?: string;
     visa_status?: string;
     industry_field?: string;
-    passport_no?: string;
-    passport_exp?: string;
-    address?: string;
-    japan_residence?: string;
+    passport_no?: string | null;
+    passport_exp?: string | null;
+    address?: string | null;
+    japan_residence?: string | null;
 };
 
 export async function importWorkers(workersData: ImportWorkerPayload[]) {

@@ -1,0 +1,306 @@
+'use client'
+
+import React, { useState, useEffect } from 'react';
+import { Building2, Edit, MapPin, Users, Briefcase, AlignLeft, Save, X, Loader2 } from 'lucide-react';
+import { updateCompany } from './actions';
+
+interface Company {
+    id: string;
+    name_jp: string;
+    name_kana?: string;
+    name_romaji?: string;
+    status?: string | null;
+    corporate_number?: string;
+    registration_number?: string;
+    representative?: string;
+    representative_kana?: string;
+    manager_name?: string;
+    pic_name?: string;
+    life_advisor?: string;
+    tech_advisor?: string;
+    postal_code?: string;
+    address?: string;
+    phone?: string;
+    email?: string;
+    industry?: string;
+    accepted_occupations?: string;
+    employee_count?: number;
+    active_worker_count?: number;
+    training_date?: string;
+    remarks?: string;
+}
+
+interface CompanyDetailColumnProps {
+    companies: Company[];
+}
+
+// ── Sub-components ────────────────────────────────────────
+function SectionHeader({ icon, label, color }: { icon: React.ReactNode; label: string; color: string }) {
+    return (
+        <div className={`flex items-center gap-2 px-5 py-2.5 border-b ${color}`}>
+            <span className="opacity-60">{icon}</span>
+            <span className="text-[10px] font-black uppercase tracking-[0.18em]">{label}</span>
+        </div>
+    );
+}
+
+interface RowProps {
+    label: string;
+    name: string;
+    value: any;
+    isEditing: boolean;
+    onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
+    type?: string;
+    placeholder?: string;
+    valueClass?: string;
+}
+
+function Row({ label, name, value, isEditing, onChange, type = 'text', placeholder, valueClass }: RowProps) {
+    if (isEditing) {
+        return (
+            <div className="flex flex-col sm:flex-row justify-between sm:items-center px-5 py-2 border-b border-gray-50 bg-white">
+                <span className="text-[11px] font-bold text-gray-400 shrink-0 min-w-[130px] mb-1 sm:mb-0">{label}</span>
+                <input
+                    name={name}
+                    type={type}
+                    value={value || ''}
+                    onChange={onChange}
+                    placeholder={placeholder}
+                    className="flex-1 h-7 px-2 bg-white border border-gray-200 rounded text-[12px] font-bold text-gray-800 outline-none focus:border-blue-500 transition-colors"
+                />
+            </div>
+        );
+    }
+
+    return (
+        <div className="flex justify-between items-center px-5 py-2.5 border-b border-gray-50 last:border-0 hover:bg-slate-50/50 transition-colors">
+            <span className="text-[11px] font-bold text-gray-400 shrink-0 min-w-[130px]">{label}</span>
+            <span className={`text-[12px] font-bold text-right break-all ${valueClass || 'text-gray-800'}`}>{value || '---'}</span>
+        </div>
+    );
+}
+
+export default function CompanyDetailColumn({ companies }: CompanyDetailColumnProps) {
+    const [isEditing, setIsEditing] = useState(false);
+    const [editData, setEditData] = useState<Partial<Company>>({});
+    const [isSaving, setIsSaving] = useState(false);
+
+    const c = companies[0];
+
+    // Reset editing state when company selection changes
+    useEffect(() => {
+        setIsEditing(false);
+        if (c) {
+            setEditData(c);
+        }
+    }, [c?.id]);
+
+    if (companies.length === 0) {
+        return (
+            <div className="h-full flex flex-col items-center justify-center text-gray-300 p-8 text-center bg-white">
+                <Building2 size={52} className="mb-4 opacity-20" />
+                <p className="text-[14px] font-black text-gray-400">企業を選択してください</p>
+                <p className="text-[12px] text-gray-300 mt-1">左のリストから詳細を確認したい企業を選択します</p>
+            </div>
+        );
+    }
+
+    if (companies.length > 1) {
+        return (
+            <div className="h-full flex flex-col items-center justify-center text-gray-300 p-8 text-center bg-white">
+                <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center mb-4">
+                    <span className="text-[20px] font-black text-blue-500">{companies.length}</span>
+                </div>
+                <p className="text-[14px] font-black text-gray-400">{companies.length} 社を選択中</p>
+                <p className="text-[12px] text-gray-300 mt-1">詳細を見るには1社のみ選択してください</p>
+            </div>
+        );
+    }
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+        setEditData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    };
+
+    const handleSave = async () => {
+        setIsSaving(true);
+        try {
+            const formData = new FormData();
+            Object.entries(editData).forEach(([key, val]) => {
+                if (val !== undefined && val !== null) {
+                    formData.append(key, val.toString());
+                }
+            });
+            // Ensure ID is passed
+            formData.set('id', c.id);
+
+            await updateCompany(formData);
+            setIsEditing(false);
+        } catch (error) {
+            console.error('Failed to update company:', error);
+            alert('保存に失敗しました。');
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+    return (
+        <div className="h-full flex flex-col bg-white overflow-hidden relative">
+
+            {/* ── Header ── */}
+            <div className="px-5 py-5 bg-white border-b border-gray-100 shrink-0 sticky top-0 z-10">
+                <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-4 min-w-0">
+                        <div className="w-14 h-14 rounded-xl border border-gray-200 bg-gray-50 flex items-center justify-center shrink-0 text-gray-400">
+                            <Building2 size={24} />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-2 flex-wrap">
+                                {isEditing ? (
+                                    <input
+                                        name="name_jp"
+                                        value={editData.name_jp || ''}
+                                        onChange={handleInputChange}
+                                        className="text-[18px] font-black text-gray-900 border-b-2 border-blue-500 outline-none w-full bg-transparent"
+                                        placeholder="企業名を入力"
+                                    />
+                                ) : (
+                                    <>
+                                        <h2 className="text-[18px] font-black text-gray-900 tracking-tight leading-none truncate">{c.name_jp || '---'}</h2>
+                                        <span className={`text-[10px] font-black px-2 py-0.5 rounded
+                                                ${(c.active_worker_count || 0) > 0 ? 'bg-blue-50 text-blue-600 border border-blue-100' : 'bg-gray-50 text-gray-400 border border-gray-200'}
+                                            `}>
+                                            {c.active_worker_count! > 0 ? '受入中' : '未受入'}
+                                        </span>
+                                    </>
+                                )}
+                            </div>
+
+                            {isEditing ? (
+                                <input
+                                    name="name_romaji"
+                                    value={editData.name_romaji || ''}
+                                    onChange={handleInputChange}
+                                    className="text-[11px] text-gray-400 font-bold uppercase tracking-wider w-full mt-2 border-b border-gray-200 outline-none bg-transparent"
+                                    placeholder="ROMAN NAME"
+                                />
+                            ) : (
+                                <p className="text-[11px] text-gray-400 font-bold uppercase tracking-wider truncate mt-1.5">{c.name_romaji || '---'}</p>
+                            )}
+
+                            {!isEditing && (
+                                <div className="flex items-center gap-1.5 mt-2 text-[10px] font-bold text-gray-500">
+                                    <MapPin size={11} className="text-gray-400" />
+                                    <span className="truncate">{c.address || '所在地未登録'}</span>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="shrink-0 ml-4 flex gap-2">
+                        {isEditing ? (
+                            <>
+                                <button
+                                    onClick={() => { setIsEditing(false); setEditData(c); }}
+                                    className="h-8 px-4 bg-white border border-gray-200 hover:bg-gray-50 text-gray-500 rounded-md text-[11px] font-bold transition-all flex items-center gap-1.5 active:scale-95"
+                                >
+                                    <X size={13} />
+                                    キャンセル
+                                </button>
+                                <button
+                                    onClick={handleSave}
+                                    disabled={isSaving}
+                                    className="h-8 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md text-[11px] font-bold transition-all flex items-center gap-1.5 active:scale-95 disabled:opacity-50"
+                                >
+                                    {isSaving ? <Loader2 size={13} className="animate-spin" /> : <Save size={13} />}
+                                    保存する
+                                </button>
+                            </>
+                        ) : (
+                            <button
+                                onClick={() => { setIsEditing(true); setEditData(c); }}
+                                className="h-8 px-4 bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-200 text-gray-600 hover:text-blue-700 rounded-md text-[11px] font-bold transition-all flex items-center gap-1.5 active:scale-95"
+                            >
+                                <Edit size={13} />
+                                編集する
+                            </button>
+                        )}
+                    </div>
+                </div>
+            </div>
+
+            {/* ── Scrollable body ── */}
+            <div className="flex-1 overflow-y-auto thin-scrollbar p-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+
+                    {/* --- Left Column --- */}
+                    <div className="flex flex-col gap-3">
+                        {/* 1. Corporate Info & Contact */}
+                        <div className="bg-white rounded-md border border-gray-200 overflow-hidden">
+                            <SectionHeader icon={<Building2 size={13} className="text-blue-600" />} label="企業情報・連絡先 / Corporate & Contact" color="bg-blue-50 text-blue-900 border-b border-blue-100" />
+                            <Row label="企業名" name="name_jp" value={isEditing ? editData.name_jp : c.name_jp} isEditing={isEditing} onChange={handleInputChange} />
+                            <Row label="フリガナ" name="name_kana" value={isEditing ? editData.name_kana : c.name_kana} isEditing={isEditing} onChange={handleInputChange} />
+                            <Row label="ローマ字" name="name_romaji" value={isEditing ? editData.name_romaji : c.name_romaji} isEditing={isEditing} onChange={handleInputChange} valueClass="font-bold uppercase" />
+                            <Row label="法人番号(13桁)" name="corporate_number" value={isEditing ? editData.corporate_number : c.corporate_number} isEditing={isEditing} onChange={handleInputChange} valueClass="font-mono text-gray-700" />
+                            <Row label="登録支援機関番号" name="registration_number" value={isEditing ? editData.registration_number : c.registration_number} isEditing={isEditing} onChange={handleInputChange} valueClass="font-mono text-gray-700" />
+
+                            <div className="h-2 bg-slate-50 border-t border-b border-gray-100" />{/* Separator */}
+
+                            <Row label="郵便番号" name="postal_code" value={isEditing ? editData.postal_code : c.postal_code} isEditing={isEditing} onChange={handleInputChange} valueClass="font-mono text-gray-700" />
+                            <Row label="所在地（住所）" name="address" value={isEditing ? editData.address : c.address} isEditing={isEditing} onChange={handleInputChange} />
+                            <Row label="電話番号" name="phone" value={isEditing ? editData.phone : c.phone} isEditing={isEditing} onChange={handleInputChange} valueClass="font-mono text-gray-700" />
+                            <Row label="メールアドレス" name="email" value={isEditing ? editData.email : c.email} isEditing={isEditing} onChange={handleInputChange} />
+                            <Row label="担当者" name="pic_name" value={isEditing ? editData.pic_name : c.pic_name} isEditing={isEditing} onChange={handleInputChange} />
+                        </div>
+                    </div>
+
+                    {/* --- Right Column --- */}
+                    <div className="flex flex-col gap-3">
+                        {/* 2. Executive & Business */}
+                        <div className="bg-white rounded-md border border-gray-200 overflow-hidden">
+                            <SectionHeader icon={<Users size={13} className="text-blue-600" />} label="役員・業種・受入 / Reps & Business" color="bg-blue-50 text-blue-900 border-b border-blue-100" />
+                            <Row label="代表者名" name="representative" value={isEditing ? editData.representative : c.representative} isEditing={isEditing} onChange={handleInputChange} />
+                            <Row label="代表者フリガナ" name="representative_kana" value={isEditing ? editData.representative_kana : c.representative_kana} isEditing={isEditing} onChange={handleInputChange} />
+                            <Row label="責任者" name="manager_name" value={isEditing ? editData.manager_name : c.manager_name} isEditing={isEditing} onChange={handleInputChange} />
+                            <Row label="講習受講日" name="training_date" type="date" value={isEditing ? editData.training_date : (c.training_date ? c.training_date.replace(/-/g, '/') : null)} isEditing={isEditing} onChange={handleInputChange} valueClass="font-mono" />
+                            <Row label="生活指導員" name="life_advisor" value={isEditing ? editData.life_advisor : c.life_advisor} isEditing={isEditing} onChange={handleInputChange} />
+                            <Row label="技能指導員" name="tech_advisor" value={isEditing ? editData.tech_advisor : c.tech_advisor} isEditing={isEditing} onChange={handleInputChange} />
+
+                            <div className="h-2 bg-slate-50 border-t border-b border-gray-100" />{/* Separator */}
+
+                            <Row label="業種" name="industry" value={isEditing ? editData.industry : c.industry} isEditing={isEditing} onChange={handleInputChange} />
+                            <Row label="受入職種" name="accepted_occupations" value={isEditing ? editData.accepted_occupations : c.accepted_occupations} isEditing={isEditing} onChange={handleInputChange} />
+                            <Row label="従業員数" name="employee_count" type="number" value={isEditing ? editData.employee_count : (c.employee_count ? `${c.employee_count} 名` : null)} isEditing={isEditing} onChange={handleInputChange} />
+                            {!isEditing && (
+                                <Row label="受入中実習生・特定技能" name="active_worker_count" value={c.active_worker_count ? `${c.active_worker_count} 名` : '0 名'} isEditing={false} onChange={() => { }} valueClass={c.active_worker_count! > 0 ? 'text-blue-600 font-black' : ''} />
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Remarks */}
+                    <div className="bg-white rounded-md border border-gray-200 overflow-hidden md:col-span-2">
+                        <SectionHeader icon={<AlignLeft size={13} className="text-blue-600" />} label="備考 / Remarks" color="bg-blue-50 text-blue-900 border-b border-blue-100" />
+                        {isEditing ? (
+                            <div className="p-3 bg-white">
+                                <textarea
+                                    name="remarks"
+                                    value={editData.remarks || ''}
+                                    onChange={handleInputChange}
+                                    className="w-full min-h-[120px] p-3 border border-gray-200 rounded text-[12px] font-medium text-gray-800 outline-none focus:border-blue-500 transition-colors"
+                                    placeholder="備考を入力..."
+                                />
+                            </div>
+                        ) : (
+                            c.remarks ? (
+                                <p className="px-5 py-4 text-[12px] text-gray-700 font-medium leading-relaxed whitespace-pre-wrap">{c.remarks}</p>
+                            ) : (
+                                <p className="px-5 py-4 text-[12px] text-gray-400 italic">備考・メモはありません</p>
+                            )
+                        )}
+                    </div>
+
+                </div>
+                <div className="h-4" />
+            </div>
+        </div>
+    );
+}

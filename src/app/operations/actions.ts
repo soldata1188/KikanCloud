@@ -116,3 +116,25 @@ export async function updateOperationData(workerId: string, column: 'kentei_stat
     revalidatePath('/operations')
     return { success: true }
 }
+
+export async function getWorkerTasksAndLogs(workerId: string) {
+    const supabase = await createClient()
+
+    const [{ data: tasks }, { data: logs }] = await Promise.all([
+        supabase.from('tasks')
+            .select('*, assigned_user:assigned_to(full_name)')
+            .eq('worker_id', workerId)
+            .eq('is_deleted', false)
+            .order('due_date', { ascending: true, nullsFirst: false }),
+        supabase.from('shien_logs')
+            .select('*, author:author_id(full_name)')
+            .eq('worker_id', workerId)
+            .eq('is_deleted', false)
+            .order('support_date', { ascending: false })
+    ])
+
+    return {
+        tasks: tasks || [],
+        logs: logs || []
+    }
+}

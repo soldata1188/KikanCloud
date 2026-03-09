@@ -18,47 +18,81 @@ export default function LoginPage() {
             const emailForAuth = loginId.includes('@') ? loginId : `${loginId.trim().toLowerCase()}@kikancloud.local`
             const { error: authError } = await supabase.auth.signInWithPassword({ email: emailForAuth, password: password })
 
-            if (authError) setError('ログインIDまたはパスワードが正しくありません。')
-            else { router.push('/'); router.refresh(); }
+            if (authError) {
+                if (authError.message === 'Failed to fetch') {
+                    setError('サーバーに接続できません。(Supabase/Dockerが起動していない可能性があります)')
+                } else if (authError.status === 400 || authError.status === 401) {
+                    setError('ログインIDまたはパスワードが正しくありません。')
+                } else {
+                    setError(`エラー: ${authError.message}`)
+                }
+            } else { router.push('/'); router.refresh(); }
         })
     }
 
     return (
-        <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 font-sans text-slate-800 selection:bg-blue-500/20">
-            <div className="w-full max-w-[400px] bg-white border border-slate-200 rounded-xl shadow-xl overflow-hidden">
-                <div className="p-8 text-center bg-slate-50 border-b border-slate-200">
-                    <div className="w-14 h-14 bg-[#0067b8] rounded-xl flex items-center justify-center mx-auto mb-4 shadow-sm border border-blue-700">
-                        <Hexagon size={28} className="text-white fill-white/20" />
+        <div className="min-h-screen bg-[#F0F2F5] flex items-center justify-center p-4 font-sans text-gray-900 selection:bg-blue-600/20 anim-page">
+            <div className="w-full max-w-[420px] bg-white border border-gray-200 rounded-2xl shadow-xl overflow-hidden anim-modal">
+                <div className="p-10 text-center bg-white border-b border-gray-50">
+                    <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-blue-100 transition-transform hover:scale-105 duration-300">
+                        <Hexagon size={32} className="text-white fill-white/20" />
                     </div>
-                    <h1 className="text-2xl font-black tracking-tight text-slate-800">KikanCloud</h1>
-                    <p className="text-[13px] text-slate-500 mt-1 font-medium">基幹システム ログイン</p>
+                    <h1 className="text-3xl font-black tracking-tighter text-gray-900 italic">Kikan<span className="text-blue-600 NOT-italic">Cloud</span></h1>
+                    <p className="text-[14px] text-gray-400 mt-2 font-bold uppercase tracking-widest">Operator Portal</p>
                 </div>
 
-                <div className="p-8 pb-10">
-                    {error && <div className="mb-6 p-3 bg-red-50 border border-red-200 text-red-600 text-[13px] font-bold rounded-lg flex items-center gap-2"><ShieldAlert size={16} className="shrink-0" /> {error}</div>}
+                <div className="p-10">
+                    {error && (
+                        <div className="mb-6 p-4 bg-red-50 border border-red-100 text-red-600 text-[13px] font-black rounded-xl flex items-center gap-3 anim-badge">
+                            <ShieldAlert size={18} className="shrink-0" />
+                            {error}
+                        </div>
+                    )}
 
-                    <form onSubmit={handleLogin} className="space-y-5">
-                        <div>
-                            <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest block mb-1.5">ログインID (Login ID)</label>
+                    <form onSubmit={handleLogin} className="space-y-6">
+                        <div className="group">
+                            <label className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] block mb-2 px-1">ログインID</label>
                             <div className="relative">
-                                <User size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-                                <input required value={loginId} onChange={(e) => setLoginId(e.target.value)} className="w-full h-11 pl-10 pr-4 bg-slate-50 border border-slate-200 rounded-lg text-[14px] font-mono outline-none focus:border-[#0067b8] focus:bg-white focus:ring-1 focus:ring-[#0067b8] transition-all" placeholder="例: staff_01" autoCapitalize="none" autoCorrect="off" />
+                                <User size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-blue-600 transition-colors" />
+                                <input
+                                    required
+                                    value={loginId}
+                                    onChange={(e) => setLoginId(e.target.value)}
+                                    className="w-full h-12 pl-12 pr-4 bg-gray-50 border border-gray-100 rounded-xl text-[15px] font-bold outline-none focus:border-blue-600 focus:bg-white focus:ring-4 focus:ring-blue-600/5 transition-all placeholder:text-gray-300"
+                                    placeholder="admin"
+                                    autoCapitalize="none"
+                                    autoCorrect="off"
+                                />
                             </div>
                         </div>
-                        <div>
-                            <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest block mb-1.5">パスワード (Password)</label>
+                        <div className="group">
+                            <label className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] block mb-2 px-1">パスワード</label>
                             <div className="relative">
-                                <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-                                <input required type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full h-11 pl-10 pr-4 bg-slate-50 border border-slate-200 rounded-lg text-[14px] font-mono outline-none focus:border-[#0067b8] focus:bg-white focus:ring-1 focus:ring-[#0067b8] transition-all" placeholder="••••••••" />
+                                <Lock size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-blue-600 transition-colors" />
+                                <input
+                                    required
+                                    type="password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    className="w-full h-12 pl-12 pr-4 bg-gray-50 border border-gray-100 rounded-xl text-[15px] font-bold outline-none focus:border-blue-600 focus:bg-white focus:ring-4 focus:ring-blue-600/5 transition-all placeholder:text-gray-300"
+                                    placeholder="••••••••"
+                                />
                             </div>
                         </div>
-                        <button type="submit" disabled={isPending} className="w-full h-12 bg-[#0067b8] text-white font-bold rounded-lg text-[14px] hover:bg-blue-700 active:scale-[0.98] transition-all flex items-center justify-center gap-2 mt-4 disabled:opacity-60 shadow-md">
-                            {isPending ? <Loader2 size={18} className="animate-spin" /> : 'システムにログイン'}
+                        <button
+                            type="submit"
+                            disabled={isPending}
+                            className="w-full h-14 bg-blue-600 text-white font-black rounded-xl text-[15px] hover:bg-blue-700 active:scale-[0.98] transition-all flex items-center justify-center gap-2 mt-4 disabled:opacity-60 shadow-lg shadow-blue-200 uppercase tracking-widest"
+                        >
+                            {isPending ? <Loader2 size={20} className="animate-spin" /> : 'システムにログイン'}
                         </button>
                     </form>
 
-                    <div className="mt-8 pt-6 border-t border-slate-100 text-center">
-                        <p className="text-[11px] text-slate-400 leading-relaxed max-w-[280px] mx-auto">アカウントの発行やログイン方法は、<br className="hidden sm:block" />システム管理者（監理団体）にお問い合わせください。</p>
+                    <div className="mt-10 pt-8 border-t border-gray-50 text-center">
+                        <p className="text-[12px] text-gray-400 font-bold leading-relaxed max-w-[300px] mx-auto opacity-60">
+                            Enterprise Resource Planning System<br />
+                            © 2026 KikanCloud Security Global
+                        </p>
                     </div>
                 </div>
             </div>

@@ -19,15 +19,18 @@ export default async function CompanyDetailPage(props: { params: Promise<{ id: s
 
     if (error || !company) redirect('/companies')
 
-    // Fetch documents
-    const { data: docs } = await supabase.storage
-        .from('company_documents')
-        .list(`${company.tenant_id}/${company.id}`);
+    // Fetch structured documents from db
+    const { data: dbDocs } = await supabase
+        .from('client_documents')
+        .select('*')
+        .eq('company_id', params.id)
+        .eq('doc_category', 'general')
+        .order('created_at', { ascending: false });
 
-    const documents = docs?.filter(d => d.name !== '.emptyFolderPlaceholder').map(doc => {
-        const { data } = supabase.storage.from('company_documents').getPublicUrl(`${company.tenant_id}/${company.id}/${doc.name}`);
+    const documents = dbDocs?.map(doc => {
+        const { data } = supabase.storage.from('client_docs').getPublicUrl(doc.file_path);
         return {
-            name: doc.name,
+            name: doc.file_name,
             url: data.publicUrl,
             created_at: doc.created_at
         };

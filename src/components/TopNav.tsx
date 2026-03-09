@@ -11,12 +11,12 @@ export function TopNav({ title, role }: { title: string, role?: string }) {
 
     return (
         <>
-            <header className="h-12 bg-white/70 backdrop-blur-md text-slate-900 flex items-center justify-between px-6 shrink-0 z-[110] w-full border-b border-slate-200 sticky top-0 shadow-sm">
+            <header className="h-[42px] bg-white/70 backdrop-blur-md text-slate-900 flex items-center justify-between px-4 shrink-0 z-0 w-full border-b border-slate-200 sticky top-0">
                 {/* Left: app icon + org name + current page */}
                 <div className="flex items-center gap-3 relative z-10">
-                    <span className="font-extrabold text-[13px] tracking-tight hidden sm:block text-slate-800">ソリューション協同組合</span>
-                    <span className="text-slate-200 hidden sm:block text-xs">|</span>
-                    <span className="text-[#0067b8] font-black text-[11px] hidden sm:block tracking-widest uppercase">{title}</span>
+                    <span className="font-black text-[13px] tracking-tight hidden sm:block text-blue-600">KikanCloud</span>
+                    <span className="text-gray-200 hidden sm:block text-xs font-light">/</span>
+                    <span className="text-gray-900 font-bold text-[12px] hidden sm:block tracking-tight">{title || 'ホーム'}</span>
                 </div>
 
                 {/* Right: AI + サポート + avatar */}
@@ -26,16 +26,16 @@ export function TopNav({ title, role }: { title: string, role?: string }) {
                     </div>
                     <button
                         onClick={() => setIsAIChatOpen(true)}
-                        className="text-slate-600 hover:text-[#0067b8] transition-all flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100/50 border border-slate-200 hover:border-[#0067b8]/30 group"
+                        className="text-gray-600 hover:text-blue-600 transition-all flex items-center gap-1.5 px-2 py-1 rounded-md bg-gray-100/80 border border-transparent hover:border-blue-200 group"
                         title="AIアシスタント"
                     >
-                        <Sparkles size={14} className="text-slate-400 group-hover:text-[#0067b8] group-hover:animate-pulse" />
-                        <span className="hidden md:block text-[10px] font-bold uppercase tracking-tighter">AI Assistant</span>
+                        <Sparkles size={14} className="text-gray-400 group-hover:text-blue-600 group-hover:animate-pulse" />
+                        <span className="hidden md:block text-[10px] font-black uppercase tracking-wider">AI Assistant</span>
                     </button>
 
                     {/* User Avatar with Dropdown */}
                     <div className="relative group/avatar">
-                        <div className="w-8 h-8 rounded-full bg-[#0067b8] text-white flex items-center justify-center font-black text-[11px] cursor-pointer shrink-0 shadow-md border-2 border-white group-hover/avatar:scale-110 transition-transform">
+                        <div className="w-7 h-7 rounded-full bg-blue-600 text-white flex items-center justify-center font-black text-[11px] cursor-pointer shrink-0 border-2 border-white group-hover/avatar:scale-105 transition-all">
                             {role ? role.charAt(0).toUpperCase() : 'U'}
                         </div>
 

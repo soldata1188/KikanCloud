@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react';
-import { ArrowLeft, User, FileText, X, ExternalLink, IdCard, Briefcase, FileBadge2, DownloadCloud, Trash2, Pencil, ChevronRight, ChevronDown } from 'lucide-react';
+import { ArrowLeft, User, FileText, X, ExternalLink, IdCard, Briefcase, FileBadge2, DownloadCloud, Trash2, Pencil, ChevronRight, ChevronDown, MoreHorizontal } from 'lucide-react';
 import Link from 'next/link';
 import { deleteWorker } from '@/app/workers/actions';
 
@@ -110,7 +110,7 @@ export default function WorkerDetailClient({ worker, documents }: { worker: Work
 
     const statusCfg: Record<string, { label: string; dot: string; bg: string; text: string; border: string }> = {
         'waiting': { label: '未入国', dot: 'bg-gray-400', bg: 'bg-gray-50', text: 'text-gray-600', border: 'border-gray-200' },
-        'standby': { label: '対応中', dot: 'bg-[#0067b8]', bg: 'bg-blue-50', text: 'text-[#0067b8]', border: 'border-blue-200' },
+        'standby': { label: '対応中', dot: 'bg-blue-600', bg: 'bg-blue-50', text: 'text-blue-600', border: 'border-blue-200' },
         'working': { label: '就業中', dot: 'bg-emerald-400', bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200' },
         'missing': { label: '失踪', dot: 'bg-rose-400', bg: 'bg-rose-50', text: 'text-rose-700', border: 'border-rose-200' },
         'returned': { label: '帰国', dot: 'bg-gray-400', bg: 'bg-gray-100', text: 'text-gray-500', border: 'border-gray-200' },
@@ -119,10 +119,13 @@ export default function WorkerDetailClient({ worker, documents }: { worker: Work
     const cfg = statusCfg[worker.status] || { label: worker.status, dot: 'bg-slate-400', bg: 'bg-slate-50', text: 'text-slate-600', border: 'border-slate-200' };
 
     const SectionCard = ({ icon, iconColor, title, children }: { icon: React.ReactNode; iconColor: string; title: string; children: React.ReactNode }) => (
-        <div className="bg-white border border-gray-200 overflow-hidden rounded-md">
-            <div className={`px-4 py-2.5 border-b border-[#005a9e] flex items-center gap-2.5 bg-[#0067b8]`}>
-                <span className="text-white">{icon}</span>
-                <h3 className="text-[11px] font-black text-white uppercase tracking-widest">{title}</h3>
+        <div className="app-card overflow-hidden">
+            <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50/30">
+                <div className="flex items-center gap-2.5">
+                    <span className="text-blue-600">{icon}</span>
+                    <h3 className="text-sm font-bold text-gray-800 tracking-tight">{title}</h3>
+                </div>
+                <button className="text-gray-400 hover:text-gray-600"><MoreHorizontal size={14} /></button>
             </div>
             <div className="flex flex-col">{children}</div>
         </div>
@@ -140,15 +143,15 @@ export default function WorkerDetailClient({ worker, documents }: { worker: Work
                 <div className="space-y-2">
                     {documents.map((doc, idx) => (
                         <div key={idx} onClick={() => setPreviewDoc(doc)}
-                            className="group relative flex items-center gap-3 p-3 rounded-md border border-gray-200 bg-white hover:border-[#0067b8] cursor-pointer transition-all active:scale-[0.99]">
-                            <div className="w-9 h-9 shrink-0 bg-gray-50 text-gray-400 rounded flex items-center justify-center border border-gray-200 group-hover:bg-[#0067b8] group-hover:text-white group-hover:border-[#0067b8] transition-all">
-                                <FileText size={16} strokeWidth={2} />
+                            className="group relative flex items-center gap-3 p-3 rounded-xl border border-gray-200 bg-white hover:border-blue-300 hover:shadow-sm cursor-pointer transition-all active:scale-[0.98]">
+                            <div className="w-10 h-10 shrink-0 bg-gray-50 text-gray-400 rounded-lg flex items-center justify-center border border-gray-100 group-hover:bg-blue-50 group-hover:text-blue-600 group-hover:border-blue-200 transition-all">
+                                <FileText size={18} />
                             </div>
                             <div className="flex-1 min-w-0">
-                                <h4 className="text-[11px] font-black text-gray-900 truncate uppercase leading-tight group-hover:text-[#0067b8] transition-colors">{getDocName(doc.name)}</h4>
-                                <p className="text-[9px] text-gray-400 mt-1 truncate font-mono uppercase tracking-tight">{doc.name}</p>
+                                <h4 className="text-[12px] font-bold text-gray-900 truncate leading-tight group-hover:text-blue-600 transition-colors">{getDocName(doc.name)}</h4>
+                                <p className="text-[10px] text-gray-400 mt-1 truncate font-mono tracking-tight">{doc.name}</p>
                             </div>
-                            <ChevronRight size={12} className="text-gray-300 shrink-0 group-hover:text-[#0067b8]" />
+                            <ChevronRight size={14} className="text-gray-300 shrink-0 group-hover:text-blue-600" />
                         </div>
                     ))}
                 </div>
@@ -222,30 +225,30 @@ export default function WorkerDetailClient({ worker, documents }: { worker: Work
                                 </div>
 
                                 {/* Info block */}
-                                <div className="flex-1 p-5 sm:p-8 flex flex-col justify-center bg-white relative">
-                                    <div className="text-[9px] sm:text-[10px] text-[#0067b8] font-black uppercase tracking-[0.3em] mb-2">人材情報管理記録</div>
-                                    <h3 className="text-[22px] sm:text-[28px] font-black text-gray-900 tracking-tighter leading-none uppercase mb-4">
+                                <div className="flex-1 p-6 sm:p-10 flex flex-col justify-center bg-white relative">
+                                    <div className="text-[10px] text-blue-600 font-black uppercase tracking-widest mb-2 px-2 py-0.5 bg-blue-50 w-fit rounded">人材詳細プロファイル</div>
+                                    <h3 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tighter leading-none mb-6">
                                         {worker.full_name_romaji || '—'}
                                     </h3>
-                                    <div className="flex flex-wrap gap-2 sm:gap-3">
-                                        <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-50 text-gray-900 text-[11px] font-black rounded border border-gray-200 uppercase tracking-widest">
-                                            <Briefcase size={11} className="text-[#0067b8]" />
+                                    <div className="flex flex-wrap gap-2 sm:gap-4">
+                                        <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100/50 text-gray-800 text-[12px] font-bold rounded-lg border border-gray-200/50 transition-all hover:bg-white hover:shadow-sm">
+                                            <Briefcase size={14} className="text-blue-600" />
                                             {worker.companies?.name_jp || '未配属'}
                                         </div>
-                                        <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-50 text-gray-900 text-[11px] font-black rounded border border-gray-200 uppercase tracking-widest">
-                                            <FileBadge2 size={11} className="text-[#0067b8]" />
+                                        <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100/50 text-gray-800 text-[12px] font-bold rounded-lg border border-gray-200/50 transition-all hover:bg-white hover:shadow-sm">
+                                            <FileBadge2 size={14} className="text-blue-600" />
                                             {formatSystemType(worker.system_type)}
                                         </div>
                                     </div>
                                     {/* Pulse Timeline */}
-                                    <div className="mt-6 pt-4 border-t border-gray-100">
-                                        <div className="flex justify-between items-center mb-3">
-                                            <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">手続きパルス (今後6ヶ月)</span>
+                                    <div className="mt-8 pt-6 border-t border-gray-100">
+                                        <div className="flex justify-between items-center mb-4">
+                                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none">手続きリマインダー</span>
                                         </div>
-                                        <div className="h-1 bg-gray-100 rounded-full relative overflow-visible">
-                                            <DetailPulse date={worker.zairyu_exp} label="在留" color="bg-rose-500" />
-                                            <DetailPulse date={worker.cert_end_date} label="認定" color="bg-amber-500" />
-                                            {worker.kentei_status?.exam_date_written && <DetailPulse date={worker.kentei_status.exam_date_written} label="検定" />}
+                                        <div className="h-1.5 bg-gray-100 rounded-full relative overflow-visible">
+                                            <DetailPulse date={worker.zairyu_exp} label="在留" color="bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.4)]" />
+                                            <DetailPulse date={worker.cert_end_date} label="認定" color="bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.4)]" />
+                                            {worker.kentei_status?.exam_date_written && <DetailPulse date={worker.kentei_status.exam_date_written} label="検定" color="bg-blue-600 shadow-[0_0_8px_rgba(37,99,235,0.4)]" />}
                                         </div>
                                     </div>
                                 </div>

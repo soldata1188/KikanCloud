@@ -4,7 +4,7 @@ import { APIProvider, Map, AdvancedMarker, useMap, InfoWindow } from '@vis.gl/re
 import {
     MapPin as MapPinIcon, Building2, User, Search, X,
     ChevronDown, Filter, Navigation, Layers,
-    Eye, EyeOff, List, AlertTriangle, Loader2, RefreshCw
+    AlertTriangle, RefreshCw
 } from 'lucide-react'
 import { useEffect } from 'react'
 
@@ -161,32 +161,14 @@ export default function RoutingClient({ initialLocations, filterCompanies, googl
     const [panTarget, setPanTarget] = useState<{ lat: number; lng: number } | null>(null)
     const [isSidebarOpen, setIsSidebarOpen] = useState(true)
 
-    // Backfill state
-    const [isBackfilling, setIsBackfilling] = useState(false)
-    const [backfillResult, setBackfillResult] = useState<string | null>(null)
+    const [isMobile, setIsMobile] = useState(false)
 
-    const handleBackfill = async () => {
-        setIsBackfilling(true)
-        setBackfillResult(null)
-        try {
-            // Last 12 chars of the public anon key — simple shared secret for this internal route
-            const token = (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '').slice(-12)
-            const res = await fetch('/api/geocode-backfill', {
-                method: 'POST',
-                headers: { 'x-backfill-secret': token }
-            })
-            const json = await res.json()
-            if (!res.ok) throw new Error(json.error || 'エラー')
-            setBackfillResult(
-                `完了！企業 ${json.companies.updated}件・実習生 ${json.workers.updated}件 của tọa độ đã được đăng ký. Đang tải lại trang...`
-            )
-            setTimeout(() => window.location.reload(), 1500)
-        } catch (e: unknown) {
-            setBackfillResult(`エラー: ${e instanceof Error ? e.message : '不明'}`)
-        } finally {
-            setIsBackfilling(false)
-        }
-    }
+    useEffect(() => {
+        const checkMobile = () => setIsMobile(window.innerWidth < 768)
+        checkMobile()
+        window.addEventListener('resize', checkMobile)
+        return () => window.removeEventListener('resize', checkMobile)
+    }, [])
 
     const defaultCenter = mappable.length > 0
         ? { lat: mappable[0].latitude, lng: mappable[0].longitude }
@@ -224,8 +206,6 @@ export default function RoutingClient({ initialLocations, filterCompanies, googl
         worker: initialLocations.filter(l => l.type === 'worker').length,
     }
     const unmappedCount = unmapped.length
-    // True if any workers exist but have no coords yet (just added columns back)
-    const hasWorkersWithNoCoords = initialLocations.some(l => l.type === 'worker' && (l.latitude === null || l.longitude === null))
 
     if (!googleMapsKey) {
         return (
@@ -249,9 +229,10 @@ export default function RoutingClient({ initialLocations, filterCompanies, googl
                 {/* ══════════════ SIDEBAR ══════════════ */}
                 {/* Mobile: fixed bottom sheet | Desktop: left sidebar */}
                 {/* Backdrop — mobile AND desktop when open */}
+                {/* Backdrop — mobile ONLY when open */}
                 {isSidebarOpen && (
                     <div
-                        className="fixed inset-0 z-30"
+                        className="fixed inset-0 z-30 md:hidden"
                         style={{ background: 'rgba(0,0,0,0.15)' }}
                         onClick={() => setIsSidebarOpen(false)}
                     />
@@ -260,8 +241,8 @@ export default function RoutingClient({ initialLocations, filterCompanies, googl
                     flex flex-col z-40
                     transition-all duration-300 ease-in-out
                     fixed bottom-0 left-0 right-0
-                    md:bottom-auto md:right-auto md:top-0 md:left-0 md:h-full
-                    rounded-t-2xl md:rounded-none md:rounded-r-2xl
+                    md:relative md:bottom-auto md:right-auto md:top-0 md:left-0 md:h-full md:shrink-0
+                    rounded-t-2xl md:rounded-none
                     ${isSidebarOpen
                         ? 'md:w-[340px] translate-y-0 h-[68vh] pb-safe md:h-full md:translate-y-0'
                         : 'md:w-0 md:overflow-hidden translate-y-full md:translate-y-0 h-[68vh]'
@@ -271,10 +252,10 @@ export default function RoutingClient({ initialLocations, filterCompanies, googl
                         background: 'rgba(255,255,255,0.78)',
                         backdropFilter: 'blur(24px)',
                         WebkitBackdropFilter: 'blur(24px)',
-                        borderRight: isSidebarOpen ? '1px solid rgba(255,255,255,0.5)' : 'none',
+                        borderRight: isSidebarOpen ? '1px solid rgba(0,0,0,0.05)' : 'none',
                         borderTop: '1px solid rgba(255,255,255,0.6)',
-                        boxShadow: isSidebarOpen
-                            ? '4px 0 32px rgba(0,0,0,0.10), inset -1px 0 0 rgba(255,255,255,0.4), 0 -8px 32px rgba(0,0,0,0.10)'
+                        boxShadow: (isSidebarOpen && isMobile)
+                            ? '0 -8px 32px rgba(0,0,0,0.10)'
                             : undefined,
                     }}
                 >
@@ -372,37 +353,13 @@ export default function RoutingClient({ initialLocations, filterCompanies, googl
                         </div>
                     </div>
 
-                    {/* ── Backfill banner: always show if any worker has no coords ── */}
-                    {(unmappedCount > 0 || hasWorkersWithNoCoords) && (
-                        <div className="mx-3 my-2 p-3 bg-amber-50 border border-amber-200 rounded-xl shrink-0">
-                            <div className="flex items-start gap-2 mb-2">
-                                <AlertTriangle size={14} className="text-amber-500 shrink-0 mt-0.5" />
-                                <div>
-                                    <p className="text-[11px] font-black text-amber-700">
-                                        {unmappedCount > 0 ? `${unmappedCount} 件が地図に未表示` : `対象者の座標を登録してください`}
-                                    </p>
-                                    <p className="text-[10px] text-amber-600 mt-0.5 leading-snug">
-                                        住所から座標を自動取得してマップに表示します。
-                                    </p>
-                                </div>
-                            </div>
-                            {backfillResult ? (
-                                <p className={`text-[10px] font-bold px-2 py-1.5 rounded-md ${backfillResult.startsWith('エラー') ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-700'}`}>
-                                    {backfillResult}
-                                </p>
-                            ) : (
-                                <button
-                                    onClick={handleBackfill}
-                                    disabled={isBackfilling}
-                                    className="w-full flex items-center justify-center gap-1.5 py-2 bg-amber-500 hover:bg-amber-600 disabled:opacity-60 disabled:cursor-not-allowed text-white text-[11px] font-black rounded-md transition-colors"
-                                >
-                                    {isBackfilling ? (
-                                        <><Loader2 size={11} className="animate-spin" /> 座標を取得中...</>
-                                    ) : (
-                                        <><RefreshCw size={11} /> 座標を一括登録（住所→地図）</>
-                                    )}
-                                </button>
-                            )}
+                    {/* ── Unmapped locations info ── */}
+                    {unmappedCount > 0 && (
+                        <div className="mx-3 my-2 px-3 py-2 bg-amber-50/50 border border-amber-100 rounded-xl flex items-center gap-2 shrink-0">
+                            <AlertTriangle size={13} className="text-amber-500 shrink-0" />
+                            <p className="text-[11px] font-bold text-amber-700 leading-tight">
+                                {unmappedCount}件 座標未登録（住所を登録すると地図に表示されます）
+                            </p>
                         </div>
                     )}
 
@@ -639,30 +596,7 @@ export default function RoutingClient({ initialLocations, filterCompanies, googl
                     {/* ── Sidebar toggle button ── */}
                     {/* Desktop: top-left | Mobile: bottom-right floating button */}
                     {/* Desktop toggle — prominent pill top-left */}
-                    <button
-                        onClick={() => setIsSidebarOpen(v => !v)}
-                        className="hidden md:flex absolute top-4 left-4 z-[201] items-center gap-2 px-4 py-2 rounded-full transition-all active:scale-95 hover:scale-105"
-                        title={isSidebarOpen ? 'サイドバーを隠す' : 'サイドバーを表示'}
-                        style={{
-                            background: isSidebarOpen ? 'rgba(255,255,255,0.92)' : 'rgba(0,103,184,0.92)',
-                            backdropFilter: 'blur(12px)',
-                            WebkitBackdropFilter: 'blur(12px)',
-                            border: isSidebarOpen ? '1px solid rgba(0,103,184,0.25)' : '1px solid rgba(255,255,255,0.3)',
-                            boxShadow: '0 4px 20px rgba(0,0,0,0.18), 0 1px 4px rgba(0,103,184,0.2)',
-                        }}
-                    >
-                        {isSidebarOpen ? (
-                            <>
-                                <X size={14} className="text-slate-500 shrink-0" />
-                                <span className="text-[12px] font-black text-slate-600 whitespace-nowrap">閉じる</span>
-                            </>
-                        ) : (
-                            <>
-                                <List size={14} className="text-white shrink-0" />
-                                <span className="text-[12px] font-black text-white whitespace-nowrap">一覧を表示</span>
-                            </>
-                        )}
-                    </button>
+
                     {/* Mobile toggle — floating pill */}
                     <button
                         onClick={() => setIsSidebarOpen(v => !v)}

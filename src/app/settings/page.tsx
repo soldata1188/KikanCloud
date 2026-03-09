@@ -54,12 +54,17 @@ export default async function SettingsPage() {
     }
 
     return (
-        <div className="flex h-screen bg-white font-sans text-slate-900 overflow-hidden selection:bg-emerald-500/20">
+        <div className="seamless-block">
             <Sidebar active="settings" />
             <div className="flex-1 flex flex-col relative min-w-0">
                 <TopNav title="システム設定" role={userRole} />
-                <main className="flex-1 overflow-y-auto p-0 bg-slate-50/50">
-                    <Suspense fallback={<div className="flex items-center justify-center h-full"><div className="w-8 h-8 border-4 border-[#0067b8] border-t-transparent rounded-full animate-spin"></div></div>}>
+                <div className="seamless-header">
+                    <h2 className="text-[14px] font-black text-gray-950">
+                        システム<span className="text-blue-700">設定</span>
+                    </h2>
+                </div>
+                <main className="flex-1 overflow-y-auto relative bg-white thin-scrollbar">
+                    <Suspense fallback={<div className="flex items-center justify-center h-full"><div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div></div>}>
                         <SettingsPageClient
                             currentUser={{
                                 id: user.id,

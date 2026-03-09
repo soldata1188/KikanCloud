@@ -72,10 +72,10 @@ export default async function RoutingPage() {
     const googleMapsKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''
 
     return (
-        <div className="flex h-screen bg-slate-50 font-sans text-slate-900">
+        <div className="seamless-block">
             <Sidebar active="routing" />
             <div className="flex-1 flex flex-col relative min-w-0 overflow-hidden">
-                <main className="flex-1 relative overflow-hidden pb-14 md:pb-0">
+                <main className="flex-1 relative overflow-hidden">
                     <RoutingClient
                         initialLocations={initialLocations}
                         filterCompanies={filterCompanies}

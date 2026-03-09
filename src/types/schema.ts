@@ -124,3 +124,59 @@ export interface User {
     created_at?: string;
     updated_at?: string;
 }
+
+export interface Task {
+    id: string;
+    tenant_id: string;
+    company_id?: string;
+    worker_id?: string;
+    title: string;
+    description?: string;
+    status: 'todo' | 'in_progress' | 'done';
+    priority: 'low' | 'medium' | 'high' | 'urgent';
+    due_date?: string;
+    assigned_to?: string;
+    task_type: 'manual' | 'auto_visa' | 'auto_exam' | 'auto_kansa';
+    is_deleted?: boolean;
+    created_at?: string;
+    updated_at?: string;
+
+    // Relationships
+    companies?: Company;
+    workers?: Worker;
+    assigned_user?: User;
+}
+
+export interface ShienLog {
+    id: string;
+    tenant_id: string;
+    company_id: string;
+    worker_id?: string;
+    content: string;
+    support_date: string;
+    support_type: 'visit' | 'phone' | 'online' | 'other';
+    author_id?: string;
+    is_deleted?: boolean;
+    created_at?: string;
+    updated_at?: string;
+
+    // Relationships
+    companies?: Company;
+    workers?: Worker;
+    author?: User;
+}
+
+export interface ClientDocument {
+    id: string;
+    tenant_id: string;
+    company_id: string;
+    worker_id?: string;
+    doc_type: 'payroll' | 'timesheet' | 'worklog' | 'other';
+    doc_category: 'general' | 'worker_specific';
+    target_month: string;
+    file_name: string;
+    file_path: string;
+    file_size: number;
+    uploaded_by?: string;
+    created_at?: string;
+}

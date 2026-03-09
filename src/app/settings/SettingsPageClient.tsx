@@ -111,7 +111,7 @@ function TabAI() {
                     </div>
                     <div>
                         <h3 className="text-lg font-bold text-gray-900">AI アシスタント設定</h3>
-                        <p className="text-xs text-gray-500 mt-0.5">自動生成 và 業務効率化のためのAIモデル設定</p>
+                        <p className="text-xs text-gray-500 mt-0.5">自動生成と業務効率化のためのAIモデル設定</p>
                     </div>
                 </div>
                 {showSuccess && (
@@ -195,11 +195,11 @@ export default function SettingsPageClient({ currentUser, usersList, companiesLi
                         const isActive = activeTab === tab.id;
                         return (
                             <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                                className={`flex items-center gap-3 px-4 py-2 text-xs font-bold rounded-md transition-all duration-150 whitespace-nowrap text-left
+                                className={`flex items-center gap-3 px-4 py-2.5 text-xs font-black rounded-lg transition-all duration-150 whitespace-nowrap text-left uppercase tracking-widest
                                     ${isActive
-                                        ? "bg-white border border-gray-200 text-[#0067b8] shadow-sm"
-                                        : "text-gray-500 hover:bg-gray-100 hover:text-gray-900"}`}>
-                                <Icon size={14} className={isActive ? "text-[#0067b8]" : "text-gray-400"} strokeWidth={isActive ? 2.5 : 2} />
+                                        ? "bg-blue-50 text-blue-700 shadow-sm border border-blue-100"
+                                        : "text-gray-400 hover:bg-gray-50 hover:text-gray-600 border border-transparent"}`}>
+                                <Icon size={14} className={isActive ? "text-blue-700" : "text-gray-400"} strokeWidth={isActive ? 2.5 : 2} />
                                 {tab.label}
                             </button>
                         );
@@ -240,9 +240,9 @@ export default function SettingsPageClient({ currentUser, usersList, companiesLi
                             <div className="flex items-center gap-0 border-b border-gray-100 px-6 bg-gray-50/50">
                                 {ORG_SUB_TABS.map(({ id, label, icon: Icon }) => (
                                     <button key={id} onClick={() => setOrgSubTab(id)}
-                                        className={`relative flex items-center gap-2 px-6 py-4 text-xs font-bold transition-all border-b-2 -mb-[1px]
+                                        className={`relative flex items-center gap-2 px-6 py-4 text-xs font-black tracking-widest uppercase transition-all border-b-2 -mb-[1px]
                                             ${orgSubTab === id
-                                                ? "text-gray-900 border-[#0067b8]"
+                                                ? "text-blue-700 border-blue-600"
                                                 : "text-gray-400 border-transparent hover:text-gray-700"}`}>
                                         <Icon size={14} />
                                         {label}

@@ -1,54 +1,76 @@
--- Xóa dữ liệu cũ để tránh lỗi trùng lặp khi reset (Cascade sẽ tự động xóa các bảng con)
-TRUNCATE TABLE public.job_transfers, public.exams, public.visas, public.workers, public.companies, public.audits, public.procedures, public.worker_documents, public.client_documents, public.messages, public.notifications CASCADE;
+-- CLEANUP EVERYTHING
+DELETE FROM auth.identities;
+DELETE FROM auth.users;
+DELETE FROM auth.instances;
 
--- 1. Tạo 1 Nghiệp đoàn (Tenant)
-INSERT INTO public.tenants (id, name, org_type, domain, status) 
-VALUES ('11111111-1111-1111-1111-111111111111', 'Mirai Union (Demo)', 'kanri_dantai', 'mirai-demo', 'active')
-ON CONFLICT (id) DO NOTHING;
+DO $$
+DECLARE
+  uid UUID := '99999999-9999-9999-9999-999999999999';
+  tid UUID := '11111111-1111-1111-1111-111111111111';
+BEGIN
+  -- 1. Create Auth Instance (CRITICAL for local GoTrue)
+  INSERT INTO auth.instances (id, uuid, created_at, updated_at)
+  VALUES ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', now(), now());
 
--- 2. Tạo 2 Xí nghiệp (Company)
-INSERT INTO public.companies (id, tenant_id, name_jp, corporate_number, address, representative) 
-VALUES 
-('22222222-2222-2222-2222-222222222221', '11111111-1111-1111-1111-111111111111', 'Toyota Auto (Demo)', '1234567890123', 'Aichi, Japan', 'Taro Yamada'),
-('22222222-2222-2222-2222-222222222222', '11111111-1111-1111-1111-111111111111', 'Yamaha Kogyo (Demo)', '9876543210987', 'Tokyo, Japan', 'Hanako Suzuki');
+  -- 2. Create Tenant
+  INSERT INTO public.tenants (id, name, org_type, status) 
+  VALUES (tid, 'KikanCloud Demo Union', 'kanri_dantai', 'active')
+  ON CONFLICT (id) DO NOTHING;
 
--- 3. Tạo 3 Người lao động (Workers) với ID tĩnh
-INSERT INTO public.workers (id, tenant_id, company_id, full_name_romaji, full_name_kana, dob, passport_exp, zairyu_no, entry_date, system_type, status) 
-VALUES 
-('33333333-3333-3333-3333-333333333331', '11111111-1111-1111-1111-111111111111', '22222222-2222-2222-2222-222222222221', 'NGUYEN VAN A', 'グエン ヴァン ア', '2000-01-01', CURRENT_DATE + INTERVAL '30 days', 'AB12345678CD', '2023-01-01', 'ikusei_shuro', 'working'),
-('33333333-3333-3333-3333-333333333332', '11111111-1111-1111-1111-111111111111', '22222222-2222-2222-2222-222222222222', 'TRAN THI B', 'チャン ティ ビー', '2001-05-15', CURRENT_DATE + INTERVAL '2 years', 'XY98765432ZZ', '2024-04-01', 'ginou_jisshu', 'working'),
-('33333333-3333-3333-3333-333333333333', '11111111-1111-1111-1111-111111111111', '22222222-2222-2222-2222-222222222221', 'LE VAN C', 'レ ヴァン シー', '1998-10-20', CURRENT_DATE + INTERVAL '5 months', 'MN11223344PQ', '2022-10-01', 'tokuteigino', 'working');
+  -- 3. Create Auth User (ALL token fields MUST be '' not NULL for GoTrue compatibility)
+  INSERT INTO auth.users (
+    id, instance_id, aud, role, email, encrypted_password, email_confirmed_at, 
+    raw_app_meta_data, raw_user_meta_data, created_at, updated_at,
+    last_sign_in_at, is_super_admin, is_sso_user,
+    confirmation_token, recovery_token, email_change_token_new, email_change,
+    email_change_token_current, phone_change_token, phone_change, reauthentication_token
+  ) VALUES (
+    uid, '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 
+    'admin@kikancloud.local', crypt('password123', gen_salt('bf', 10)), now(), 
+    '{"provider":"email","providers":["email"]}'::jsonb, 
+    '{"full_name":"Admin Mirai"}'::jsonb, 
+    now(), now(), now(), false, false,
+    '', '', '', '', '', '', '', ''
+  );
 
--- 4. Tạo 3 Hồ sơ Visa tương ứng (Visas)
-INSERT INTO public.visas (id, tenant_id, worker_id, visa_type, expiration_date, process_status)
-VALUES
-('44444444-4444-4444-4444-444444444441', '11111111-1111-1111-1111-111111111111', '33333333-3333-3333-3333-333333333331', 'ikusei_shuro', CURRENT_DATE + INTERVAL '45 days', 'gathering'),
-('44444444-4444-4444-4444-444444444442', '11111111-1111-1111-1111-111111111111', '33333333-3333-3333-3333-333333333332', 'tokuteigino', CURRENT_DATE + INTERVAL '1 year', 'approved'),
-('44444444-4444-4444-4444-444444444443', '11111111-1111-1111-1111-111111111111', '33333333-3333-3333-3333-333333333333', 'tokuteigino', CURRENT_DATE + INTERVAL '6 months', 'gathering');
+  -- 4. Create Identity
+  INSERT INTO auth.identities (id, user_id, identity_data, provider, provider_id, last_sign_in_at, created_at, updated_at)
+  VALUES (gen_random_uuid(), uid, format('{"sub":"%s","email":"%s"}', uid::text, 'admin@kikancloud.local')::jsonb, 'email', uid::text, now(), now(), now());
 
--- Bật extension mã hóa mật khẩu
-CREATE EXTENSION IF NOT EXISTS pgcrypto;
+  -- 5. Create Public User (Use UPSERT to ensure login_id is set)
+  INSERT INTO public.users (id, tenant_id, full_name, role, login_id)
+  VALUES (uid, tid, 'Administrator', 'admin', 'admin')
+  ON CONFLICT (id) DO UPDATE SET login_id = EXCLUDED.login_id, tenant_id = EXCLUDED.tenant_id;
 
--- Vô hiệu hóa trigger tạo user tự động (để tránh xung đột với dữ liệu tĩnh)
-DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+END $$;
 
--- Xóa tài khoản cũ nếu có để tránh lỗi trùng lặp khi reset
-DELETE FROM auth.users WHERE email = 'admin@mirai.com';
+-- 6. Sample Companies
+INSERT INTO public.companies (id, tenant_id, name_jp, industry) VALUES 
+(gen_random_uuid(), '11111111-1111-1111-1111-111111111111', 'トヨタ自動車 (株)', '製造'),
+(gen_random_uuid(), '11111111-1111-1111-1111-111111111111', 'ヤマハ発動機 (株)', '製造'),
+(gen_random_uuid(), '11111111-1111-1111-1111-111111111111', '鹿島建設 (株)', '建設'),
+(gen_random_uuid(), '11111111-1111-1111-1111-111111111111', 'ソニー (株)', '製造'),
+(gen_random_uuid(), '11111111-1111-1111-1111-111111111111', 'パナソニック (株)', '製造');
 
--- Tiêm tài khoản Auth (Mật khẩu: password123)
-INSERT INTO auth.users (instance_id, id, aud, role, email, encrypted_password, email_confirmed_at, raw_user_meta_data, created_at, updated_at)
-VALUES ('00000000-0000-0000-0000-000000000000', '99999999-9999-9999-9999-999999999999', 'authenticated', 'authenticated', 'admin@mirai.com', crypt('password123', gen_salt('bf')), now(), '{"full_name":"Admin Mirai"}'::jsonb, now(), now());
-
--- Thêm Identity bắt buộc cho Supabase Auth (Để được phép đăng nhập Password)
-INSERT INTO auth.identities (id, provider_id, user_id, identity_data, provider, last_sign_in_at, created_at, updated_at)
-VALUES (gen_random_uuid(), '99999999-9999-9999-9999-999999999999', '99999999-9999-9999-9999-999999999999', format('{"sub":"%s","email":"%s"}', '99999999-9999-9999-9999-999999999999', 'admin@mirai.com')::jsonb, 'email', now(), now(), now()) ON CONFLICT DO NOTHING;
-
--- Map tài khoản đó vào bảng users của SaaS (Gắn với Nghiệp đoàn Demo 11111111-1111-1111-1111-111111111111)
-INSERT INTO public.users (id, tenant_id, full_name, role)
-VALUES ('99999999-9999-9999-9999-999999999999', '11111111-1111-1111-1111-111111111111', 'Admin Mirai', 'admin')
-ON CONFLICT (id) DO UPDATE SET tenant_id = '11111111-1111-1111-1111-111111111111';
-
--- Bật lại trigger tạo user tự động
-CREATE TRIGGER on_auth_user_created
-  AFTER INSERT ON auth.users
-  FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
+-- 7. Sample Workers
+DO $$
+DECLARE
+    comp_record RECORD;
+    i INTEGER;
+BEGIN
+    FOR i IN 1..30 LOOP
+        SELECT id INTO comp_record FROM public.companies ORDER BY random() LIMIT 1;
+        INSERT INTO public.workers (
+            tenant_id, company_id, 
+            full_name_romaji, full_name_kana, dob, 
+            entry_date, entry_batch,
+            system_type, status
+        ) VALUES (
+            '11111111-1111-1111-1111-111111111111', comp_record.id,
+            'WORKER ' || i, 'ワーカー ' || i, '1998-05-15',
+            '2024-01-01', '2024-01生',
+            (ARRAY['ginou_jisshu', 'tokuteigino'])[1 + floor(random() * 2)],
+            'working'
+        );
+    END LOOP;
+END $$;

@@ -13,7 +13,7 @@ export function MonthFilter({ defaultValue }: { defaultValue: string }) {
                 params.set('month', e.target.value)
                 router.push(`/audits?${params.toString()}`)
             }}
-            className="h-[36px] px-3 bg-white border border-gray-200 rounded-md text-[12px] font-bold text-gray-800 outline-none cursor-pointer hover:border-gray-300 transition-colors shadow-sm"
+            className="h-[36px] px-3 bg-white border border-gray-300 rounded-md text-[13px] font-black text-gray-950 outline-none cursor-pointer hover:border-blue-500 transition-colors"
         />
     )
 }

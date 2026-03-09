@@ -21,18 +21,15 @@ export default async function OperationsPage() {
         <div className="flex h-screen bg-white font-sans text-gray-900 overflow-hidden selection:bg-primary-700/20">
             <Sidebar active="operations" />
             <div className="flex-1 flex flex-col relative min-w-0">
-
-                <main className="flex-1 overflow-y-auto p-0 relative">
-                    <div className="min-h-full bg-white">
-                        <OperationsClient
-                            initialWorkers={workers}
-                            companies={companies}
-                            initialVisas={visas}
-                            initialExams={exams}
-                            initialTransfers={transfers}
-                            staff={staff}
-                        />
-                    </div>
+                <main className="flex-1 overflow-hidden relative bg-[#F0F2F5]">
+                    <OperationsClient
+                        initialWorkers={workers}
+                        companies={companies}
+                        initialVisas={visas}
+                        initialExams={exams}
+                        initialTransfers={transfers}
+                        staff={staff}
+                    />
                 </main>
             </div>
         </div>

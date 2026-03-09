@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useRef } from 'react';
-import { ArrowLeft, UploadCloud, FileText, Loader2, Sparkles, Image as ImageIcon, X } from 'lucide-react';
+import { ArrowLeft, UploadCloud, FileText, Loader2, Sparkles, Image as ImageIcon, X, User, Shield, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
 
 interface WorkerData {
@@ -58,17 +58,22 @@ const DOC_TYPES = [
 ];
 
 const FormRow = ({ label, children, isLast = false }: { label: React.ReactNode, children: React.ReactNode, isLast?: boolean }) => (
-    <div className={`flex flex-col sm:flex-row ${!isLast ? 'border-b border-gray-200' : ''} hover:bg-gray-50/30 transition-colors`}>
-        <div className="w-full sm:w-[140px] lg:w-[180px] bg-[#f8fcfd] px-4 py-1.5 flex items-center border-b sm:border-b-0 sm:border-r border-gray-200 shrink-0">
-            <label className="text-[13px] font-bold text-[#1f1f1f]">{label}</label>
-        </div>
-        <div className="flex-1 px-4 py-1.5 flex items-center">
-            <div className="w-full">
-                {children}
-            </div>
+    <div className={`flex justify-between items-center px-5 py-2.5 border-b border-gray-50 bg-white ${isLast ? 'border-0' : ''}`}>
+        <span className="text-[11px] font-bold text-gray-400 shrink-0 min-w-[100px]">{label}</span>
+        <div className="flex-1 flex w-full">
+            {children}
         </div>
     </div>
 );
+
+function SectionHeader({ icon, label, color }: { icon: React.ReactNode; label: string; color: string }) {
+    return (
+        <div className={`flex items-center gap-2 px-5 py-2.5 border-b ${color}`}>
+            <span className="opacity-60">{icon}</span>
+            <span className="text-[10px] font-black uppercase tracking-[0.18em]">{label}</span>
+        </div>
+    );
+}
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function NewWorkerClient({ companies }: { companies: any[] }) {
@@ -256,64 +261,58 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
     };
 
     const getInputClass = (name: string) => {
-        const baseClass = "w-full bg-transparent focus:bg-gray-50/80 border-none rounded-none px-3 py-1 text-[13px] outline-none text-[#1f1f1f] transition-all duration-300 shadow-none ring-0 focus:ring-0";
+        const baseClass = "flex-1 h-7 w-full px-2 bg-white border border-indigo-200 rounded text-[12px] font-bold text-gray-800 outline-none focus:border-indigo-500";
         if (highlightedFields.includes(name)) {
-            return baseClass + " bg-[#24b47e]/10 !text-[#24b47e] font-bold";
+            return baseClass + " !bg-emerald-50 !text-emerald-700 !border-emerald-300";
         }
         return baseClass;
     };
 
     return (
-        <div className="flex-1 flex flex-col h-full bg-white relative anim-page">
+        <div className="flex-1 flex flex-col h-full bg-slate-50 relative anim-page">
             {/* Red Toast Output */}
             {toastError && (
                 <div className="fixed top-4 right-4 z-50 animate-in fade-in slide-in-from-top-5 duration-300">
-                    <div className="flex items-center gap-3 bg-red-50/95 backdrop-blur border border-red-200 shadow-lg px-5 py-3.5 rounded-2xl text-red-700">
+                    <div className="flex items-center gap-3 bg-red-50/95 backdrop-blur border border-red-200 px-5 py-3.5 rounded-2xl text-red-700">
                         <X className="w-5 h-5 text-red-500 shrink-0 cursor-pointer hover:bg-red-100 rounded-full" onClick={() => setToastError(null)} />
                         <span className="text-sm font-bold tracking-wide">{toastError}</span>
                     </div>
                 </div>
             )}
 
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-                <div className="flex items-center gap-4">
-                    <Link href="/workers" className="w-10 h-10 flex items-center justify-center rounded-none hover:bg-gray-100 transition-colors text-[#1f1f1f]">
-                        <ArrowLeft size={24} strokeWidth={1.5} />
-                    </Link>
-                    <h2 className="text-[24px] font-medium tracking-tight text-[#1f1f1f] flex items-center gap-2">
-                        外国人材新規追加
-                        <span className="text-xs bg-[#24b47e]/10 text-[#24b47e] px-2 py-1 rounded-none border border-[#24b47e]/20 flex items-center gap-1 font-bold">
-                            <Sparkles size={12} /> AI ワークスペース
-                        </span>
-                    </h2>
-                </div>
-                <div className="flex items-center gap-3">
-                    <Link href="/workers" className="px-5 py-2.5 text-[#1f1f1f] text-sm bg-white font-medium hover:bg-gray-50 rounded-none transition-colors border border-gray-300">
-                        キャンセル
-                    </Link>
-                    <button
-                        type="button"
-                        onClick={handleSubmit}
-                        disabled={isSubmitting}
-                        className="px-6 py-2.5 text-white text-sm bg-[#24b47e] hover:bg-[#1e9a6a] font-bold rounded-none transition-colors disabled:opacity-50 flex items-center gap-2"
-                    >
-                        {isSubmitting && <Loader2 size={16} className="animate-spin" />}
-                        {isSubmitting ? '保存中...' : '保存'}
-                    </button>
-                </div>
-            </div>
+            <div className="flex flex-1 overflow-hidden justify-center bg-slate-50">
+                {/* FORM CONTENT */}
+                <div className="w-full max-w-[900px] h-full overflow-y-auto p-4 md:p-6 no-scrollbar pb-24 bg-white">
+                    <div className="flex justify-between items-center mb-4">
+                        <div className="flex items-center gap-2">
+                            <span className="text-[12px] font-black px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">NEW WORKER</span>
+                            <span className="text-[14px] font-black text-gray-900 tracking-tight">人材新規登録</span>
+                        </div>
+                        <div className="flex flex-col md:flex-row gap-2">
+                            <Link
+                                href="/workers"
+                                className="w-full md:w-auto h-8 px-4 bg-white border border-gray-200 hover:bg-gray-50 text-gray-500 rounded-md text-[11px] font-bold transition-all flex items-center justify-center"
+                            >
+                                キャンセル
+                            </Link>
+                            <button
+                                type="button"
+                                onClick={handleSubmit}
+                                disabled={isSubmitting}
+                                className="w-full md:w-auto h-8 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md text-[11px] font-bold transition-all flex items-center justify-center gap-1.5 disabled:opacity-50"
+                            >
+                                {isSubmitting && <Loader2 size={13} className="animate-spin" />}
+                                {isSubmitting ? '登録中...' : '登録完了'}
+                            </button>
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 w-full">
 
-            <div className="flex flex-1 overflow-hidden">
-                {/* LEFT PANE: Form Data */}
-                <div className="flex-1 h-full overflow-y-auto p-6 border-r border-gray-200 no-scrollbar pb-24">
-                    <div className="space-y-6 max-w-3xl mx-auto">
-
-                        <div className="bg-white rounded-none border border-[#c4c8cf] overflow-hidden mb-6">
-                            <div className="px-6 py-4 border-b border-[#c4c8cf] bg-[#f8fcfd]/10">
-                                <h3 className="text-base font-bold text-[#1f1f1f] flex items-center gap-2">基本情報</h3>
-                            </div>
-                            <div className="flex flex-col">
-                                <FormRow label={<span>氏名（ローマ字）<span className="text-[10px] text-red-600 ml-2">必須</span></span>}>
+                        {/* --- Left Column --- */}
+                        <div className="flex flex-col gap-2">
+                            <div className="bg-white rounded border border-slate-200 overflow-hidden">
+                                <SectionHeader icon={<User size={13} />} label="個人・雇用・住所 / Profile" color="bg-blue-600 text-white" />
+                                <FormRow label={<span>氏名(ローマ字)<span className="text-[10px] text-red-600 ml-1">必須</span></span>}>
                                     <input name="full_name_romaji" value={formData.full_name_romaji} onChange={handleInputChange} className={getInputClass("full_name_romaji")} placeholder="例: NGUYEN VAN A" />
                                 </FormRow>
                                 <FormRow label="氏名（カナ）">
@@ -323,73 +322,46 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
                                     <input name="dob" type="date" value={formData.dob} onChange={handleInputChange} className={getInputClass("dob")} />
                                 </FormRow>
                                 <FormRow label="性別">
-                                    <select name="gender" value={formData.gender} onChange={handleInputChange} className={getInputClass("gender") + " appearance-none"}>
+                                    <select name="gender" value={formData.gender} onChange={handleInputChange} className={getInputClass("gender")}>
                                         <option value="">選択してください</option>
                                         <option value="male">男性</option>
                                         <option value="female">女性</option>
                                     </select>
                                 </FormRow>
-                                <FormRow label="配偶者">
-                                    <div className="flex gap-4">
-                                        <label className="flex items-center gap-1.5 cursor-pointer">
-                                            <input type="radio" name="has_spouse" value="true" checked={formData.has_spouse === 'true'} onChange={handleInputChange} className="accent-[#24b47e]" />
-                                            <span className="text-[13px] text-[#1f1f1f]">有</span>
-                                        </label>
-                                        <label className="flex items-center gap-1.5 cursor-pointer">
-                                            <input type="radio" name="has_spouse" value="false" checked={formData.has_spouse === 'false'} onChange={handleInputChange} className="accent-[#24b47e]" />
-                                            <span className="text-[13px] text-[#1f1f1f]">無</span>
-                                        </label>
-                                    </div>
-                                </FormRow>
                                 <FormRow label="血液型">
-                                    <select name="blood_type" value={formData.blood_type} onChange={handleInputChange} className={getInputClass("blood_type") + " appearance-none"}>
+                                    <select name="blood_type" value={formData.blood_type} onChange={handleInputChange} className={getInputClass("blood_type")}>
                                         <option value="">選択してください</option>
                                         <option value="A">A</option><option value="B">B</option><option value="O">O</option><option value="AB">AB</option>
                                     </select>
                                 </FormRow>
                                 <FormRow label="国籍">
-                                    <select name="nationality" value={formData.nationality} onChange={handleInputChange} className={getInputClass("nationality") + " appearance-none"}>
+                                    <select name="nationality" value={formData.nationality} onChange={handleInputChange} className={getInputClass("nationality")}>
                                         <option value="ベトナム">ベトナム</option>
                                         <option value="インドネシア">インドネシア</option>
                                         <option value="フィリピン">フィリピン</option>
                                         <option value="カンボジア">カンボジア</option>
                                     </select>
                                 </FormRow>
-                                <FormRow label="本国の出生地">
+                                <FormRow label="出身地">
                                     <input name="birthplace" value={formData.birthplace} onChange={handleInputChange} className={getInputClass("birthplace")} placeholder="例: ハノイ市" />
                                 </FormRow>
-                                <FormRow label="社宅住所">
-                                    <input name="address" value={formData.address} onChange={handleInputChange} className={getInputClass("address")} placeholder="例: 東京都新宿区..." />
+                                <FormRow label="配偶者">
+                                    <select name="has_spouse" value={formData.has_spouse} onChange={handleInputChange} className={getInputClass("has_spouse")}>
+                                        <option value="false">無</option>
+                                        <option value="true">有</option>
+                                    </select>
                                 </FormRow>
-                                <FormRow label="日本の居住地" isLast={true}>
-                                    <input name="japan_residence" value={formData.japan_residence} onChange={handleInputChange} className={getInputClass("japan_residence")} placeholder="例: 東京都新宿区大久保1-1-1..." />
+                                <FormRow label="送出機関">
+                                    <input name="sending_org" value={formData.sending_org} onChange={handleInputChange} className={getInputClass("sending_org")} placeholder="例: VINAJAPAN JSC" />
                                 </FormRow>
-                            </div>
-                        </div>
-
-                        <div className="bg-white rounded-none border border-[#c4c8cf] overflow-hidden mb-6">
-                            <div className="px-6 py-4 border-b border-[#c4c8cf] bg-[#f8fcfd]/10">
-                                <h3 className="text-base font-bold text-[#1f1f1f] flex items-center gap-2">管理情報</h3>
-                            </div>
-                            <div className="flex flex-col">
                                 <FormRow label="配属先企業">
-                                    <select name="company_id" value={formData.company_id} onChange={handleInputChange} className={getInputClass("company_id") + " appearance-none"}>
+                                    <select name="company_id" value={formData.company_id} onChange={handleInputChange} className={getInputClass("company_id")}>
                                         <option value="">未配属</option>
                                         {companies?.map(c => <option key={c.id} value={c.id}>{c.name_jp}</option>)}
                                     </select>
                                 </FormRow>
-                                <FormRow label="職種区分">
-                                    <input name="industry_field" value={formData.industry_field} onChange={handleInputChange} className={getInputClass("industry_field")} placeholder="例: 溶接、建設" />
-                                </FormRow>
-                                <FormRow label="制度区分">
-                                    <select name="system_type" value={formData.system_type} onChange={handleInputChange} className={getInputClass("system_type") + " appearance-none"}>
-                                        <option value="ikusei_shuro">育成就労</option>
-                                        <option value="tokuteigino">特定技能</option>
-                                        <option value="ginou_jisshu">技能実習</option>
-                                    </select>
-                                </FormRow>
                                 <FormRow label="ステータス">
-                                    <select name="status" value={formData.status} onChange={handleInputChange} className={getInputClass("status") + " appearance-none"}>
+                                    <select name="status" value={formData.status} onChange={handleInputChange} className={getInputClass("status")}>
                                         <option value="waiting">未入国</option>
                                         <option value="standby">対応中</option>
                                         <option value="working">就業中</option>
@@ -398,17 +370,26 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
                                         <option value="transferred">転籍済</option>
                                     </select>
                                 </FormRow>
-                                <FormRow label="送出機関" isLast={true}>
-                                    <input name="sending_org" value={formData.sending_org} onChange={handleInputChange} className={getInputClass("sending_org")} placeholder="例: VINAJAPAN JSC" />
+                                <FormRow label="社宅住所" isLast={true}>
+                                    <input name="japan_residence" value={formData.japan_residence} onChange={handleInputChange} className={getInputClass("japan_residence")} placeholder="例: 東京都新宿区大久保1-1-1..." />
                                 </FormRow>
                             </div>
                         </div>
 
-                        <div className="bg-white rounded-none border border-[#c4c8cf] overflow-hidden mb-6">
-                            <div className="px-6 py-4 border-b border-[#c4c8cf] bg-[#f8fcfd]/10">
-                                <h3 className="text-base font-bold text-[#1f1f1f] flex items-center gap-2">期限・証明書</h3>
-                            </div>
-                            <div className="flex flex-col">
+                        {/* --- Right Column --- */}
+                        <div className="flex flex-col gap-2">
+                            <div className="bg-white rounded border border-slate-200 overflow-hidden">
+                                <SectionHeader icon={<Shield size={13} />} label="入国・在留・書類 / Visa & Docs" color="bg-blue-600 text-white" />
+                                <FormRow label="制度区分">
+                                    <select name="system_type" value={formData.system_type} onChange={handleInputChange} className={getInputClass("system_type")}>
+                                        <option value="ikusei_shuro">育成就労</option>
+                                        <option value="tokuteigino">特定技能</option>
+                                        <option value="ginou_jisshu">技能実習</option>
+                                    </select>
+                                </FormRow>
+                                <FormRow label="職種区分">
+                                    <input name="industry_field" value={formData.industry_field} onChange={handleInputChange} className={getInputClass("industry_field")} placeholder="例: 溶接、建設" />
+                                </FormRow>
                                 <FormRow label="入国期生">
                                     <input name="entry_batch" value={formData.entry_batch} onChange={handleInputChange} className={getInputClass("entry_batch")} placeholder="例: 第15期生" />
                                 </FormRow>
@@ -418,208 +399,48 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
                                 <FormRow label="在留資格">
                                     <input name="visa_status" value={formData.visa_status} onChange={handleInputChange} className={getInputClass("visa_status")} placeholder="例: 技能実習第1号イ" />
                                 </FormRow>
-                                <FormRow label="保険期限">
-                                    <input name="insurance_exp" type="date" value={formData.insurance_exp} onChange={handleInputChange} className={getInputClass("insurance_exp")} title="保険期限" />
-                                </FormRow>
                                 <FormRow label="在留カード番号">
                                     <input name="zairyu_no" value={formData.zairyu_no} onChange={handleInputChange} className={getInputClass("zairyu_no")} maxLength={12} placeholder="例: AB12345678CD" />
                                 </FormRow>
                                 <FormRow label="在留期限">
-                                    <input name="zairyu_exp" type="date" value={formData.zairyu_exp} onChange={handleInputChange} className={getInputClass("zairyu_exp")} title="在留期限" />
+                                    <input name="zairyu_exp" type="date" value={formData.zairyu_exp} onChange={handleInputChange} className={getInputClass("zairyu_exp")} />
                                 </FormRow>
                                 <FormRow label="パスポート番号">
                                     <input name="passport_no" value={formData.passport_no} onChange={handleInputChange} className={getInputClass("passport_no")} placeholder="例: C1234567" />
                                 </FormRow>
                                 <FormRow label="パスポート期限">
-                                    <input name="passport_exp" type="date" value={formData.passport_exp} onChange={handleInputChange} className={getInputClass("passport_exp")} title="パスポート期限" />
-                                </FormRow>
-                                <FormRow label="認定番号">
-                                    <input name="cert_no" value={formData.cert_no} onChange={handleInputChange} className={getInputClass("cert_no")} placeholder="認定番号" />
+                                    <input name="passport_exp" type="date" value={formData.passport_exp} onChange={handleInputChange} className={getInputClass("passport_exp")} />
                                 </FormRow>
                                 <FormRow label="認定開始日">
-                                    <input name="cert_start_date" type="date" value={formData.cert_start_date} onChange={handleInputChange} className={getInputClass("cert_start_date")} title="認定開始日" />
+                                    <input name="cert_start_date" type="date" value={formData.cert_start_date} onChange={handleInputChange} className={getInputClass("cert_start_date")} />
                                 </FormRow>
-                                <FormRow label="認定修了日" isLast={true}>
-                                    <input name="cert_end_date" type="date" value={formData.cert_end_date} onChange={handleInputChange} className={getInputClass("cert_end_date")} title="認定修了日" />
+                                <FormRow label="認定終了日">
+                                    <input name="cert_end_date" type="date" value={formData.cert_end_date} onChange={handleInputChange} className={getInputClass("cert_end_date")} />
+                                </FormRow>
+                                <FormRow label="保険期限" isLast={true}>
+                                    <input name="insurance_exp" type="date" value={formData.insurance_exp} onChange={handleInputChange} className={getInputClass("insurance_exp")} />
                                 </FormRow>
                             </div>
                         </div>
 
-                        {/* SECTION: 備考・特記事項 */}
-                        <div className="bg-white rounded-none border border-[#c4c8cf] overflow-hidden mb-6">
-                            <div className="px-6 py-4 border-b border-[#c4c8cf] bg-[#f8fcfd]/10">
-                                <h3 className="text-base font-bold text-[#1f1f1f] flex items-center gap-2">備考・特記事項</h3>
-                            </div>
-                            <div className="flex flex-col">
-                                <FormRow label="備考" isLast>
-                                    <textarea name="remarks" value={formData.remarks} onChange={handleInputChange} rows={5} placeholder="実習生に関する特記事項やメモを自由にご入力ください。" className="w-full bg-transparent focus:bg-gray-50/80 border-none rounded-none px-3 py-2 text-sm outline-none text-[#1f1f1f] transition-all duration-300 shadow-none ring-0 focus:ring-0 resize-y min-h-[100px]" />
-                                </FormRow>
+                        {/* 7. 備考 */}
+                        <div className="bg-white rounded border border-slate-200 overflow-hidden col-span-2">
+                            <SectionHeader icon={<MessageSquare size={13} />} label="備考 / Remarks" color="bg-slate-50 text-slate-500" />
+                            <div className="p-2 bg-white">
+                                <textarea
+                                    name="remarks"
+                                    value={formData.remarks}
+                                    onChange={handleInputChange}
+                                    className="w-full min-h-[80px] p-3 border border-indigo-200 bg-white rounded text-[12px] outline-none focus:border-indigo-500 font-medium text-gray-800"
+                                    placeholder="実習生に関する特記事項やメモを自由にご入力ください。"
+                                />
                             </div>
                         </div>
 
                     </div>
                 </div>
 
-                {/* RIGHT PANE: Document Kanban Flow */}
-                <div className="w-[300px] shrink-0 h-full flex flex-col bg-[#fafafa] border-l border-gray-200">
-
-                    {/* Header */}
-                    <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white z-10">
-                        <div className="flex items-center gap-1.5">
-                            <UploadCloud size={18} className="text-[#1f1f1f]" />
-                            <h3 className="text-[15px] font-bold text-[#1f1f1f]">書類関係</h3>
-                        </div>
-                    </div>
-
-                    <div className="flex-1 overflow-y-auto p-4 no-scrollbar pb-24 space-y-6">
-
-                        {/* 1. Staging Area */}
-                        <div>
-                            <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2.5 pl-1">1. ステージングエリア</h4>
-                            <div
-                                className={`cursor-pointer w-full h-[120px] border-2 border-dashed rounded-[10px] flex flex-col items-center justify-center p-3 transition-all relative
-                                    ${stagedFile ? 'border-[#24b47e] bg-[#24b47e]/5' : 'border-[#878787] bg-white hover:bg-gray-50 hover:border-[#1f1f1f]'}`}
-                                onDragOver={(e) => e.preventDefault()}
-                                onDrop={handleMainFileDrop}
-                                onClick={() => mainFileInputRef.current?.click()}
-                            >
-                                <input type="file" className="hidden" ref={mainFileInputRef} onChange={handleMainFileSelect} />
-                                {stagedFile ? (
-                                    <div className="flex flex-col items-center animate-in zoom-in-95 duration-200 w-full">
-                                        <FileText size={32} className="text-[#24b47e] mb-1.5" />
-                                        <div className="text-[13px] font-bold text-[#24b47e] text-center truncate w-full px-2" title={stagedFile.name}>{stagedFile.name}</div>
-                                        <div className="text-[10px] text-[#24b47e]/80 mt-1 font-medium bg-[#24b47e]/10 px-2 py-0.5 rounded-none">ファイル受信済み</div>
-                                    </div>
-                                ) : (
-                                    <div className="flex flex-col items-center group">
-                                        <UploadCloud size={28} className="text-gray-400 mb-2 group-hover:text-gray-600 transition-colors" />
-                                        <div className="text-[13px] font-bold text-[#1f1f1f]">ここに書類をドロップ</div>
-                                        <div className="text-[11px] text-gray-500 mt-0.5 font-medium">クリックまたはドラッグ＆ドロップ</div>
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Action Card: Slides down when file is staged */}
-                            {stagedFile && (
-                                <div className="mt-3 p-3 bg-white border border-[#24b47e]/30 rounded-[10px] animate-in slide-in-from-top-2 fade-in-50 duration-200 relative">
-                                    <label className="block text-[11px] font-bold text-gray-600 mb-1.5 uppercase">カテゴリー指定:</label>
-                                    <select
-                                        value={stagedTargetDoc}
-                                        onChange={e => setStagedTargetDoc(e.target.value)}
-                                        className="w-full bg-gray-50 border border-gray-300 focus:border-[#24b47e] focus:bg-white focus:ring-1 focus:ring-[#24b47e] focus:outline-none rounded-none pl-2.5 pr-8 py-2 text-xs mb-3 font-medium transition-colors cursor-pointer appearance-none"
-                                    >
-                                        <option value="">-- 書類の種類を選択してください --</option>
-                                        {allDocTypes.map(doc => (
-                                            <option key={doc.id} value={doc.id}>
-                                                {doc.label} {files[doc.id] && files[doc.id].length > 0 ? `(${files[doc.id].length}件追加済み)` : ''}
-                                            </option>
-                                        ))}
-                                        <option value="new_custom" className="font-bold text-[#24b47e]">➕ 新規カテゴリーを追加</option>
-                                    </select>
-
-                                    {stagedTargetDoc === 'new_custom' && (
-                                        <input
-                                            type="text"
-                                            placeholder="カテゴリー名をご入力ください..."
-                                            value={newCustomCategory}
-                                            onChange={e => setNewCustomCategory(e.target.value)}
-                                            className="w-full bg-white border border-gray-300 focus:border-[#24b47e] focus:ring-1 focus:ring-[#24b47e] focus:outline-none rounded-none pl-2.5 pr-2 py-2 text-xs mb-3 font-medium transition-colors"
-                                        />
-                                    )}
-
-                                    <button
-                                        type="button"
-                                        onClick={stageToStorage}
-                                        disabled={!stagedTargetDoc || (stagedTargetDoc === 'new_custom' && !newCustomCategory.trim())}
-                                        className="w-full py-2 bg-[#1f1f1f] disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white text-xs font-bold rounded-none hover:bg-black transition-colors flex items-center justify-center gap-1.5"
-                                    >
-                                        ストレージへ保存 <ArrowLeft size={14} className="rotate-180" />
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* 2. Storage Board */}
-                        <div>
-                            <div className="flex items-center justify-between mb-2.5 pl-1">
-                                <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">2. ストレージ（保管庫）</h4>
-                                {Object.keys(files).length > 0 && (
-                                    <span className="bg-gray-100 text-[#1f1f1f] px-1.5 py-0.5 rounded-none font-bold text-[10px]">
-                                        {Object.values(files).reduce((acc, arr) => acc + arr.length, 0)} ファイル
-                                    </span>
-                                )}
-                            </div>
-
-                            <div className="space-y-2.5 relative min-h-[140px] rounded-none border border-gray-100 bg-gray-50/50 p-2">
-                                {Object.keys(files).length === 0 && !isScanning && (
-                                    <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
-                                        <FileText size={24} className="text-gray-300 mb-2" />
-                                        <span className="text-[11px] text-gray-400 font-medium italic">ストレージは空です。<br />ここにファイルを分類してください。</span>
-                                    </div>
-                                )}
-
-                                {allDocTypes.map(doc => {
-                                    const fileArr = files[doc.id] || [];
-                                    const scanning = isScanning === doc.id;
-
-                                    if (fileArr.length === 0 && !scanning) return null;
-
-                                    return (
-                                        <React.Fragment key={doc.id}>
-                                            {fileArr.map((f, idx) => (
-                                                <div key={f.id} className="p-1.5 bg-white border border-[#e5e7eb] rounded-none flex items-center justify-between animate-in fade-in zoom-in-95 duration-200 group">
-                                                    <div className="flex items-center gap-2 overflow-hidden flex-1">
-                                                        <div className="w-7 h-7 rounded-none flex items-center justify-center shrink-0 bg-[#24b47e]/10 text-[#24b47e]">
-                                                            {doc.id === 'avatar' ? <ImageIcon size={14} /> : <FileText size={14} />}
-                                                        </div>
-                                                        <div className="truncate flex-1">
-                                                            <div className="text-xs font-bold text-[#1f1f1f] flex items-center gap-1.5 leading-none">
-                                                                <span className="truncate">{doc.label} {fileArr.length > 1 ? `#${idx + 1}` : ''}</span>
-                                                            </div>
-                                                            <div className="flex flex-col mt-0.5">
-                                                                <div className="text-[11px] text-gray-600 font-medium truncate leading-tight" title={f.file.name}>{f.file.name}</div>
-                                                                <div className="text-[9px] text-gray-400 font-medium leading-none mt-0.5">保存日: {f.timestamp}</div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    <div className="flex items-center ml-1.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => removeFromStorage(doc.id, f.id)}
-                                                            className="w-6 h-6 flex items-center justify-center rounded-none text-gray-400 hover:text-white hover:bg-red-500 transition-colors"
-                                                            title="ファイルを削除"
-                                                        >
-                                                            <X size={12} strokeWidth={2.5} />
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                            {scanning && (
-                                                <div className="p-1.5 bg-white border border-[#e5e7eb] rounded-none flex items-center justify-between animate-in fade-in zoom-in-95 duration-200">
-                                                    <div className="flex items-center gap-2 overflow-hidden flex-1">
-                                                        <div className="w-7 h-7 rounded-none flex items-center justify-center shrink-0 bg-gray-100 text-[#1f1f1f]">
-                                                            {doc.id === 'avatar' ? <ImageIcon size={14} /> : <FileText size={14} />}
-                                                        </div>
-                                                        <div className="truncate flex-1">
-                                                            <div className="text-xs font-bold text-[#1f1f1f] flex items-center gap-1.5 leading-none">
-                                                                <span className="truncate">{doc.label}</span>
-                                                            </div>
-                                                            <div className="text-[10px] text-[#1f1f1f] flex items-center gap-1 mt-0.5 font-bold leading-none">
-                                                                <Loader2 size={10} className="animate-spin" /> ✨ AIスキャン中...
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            )}
-                                        </React.Fragment>
-                                    );
-                                })}
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
+                {/* RIGHT PANE: Document Kanban Flow removed per request */}
 
             </div>
 

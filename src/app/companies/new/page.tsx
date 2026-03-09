@@ -1,12 +1,29 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { createCompany } from '../actions'
-import { ArrowLeft, Building2, MapPin, Users } from 'lucide-react'
+import { Building2, MapPin, Users, Briefcase, MessageSquare, PlusCircle } from 'lucide-react'
 import { Sidebar } from '@/components/Sidebar'
 import { redirect } from 'next/navigation'
 import { FormSubmitButton } from './FormSubmitButton'
 import { TopNav } from '@/components/TopNav'
-import { CompanyDocumentKanban } from './CompanyDocumentKanban'
+
+const FormRow = ({ label, children, isLast = false }: { label: React.ReactNode, children: React.ReactNode, isLast?: boolean }) => (
+    <div className={`flex justify-between items-center px-5 py-2.5 border-b border-gray-50 bg-white ${isLast ? 'border-0' : ''}`}>
+        <span className="text-[11px] font-bold text-gray-400 shrink-0 min-w-[100px]">{label}</span>
+        <div className="flex-1 flex w-full">
+            {children}
+        </div>
+    </div>
+);
+
+function SectionHeader({ icon, label, color }: { icon: React.ReactNode; label: string; color: string }) {
+    return (
+        <div className={`flex items-center gap-2 px-5 py-2.5 border-b ${color}`}>
+            <span className="opacity-60">{icon}</span>
+            <span className="text-[10px] font-black uppercase tracking-[0.18em]">{label}</span>
+        </div>
+    );
+}
 
 export default async function NewCompanyPage() {
     const supabase = await createClient()
@@ -15,61 +32,107 @@ export default async function NewCompanyPage() {
 
     const { data: userProfile } = await supabase.from('users').select('role').eq('id', user.id).single()
 
+    const inputClass = "w-full h-8 px-2 bg-white border border-indigo-200 rounded text-[12px] font-bold text-gray-800 outline-none focus:border-indigo-500 transition-colors";
+
     return (
         <div className="flex h-screen bg-white font-sans text-gray-900 overflow-hidden selection:bg-emerald-500/20">
             <Sidebar active="companies" />
             <div className="flex-1 flex flex-col relative min-w-0">
                 <TopNav title="受入企業 新規登録" role={userProfile?.role} />
-                <form action={createCompany} className="flex-1 flex flex-col overflow-hidden min-h-0 bg-white">
-                    {/* Toolbar */}
-                    <div className="flex items-center justify-between px-6 h-12 border-b border-gray-100 bg-white z-20 shrink-0">
-                        <div className="flex items-center gap-4">
-                            <Link href="/companies" className="flex items-center gap-2 text-gray-400 hover:text-gray-900 transition-colors">
-                                <ArrowLeft size={16} />
-                                <span className="text-xs font-bold uppercase tracking-widest leading-none">戻る</span>
-                            </Link>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <Link href="/companies" className="px-3 py-1.5 text-gray-500 text-[11px] font-bold bg-white hover:bg-gray-50 rounded-md transition-colors border border-gray-200">
-                                キャンセル
-                            </Link>
-                            <FormSubmitButton />
-                        </div>
-                    </div>
 
-                    {/* Content */}
-                    <div className="flex flex-1 overflow-hidden">
-                        <div className="flex-1 overflow-y-auto p-6 border-r border-gray-200 no-scrollbar pb-24 bg-white">
-                            <div className="space-y-6 max-w-3xl mx-auto">
+                <form action={createCompany} className="flex-1 flex flex-col overflow-hidden bg-slate-50">
+                    <div className="w-full max-w-[900px] h-full overflow-y-auto p-4 md:p-6 mx-auto no-scrollbar pb-24 bg-white">
 
-                                {/* SECTION 1: 法人基本情報 */}
-                                <div className="bg-white rounded-none border border-[#c4c8cf] overflow-hidden mb-6">
-                                    <div className="px-6 py-4 border-b border-[#c4c8cf] bg-[#f8fcfd]/10">
-                                        <h3 className="text-base font-bold text-[#1f1f1f] flex items-center gap-2">
-                                            <Building2 size={18} className="text-[#24b47e]" />
-                                            法人基本情報
-                                        </h3>
-                                    </div>
+                        {/* Header */}
+                        <div className="flex justify-between items-center mb-4">
+                            <div className="flex items-center gap-2">
+                                <span className="text-[12px] font-black px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">NEW COMPANY</span>
+                                <span className="text-[14px] font-black text-gray-900 tracking-tight">受入企業 新規登録</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <Link
+                                    href="/companies"
+                                    className="h-8 px-4 bg-white border border-gray-200 hover:bg-gray-50 text-gray-500 rounded-md text-[11px] font-bold transition-all flex items-center justify-center"
+                                >
+                                    キャンセル
+                                </Link>
+                                <FormSubmitButton />
+                            </div>
+                        </div>
+
+                        {/* 2-Column Grid */}
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 w-full">
+
+                            {/* --- Left Column --- */}
+                            <div className="flex flex-col gap-4">
+                                <div className="bg-white rounded border border-slate-200 overflow-hidden">
+                                    <SectionHeader icon={<Building2 size={13} />} label="企業情報・連絡先 / Corporate & Contact" color="bg-blue-600 text-white" />
                                     <div className="flex flex-col">
-                                        <FormRow label="企業名" required>
-                                            <input name="name_jp" type="text" required placeholder="例：株式会社ミライ" className="w-full bg-transparent focus:bg-gray-50/80 border-none rounded-none px-3 py-1.5 text-sm outline-none text-[#1f1f1f] transition-all duration-300 shadow-none ring-0 focus:ring-0" />
+                                        <FormRow label={<span>企業名<span className="text-[10px] text-red-600 ml-1">必須</span></span>}>
+                                            <input name="name_jp" type="text" required placeholder="例：株式会社ミライ" className={inputClass} />
                                         </FormRow>
-                                        <FormRow label="会社名（フリガナ）">
-                                            <input name="name_kana" type="text" placeholder="例：カブシキガイシャミライ" className="w-full bg-transparent focus:bg-gray-50/80 border-none rounded-none px-3 py-1.5 text-sm outline-none text-[#1f1f1f] transition-all duration-300 shadow-none ring-0 focus:ring-0" />
+                                        <FormRow label="フリガナ">
+                                            <input name="name_kana" type="text" placeholder="例：カブシキガイシャミライ" className={inputClass} />
                                         </FormRow>
-                                        <FormRow label="企業名（ローマ字）">
-                                            <input name="name_romaji" type="text" placeholder="例：MIRAI CO., LTD" className="w-full bg-transparent focus:bg-gray-50/80 border-none rounded-none px-3 py-1.5 text-sm outline-none uppercase text-[#1f1f1f] transition-all duration-300 shadow-none ring-0 focus:ring-0" />
+                                        <FormRow label="ローマ字">
+                                            <input name="name_romaji" type="text" placeholder="例：MIRAI CO., LTD" className={`${inputClass} uppercase`} />
                                         </FormRow>
-                                        <FormRow label="法人番号（13桁）">
-                                            <input name="corporate_number" type="text" maxLength={13} placeholder="例：1234567890123" className="w-full bg-transparent focus:bg-gray-50/80 border-none rounded-none px-3 py-1.5 text-sm outline-none font-mono text-[#1f1f1f] transition-all duration-300 shadow-none ring-0 focus:ring-0" />
+                                        <FormRow label="法人番号(13桁)">
+                                            <input name="corporate_number" type="text" maxLength={13} placeholder="例：1234567890123" className={`${inputClass} font-mono`} />
                                         </FormRow>
-                                        <FormRow label="業種 (Industry)">
-                                            <input
-                                                name="industry"
-                                                list="industry-datalist"
-                                                placeholder="例：製造業、建設業..."
-                                                className="w-full bg-transparent focus:bg-gray-50/80 border-none rounded-none px-3 py-1.5 text-sm outline-none text-[#1f1f1f] transition-all duration-300 shadow-none ring-0 focus:ring-0"
-                                            />
+                                        <FormRow label="登録支援機関番号">
+                                            <input name="registration_number" type="text" placeholder="例：20登-000001" className={`${inputClass} font-mono`} />
+                                        </FormRow>
+
+
+
+                                        <FormRow label="郵便番号">
+                                            <input name="postal_code" type="text" placeholder="例：160-0022" className={`${inputClass} font-mono`} />
+                                        </FormRow>
+                                        <FormRow label="所在地（住所）">
+                                            <input name="address" type="text" placeholder="例：東京都新宿区新宿1-1-1" className={inputClass} />
+                                        </FormRow>
+                                        <FormRow label="電話番号">
+                                            <input name="phone" type="text" placeholder="例：03-1234-5678" className={`${inputClass} font-mono`} />
+                                        </FormRow>
+                                        <FormRow label="メールアドレス">
+                                            <input name="email" type="email" placeholder="例：example@domain.com" className={inputClass} />
+                                        </FormRow>
+                                        <FormRow label="担当者" isLast>
+                                            <input name="pic_name" type="text" placeholder="例：鈴木 一郎" className={inputClass} />
+                                        </FormRow>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* --- Right Column --- */}
+                            <div className="flex flex-col gap-4">
+                                <div className="bg-white rounded border border-slate-200 overflow-hidden">
+                                    <SectionHeader icon={<Users size={13} />} label="役員・業種・受入 / Reps & Business" color="bg-blue-600 text-white" />
+                                    <div className="flex flex-col">
+                                        <FormRow label="代表者名">
+                                            <input name="representative" type="text" placeholder="例：山田 太郎" className={inputClass} />
+                                        </FormRow>
+                                        <FormRow label="代表者フリガナ">
+                                            <input name="representative_kana" type="text" placeholder="例：ヤマダ タロウ" className={inputClass} />
+                                        </FormRow>
+                                        <FormRow label="責任者">
+                                            <input name="manager_name" type="text" placeholder="例：田中 健太" className={inputClass} />
+                                        </FormRow>
+                                        <FormRow label="講習受講日">
+                                            <input name="training_date" type="date" className={inputClass} />
+                                        </FormRow>
+                                        <FormRow label="生活指導員">
+                                            <input name="life_advisor" type="text" placeholder="例：佐藤 花子" className={inputClass} />
+                                        </FormRow>
+                                        <FormRow label="技能指導員">
+                                            <input name="tech_advisor" type="text" placeholder="例：高橋 次郎" className={inputClass} />
+                                        </FormRow>
+
+
+
+                                        <FormRow label="業種">
+                                            <input name="industry" list="industry-datalist" placeholder="例：建設業、製造業..." className={inputClass} />
                                             <datalist id="industry-datalist">
                                                 <option value="建設業" />
                                                 <option value="製造業" />
@@ -77,147 +140,31 @@ export default async function NewCompanyPage() {
                                             </datalist>
                                         </FormRow>
                                         <FormRow label="受入職種">
-                                            <input
-                                                name="accepted_occupations"
-                                                placeholder="例：機械加工、溶接..."
-                                                className="w-full bg-transparent focus:bg-gray-50/80 border-none rounded-none px-3 py-1.5 text-sm outline-none text-[#1f1f1f] transition-all duration-300 shadow-none ring-0 focus:ring-0"
-                                            />
+                                            <input name="accepted_occupations" placeholder="例：機械加工、溶接..." className={inputClass} />
                                         </FormRow>
                                         <FormRow label="従業員数" isLast>
-                                            <input
-                                                name="employee_count"
-                                                type="number"
-                                                placeholder="例：50"
-                                                className="w-full bg-transparent focus:bg-gray-50/80 border-none rounded-none px-3 py-1.5 text-sm outline-none text-[#1f1f1f] transition-all duration-300 shadow-none ring-0 focus:ring-0"
-                                            />
-                                        </FormRow>
-                                    </div>
-                                </div>
-
-                                {/* SECTION 2: 連絡先・所在地 */}
-                                <div className="bg-white rounded-none border border-[#c4c8cf] overflow-hidden mb-6">
-                                    <div className="px-6 py-4 border-b border-[#c4c8cf] bg-[#f8fcfd]/10">
-                                        <h3 className="text-base font-bold text-[#1f1f1f] flex items-center gap-2">
-                                            <MapPin size={18} className="text-[#24b47e]" />
-                                            連絡先・所在地
-                                        </h3>
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <FormRow label="郵便番号">
-                                            <input name="postal_code" type="text" placeholder="例：160-0022" className="w-full bg-transparent focus:bg-gray-50/80 border-none rounded-none px-3 py-1.5 text-sm outline-none text-[#1f1f1f] transition-all duration-300 shadow-none ring-0 focus:ring-0" />
-                                        </FormRow>
-                                        <FormRow label="電話番号">
-                                            <input name="phone" type="text" placeholder="例：03-1234-5678" className="w-full bg-transparent focus:bg-gray-50/80 border-none rounded-none px-3 py-1.5 text-sm outline-none text-[#1f1f1f] transition-all duration-300 shadow-none ring-0 focus:ring-0" />
-                                        </FormRow>
-                                        <FormRow label="所在地（住所）">
-                                            <input name="address" type="text" placeholder="例：東京都新宿区新宿1-1-1" className="w-full bg-transparent focus:bg-gray-50/80 border-none rounded-none px-3 py-1.5 text-sm outline-none text-[#1f1f1f] transition-all duration-300 shadow-none ring-0 focus:ring-0" />
-                                        </FormRow>
-                                        <FormRow label="連絡・実習担当者">
-                                            <input name="pic_name" type="text" placeholder="例：鈴木 一郎" className="w-full bg-transparent focus:bg-gray-50/80 border-none rounded-none px-3 py-1.5 text-sm outline-none text-[#1f1f1f] transition-all duration-300 shadow-none ring-0 focus:ring-0" />
-                                        </FormRow>
-                                        <FormRow label="メールアドレス" isLast>
-                                            <input name="email" type="email" placeholder="例：example@domain.com" className="w-full bg-transparent focus:bg-gray-50/80 border-none rounded-none px-3 py-1.5 text-sm outline-none text-[#1f1f1f] transition-all duration-300 shadow-none ring-0 focus:ring-0" />
-                                        </FormRow>
-                                    </div>
-                                </div>
-
-                                {/* SECTION 3: 担当者情報（監査用） */}
-                                <div className="bg-white rounded-none border border-[#c4c8cf] overflow-hidden mb-6">
-                                    <div className="px-6 py-4 border-b border-[#c4c8cf] bg-[#f8fcfd]/10">
-                                        <h3 className="text-base font-bold text-[#1f1f1f] flex items-center gap-2">
-                                            <Users size={18} className="text-[#24b47e]" />
-                                            担当者情報（監査用）
-                                        </h3>
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <FormRow label="代表者名">
-                                            <input name="representative" type="text" placeholder="例：山田 太郎" className="w-full bg-transparent focus:bg-gray-50/80 border-none rounded-none px-3 py-1.5 text-sm outline-none text-[#1f1f1f] transition-all duration-300 shadow-none ring-0 focus:ring-0" />
-                                        </FormRow>
-                                        <FormRow label="代表者名（ローマ字）">
-                                            <input name="representative_romaji" type="text" placeholder="例：YAMADA TARO" className="w-full bg-transparent focus:bg-gray-50/80 border-none rounded-none px-3 py-1.5 text-sm outline-none uppercase text-[#1f1f1f] transition-all duration-300 shadow-none ring-0 focus:ring-0" />
-                                        </FormRow>
-                                        <FormRow label="責任者">
-                                            <input name="manager_name" type="text" placeholder="例：田中 健太" className="w-full bg-transparent focus:bg-gray-50/80 border-none rounded-none px-3 py-1.5 text-sm outline-none text-[#1f1f1f] transition-all duration-300 shadow-none ring-0 focus:ring-0" />
-                                        </FormRow>
-                                        <FormRow label="講習受講日">
-                                            <input name="training_date" type="date" className="w-full bg-transparent focus:bg-gray-50/80 border-none rounded-none px-3 py-1.5 text-sm outline-none text-[#1f1f1f] transition-all duration-300 shadow-none ring-0 focus:ring-0" />
-                                        </FormRow>
-                                        <FormRow label="生活指導員">
-                                            <input name="life_advisor" type="text" placeholder="例：佐藤 花子" className="w-full bg-transparent focus:bg-gray-50/80 border-none rounded-none px-3 py-1.5 text-sm outline-none text-[#1f1f1f] transition-all duration-300 shadow-none ring-0 focus:ring-0" />
-                                        </FormRow>
-                                        <FormRow label="技能指導員" isLast>
-                                            <input name="tech_advisor" type="text" placeholder="例：高橋 次郎" className="w-full bg-transparent focus:bg-gray-50/80 border-none rounded-none px-3 py-1.5 text-sm outline-none text-[#1f1f1f] transition-all duration-300 shadow-none ring-0 focus:ring-0" />
-                                        </FormRow>
-                                    </div>
-                                </div>
-                                {/* SECTION 4: 保険・登録・費用情報 */}
-                                <div className="bg-white rounded-none border border-[#c4c8cf] overflow-hidden mb-6">
-                                    <div className="px-6 py-4 border-b border-[#c4c8cf] bg-[#f8fcfd]/10">
-                                        <h3 className="text-base font-bold text-[#1f1f1f] flex items-center gap-2">
-                                            <Building2 size={18} className="text-[#24b47e]" />
-                                            保険・登録・費用情報
-                                        </h3>
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <FormRow label="労働保険番号">
-                                            <input name="labor_insurance_number" type="text" placeholder="例：12-345-678901-234" className="w-full bg-transparent focus:bg-gray-50/80 border-none rounded-none px-3 py-1.5 text-sm outline-none text-[#1f1f1f] transition-all duration-300 shadow-none ring-0 focus:ring-0" />
-                                        </FormRow>
-                                        <FormRow label="雇用保険番号">
-                                            <input name="employment_insurance_number" type="text" placeholder="例：1234-567890-1" className="w-full bg-transparent focus:bg-gray-50/80 border-none rounded-none px-3 py-1.5 text-sm outline-none text-[#1f1f1f] transition-all duration-300 shadow-none ring-0 focus:ring-0" />
-                                        </FormRow>
-                                        <FormRow label="受理届出番号">
-                                            <input name="acceptance_notification_number" type="text" placeholder="例：2023-12345" className="w-full bg-transparent focus:bg-gray-50/80 border-none rounded-none px-3 py-1.5 text-sm outline-none text-[#1f1f1f] transition-all duration-300 shadow-none ring-0 focus:ring-0" />
-                                        </FormRow>
-                                        <FormRow label="受理届出日">
-                                            <input name="acceptance_notification_date" type="date" className="w-full bg-transparent focus:bg-gray-50/80 border-none rounded-none px-3 py-1.5 text-sm outline-none text-[#1f1f1f] transition-all duration-300 shadow-none ring-0 focus:ring-0" />
-                                        </FormRow>
-                                        <FormRow label="一般監理費（円）">
-                                            <input name="general_supervision_fee" type="number" placeholder="例：30000" className="w-full bg-transparent focus:bg-gray-50/80 border-none rounded-none px-3 py-1.5 text-sm outline-none text-[#1f1f1f] transition-all duration-300 shadow-none ring-0 focus:ring-0" />
-                                        </FormRow>
-                                        <FormRow label="3号監理費（円）">
-                                            <input name="category_3_supervision_fee" type="number" placeholder="例：20000" className="w-full bg-transparent focus:bg-gray-50/80 border-none rounded-none px-3 py-1.5 text-sm outline-none text-[#1f1f1f] transition-all duration-300 shadow-none ring-0 focus:ring-0" />
-                                        </FormRow>
-                                        <FormRow label="支援料（円）" isLast>
-                                            <input name="support_fee" type="number" placeholder="例：25000" className="w-full bg-transparent focus:bg-gray-50/80 border-none rounded-none px-3 py-1.5 text-sm outline-none text-[#1f1f1f] transition-all duration-300 shadow-none ring-0 focus:ring-0" />
-                                        </FormRow>
-                                    </div>
-                                </div>
-
-                                {/* SECTION 5: 備考・特記事項 */}
-                                <div className="bg-white rounded-none border border-[#c4c8cf] overflow-hidden mb-6">
-                                    <div className="px-6 py-4 border-b border-[#c4c8cf] bg-[#f8fcfd]/10">
-                                        <h3 className="text-base font-bold text-[#1f1f1f] flex items-center gap-2">
-                                            備考・特記事項
-                                        </h3>
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <FormRow label="備考" isLast>
-                                            <textarea name="remarks" rows={5} placeholder="企業に関する特記事項やメモを自由に入力してください..." className="w-full bg-transparent focus:bg-gray-50/80 border-none rounded-none px-3 py-2 text-sm outline-none text-[#1f1f1f] transition-all duration-300 shadow-none ring-0 focus:ring-0 resize-y min-h-[100px]" />
+                                            <input name="employee_count" type="number" placeholder="例：50" className={inputClass} />
                                         </FormRow>
                                     </div>
                                 </div>
                             </div>
+
+
+                            {/* Remarks - Full Width below columns */}
+                            <div className="bg-white rounded border border-slate-200 overflow-hidden col-span-1 lg:col-span-2">
+                                <SectionHeader icon={<MessageSquare size={13} />} label="備考 / Remarks" color="bg-slate-50 text-slate-500" />
+                                <div className="p-3">
+                                    <textarea
+                                        name="remarks"
+                                        className="w-full min-h-[90px] p-3 border border-indigo-200 bg-white rounded text-[12px] outline-none focus:border-indigo-500 font-medium text-gray-800 transition-colors"
+                                        placeholder="企業に関する特記事項やメモを自由に入力してください..."
+                                    />
+                                </div>
+                            </div>
                         </div>
-                        {/* RIGHT PANE: Document Kanban Flow */}
-                        <CompanyDocumentKanban />
+
                     </div>
                 </form>
-            </div>
-        </div>
-    )
-}
-
-function FormRow({ label, children, isLast = false, required = false }: { label: React.ReactNode, children: React.ReactNode, isLast?: boolean, required?: boolean }) {
-    return (
-        <div className={`flex flex-col sm:flex-row ${!isLast ? 'border-b border-[#c4c8cf]' : ''} hover:bg-gray-50/50 transition-colors`}>
-            <div className="w-full sm:w-[160px] lg:w-[200px] bg-[#f8fcfd]/40 px-3 py-2 flex items-center border-b sm:border-b-0 sm:border-r border-[#c4c8cf] shrink-0">
-                <label className="text-sm font-bold text-[#1f1f1f] flex flex-row items-center gap-2 w-full relative">
-                    {label}
-                    {required && <span className="text-[10px] text-red-500 font-bold bg-red-50 px-1.5 py-0.5 border border-red-100 rounded-none shrink-0">必須</span>}
-                </label>
-            </div>
-            <div className="flex-1 px-2 py-0.5 flex items-center bg-transparent relative">
-                {children}
             </div>
         </div>
     )

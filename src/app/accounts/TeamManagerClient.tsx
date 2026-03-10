@@ -8,10 +8,10 @@ import { createProvisionedAccount, resetUserPassword, deleteProvisionedAccount }
 
 // ── Role display config ────────────────────────────────────────────
 const ROLE_CONFIG: Record<string, { label: string; color: string; bg: string; icon: React.ReactNode }> = {
-    admin: { label: 'ADMIN', color: 'text-white', bg: 'bg-gray-900', icon: <Shield size={11} /> },
-    union_admin: { label: '業務管理者', color: 'text-white', bg: 'bg-gray-900', icon: <Shield size={11} /> },
-    staff: { label: '組合スタッフ', color: 'text-[#0067b8]', bg: 'bg-blue-50', icon: <UserCheck size={11} /> },
-    company_admin: { label: '受入企業 管理者', color: 'text-indigo-800', bg: 'bg-indigo-50', icon: <Building2 size={11} /> },
+    admin: { label: 'ADMIN', color: 'text-white', bg: 'bg-emerald-900', icon: <Shield size={11} /> },
+    union_admin: { label: '業務管理者', color: 'text-white', bg: 'bg-emerald-800', icon: <Shield size={11} /> },
+    staff: { label: '組合スタッフ', color: 'text-emerald-700', bg: 'bg-emerald-50', icon: <UserCheck size={11} /> },
+    company_admin: { label: '受入企業 管理者', color: 'text-amber-800', bg: 'bg-amber-50', icon: <Building2 size={11} /> },
 }
 
 // ── Password generator ────────────────────────────────────────────
@@ -25,7 +25,7 @@ function CopyButton({ text }: { text: string }) {
     const [copied, setCopied] = useState(false)
     return (
         <button type="button" onClick={() => { navigator.clipboard.writeText(text); setCopied(true); setTimeout(() => setCopied(false), 2000) }}
-            className={`w-7 h-7 flex items-center justify-center rounded border transition-all ${copied ? 'border-blue-300 text-blue-600 bg-blue-50' : 'border-gray-200 text-gray-400 hover:border-gray-400 hover:text-gray-700 bg-white'}`}>
+            className={`w-7 h-7 flex items-center justify-center rounded border transition-all ${copied ? 'border-emerald-300 text-emerald-600 bg-emerald-50' : 'border-gray-200 text-gray-400 hover:border-gray-400 hover:text-gray-700 bg-white'}`}>
             {copied ? <Check size={12} /> : <Copy size={12} />}
         </button>
     )
@@ -108,23 +108,23 @@ export default function TeamManagerClient({
             {/* ── Header + Stats ── */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="bg-white border border-gray-200 rounded-lg p-5">
-                    <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">組合スタッフ</div>
-                    <div className="text-3xl font-bold text-gray-900">{staffCount}</div>
+                    <div className="text-[10px] font-normal text-gray-400 uppercase tracking-wider mb-1">組合スタッフ</div>
+                    <div className="text-3xl font-normal text-gray-900">{staffCount}</div>
                     <div className="text-xs text-gray-400 mt-1">名のアカウントが有効</div>
                     <div className="mt-3 h-1 w-full bg-gray-100 rounded-full overflow-hidden">
-                        <div className="h-full bg-[#0067b8]" style={{ width: `${Math.min((staffCount / Math.max(staffList.length, 1)) * 100, 100)}%` }} />
+                        <div className="h-full bg-emerald-600" style={{ width: `${Math.min((staffCount / Math.max(staffList.length, 1)) * 100, 100)}%` }} />
                     </div>
                 </div>
                 <div className="bg-white border border-gray-200 rounded-lg p-5">
-                    <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">受入企業 管理者</div>
-                    <div className="text-3xl font-bold text-gray-900">{companyAdminCount}</div>
+                    <div className="text-[10px] font-normal text-gray-400 uppercase tracking-wider mb-1">受入企業 管理者</div>
+                    <div className="text-3xl font-normal text-gray-900">{companyAdminCount}</div>
                     <div className="text-xs text-gray-400 mt-1">社のポータルアクセスが有効</div>
                     <div className="mt-3 h-1 w-full bg-gray-100 rounded-full overflow-hidden">
-                        <div className="h-full bg-indigo-500" style={{ width: `${Math.min((companyAdminCount / Math.max(staffList.length, 1)) * 100, 100)}%` }} />
+                        <div className="h-full bg-emerald-500" style={{ width: `${Math.min((companyAdminCount / Math.max(staffList.length, 1)) * 100, 100)}%` }} />
                     </div>
                 </div>
                 <div className="bg-white border border-gray-200 rounded-lg p-5 flex flex-col justify-center">
-                    <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 text-center">ログインID</div>
+                    <div className="text-[10px] font-normal text-gray-400 uppercase tracking-wider mb-2 text-center">ログインID</div>
                     <div className="text-[11px] text-center font-mono text-gray-500 bg-gray-50 py-2 rounded border border-gray-100">
                         ID@kikancloud.local
                     </div>
@@ -134,19 +134,19 @@ export default function TeamManagerClient({
             {/* ── Account List ── */}
             <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
                 <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-                    <h2 className="text-sm font-bold text-gray-900 flex items-center gap-2">
-                        <Users size={16} className="text-[#0067b8]" /> 発行済みアカウント
+                    <h2 className="text-sm font-normal text-gray-900 flex items-center gap-2 uppercase tracking-wide">
+                        <Users size={16} className="text-emerald-600" /> 発行済みアカウント
                     </h2>
                     {isAdmin && (
                         <button onClick={() => { setIsCreateOpen(true); setCreateMsg({ type: '', text: '' }); setCreatePw('') }}
-                            className="bg-[#0067b8] hover:bg-[#005a9e] text-white px-4 py-2 rounded-md text-xs font-bold transition-colors">
-                            <Plus size={14} className="inline mr-1" /> アカウント新規発行
+                            className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md text-xs font-normal transition-colors uppercase tracking-widest">
+                            <Plus size={14} className="inline mr-1" /> 新規発行
                         </button>
                     )}
                 </div>
                 <table className="w-full text-left border-collapse">
                     <thead>
-                        <tr className="bg-gray-50 border-b border-gray-100 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                        <tr className="bg-gray-50 border-b border-gray-100 text-[10px] font-normal text-gray-400 uppercase tracking-wider">
                             <th className="px-6 py-3">氏名 / 企業</th>
                             <th className="px-6 py-3">ログインID</th>
                             <th className="px-6 py-3">権限</th>
@@ -157,16 +157,16 @@ export default function TeamManagerClient({
                         {staffList.map((staff) => {
                             const rc = ROLE_CONFIG[staff.role] || ROLE_CONFIG.staff
                             return (
-                                <tr key={staff.id} className="hover:bg-blue-50/30 transition-colors">
+                                <tr key={staff.id} className="hover:bg-emerald-50/30 transition-colors">
                                     <td className="px-6 py-3.5">
                                         <div className="flex items-center gap-3">
-                                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 ${rc.bg} ${rc.color}`}>
+                                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-normal shrink-0 ${rc.bg} ${rc.color}`}>
                                                 {(staff.full_name || '?').charAt(0)}
                                             </div>
                                             <div>
-                                                <div className="text-sm font-bold text-gray-900">{staff.full_name || 'N/A'}</div>
+                                                <div className="text-sm font-normal text-gray-900">{staff.full_name || 'N/A'}</div>
                                                 {staff.companies?.name_jp && (
-                                                    <div className="text-[10px] text-gray-400 flex items-center gap-1">
+                                                    <div className="text-[10px] text-gray-400 flex items-center gap-1 font-normal">
                                                         <Building2 size={10} /> {staff.companies.name_jp}
                                                     </div>
                                                 )}
@@ -174,12 +174,12 @@ export default function TeamManagerClient({
                                         </div>
                                     </td>
                                     <td className="px-6 py-3.5">
-                                        <span className="text-xs font-mono font-bold text-gray-600 bg-gray-100 px-2 py-1 rounded">
+                                        <span className="text-xs font-mono font-normal text-gray-600 bg-gray-100 px-2 py-1 rounded">
                                             {staff.login_id || staff.email?.split('@')[0] || '---'}
                                         </span>
                                     </td>
                                     <td className="px-6 py-3.5">
-                                        <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase ${rc.bg} ${rc.color}`}>
+                                        <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-normal uppercase tracking-widest ${rc.bg} ${rc.color}`}>
                                             {rc.icon} {rc.label}
                                         </span>
                                     </td>
@@ -189,7 +189,7 @@ export default function TeamManagerClient({
                                                 <div className="flex items-center justify-end gap-2">
                                                     <button
                                                         onClick={() => { setResetTarget({ id: staff.id, name: staff.full_name, loginId: staff.login_id || staff.email }); setResetMsg({ type: '', text: '' }); setNewPassword('') }}
-                                                        className="h-7 w-7 flex items-center justify-center rounded border border-gray-200 text-gray-400 hover:border-blue-400 hover:text-blue-600 transition-colors">
+                                                        className="h-7 w-7 flex items-center justify-center rounded border border-gray-200 text-gray-400 hover:border-emerald-400 hover:text-emerald-600 transition-colors">
                                                         <Key size={13} />
                                                     </button>
                                                     <button
@@ -214,39 +214,39 @@ export default function TeamManagerClient({
                 <div className="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
                     <div className="bg-white rounded-lg border border-gray-200 shadow-xl w-full max-w-md">
                         <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-                            <h3 className="font-bold text-gray-900">アカウント新規発行</h3>
+                            <h3 className="font-normal text-gray-900 uppercase tracking-tight">アカウント新規発行</h3>
                             <button onClick={() => setIsCreateOpen(false)}><X size={16} /></button>
                         </div>
                         <form onSubmit={handleCreate} className="p-6 space-y-4">
                             {/* ... (internal form fields updated similarly with rounded-md and blue theme) ... */}
                             {/* Shortened for brevity in thought, but applied in replacement */}
                             <div>
-                                <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">権限</label>
+                                <label className="block text-[10px] font-normal text-gray-400 uppercase mb-1 tracking-wider">権限</label>
                                 <div className="grid grid-cols-2 gap-2">
                                     <button type="button" onClick={() => setSelectedRole('staff')}
-                                        className={`px-3 py-2 text-xs font-bold border rounded-md transition-colors ${selectedRole === 'staff' ? 'bg-blue-50 border-[#0067b8] text-[#0067b8]' : 'bg-white border-gray-200 text-gray-500'}`}>組合スタッフ</button>
+                                        className={`px-3 py-2 text-xs font-normal border rounded-md transition-colors uppercase tracking-widest ${selectedRole === 'staff' ? 'bg-emerald-50 border-emerald-500 text-emerald-700' : 'bg-white border-gray-200 text-gray-500'}`}>組合スタッフ</button>
                                     <button type="button" onClick={() => setSelectedRole('company_admin')}
-                                        className={`px-3 py-2 text-xs font-bold border rounded-md transition-colors ${selectedRole === 'company_admin' ? 'bg-indigo-50 border-indigo-500 text-indigo-700' : 'bg-white border-gray-200 text-gray-500'}`}>受入企業管理者</button>
+                                        className={`px-3 py-2 text-xs font-normal border rounded-md transition-colors uppercase tracking-widest ${selectedRole === 'company_admin' ? 'bg-amber-50 border-amber-500 text-amber-700' : 'bg-white border-gray-200 text-gray-500'}`}>企業管理者</button>
                                 </div>
                             </div>
                             <div>
-                                <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">氏名</label>
-                                <input name="fullName" required className="w-full h-10 px-3 bg-gray-50 border border-gray-200 rounded-md text-sm outline-none focus:border-[#0067b8]" />
+                                <label className="block text-[10px] font-normal text-gray-400 uppercase mb-1 tracking-wider">氏名</label>
+                                <input name="fullName" required className="w-full h-10 px-3 bg-gray-50 border border-gray-200 rounded-md text-sm outline-none focus:border-emerald-500 font-normal" />
                             </div>
                             <div>
-                                <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">ログインID</label>
-                                <input name="loginId" required className="w-full h-10 px-3 bg-gray-50 border border-gray-200 rounded-md text-sm font-mono outline-none focus:border-[#0067b8]" />
+                                <label className="block text-[10px] font-normal text-gray-400 uppercase mb-1 tracking-wider">ログインID</label>
+                                <input name="loginId" required className="w-full h-10 px-3 bg-gray-50 border border-gray-200 rounded-md text-sm font-mono outline-none focus:border-emerald-500 font-normal" />
                             </div>
                             <div>
-                                <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">初期パスワード</label>
+                                <label className="block text-[10px] font-normal text-gray-400 uppercase mb-1 tracking-wider">初期パスワード</label>
                                 <div className="flex gap-2">
-                                    <input value={createPw} onChange={e => setCreatePw(e.target.value)} required className="flex-1 h-10 px-3 bg-gray-50 border border-gray-200 rounded-md text-sm font-mono outline-none focus:border-[#0067b8]" />
-                                    <button type="button" onClick={() => setCreatePw(genPassword())} className="px-3 bg-gray-100 border border-gray-200 rounded-md text-xs font-bold"><RefreshCw size={14} /></button>
+                                    <input value={createPw} onChange={e => setCreatePw(e.target.value)} required className="flex-1 h-10 px-3 bg-gray-50 border border-gray-200 rounded-md text-sm font-mono outline-none focus:border-emerald-500 font-normal" />
+                                    <button type="button" onClick={() => setCreatePw(genPassword())} className="px-3 bg-gray-100 border border-gray-200 rounded-md text-xs font-normal"><RefreshCw size={14} /></button>
                                 </div>
                             </div>
                             <div className="pt-4 flex justify-end gap-3">
-                                <button type="button" onClick={() => setIsCreateOpen(false)} className="px-4 py-2 text-xs font-bold text-gray-500">キャンセル</button>
-                                <button type="submit" disabled={isPendingCreate} className="bg-[#0067b8] text-white px-6 py-2 rounded-md text-xs font-bold">発行する</button>
+                                <button type="button" onClick={() => setIsCreateOpen(false)} className="px-4 py-2 text-xs font-normal text-gray-500 uppercase tracking-widest">キャンセル</button>
+                                <button type="submit" disabled={isPendingCreate} className="bg-emerald-600 text-white px-6 py-2 rounded-md text-xs font-normal uppercase tracking-widest">発行</button>
                             </div>
                         </form>
                     </div>
@@ -258,25 +258,25 @@ export default function TeamManagerClient({
                 <div className="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
                     <div className="bg-white rounded-lg border border-gray-200 shadow-xl w-full max-w-sm">
                         <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-                            <h3 className="font-bold text-gray-900">パスワード再発行</h3>
+                            <h3 className="font-normal text-gray-900 uppercase tracking-tight">パスワード再発行</h3>
                             <button onClick={() => setResetTarget(null)}><X size={16} /></button>
                         </div>
                         <form onSubmit={handleResetPassword} className="p-6 space-y-4">
                             {resetMsg.text && (
-                                <div className={`p-3 text-xs font-bold rounded-md border ${resetMsg.type === 'error' ? 'bg-rose-50 text-rose-700 border-rose-100' : 'bg-blue-50 text-blue-700 border-blue-100'}`}>
+                                <div className={`p-3 text-xs font-normal rounded-md border ${resetMsg.type === 'error' ? 'bg-rose-50 text-rose-700 border-rose-100' : 'bg-emerald-50 text-emerald-700 border-emerald-100'}`}>
                                     {resetMsg.text}
                                 </div>
                             )}
                             <div>
-                                <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">新しいパスワード</label>
+                                <label className="block text-[10px] font-normal text-gray-400 uppercase mb-1 tracking-wider">新しいパスワード</label>
                                 <div className="flex gap-2">
-                                    <input value={newPassword} onChange={e => setNewPassword(e.target.value)} required minLength={6} className="flex-1 h-10 px-3 bg-gray-50 border border-gray-200 rounded-md text-sm font-mono outline-none focus:border-[#0067b8]" />
-                                    <button type="button" onClick={() => setNewPassword(genPassword())} className="px-3 bg-gray-100 border border-gray-200 rounded-md text-xs font-bold"><RefreshCw size={14} /></button>
+                                    <input value={newPassword} onChange={e => setNewPassword(e.target.value)} required minLength={6} className="flex-1 h-10 px-3 bg-gray-50 border border-gray-200 rounded-md text-sm font-mono outline-none focus:border-emerald-500 font-normal" />
+                                    <button type="button" onClick={() => setNewPassword(genPassword())} className="px-3 bg-gray-100 border border-gray-200 rounded-md text-xs font-normal"><RefreshCw size={14} /></button>
                                 </div>
                             </div>
                             <div className="pt-4 flex justify-end gap-3">
-                                <button type="button" onClick={() => setResetTarget(null)} className="px-4 py-2 text-xs font-bold text-gray-500">キャンセル</button>
-                                <button type="submit" disabled={isPendingReset || !newPassword} className="bg-[#0067b8] text-white px-6 py-2 rounded-md text-xs font-bold">再発行する</button>
+                                <button type="button" onClick={() => setResetTarget(null)} className="px-4 py-2 text-xs font-normal text-gray-500 uppercase tracking-widest">キャンセル</button>
+                                <button type="submit" disabled={isPendingReset || !newPassword} className="bg-emerald-600 text-white px-6 py-2 rounded-md text-xs font-normal uppercase tracking-widest">再発行</button>
                             </div>
                         </form>
                     </div>
@@ -288,15 +288,15 @@ export default function TeamManagerClient({
                 <div className="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
                     <div className="bg-white rounded-lg border border-gray-200 shadow-xl w-full max-w-sm overflow-hidden">
                         <div className="px-6 py-4 border-b border-rose-100 bg-rose-50">
-                            <h3 className="font-bold text-rose-800">アカウント削除確認</h3>
+                            <h3 className="font-normal text-rose-800 uppercase tracking-tight">アカウント削除確認</h3>
                         </div>
                         <div className="p-6">
                             <p className="text-sm text-gray-600 mb-6">
                                 <strong>{deleteTarget.name}</strong> のアカウントを完全に削除しますか？
                             </p>
                             <div className="flex justify-end gap-3">
-                                <button onClick={() => setDeleteTarget(null)} className="px-4 py-2 text-xs font-bold text-gray-500">キャンセル</button>
-                                <button onClick={handleDelete} disabled={isPendingDelete} className="bg-rose-600 hover:bg-rose-700 text-white px-6 py-2 rounded-md text-xs font-bold transition-colors">削除する</button>
+                                <button onClick={() => setDeleteTarget(null)} className="px-4 py-2 text-xs font-normal text-gray-500 uppercase tracking-widest">キャンセル</button>
+                                <button onClick={handleDelete} disabled={isPendingDelete} className="bg-rose-600 hover:bg-rose-700 text-white px-6 py-2 rounded-md text-xs font-normal transition-colors uppercase tracking-widest">削除</button>
                             </div>
                         </div>
                     </div>

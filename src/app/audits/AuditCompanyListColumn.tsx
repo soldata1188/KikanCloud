@@ -23,7 +23,7 @@ export default function AuditCompanyListColumn({ companies, selectedId, onSelect
         return (
             <div className="flex flex-col items-center justify-center h-full p-8 text-center text-gray-400">
                 <Building2 size={32} className="opacity-10 mb-3" />
-                <p className="text-[12px] font-bold uppercase tracking-widest opacity-40 leading-relaxed">
+                <p className="text-[12px] font-normal uppercase tracking-widest opacity-40 leading-relaxed">
                     該当する企業は<br />ありません
                 </p>
             </div>
@@ -42,40 +42,39 @@ export default function AuditCompanyListColumn({ companies, selectedId, onSelect
                     <button
                         key={row.company.id}
                         onClick={() => onSelect(row.company.id)}
-                        className={`w-full text-left px-4 py-2 transition-all duration-150 group relative ${isSelected ? 'bg-blue-50/80' : 'hover:bg-gray-50'
+                        className={`w-full text-left px-3 py-2.5 border-b border-gray-100 transition-colors duration-150 group relative ${isSelected ? 'bg-emerald-50 border-l-[3px] border-emerald-500' : 'hover:bg-emerald-50/40 border-l-[3px] border-transparent'
                             }`}
                     >
-                        <div className="flex flex-col gap-0.5">
+                        <div className="flex flex-col gap-0.5 min-w-0 flex-1">
                             <div className="flex items-center justify-between gap-2">
                                 <div className="flex-1 min-w-0">
-                                    <h3 className={`text-[13px] font-black truncate leading-tight ${isSelected ? 'text-blue-800' : 'text-gray-900'
+                                    <h3 className={`text-[13px] font-normal truncate uppercase tracking-wide leading-none ${isSelected ? 'text-emerald-900' : 'text-slate-900'
                                         }`}>
                                         {row.company.name_jp}
                                     </h3>
-                                    <div className="flex items-center gap-1.5 mt-0.5">
-                                        <div className={`p-0.5 rounded-[4px] ${config.bg} border ${config.border}`}>
+                                    <div className="flex items-center gap-1.5 mt-1 border-0">
+                                        <div className={`p-0.5 rounded-[3px] ${config.bg} border ${config.border}`}>
                                             <Icon size={9} className={config.color} />
                                         </div>
-                                        <span className={`text-[11px] font-black uppercase tracking-tight ${config.color}`}>
+                                        <span className={`text-[10px] font-normal uppercase tracking-tight ${config.color}`}>
                                             {config.label}
                                         </span>
                                         {row.nextKansaDue && (
-                                            <span className="text-[11px] text-gray-900 font-mono font-black">
-                                                | {row.nextKansaDue.replace(/-/g, '/').substring(5)}
-                                            </span>
+                                            <>
+                                                <span className={`text-[9px] opacity-30 ${isSelected ? 'text-emerald-300' : 'text-slate-300'}`}>|</span>
+                                                <span className={`text-[10px] font-normal font-mono ${isSelected ? 'text-emerald-600' : 'text-slate-500'}`}>
+                                                    {row.nextKansaDue.replace(/-/g, '/').substring(5)}
+                                                </span>
+                                            </>
                                         )}
                                     </div>
                                 </div>
 
-                                <div className={`shrink-0 transition-transform ${isSelected ? 'translate-x-1' : 'opacity-0 translate-x-0 group-hover:opacity-100 translate-x-1'}`}>
-                                    <ChevronRight size={13} className={isSelected ? 'text-blue-500' : 'text-gray-300'} />
+                                <div className={`shrink-0 transition-transform ${isSelected ? 'translate-x-1' : 'opacity-0 translate-x-0 group-hover:opacity-100'}`}>
+                                    <ChevronRight size={13} className={isSelected ? 'text-emerald-500' : 'text-gray-300'} />
                                 </div>
                             </div>
                         </div>
-
-                        {isSelected && (
-                            <div className="absolute left-0 top-0 bottom-0 w-[4px] bg-blue-600" />
-                        )}
                     </button>
                 );
             })}

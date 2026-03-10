@@ -83,7 +83,15 @@ export function CompaniesClient({ companies: initialCompanies, userRole }: Compa
             result = result.filter(c => c.active_worker_count === 0);
         }
 
-        return result;
+        const cleanName = (name: string) => {
+            return name.replace(/株式会社|有限会社|合同会社|（株）|\(株\)|（有）|\(有\)|（同）|\(同\)/g, '').trim();
+        };
+
+        return result.sort((a, b) => {
+            const nameA = cleanName(a.name_jp || '');
+            const nameB = cleanName(b.name_jp || '');
+            return nameA.localeCompare(nameB, 'ja');
+        });
     }, [mappedCompanies, searchTerm, selectedIndustry, activeTab]);
 
     // Auto-select first company when list changes
@@ -136,7 +144,7 @@ export function CompaniesClient({ companies: initialCompanies, userRole }: Compa
                             placeholder="企業名または法人番号..."
                             value={searchTerm}
                             onChange={e => setSearchTerm(e.target.value)}
-                            className="w-full h-7 pl-9 pr-3 bg-gray-50 border border-gray-200 rounded-[6px] text-[13px] font-bold text-gray-900 placeholder:text-gray-500 outline-none focus:border-blue-500 focus:bg-white transition-all"
+                            className="w-full h-7 pl-9 pr-3 bg-gray-50 border border-gray-300 rounded-[6px] text-[13px] font-semibold text-gray-900 placeholder:text-gray-500 outline-none focus:border-blue-500 focus:bg-white transition-all shadow-sm"
                         />
                     </div>
                 </div>
@@ -169,11 +177,11 @@ export function CompaniesClient({ companies: initialCompanies, userRole }: Compa
                 <div className="flex w-full min-w-max h-full border-t border-gray-200 overflow-hidden bg-white">
 
                     {/* Column 0: Industry (240px) */}
-                    <div className="w-[240px] shrink-0 flex flex-col overflow-hidden border-r border-gray-200">
-                        <div className="h-[48px] px-4 border-b border-gray-200 bg-white/50 flex items-center shrink-0">
+                    <div className="w-[240px] shrink-0 flex flex-col overflow-hidden border-r border-gray-300">
+                        <div className="h-[48px] px-4 border-b border-gray-300 bg-white flex items-center shrink-0">
                             <div className="flex items-center gap-2">
                                 <Briefcase size={14} className="text-gray-400" />
-                                <span className="text-[11px] font-black uppercase tracking-widest text-gray-900">業種区分</span>
+                                <span className="text-[11px] font-semibold uppercase tracking-widest text-gray-900">業種区分</span>
                             </div>
                         </div>
                         <div className="flex-1 overflow-hidden">
@@ -186,22 +194,22 @@ export function CompaniesClient({ companies: initialCompanies, userRole }: Compa
                     </div>
 
                     {/* Column 1: Company List (320px) */}
-                    <div className="w-[320px] shrink-0 flex flex-col overflow-hidden border-r border-gray-200">
-                        <div className="h-[48px] px-4 border-b border-gray-200 bg-blue-50/20 flex items-center justify-between shrink-0">
-                            <div className="flex items-center gap-2 text-blue-700">
-                                <Building2 size={14} className="text-blue-400" />
-                                <span className="text-[11px] font-black uppercase tracking-widest">企業リスト</span>
+                    <div className="w-[320px] shrink-0 flex flex-col overflow-hidden border-r border-gray-300">
+                        <div className="h-[48px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
+                            <div className="flex items-center gap-2 text-slate-900">
+                                <Building2 size={14} className="text-slate-400" />
+                                <span className="text-[11px] font-semibold uppercase tracking-widest">企業リスト</span>
                             </div>
-                            <span className="text-[11px] font-bold bg-white px-1.5 py-0.5 rounded-[6px] text-blue-700 border border-blue-200 shadow-sm">
+                            <span className="text-[11px] font-bold bg-gray-50 px-1.5 py-0.5 rounded-[6px] text-slate-600 border border-gray-200 shadow-sm">
                                 {filteredCompanies.length}
                             </span>
                         </div>
 
                         {/* Tabs - Refined to match Workers/Audits style */}
-                        <div className="flex border-b border-gray-200 bg-white shrink-0 p-1 gap-1">
-                            <button onClick={() => setActiveTab('active')} className={`flex-1 h-8 rounded-[4px] text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'active' ? 'bg-blue-700 text-white' : 'text-gray-400 hover:text-blue-600 hover:bg-blue-50/50'}`}>受入中</button>
-                            <button onClick={() => setActiveTab('inactive')} className={`flex-1 h-8 rounded-[4px] text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'inactive' ? 'bg-blue-700 text-white' : 'text-gray-400 hover:text-blue-600 hover:bg-blue-50/50'}`}>未受入</button>
-                            <button onClick={() => setActiveTab('all')} className={`flex-1 h-8 rounded-[4px] text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'all' ? 'bg-blue-700 text-white' : 'text-gray-400 hover:text-blue-600 hover:bg-blue-50/50'}`}>すべて</button>
+                        <div className="flex bg-white shrink-0 p-1.5 gap-1.5 border-b border-gray-300">
+                            <button onClick={() => setActiveTab('active')} className={`flex-1 h-7 rounded-[4px] text-[11px] font-semibold transition-all ${activeTab === 'active' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'}`}>受入中</button>
+                            <button onClick={() => setActiveTab('inactive')} className={`flex-1 h-7 rounded-[4px] text-[11px] font-semibold transition-all ${activeTab === 'inactive' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'}`}>未受入</button>
+                            <button onClick={() => setActiveTab('all')} className={`flex-1 h-7 rounded-[4px] text-[11px] font-semibold transition-all ${activeTab === 'all' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'}`}>すべて</button>
                         </div>
 
                         <div className="flex-1 overflow-hidden">
@@ -214,16 +222,16 @@ export function CompaniesClient({ companies: initialCompanies, userRole }: Compa
                     </div>
 
                     {/* Column 2: Detail (720px) */}
-                    <div className="w-[720px] shrink-0 flex flex-col overflow-hidden border-r border-gray-200 bg-white">
+                    <div className="w-[720px] shrink-0 flex flex-col overflow-hidden border-r border-gray-300 bg-white">
                         <CompanyDetailColumn companies={selectedCompany ? [selectedCompany] : []} />
                     </div>
 
                     {/* Column 3: Documents (Flexible wide) */}
                     <div className="flex-1 min-w-[320px] flex flex-col overflow-hidden">
-                        <div className="h-[48px] px-4 border-b border-gray-200 bg-white/50 flex items-center justify-between shrink-0">
+                        <div className="h-[48px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
                             <div className="flex items-center gap-2">
                                 <FileText size={14} className="text-gray-400" />
-                                <span className="text-[11px] font-black uppercase tracking-widest text-gray-900 truncate">書類・資料 ({selectedCompany?.name_jp || '未選択'})</span>
+                                <span className="text-[11px] font-semibold uppercase tracking-widest text-gray-900 truncate">書類・資料 ({selectedCompany?.name_jp || '未選択'})</span>
                             </div>
                         </div>
                         <div className="flex-1 overflow-hidden">

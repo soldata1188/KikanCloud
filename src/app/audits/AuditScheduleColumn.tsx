@@ -65,31 +65,31 @@ function InlineEditor({
     const isDone = existingAudit?.status === 'completed';
 
     return (
-        <div className="flex flex-col gap-2 p-4 bg-white rounded-[6px] border border-gray-200 shadow-sm hover:shadow-md hover:border-blue-100 transition-all group">
+        <div className="flex flex-col gap-2 p-4 bg-white rounded-[6px] border border-gray-200 shadow-sm hover:shadow-md hover:border-emerald-100 transition-all group">
             <div className="flex items-center justify-between mb-1">
                 <div className="flex items-center gap-2">
-                    <div className={`p-1.5 rounded-[6px] ${typeBadge} bg-white shadow-sm border border-transparent group-hover:border-blue-200`}>
-                        <ClipboardList size={14} className="text-blue-600" />
+                    <div className={`p-1.5 rounded-[6px] ${typeBadge} bg-white shadow-sm border border-transparent group-hover:border-emerald-200`}>
+                        <ClipboardList size={14} className="text-emerald-600" />
                     </div>
-                    <span className="text-[15px] font-black text-gray-900 tracking-tight">{typeLabel}</span>
+                    <span className="text-[15px] font-normal text-gray-900 tracking-tight">{typeLabel}</span>
                 </div>
                 {isDone ? (
                     <div className="flex items-center gap-1.5 px-2 py-0.5 bg-emerald-50 text-emerald-600 rounded-full border border-emerald-100 italic">
                         <CheckCircle2 size={12} />
-                        <span className="text-[11px] font-black uppercase tracking-widest text-emerald-700">完了</span>
+                        <span className="text-[11px] font-normal uppercase tracking-widest text-emerald-700">完了</span>
                     </div>
                 ) : (
                     <div className="flex items-center gap-1.5 px-2 py-0.5 bg-blue-50 text-blue-600 rounded-full border border-blue-100 italic">
                         <Clock size={12} />
-                        <span className="text-[11px] font-black uppercase tracking-widest text-blue-700">実施予定</span>
+                        <span className="text-[11px] font-normal uppercase tracking-widest text-blue-700">実施予定</span>
                     </div>
                 )}
             </div>
 
             <div className="grid grid-cols-2 gap-3 mt-2">
                 <div className="flex flex-col gap-1.5">
-                    <label className="text-[11px] font-black uppercase tracking-widest text-gray-900 ml-1 flex items-center gap-1.5">
-                        <CalendarCheck size={11} className="text-blue-500" />
+                    <label className="text-[11px] font-normal uppercase tracking-widest text-gray-900 ml-1 flex items-center gap-1.5">
+                        <CalendarCheck size={11} className="text-emerald-500" />
                         実施予定日
                     </label>
                     <input
@@ -97,22 +97,22 @@ function InlineEditor({
                         value={date}
                         onChange={e => { setDate(e.target.value); setIsDirty(true); setSaved(false); }}
                         readOnly={isDone}
-                        className={`h-9 px-3 text-[13px] font-bold rounded-[6px] border outline-none transition-all w-full
-                            ${isDone ? 'bg-gray-50 border-gray-200 text-gray-500 opacity-80 cursor-not-allowed' : 'bg-white border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 text-gray-900 font-black'}`}
+                        className={`h-9 px-3 text-[13px] font-normal rounded-[6px] border outline-none transition-all w-full
+                            ${isDone ? 'bg-gray-50 border-gray-200 text-gray-500 opacity-80 cursor-not-allowed' : 'bg-white border-gray-300 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/5 text-gray-900'}`}
                     />
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-[#94A3B8] ml-1 flex items-center gap-1.5">
-                        <UserCircle size={11} className="text-blue-400" />
+                    <label className="text-[10px] font-normal uppercase tracking-widest text-[#94A3B8] ml-1 flex items-center gap-1.5">
+                        <UserCircle size={11} className="text-emerald-400" />
                         担当スタッフ
                     </label>
                     <select
                         value={person}
                         disabled={isDone}
                         onChange={e => { setPerson(e.target.value); setIsDirty(true); setSaved(false); }}
-                        className={`h-9 px-1 text-[13px] font-bold rounded-[6px] border outline-none transition-all w-full appearance-none cursor-pointer
-                            ${isDone ? 'bg-gray-50 border-gray-100 text-gray-400 opacity-80 cursor-not-allowed' : 'bg-white border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 text-gray-800'}`}
+                        className={`h-9 px-1 text-[13px] font-normal rounded-[6px] border outline-none transition-all w-full appearance-none cursor-pointer
+                            ${isDone ? 'bg-gray-50 border-gray-100 text-gray-400 opacity-80 cursor-not-allowed' : 'bg-white border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/5 text-gray-800'}`}
                     >
                         <option value="">— 担当 —</option>
                         {staffList.map(s => (
@@ -127,7 +127,7 @@ function InlineEditor({
                     {existingAudit?.id && (
                         <Link
                             href={`/audits/${existingAudit.id}/edit`}
-                            className="text-[11px] font-black text-gray-400 hover:text-blue-600 transition-colors flex items-center gap-1 bg-gray-50 hover:bg-blue-50 px-3 py-1.5 rounded-[6px] border border-transparent hover:border-blue-100 shadow-sm"
+                            className="text-[11px] font-normal text-gray-400 hover:text-emerald-600 transition-colors flex items-center gap-1 bg-gray-50 hover:bg-emerald-50 px-3 py-1.5 rounded-[6px] border border-transparent hover:border-emerald-100 shadow-sm"
                         >
                             <Pencil size={12} />
                             レポートを編集
@@ -140,14 +140,14 @@ function InlineEditor({
                         <button
                             onClick={handleSave}
                             disabled={isSaving}
-                            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-[6px] text-[11px] font-black flex items-center gap-2 shadow-lg shadow-blue-200 active:scale-95 transition-all"
+                            className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-1.5 rounded-[6px] text-[11px] font-normal flex items-center gap-2 shadow-lg shadow-emerald-200 active:scale-95 transition-all"
                         >
                             {isSaving ? <Clock size={12} className="animate-spin" /> : <Save size={12} />}
                             変更を保存
                         </button>
                     )}
                     {saved && (
-                        <div className="flex items-center gap-1.5 text-emerald-600 font-black text-[11px]">
+                        <div className="flex items-center gap-1.5 text-emerald-600 font-normal text-[11px]">
                             <Check size={14} strokeWidth={3} />
                             保存済み
                         </div>
@@ -165,7 +165,7 @@ function InlineEditor({
                                     onSaved();
                                 });
                             }}
-                            className="bg-gray-900 hover:bg-black text-white px-4 py-1.5 rounded-[6px] text-[11px] font-black flex items-center gap-2 shadow-lg shadow-gray-200 active:scale-95 transition-all"
+                            className="bg-gray-900 hover:bg-black text-white px-4 py-1.5 rounded-[6px] text-[11px] font-normal flex items-center gap-2 shadow-lg shadow-gray-200 active:scale-95 transition-all"
                         >
                             <CheckCircle2 size={12} />
                             完了にする
@@ -191,7 +191,7 @@ export default function AuditScheduleColumn({ row, filterMonth, staffList, onSav
                 <div className="w-20 h-20 rounded-full bg-white border border-dashed border-gray-200 flex items-center justify-center mb-6 opacity-60">
                     <History size={32} />
                 </div>
-                <h3 className="text-[14px] font-black uppercase tracking-widest text-slate-400 mb-2">会社を選択してください</h3>
+                <h3 className="text-[14px] font-normal uppercase tracking-widest text-slate-400 mb-2">会社を選択してください</h3>
                 <p className="text-[11px] font-medium text-slate-400/60 max-w-[200px]">詳細情報を表示するには、左のリストから会社を選択してください。</p>
             </div>
         );
@@ -224,15 +224,15 @@ export default function AuditScheduleColumn({ row, filterMonth, staffList, onSav
                 <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-md px-6 py-4 border-b border-gray-200 flex flex-col gap-3">
                     <div className="flex items-center justify-between gap-4">
                         <div className="flex items-center gap-3 overflow-hidden">
-                            <div className="w-12 h-12 rounded-[6px] bg-blue-600 text-white flex items-center justify-center shrink-0">
+                            <div className="w-12 h-12 rounded-[6px] bg-emerald-600 text-white flex items-center justify-center shrink-0">
                                 <Building2 size={24} />
                             </div>
                             <div className="overflow-hidden">
-                                <h2 className="text-[18px] font-black text-gray-900 truncate leading-snug" title={row.company.name_jp}>
+                                <h2 className="text-[18px] font-normal text-gray-900 truncate leading-snug" title={row.company.name_jp}>
                                     {row.company.name_jp}
                                 </h2>
-                                <p className="text-[11px] font-black uppercase tracking-widest text-[#B4C0D1] flex items-center gap-1.5">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                                <p className="text-[11px] font-normal uppercase tracking-widest text-[#B4C0D1] flex items-center gap-1.5">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                                     モニタリングスケジュール
                                 </p>
                             </div>
@@ -240,7 +240,7 @@ export default function AuditScheduleColumn({ row, filterMonth, staffList, onSav
 
                         <button
                             onClick={() => onOpenAddModal(row.company.id, 'homon')}
-                            className="w-10 h-10 rounded-[6px] bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all active:scale-90"
+                            className="w-10 h-10 rounded-[6px] bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center hover:bg-emerald-600 hover:text-white transition-all active:scale-90"
                         >
                             <Plus size={20} />
                         </button>
@@ -256,8 +256,8 @@ export default function AuditScheduleColumn({ row, filterMonth, staffList, onSav
                 <div className="p-6 flex flex-col gap-6">
                     <section>
                         <div className="flex items-center gap-2 mb-4">
-                            <CalendarCheck size={14} className="text-blue-600" />
-                            <h3 className="text-[12px] font-black uppercase tracking-widest text-gray-900">
+                            <CalendarCheck size={14} className="text-emerald-600" />
+                            <h3 className="text-[12px] font-normal uppercase tracking-widest text-gray-900">
                                 今月の予定 / 記録 ({filterMonth.replace('-', '/')})
                             </h3>
                         </div>
@@ -283,7 +283,7 @@ export default function AuditScheduleColumn({ row, filterMonth, staffList, onSav
                     <section className="mt-4 pt-8 border-t border-gray-200">
                         <div className="flex items-center gap-2 mb-6">
                             <History size={14} className="text-gray-400" />
-                            <h3 className="text-[12px] font-black uppercase tracking-widest text-gray-900">
+                            <h3 className="text-[12px] font-normal uppercase tracking-widest text-gray-900">
                                 全履歴 (監査・訪問)
                             </h3>
                         </div>
@@ -296,10 +296,10 @@ export default function AuditScheduleColumn({ row, filterMonth, staffList, onSav
                                             <div className="flex items-center justify-between mb-2">
                                                 <div className="flex items-center gap-2">
                                                     <div className="flex items-center gap-2">
-                                                        <span className={`px-1.5 py-0.5 rounded-[4px] text-[8px] font-black uppercase tracking-widest border ${audit.audit_type === 'kansa' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-blue-50 text-blue-600 border-blue-100'}`}>
+                                                        <span className={`px-1.5 py-0.5 rounded-[4px] text-[8px] font-normal uppercase tracking-widest border ${audit.audit_type === 'kansa' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-emerald-50/50 text-emerald-500 border-emerald-100'}`}>
                                                             {audit.audit_type === 'kansa' ? '監査' : '訪問'}
                                                         </span>
-                                                        <span className="text-[13px] font-black text-gray-900">
+                                                        <span className="text-[13px] font-normal text-gray-900">
                                                             {(audit.actual_date || audit.scheduled_date)?.replace(/-/g, '/')}
                                                         </span>
                                                     </div>
@@ -311,20 +311,20 @@ export default function AuditScheduleColumn({ row, filterMonth, staffList, onSav
                                                     </button>
                                                 </div>
                                                 {idx === 0 && (
-                                                    <span className="text-[9px] font-black text-white bg-blue-600 px-1.5 py-0.5 rounded-[4px] uppercase shadow-blue-100">最新</span>
+                                                    <span className="text-[9px] font-normal text-white bg-blue-600 px-1.5 py-0.5 rounded-[4px] uppercase shadow-blue-100">最新</span>
                                                 )}
                                             </div>
                                             <div className="flex items-center gap-3 text-gray-900 ml-1">
                                                 <div className="flex items-center gap-1.5">
-                                                    <span className="text-[11px] font-black">{audit.pic_name || '未設定'}</span>
+                                                    <span className="text-[11px] font-normal">{audit.pic_name || '未設定'}</span>
                                                 </div>
                                                 <div className="w-1 h-1 rounded-full bg-gray-400" />
                                                 <div className="flex items-center gap-1.5">
-                                                    <span className="text-[11px] font-black uppercase tracking-tighter">完了済み</span>
+                                                    <span className="text-[11px] font-normal uppercase tracking-tighter">完了済み</span>
                                                 </div>
                                             </div>
                                             {audit.notes && (
-                                                <p className="mt-2 pl-2 text-[12px] text-gray-900 leading-relaxed font-black border-l-2 border-blue-200 ml-1.5">
+                                                <p className="mt-2 pl-2 text-[12px] text-gray-900 leading-relaxed font-normal border-l-2 border-blue-200 ml-1.5">
                                                     {audit.notes}
                                                 </p>
                                             )}
@@ -334,7 +334,7 @@ export default function AuditScheduleColumn({ row, filterMonth, staffList, onSav
                             ) : (
                                 <div className="py-12 bg-white rounded-[6px] border border-dashed border-gray-200 flex flex-col items-center justify-center text-center px-6 mx-2">
                                     <History size={24} className="text-gray-200 mb-2" />
-                                    <p className="text-[11px] font-black text-gray-300 uppercase tracking-widest leading-loose">
+                                    <p className="text-[11px] font-normal text-gray-300 uppercase tracking-widest leading-loose">
                                         過去の監査記録は<br />ありません
                                     </p>
                                 </div>
@@ -354,8 +354,8 @@ export default function AuditScheduleColumn({ row, filterMonth, staffList, onSav
                                     <ClipboardList size={18} />
                                 </div>
                                 <div>
-                                    <h3 className="text-[15px] font-black text-gray-900 tracking-tight">履歴レコードの編集</h3>
-                                    <p className="text-[11px] font-black text-gray-700 uppercase tracking-widest">{row.company.name_jp}</p>
+                                    <h3 className="text-[15px] font-normal text-gray-900 tracking-tight">履歴レコードの編集</h3>
+                                    <p className="text-[11px] font-normal text-gray-700 uppercase tracking-widest">{row.company.name_jp}</p>
                                 </div>
                             </div>
                             <button onClick={() => setEditingAudit(null)} className="p-2 hover:bg-gray-200 rounded-[6px] text-gray-400 transition-colors"><X size={20} /></button>
@@ -364,8 +364,8 @@ export default function AuditScheduleColumn({ row, filterMonth, staffList, onSav
                         <form onSubmit={handleQuickSave} className="p-6 space-y-5">
                             <div className="space-y-4">
                                 <div>
-                                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2 pl-1">Type</label>
-                                    <select name="audit_type" required defaultValue={editingAudit.audit_type} className="w-full bg-gray-50 border border-gray-200 rounded-[6px] px-4 py-2.5 outline-none text-[13px] font-bold focus:border-blue-600 appearance-none">
+                                    <label className="text-[10px] font-normal text-gray-400 uppercase tracking-widest block mb-2 pl-1">Type</label>
+                                    <select name="audit_type" required defaultValue={editingAudit.audit_type} className="w-full bg-gray-50 border border-gray-200 rounded-[6px] px-4 py-2.5 outline-none text-[13px] font-normal focus:border-blue-600 appearance-none">
                                         <option value="homon">訪問</option>
                                         <option value="kansa">監査</option>
                                         <option value="rinji">臨時</option>
@@ -373,22 +373,22 @@ export default function AuditScheduleColumn({ row, filterMonth, staffList, onSav
                                 </div>
 
                                 <div>
-                                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2 pl-1">In Charge</label>
-                                    <select name="pic_name" defaultValue={editingAudit.pic_name} className="w-full bg-gray-50 border border-gray-200 rounded-[6px] px-4 py-2.5 outline-none text-[13px] font-bold focus:border-blue-600 appearance-none">
+                                    <label className="text-[10px] font-normal text-gray-400 uppercase tracking-widest block mb-2 pl-1">In Charge</label>
+                                    <select name="pic_name" defaultValue={editingAudit.pic_name} className="w-full bg-gray-50 border border-gray-200 rounded-[6px] px-4 py-2.5 outline-none text-[13px] font-normal focus:border-blue-600 appearance-none">
                                         <option value="">— 担当を選択 —</option>
                                         {staffList.map((s: any) => <option key={s.id} value={s.name}>{s.name}</option>)}
                                     </select>
                                 </div>
 
                                 <div>
-                                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2 pl-1">Actual Date</label>
-                                    <input name="scheduled_date" type="date" required defaultValue={editingAudit.actual_date || editingAudit.scheduled_date} className="w-full bg-gray-50 border border-gray-200 rounded-[6px] px-4 py-2.5 outline-none text-[13px] font-bold focus:border-blue-600" />
+                                    <label className="text-[10px] font-normal text-gray-400 uppercase tracking-widest block mb-2 pl-1">Actual Date</label>
+                                    <input name="scheduled_date" type="date" required defaultValue={editingAudit.actual_date || editingAudit.scheduled_date} className="w-full bg-gray-50 border border-gray-200 rounded-[6px] px-4 py-2.5 outline-none text-[13px] font-normal focus:border-blue-600" />
                                 </div>
                             </div>
 
                             <div className="pt-4 flex gap-3">
-                                <button type="button" onClick={() => setEditingAudit(null)} className="flex-1 py-3 text-[13px] font-bold text-gray-500 hover:bg-gray-50 rounded-[6px] transition-colors">キャンセル</button>
-                                <button type="submit" disabled={isSavingHistory} className="flex-[2] py-3 bg-blue-600 text-white rounded-[6px] text-[13px] font-black flex items-center justify-center gap-2 active:scale-95 disabled:opacity-40 uppercase tracking-widest">
+                                <button type="button" onClick={() => setEditingAudit(null)} className="flex-1 py-3 text-[13px] font-normal text-gray-500 hover:bg-gray-50 rounded-[6px] transition-colors">キャンセル</button>
+                                <button type="submit" disabled={isSavingHistory} className="flex-[2] py-3 bg-blue-600 text-white rounded-[6px] text-[13px] font-normal flex items-center justify-center gap-2 active:scale-95 disabled:opacity-40 uppercase tracking-widest">
                                     {isSavingHistory ? <Clock size={16} className="animate-spin" /> : <Save size={16} />}
                                     {isSavingHistory ? '保存中...' : '変更を保存'}
                                 </button>

@@ -56,18 +56,18 @@ function PdfSettingsModal({ filterMonth, matrixData, onClose }: { filterMonth: s
                 <div className="flex items-center justify-between px-6 py-5 bg-gray-50/50 border-b border-gray-100">
                     <div className="flex items-center gap-3">
                         <FileDown size={20} className="text-blue-600" />
-                        <h3 className="font-black text-gray-900 text-[16px] tracking-tight">PDF出力設定</h3>
+                        <h3 className="font-normal text-gray-900 text-[16px] tracking-tight">PDF出力設定</h3>
                     </div>
                     <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-[6px] text-gray-400 transition-colors"><X size={20} /></button>
                 </div>
                 <div className="p-6 space-y-6">
                     <div>
-                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-3 pl-1">対象ステータス</span>
+                        <span className="text-[10px] font-normal text-gray-400 uppercase tracking-widest block mb-3 pl-1">対象ステータス</span>
                         <div className="grid grid-cols-2 gap-2">
                             {['overdue', 'no_data', 'today_due', 'future'].map(s => {
                                 const isOn = selectedStatuses.includes(s);
                                 return (
-                                    <button key={s} onClick={() => toggleStatus(s)} className={`px-4 py-3 rounded-[6px] border-2 text-[12px] font-bold transition-all text-left ${isOn ? 'border-blue-600 bg-blue-50 text-blue-700' : 'border-gray-100 bg-gray-50 text-gray-400 opacity-60'}`}>
+                                    <button key={s} onClick={() => toggleStatus(s)} className={`px-4 py-3 rounded-[6px] border-2 text-[12px] font-normal transition-all text-left ${isOn ? 'border-blue-600 bg-blue-50 text-blue-700' : 'border-gray-100 bg-gray-50 text-gray-400 opacity-60'}`}>
                                         {s === 'overdue' ? '予定超過' : s === 'no_data' ? '予定未作' : s === 'today_due' ? '今月予定' : '次月以降'}
                                     </button>
                                 );
@@ -75,20 +75,20 @@ function PdfSettingsModal({ filterMonth, matrixData, onClose }: { filterMonth: s
                         </div>
                     </div>
                     <div>
-                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2 pl-1">担当者</span>
-                        <select value={selectedPic} onChange={e => setSelectedPic(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-[6px] px-4 py-2.5 outline-none text-[13px] font-bold focus:border-blue-600 transition-all">
+                        <span className="text-[10px] font-normal text-gray-400 uppercase tracking-widest block mb-2 pl-1">担当者</span>
+                        <select value={selectedPic} onChange={e => setSelectedPic(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-[6px] px-4 py-2.5 outline-none text-[13px] font-normal focus:border-blue-600 transition-all">
                             <option value="">全担当者</option>
                             {picOptions.map(p => <option key={p} value={p}>{p}</option>)}
                         </select>
                     </div>
                     <div className="bg-blue-600/5 rounded-[6px] p-4 flex items-center justify-between border border-blue-100/50">
-                        <span className="text-[11px] font-black text-blue-600/60 uppercase tracking-widest">選択済み企業数</span>
-                        <span className="text-[24px] font-black text-blue-600">{targetCount}<span className="text-[12px] font-bold ml-1 opacity-60">社</span></span>
+                        <span className="text-[11px] font-normal text-blue-600/60 uppercase tracking-widest">選択済み企業数</span>
+                        <span className="text-[24px] font-normal text-blue-600">{targetCount}<span className="text-[12px] font-normal ml-1 opacity-60">社</span></span>
                     </div>
                 </div>
                 <div className="p-6 border-t border-gray-100 flex gap-3 bg-gray-50/30">
-                    <button onClick={onClose} className="flex-1 py-3 text-[13px] font-bold text-gray-500 hover:text-gray-700 transition-colors">キャンセル</button>
-                    <button onClick={handlePrint} disabled={targetCount === 0} className="flex-[2] py-3 bg-blue-600 text-white rounded-[6px] text-[13px] font-black hover:bg-blue-700 transition-all active:scale-95 disabled:opacity-40 uppercase tracking-widest">レポート出力</button>
+                    <button onClick={onClose} className="flex-1 py-3 text-[13px] font-normal text-gray-500 hover:text-gray-700 transition-colors">キャンセル</button>
+                    <button onClick={handlePrint} disabled={targetCount === 0} className="flex-[2] py-3 bg-blue-600 text-white rounded-[6px] text-[13px] font-normal hover:bg-blue-700 transition-all active:scale-95 disabled:opacity-40 uppercase tracking-widest">レポート出力</button>
                 </div>
             </div>
         </div>
@@ -114,7 +114,7 @@ function AddScheduleModal({ companies, defaultPicName, defaultCompanyId, default
                 <div className="flex items-center justify-between px-6 py-5 bg-gray-50 border-b border-gray-100">
                     <div className="flex items-center gap-3">
                         <CalendarPlus size={20} className="text-blue-600" />
-                        <h3 className="font-black text-gray-900 text-[16px] tracking-tight">新規スケジュールの追加</h3>
+                        <h3 className="font-normal text-gray-900 text-[16px] tracking-tight">新規スケジュールの追加</h3>
                     </div>
                     <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-[6px] text-gray-400 transition-colors"><X size={20} /></button>
                 </div>
@@ -123,44 +123,44 @@ function AddScheduleModal({ companies, defaultPicName, defaultCompanyId, default
                         {(['planned', 'completed'] as const).map(s => (
                             <button key={s} type="button" onClick={() => setStatus(s)} className={`px-4 py-3 rounded-[6px] border-2 flex items-center gap-3 transition-all ${status === s ? 'border-blue-600 bg-blue-50 text-blue-700' : 'border-gray-100 bg-gray-50 text-gray-400 opacity-60'}`}>
                                 {s === 'planned' ? <CalendarCheck size={16} /> : <CheckCircle2 size={16} />}
-                                <span className="text-[13px] font-black uppercase">{s === 'planned' ? '予定' : '完了'}</span>
+                                <span className="text-[13px] font-normal uppercase">{s === 'planned' ? '予定' : '完了'}</span>
                             </button>
                         ))}
                     </div>
                     <input type="hidden" name="status" value={status} />
                     <div className="space-y-4">
                         <div>
-                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2 pl-1">対象企業</label>
-                            <select name="company_id" required defaultValue={defaultCompanyId} className="w-full bg-gray-50 border border-gray-200 rounded-[6px] px-4 py-2.5 outline-none text-[13px] font-bold focus:border-blue-600 appearance-none">
+                            <label className="text-[10px] font-normal text-gray-400 uppercase tracking-widest block mb-2 pl-1">対象企業</label>
+                            <select name="company_id" required defaultValue={defaultCompanyId} className="w-full bg-gray-50 border border-gray-200 rounded-[6px] px-4 py-2.5 outline-none text-[13px] font-normal focus:border-blue-600 appearance-none">
                                 <option value="">選択してください</option>
                                 {companies.map((c: any) => <option key={c.id} value={c.id}>{c.name_jp}</option>)}
                             </select>
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2 pl-1">種別</label>
-                                <select name="audit_type" required defaultValue={defaultAuditType} className="w-full bg-gray-50 border border-gray-200 rounded-[6px] px-4 py-2.5 outline-none text-[13px] font-bold focus:border-blue-600 appearance-none">
+                                <label className="text-[10px] font-normal text-gray-400 uppercase tracking-widest block mb-2 pl-1">種別</label>
+                                <select name="audit_type" required defaultValue={defaultAuditType} className="w-full bg-gray-50 border border-gray-200 rounded-[6px] px-4 py-2.5 outline-none text-[13px] font-normal focus:border-blue-600 appearance-none">
                                     <option value="homon">社宅訪問</option>
                                     <option value="kansa">監査訪問</option>
                                     <option value="rinji">臨時対応</option>
                                 </select>
                             </div>
                             <div>
-                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2 pl-1">担当者</label>
-                                <select name="pic_name" defaultValue={defaultPicName} className="w-full bg-gray-50 border border-gray-200 rounded-[6px] px-4 py-2.5 outline-none text-[13px] font-bold focus:border-blue-600 appearance-none">
+                                <label className="text-[10px] font-normal text-gray-400 uppercase tracking-widest block mb-2 pl-1">担当者</label>
+                                <select name="pic_name" defaultValue={defaultPicName} className="w-full bg-gray-50 border border-gray-200 rounded-[6px] px-4 py-2.5 outline-none text-[13px] font-normal focus:border-blue-600 appearance-none">
                                     <option value="">— 担当を選択 —</option>
                                     {staffList.map((s: any) => <option key={s.id} value={s.name}>{s.name}</option>)}
                                 </select>
                             </div>
                         </div>
                         <div>
-                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2 pl-1">実施予定日</label>
-                            <input name="scheduled_date" type="date" required defaultValue={`${filterMonth}-01`} className="w-full bg-gray-50 border border-gray-200 rounded-[6px] px-4 py-2.5 outline-none text-[13px] font-bold focus:border-blue-600" />
+                            <label className="text-[10px] font-normal text-gray-400 uppercase tracking-widest block mb-2 pl-1">実施予定日</label>
+                            <input name="scheduled_date" type="date" required defaultValue={`${filterMonth}-01`} className="w-full bg-gray-50 border border-gray-200 rounded-[6px] px-4 py-2.5 outline-none text-[13px] font-normal focus:border-blue-600" />
                         </div>
                     </div>
                     <div className="pt-4 flex gap-3">
-                        <button type="button" onClick={onClose} className="flex-1 py-3 text-[13px] font-bold text-gray-500">キャンセル</button>
-                        <button type="submit" disabled={isPending} className="flex-[2] py-3 bg-blue-600 text-white rounded-[6px] text-[13px] font-black flex items-center justify-center gap-2 active:scale-95 disabled:opacity-40 uppercase tracking-widest">
+                        <button type="button" onClick={onClose} className="flex-1 py-3 text-[13px] font-normal text-gray-500">キャンセル</button>
+                        <button type="submit" disabled={isPending} className="flex-[2] py-3 bg-blue-600 text-white rounded-[6px] text-[13px] font-normal flex items-center justify-center gap-2 active:scale-95 disabled:opacity-40 uppercase tracking-widest">
                             {isPending ? <Clock size={16} className="animate-spin" /> : <Save size={16} />}
                             {isPending ? '保存中...' : 'スケジュールを保存'}
                         </button>
@@ -196,7 +196,15 @@ export function AuditsClient({ matrixData, filterMonth, userRole, companies = []
         if (activeTab !== 'all') {
             result = result.filter(row => row.kansaStatus === activeTab);
         }
-        return result;
+        const cleanName = (name: string) => {
+            return name.replace(/株式会社|有限会社|合同会社|（株）|\(株\)|（有）|\(有\)|（同）|\(同\)/g, '').trim();
+        };
+
+        return result.sort((a, b) => {
+            const nameA = cleanName(a.company.name_jp || '');
+            const nameB = cleanName(b.company.name_jp || '');
+            return nameA.localeCompare(nameB, 'ja');
+        });
     }, [matrixData, searchTerm, activeTab]);
 
     // Selection Handling
@@ -231,7 +239,7 @@ export function AuditsClient({ matrixData, filterMonth, userRole, companies = []
             {/* Header */}
             <header className="h-[42px] bg-white border-b border-gray-200 flex items-center justify-between px-4 z-40 shrink-0">
                 <div className="flex items-center gap-4 flex-1">
-                    <h2 className="text-[14px] font-black tracking-tight text-gray-950 border-r border-gray-200 pr-4 shrink-0">
+                    <h2 className="text-[14px] font-normal tracking-tight text-gray-950 border-r border-gray-200 pr-4 shrink-0">
                         監査<span className="text-blue-700">訪問</span>
                     </h2>
                     <div className="relative flex-1 max-w-sm group">
@@ -242,14 +250,14 @@ export function AuditsClient({ matrixData, filterMonth, userRole, companies = []
                             value={searchTerm}
                             onChange={e => setSearchTerm(e.target.value)}
                             suppressHydrationWarning
-                            className="w-full h-7 pl-9 pr-3 bg-gray-50 border border-gray-200 rounded-[6px] text-[13px] font-bold text-gray-900 placeholder:text-gray-500 outline-none focus:border-blue-500 focus:bg-white transition-all"
+                            className="w-full h-7 pl-9 pr-3 bg-gray-50 border border-gray-200 rounded-[6px] text-[13px] font-normal text-gray-900 placeholder:text-gray-500 outline-none focus:border-blue-500 focus:bg-white transition-all"
                         />
                     </div>
                 </div>
                 <div className="flex items-center gap-3">
                     <button
                         onClick={() => setShowPdfModal(true)}
-                        className="h-7 px-3 bg-white border border-gray-300 text-gray-950 hover:border-blue-600 hover:text-blue-700 rounded-[6px] text-[12px] font-black flex items-center gap-1.5 active:scale-95 transition-all shadow-sm"
+                        className="h-7 px-3 bg-white border border-gray-300 text-gray-950 hover:border-blue-600 hover:text-blue-700 rounded-[6px] text-[12px] font-normal flex items-center gap-1.5 active:scale-95 transition-all shadow-sm"
                     >
                         <FileDown size={13} /><span>PDF出力</span>
                     </button>
@@ -257,7 +265,7 @@ export function AuditsClient({ matrixData, filterMonth, userRole, companies = []
                         <RefreshCw size={14} />
                     </button>
                     {(userRole === 'admin' || userRole === 'staff') && (
-                        <button onClick={() => setShowAddModal(true)} className="h-7 px-3 bg-blue-700 hover:bg-blue-800 text-white rounded-[6px] text-[12px] font-black flex items-center gap-1.5 active:scale-95 transition-all shadow-md shadow-blue-100">
+                        <button onClick={() => setShowAddModal(true)} className="h-7 px-3 bg-blue-700 hover:bg-blue-800 text-white rounded-[6px] text-[12px] font-normal flex items-center gap-1.5 active:scale-95 transition-all shadow-md shadow-blue-100">
                             <Plus size={13} /><span>新規登録</span>
                         </button>
                     )}
@@ -268,9 +276,9 @@ export function AuditsClient({ matrixData, filterMonth, userRole, companies = []
             <div className="flex-1 flex overflow-hidden bg-white p-0">
                 <div className="flex-1 flex border-t border-gray-200 overflow-hidden bg-white">
                     {/* Column 1: Status Tabs (260px) */}
-                    <div className="w-[260px] shrink-0 border-r border-gray-200 flex flex-col bg-white">
-                        <div className="h-[48px] px-4 flex items-center border-b border-gray-200 bg-white/50 shrink-0">
-                            <span className="text-[11px] font-black text-gray-900 uppercase tracking-widest">モニタリングステータス</span>
+                    <div className="w-[260px] shrink-0 border-r border-gray-300 flex flex-col bg-white">
+                        <div className="h-[48px] px-4 flex items-center border-b border-gray-300 bg-white shrink-0">
+                            <span className="text-[11px] font-normal text-gray-900 uppercase tracking-widest">モニタリングステータス</span>
                         </div>
                         <AuditStatusColumn
                             counts={counts}
@@ -280,20 +288,20 @@ export function AuditsClient({ matrixData, filterMonth, userRole, companies = []
                     </div>
 
                     {/* Column 2: Company List (260px) */}
-                    <div className="w-[260px] shrink-0 border-r border-gray-200 flex flex-col bg-white">
-                        <div className="h-[48px] px-4 border-b border-gray-200 bg-blue-50/20 flex items-center shrink-0">
+                    <div className="w-[260px] shrink-0 border-r border-gray-300 flex flex-col bg-white">
+                        <div className="h-[48px] px-4 border-b border-gray-300 bg-white flex items-center shrink-0">
                             <div className="flex items-center justify-between w-full">
-                                <span className="text-[11px] font-black text-blue-600 uppercase tracking-widest">対象企業一覧</span>
+                                <span className="text-[11px] font-normal text-slate-900 uppercase tracking-widest">対象企業一覧</span>
                                 <div className="flex items-center gap-2">
                                     {selectedCompanyId && (
                                         <button
                                             onClick={() => setSelectedCompanyId(null)}
-                                            className="text-[11px] font-black text-blue-700 hover:text-blue-800 bg-white px-2 py-0.5 rounded-[6px] border border-blue-200 shadow-sm active:scale-95 transition-all"
+                                            className="text-[11px] font-normal text-slate-700 hover:text-slate-900 bg-white px-2 py-0.5 rounded-[6px] border border-gray-300 shadow-sm active:scale-95 transition-all"
                                         >
                                             ボード表示
                                         </button>
                                     )}
-                                    <span className="text-[11px] font-bold bg-white text-blue-700 px-1.5 py-0.5 rounded-[6px] shadow-sm border border-blue-200">{filtered.length}</span>
+                                    <span className="text-[11px] font-normal bg-gray-50 text-slate-600 px-1.5 py-0.5 rounded-[6px] shadow-sm border border-gray-200">{filtered.length}</span>
                                 </div>
                             </div>
                         </div>

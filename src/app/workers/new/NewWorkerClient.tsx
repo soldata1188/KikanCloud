@@ -311,7 +311,7 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
                         {/* --- Left Column --- */}
                         <div className="flex flex-col gap-2">
                             <div className="bg-white rounded border border-slate-200 overflow-hidden">
-                                <SectionHeader icon={<User size={13} />} label="個人・雇用・住所 / Profile" color="bg-blue-600 text-white" />
+                                <SectionHeader icon={<User size={13} />} label="個人・雇用・住所" color="bg-blue-600 text-white" />
                                 <FormRow label={<span>氏名(ローマ字)<span className="text-[10px] text-red-600 ml-1">必須</span></span>}>
                                     <input name="full_name_romaji" value={formData.full_name_romaji} onChange={handleInputChange} className={getInputClass("full_name_romaji")} placeholder="例: NGUYEN VAN A" />
                                 </FormRow>
@@ -379,7 +379,7 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
                         {/* --- Right Column --- */}
                         <div className="flex flex-col gap-2">
                             <div className="bg-white rounded border border-slate-200 overflow-hidden">
-                                <SectionHeader icon={<Shield size={13} />} label="入国・在留・書類 / Visa & Docs" color="bg-blue-600 text-white" />
+                                <SectionHeader icon={<Shield size={13} />} label="入国・在留・書類" color="bg-blue-600 text-white" />
                                 <FormRow label="制度区分">
                                     <select name="system_type" value={formData.system_type} onChange={handleInputChange} className={getInputClass("system_type")}>
                                         <option value="ikusei_shuro">育成就労</option>
@@ -425,7 +425,7 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
 
                         {/* 7. 備考 */}
                         <div className="bg-white rounded border border-slate-200 overflow-hidden col-span-2">
-                            <SectionHeader icon={<MessageSquare size={13} />} label="備考 / Remarks" color="bg-slate-50 text-slate-500" />
+                            <SectionHeader icon={<MessageSquare size={13} />} label="備考" color="bg-slate-50 text-slate-500" />
                             <div className="p-2 bg-white">
                                 <textarea
                                     name="remarks"

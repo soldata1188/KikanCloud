@@ -4,13 +4,11 @@ import React, { useState, useTransition, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import {
     Search, Clock, Briefcase, AlertTriangle, ChevronLeft, ChevronRight,
-    Sparkles, Building2, Landmark, Calendar, ExternalLink, User, Users,
-    CheckCircle2, Circle, Plus, X, SlidersHorizontal, LayoutGrid, List,
-    ArrowLeft, RefreshCw
+    Building2, Landmark, Calendar, ExternalLink, User, Users,
+    CheckCircle2, Circle, Plus, X, LayoutGrid, List, Trash2, RefreshCw, ArrowLeft
 } from 'lucide-react'
 import { bulkDeleteWorkers } from '@/app/actions/operations'
 import { updateWorkerStatus } from '@/app/operations/actions'
-import { BulkEditModal } from './BulkEditModal'
 import { BulkImportModal } from './BulkImportModal'
 import CompanyColumn from '../operations/CompanyColumn';
 import WorkerListColumn from './WorkerListColumn';
@@ -23,26 +21,32 @@ const TAB_CONFIG: Record<string, {
     label: string; icon: React.ReactNode
     activeBg: string; inactiveText: string
 }> = {
+    all: {
+        label: '全員',
+        icon: <Users size={16} />,
+        activeBg: 'bg-slate-900 text-white border-slate-900',
+        inactiveText: 'text-gray-400 hover:text-gray-600'
+    },
     active: {
-        label: '在籍中・対応中',
+        label: '稼働中',
         icon: <CheckCircle2 size={16} />,
-        activeBg: 'bg-emerald-50 text-emerald-700 border-emerald-500',
+        activeBg: 'bg-emerald-600 text-white border-emerald-600',
         inactiveText: 'text-gray-400 hover:text-emerald-600'
     },
     waiting: {
         label: '未入国',
         icon: <Clock size={16} />,
-        activeBg: 'bg-blue-50 text-blue-700 border-blue-500',
+        activeBg: 'bg-blue-600 text-white border-blue-600',
         inactiveText: 'text-gray-400 hover:text-blue-600'
     },
     closed: {
-        label: '失踪・返国・転籍済',
+        label: '失踪・帰国済',
         icon: <AlertTriangle size={16} />,
-        activeBg: 'bg-rose-50 text-rose-700 border-rose-500',
+        activeBg: 'bg-rose-600 text-white border-rose-600',
         inactiveText: 'text-gray-400 hover:text-rose-600'
     },
 }
-const TAB_KEYS = ['active', 'waiting', 'closed']
+const TAB_KEYS = ['all', 'active', 'waiting', 'closed']
 
 const reverseStatusMap: Record<string, string> = {
     'waiting': '未入国', 'standby': '対応中', 'working': '就業中', 'missing': '失踪', 'returned': '帰国', 'transferred': '転籍済'
@@ -50,11 +54,11 @@ const reverseStatusMap: Record<string, string> = {
 
 // ステータス別 テキストカラー
 const statusSelectCls = (s: string): string => {
-    if (s === 'working') return 'text-emerald-700 font-black'
-    if (s === 'standby') return 'text-blue-600 font-black'
-    if (s === 'missing') return 'text-rose-600 font-black'
-    if (s === 'transferred') return 'text-purple-600 font-black'
-    return 'text-gray-500 font-bold' // waiting, returned
+    if (s === 'working') return 'text-emerald-700 font-normal'
+    if (s === 'standby') return 'text-blue-600 font-normal'
+    if (s === 'missing') return 'text-rose-600 font-normal'
+    if (s === 'transferred') return 'text-purple-600 font-normal'
+    return 'text-gray-500 font-normal' // waiting, returned
 }
 
 const PAGE_SIZE = 50
@@ -83,15 +87,16 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
     const [activeTab, setActiveTab] = useState('active')
     const [layout, setLayout] = useState<'list' | 'grid'>('list')
     const [isRefreshing, setIsRefreshing] = useState(false);
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-    // Mobile layout optimization: Default to 'grid' on small screens
+    // モバイルレイアウトの最適化: 小画面ではデフォルトで「グリッド」表示
     useEffect(() => {
         const handleResize = () => {
             if (window.innerWidth < 768) {
                 setLayout('grid');
             }
         };
-        handleResize(); // Check on mount
+        handleResize(); // マウント時にチェック
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
@@ -106,7 +111,6 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
     const [sortKey, setSortKey] = useState<'entry_date' | 'zairyu_exp' | 'cert_end_date'>('entry_date')
     const [sortDir, setSortDir] = useState<'desc' | 'asc'>('asc')
     const [currentPage, setCurrentPage] = useState(1)
-    const [isBulkEditModalOpen, setIsBulkEditModalOpen] = useState(false)
     const [isBulkImportModalOpen, setIsBulkImportModalOpen] = useState(false)
     const [batchForm, setBatchForm] = useState({
         worker_status: '',
@@ -125,6 +129,23 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
         insurance_exp: '',
     })
 
+    const handleBulkDelete = async () => {
+        if (selectedIds.length === 0) return;
+        const res = await bulkDeleteWorkers(selectedIds);
+        if (res.success) {
+            setWorkers(prev => prev.filter(w => !selectedIds.includes(w.id)));
+            setSelectedIds([]);
+            setIsDeleteDialogOpen(false);
+        } else {
+            alert(res.error || '削除に失敗しました。');
+        }
+    };
+
+    // 企業名をクリーンアップするヘルパー関数
+    const cleanName = (name: string) => {
+        return name.replace(/株式会社|有限会社|合同会社|（株）|\(株\)|（有）|\(有\)|（同）|\(同\)/g, '').trim();
+    };
+
     // Derived filter lists
     const uniqueCompanies = React.useMemo(() => {
         const map = new Map<string, string>();
@@ -133,10 +154,17 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                 map.set(w.company_id, w.companies.name_jp);
             }
         });
-        return Array.from(map.entries()).map(([id, name]) => ({ id, name_jp: name })).sort((a, b) => a.name_jp.localeCompare(b.name_jp, 'ja'));
+
+        return Array.from(map.entries())
+            .map(([id, name]) => ({ id, name_jp: name }))
+            .sort((a, b) => {
+                const nameA = cleanName(a.name_jp);
+                const nameB = cleanName(b.name_jp);
+                return nameA.localeCompare(nameB, 'ja');
+            });
     }, [workers]);
 
-    // Build batch list with counts (based on all workers, filtered by tab status)
+    // 全てのワーカーをタブのステータスでフィルタリングし、期生リストとカウントを作成
     const batchItems = React.useMemo(() => {
         const map = new Map<string, { count: number; date: string }>();
         workers.forEach(w => {
@@ -161,7 +189,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
             });
     }, [workers]);
 
-    // Companies filtered by selected batch (for drill-down)
+    // 選択された期生でフィルタリングされた企業 (ドリルダウン用)
     const filteredCompanies = React.useMemo(() => {
         if (!selectedBatch) return uniqueCompanies;
         const ids = new Set(
@@ -196,7 +224,9 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
         if (selectedCompanyId) {
             result = result.filter(w => w.company_id === selectedCompanyId);
         }
-        const statuses = activeTab === 'active' ? ['working', 'standby'] : (activeTab === 'waiting' ? ['waiting'] : ['missing', 'returned', 'transferred'])
+        const statuses = activeTab === 'all'
+            ? ['working', 'standby', 'waiting', 'missing', 'returned', 'transferred']
+            : (activeTab === 'active' ? ['working', 'standby'] : (activeTab === 'waiting' ? ['waiting'] : ['missing', 'returned', 'transferred']))
         result = result.filter(w => statuses.includes(w.status || ''))
 
         if (searchTerm) {
@@ -233,7 +263,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
             result = result.filter(w => ((w as any).entry_date || '').startsWith(filterEntryYear))
         }
 
-        // Group by entry_batch → sort groups by latest entry_date DESC → within group: company A→Z
+        // 入国期生でグループ化 → グループを最新の入国日で降順ソート → グループ内: 企業名を昇順ソート
         const batchMap = new Map<string, any[]>()
         result.forEach(w => {
             const batch = (w as any).entry_batch || '未設定'
@@ -245,16 +275,25 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
             const ed = ((b as any).entry_date || '0000-00-00').localeCompare((a as any).entry_date || '0000-00-00')
             if (ed !== 0) return ed
             // 同日の場合: 企業名 昇順
-            return ((a as any).companies?.name_jp || '').localeCompare((b as any).companies?.name_jp || '', 'ja')
+            const cleanName = (name: string) => name.replace(/株式会社|有限会社|合同会社|（株）|\(株\)|（有）|\(有\)|（同）|\(同\)/g, '').trim();
+            return cleanName((a as any).companies?.name_jp || '').localeCompare(cleanName((b as any).companies?.name_jp || ''), 'ja')
         }))
-        const sortedBatches = Array.from(batchMap.entries()).sort(([keyA], [keyB]) => {
+        const sortedBatches = Array.from(batchMap.entries()).sort(([keyA, workersA], [keyB, workersB]) => {
+            // グループ内の最新入国日でソート (workersAは既に降順ソート済み)
+            const dateA = (workersA[0] as any)?.entry_date || '0000-00-00'
+            const dateB = (workersB[0] as any)?.entry_date || '0000-00-00'
+
+            if (dateA !== dateB) {
+                return dateB.localeCompare(dateA) // 最新日を上に
+            }
+
+            // 日付が同じ場合、期生数で比較 (例: 20期生 > 19期生)
             const numA = parseInt(keyA.match(/(\d+)/)?.[1] ?? '0', 10)
             const numB = parseInt(keyB.match(/(\d+)/)?.[1] ?? '0', 10)
-            // Groups with no numeric value (e.g. "未設定") go to the bottom
-            if (numA === 0 && numB === 0) return keyA.localeCompare(keyB, 'ja')
-            if (numA === 0) return 1
-            if (numB === 0) return -1
-            return numB - numA // Descending: larger number first
+            if (numA !== numB) return numB - numA
+
+            // 最終手段として文字列比較
+            return keyA.localeCompare(keyB, 'ja')
         })
         result = sortedBatches.flatMap(([, workers]) => workers)
 
@@ -266,7 +305,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
     const totalPages = Math.ceil(filtered.length / PAGE_SIZE)
     const paginated = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
 
-    // Compute timeline groups from current page
+    // 現在のページからタイムライングループを計算
     const paginatedGroups = (() => {
         const groups: { label: string; date: string; workers: any[] }[] = []
         paginated.forEach(w => {
@@ -286,13 +325,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
         try { await updateWorkerStatus(id, field, value) } catch { alert("更新エラー") }
     }
 
-    const handleBulkDelete = () => {
-        if (!confirm(`${selectedIds.length}件のデータを削除しますか？`)) return
-        startTransition(async () => {
-            await bulkDeleteWorkers(selectedIds)
-            setSelectedIds([])
-        })
-    }
+
 
     const applyBatch = async () => {
         const ids = selectedIds;
@@ -388,7 +421,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                     const isSelected = currentPage === page
                     return (
                         <button key={page} onClick={() => setCurrentPage(page)}
-                            className={`w-9 h-9 rounded-lg text-sm font-semibold transition-all ${isSelected ? 'bg-blue-600 text-white shadow-md shadow-blue-200' : 'bg-white text-gray-600 border border-gray-200 hover:border-blue-300 hover:bg-blue-50'}`}>
+                            className={`w-9 h-9 rounded-lg text-sm font-normal transition-all ${isSelected ? 'bg-blue-600 text-white shadow-md shadow-blue-200' : 'bg-white text-gray-600 border border-gray-200 hover:border-blue-300 hover:bg-blue-50'}`}>
                             {page}
                         </button>
                     )
@@ -398,7 +431,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                 className="w-8 h-8 flex items-center justify-center rounded-md border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 focus:border-[#0067b8] transition-all disabled:opacity-30 disabled:cursor-not-allowed">
                 <ChevronRight size={14} />
             </button>
-            <span className="text-[11px] font-bold text-gray-400 ml-3 uppercase tracking-wider">
+            <span className="text-[11px] font-normal text-gray-400 ml-3 uppercase tracking-wider">
                 {filtered.length}名中 {(currentPage - 1) * PAGE_SIZE + 1}–{Math.min(currentPage * PAGE_SIZE, filtered.length)}表示
             </span>
         </div>
@@ -410,9 +443,9 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
     return (
         <div className="flex flex-col h-full bg-white overflow-hidden text-gray-900 antialiased">
             {/* 1. Header */}
-            <header className="h-[42px] bg-white border-b border-gray-200 flex items-center justify-between px-4 z-40 shrink-0">
+            <header className="h-[42px] bg-white border-b border-gray-300 flex items-center justify-between px-4 z-40 shrink-0">
                 <div className="flex items-center gap-4 flex-1">
-                    <h2 className="text-[14px] font-black tracking-tight text-gray-950 border-r border-gray-200 pr-4 shrink-0">
+                    <h2 className="text-[14px] font-normal tracking-tight text-gray-950 border-r border-gray-300 pr-4 shrink-0">
                         人材<span className="text-blue-700">管理</span>
                     </h2>
 
@@ -425,7 +458,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             suppressHydrationWarning
-                            className="w-full h-7 pl-9 pr-3 bg-gray-50 border border-gray-200 rounded-[6px] text-[13px] font-bold text-gray-900 placeholder:text-gray-500 outline-none focus:border-blue-500 focus:bg-white transition-all"
+                            className="w-full h-7 pl-9 pr-3 bg-gray-50 border border-gray-200 rounded-[6px] text-[13px] font-normal text-gray-900 placeholder:text-gray-500 outline-none focus:border-blue-500 focus:bg-white transition-all"
                         />
                     </div>
 
@@ -434,14 +467,14 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                         <div className="flex items-center gap-2 bg-gray-50 px-2 py-1 rounded-[6px] border border-gray-200">
                             <select value={filterEntryYear} onChange={e => setFilterEntryYear(e.target.value)}
                                 suppressHydrationWarning
-                                className="bg-transparent text-[11px] font-black uppercase text-gray-600 outline-none pr-4 cursor-pointer">
+                                className="bg-transparent text-[11px] font-normal uppercase text-gray-600 outline-none pr-4 cursor-pointer">
                                 <option value="all">すべての入国年</option>
                                 {entryYearList.map(y => <option key={y} value={y}>{y}年</option>)}
                             </select>
                             <div className="w-px h-3 bg-gray-300" />
                             <select value={filterEntryBatch} onChange={e => setFilterEntryBatch(e.target.value)}
                                 suppressHydrationWarning
-                                className="bg-transparent text-[11px] font-black uppercase text-gray-600 outline-none pr-2 cursor-pointer">
+                                className="bg-transparent text-[11px] font-normal uppercase text-gray-600 outline-none pr-2 cursor-pointer">
                                 <option value="all">すべての期生</option>
                                 {entryBatchList.sort().map(b => <option key={b} value={b}>{b}期生</option>)}
                             </select>
@@ -451,17 +484,19 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
 
                 <div className="flex items-center gap-2">
                     {selectedIds.length > 0 && (
-                        <button
-                            onClick={() => setIsBulkEditModalOpen(true)}
-                            className="h-7 px-3 bg-white border border-blue-200 text-blue-700 hover:bg-blue-50 rounded-[6px] flex items-center gap-1.5 text-[12px] font-black transition-all active:scale-95 shadow-sm"
-                        >
-                            <SlidersHorizontal size={13} />
-                            一括編集
-                        </button>
+                        <>
+                            <button
+                                onClick={() => setIsDeleteDialogOpen(true)}
+                                className="h-7 px-3 bg-white border border-rose-200 text-rose-600 hover:bg-rose-50 rounded-[6px] flex items-center gap-1.5 text-[12px] font-normal transition-all active:scale-95 shadow-sm"
+                            >
+                                <Trash2 size={13} />
+                                削除
+                            </button>
+                        </>
                     )}
                     <button
                         onClick={() => setIsBulkImportModalOpen(true)}
-                        className="h-7 px-3 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 rounded-[6px] flex items-center gap-1.5 text-[12px] font-black transition-all active:scale-95 shadow-sm"
+                        className="h-7 px-3 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 rounded-[6px] flex items-center gap-1.5 text-[12px] font-normal transition-all active:scale-95 shadow-sm"
                     >
                         <List size={13} />
                         一括入力
@@ -470,7 +505,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                         <RefreshCw size={14} />
                     </button>
                     <Link href="/workers/new"
-                        className="h-7 px-3 bg-blue-700 hover:bg-blue-800 text-white rounded-[6px] flex items-center gap-1.5 text-[12px] font-black transition-all active:scale-95 shadow-sm">
+                        className="h-7 px-3 bg-blue-700 hover:bg-blue-800 text-white rounded-[6px] flex items-center gap-1.5 text-[12px] font-normal transition-all active:scale-95 shadow-sm">
                         <Plus size={13} />
                         新規登録
                     </Link>
@@ -479,14 +514,14 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
 
             {/* 2. Desktop: 4-Column Layout */}
             <div className="hidden lg:flex flex-1 overflow-x-auto thin-scrollbar bg-white">
-                <div className="flex w-full min-w-max h-full border-t border-gray-200 overflow-hidden bg-white">
+                <div className="flex w-full min-w-max h-full border-t border-gray-300 overflow-hidden bg-white">
 
                     {/* Column 0: Entry Batch */}
-                    <div className="w-[240px] flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-200">
-                        <div className="h-[48px] px-4 border-b border-gray-200 bg-white/50 flex items-center justify-between shrink-0">
+                    <div className="w-[180px] flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-300">
+                        <div className="h-[48px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
                             <div className="flex items-center gap-2">
-                                <Calendar size={14} className="text-gray-400" />
-                                <span className="text-[11px] font-black uppercase tracking-widest text-gray-900">入国期生</span>
+                                <Calendar size={20} className="text-gray-400" />
+                                <span className="text-[15px] font-normal uppercase tracking-widest text-gray-900">入国期生</span>
                             </div>
                         </div>
                         <div className="flex-1 overflow-hidden">
@@ -499,14 +534,14 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                     </div>
 
                     {/* Column 1: Companies */}
-                    <div className="w-[320px] flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-200">
-                        <div className="h-[48px] px-4 border-b border-gray-200 bg-blue-50/20 flex items-center justify-between shrink-0">
+                    <div className="w-[280px] flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-300">
+                        <div className="h-[48px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
                             <div className="flex items-center gap-2">
-                                <Building2 size={14} className="text-blue-400" />
-                                <span className="text-[11px] font-black uppercase tracking-widest text-blue-700">企業リスト</span>
+                                <Building2 size={20} className="text-blue-400" />
+                                <span className="text-[15px] font-normal uppercase tracking-widest text-blue-700">企業リスト</span>
                             </div>
                             {selectedBatch && (
-                                <span className="text-[11px] font-bold bg-white text-blue-700 px-1.5 py-0.5 rounded-[6px] border border-blue-200 shadow-sm">{filteredCompanies.length}</span>
+                                <span className="text-[11px] font-normal bg-white text-blue-700 px-1.5 py-0.5 rounded-[6px] border border-blue-200 shadow-sm">{filteredCompanies.length}</span>
                             )}
                         </div>
                         <div className="flex-1 overflow-hidden">
@@ -519,22 +554,22 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                     </div>
 
                     {/* Column 2: Workers */}
-                    <div className="w-[320px] flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-200">
-                        <div className="h-[48px] px-4 border-b border-gray-200 bg-white/50 flex items-center justify-between shrink-0">
+                    <div className="w-[420px] flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-300">
+                        <div className="h-[48px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
                             <div className="flex items-center gap-2">
-                                <Users size={14} className="text-gray-400" />
-                                <span className="text-[11px] font-black uppercase tracking-widest text-gray-900">人材リスト</span>
+                                <Users size={20} className="text-gray-400" />
+                                <span className="text-[15px] font-normal uppercase tracking-widest text-gray-900">人材リスト</span>
                             </div>
-                            <span className="text-[11px] font-bold bg-white text-gray-900 px-1.5 py-0.5 rounded-[6px] border border-gray-200 shadow-sm">{filtered.length}</span>
+                            <span className="text-[11px] font-normal bg-gray-50 text-gray-900 px-1.5 py-0.5 rounded-[6px] border border-gray-200 shadow-sm">{filtered.length}</span>
                         </div>
                         {/* Tabs */}
-                        <div className="flex border-b border-gray-200 bg-white shrink-0">
+                        <div className="flex border-b border-gray-300 bg-white shrink-0">
                             {TAB_KEYS.map((key) => {
                                 const isActive = activeTab === key
                                 const cfg = TAB_CONFIG[key]
                                 return (
                                     <button key={key} onClick={() => setActiveTab(key)}
-                                        className={`flex-1 h-[48px] flex items-center justify-center text-[10px] font-black uppercase tracking-widest transition-all border-b-2
+                                        className={`flex-1 h-[48px] flex items-center justify-center text-[10px] font-normal uppercase tracking-widest transition-all border-b-2
                                         ${isActive ? cfg.activeBg : cfg.inactiveText + ' border-transparent'}`}>
                                         {cfg.label}
                                     </button>
@@ -551,14 +586,14 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                     </div>
 
                     {/* Column 3: Profile Detail */}
-                    <div className="w-[640px] flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-200">
-                        <div className="h-[48px] px-4 border-b border-gray-200 bg-white/50 flex items-center justify-between shrink-0">
+                    <div className="w-[480px] flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-300">
+                        <div className="h-[48px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
                             <div className="flex items-center gap-2">
-                                <User size={14} className="text-gray-400" />
-                                <span className="text-[11px] font-black uppercase tracking-widest text-gray-900">人材詳細</span>
+                                <User size={20} className="text-gray-400" />
+                                <span className="text-[14px] font-normal uppercase tracking-widest text-gray-900">人材詳細</span>
                             </div>
                             {selectedIds.length > 1 && (
-                                <span className="text-[11px] font-black bg-blue-50 text-blue-700 px-2.5 py-1 rounded-[6px] border border-blue-200 shadow-sm">{selectedIds.length}名一括選択中</span>
+                                <span className="text-[11px] font-normal bg-blue-50 text-blue-700 px-2.5 py-1 rounded-[6px] border border-blue-200 shadow-sm">{selectedIds.length}名一括選択中</span>
                             )}
                         </div>
                         <div className="flex-1 overflow-hidden">
@@ -568,19 +603,20 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                                 setBatchForm={setBatchForm}
                                 onUpdate={handleChange}
                                 onBulkUpdate={applyBatch}
+                                companies={uniqueCompanies}
                             />
                         </div>
                     </div>
 
                     {/* Column 4: Documents */}
                     <div className="flex-1 min-w-[320px] flex-shrink-0 flex flex-col overflow-hidden">
-                        <div className="h-[48px] px-4 border-b border-gray-200 bg-white/50 flex items-center justify-between shrink-0">
+                        <div className="h-[48px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
                             <div className="flex items-center gap-2 text-slate-800">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" /><path d="M14 2v4a2 2 0 0 0 2 2h4" /></svg>
-                                <span className="text-[11px] font-black uppercase tracking-widest text-gray-900">関連書類</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" /><path d="M14 2v4a2 2 0 0 0 2 2h4" /></svg>
+                                <span className="text-[14px] font-normal uppercase tracking-widest text-gray-900">関連書類</span>
                             </div>
                             {selectedIds.length === 1 && (
-                                <span className="text-[11px] font-black text-blue-700 bg-blue-50 px-2 py-0.5 rounded-[6px] border border-blue-100 shadow-sm">1名選択</span>
+                                <span className="text-[11px] font-normal text-blue-700 bg-blue-50 px-2 py-0.5 rounded-[6px] border border-blue-100 shadow-sm">1名選択</span>
                             )}
                         </div>
                         <div className="flex-1 overflow-hidden">
@@ -607,11 +643,11 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                             <ArrowLeft size={16} />
                         </button>
                     )}
-                    <h1 className="text-[15px] font-black tracking-tight">
-                        {viewState === 'batches' ? '入国期生' : viewState === 'companies' ? '企業選択' : viewState === 'workers' ? '人材選択' : '詳細情報'}
+                    <h1 className="text-[15px] font-normal tracking-tight">
+                        {viewState === 'batches' ? '入国期生' : viewState === 'companies' ? '企業' : viewState === 'workers' ? '人材' : '詳細'}
                     </h1>
                     {selectedBatch && viewState !== 'batches' && (
-                        <span className="text-[10px] font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded ml-auto">{selectedBatch}</span>
+                        <span className="text-[10px] font-normal bg-amber-100 text-amber-700 px-2 py-0.5 rounded ml-auto">{selectedBatch}</span>
                     )}
                 </div>
 
@@ -642,7 +678,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                                     const isActive = activeTab === key
                                     return (
                                         <button key={key} onClick={() => setActiveTab(key)}
-                                            className={`flex-1 h-[52px] flex items-center justify-center text-[10px] font-black uppercase tracking-widest border-b-2 transition-all
+                                            className={`flex-1 h-[52px] flex items-center justify-center text-[10px] font-normal uppercase tracking-widest border-b-2 transition-all
                                             ${isActive ? cfg.activeBg : cfg.inactiveText + ' border-transparent'}`}>
                                             {cfg.label}
                                         </button>
@@ -666,26 +702,51 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                                 setBatchForm={setBatchForm}
                                 onUpdate={handleChange}
                                 onBulkUpdate={applyBatch}
+                                companies={uniqueCompanies}
                             />
                         </div>
                     )}
                 </div>
             </div>
 
-            {/* Modals */}
-            {isBulkEditModalOpen && (
-                <BulkEditModal
-                    selectedIds={selectedIds}
-                    onClose={() => setIsBulkEditModalOpen(false)}
-                    onSuccess={() => { setIsBulkEditModalOpen(false); setSelectedIds([]) }}
-                    companies={uniqueCompanies}
-                />
-            )}
+            {/* モーダル */}
             {isBulkImportModalOpen && (
                 <BulkImportModal
                     onClose={() => setIsBulkImportModalOpen(false)}
                     onSuccess={() => setIsBulkImportModalOpen(false)}
                 />
+            )}
+
+            {/* 削除確認モーダル */}
+            {isDeleteDialogOpen && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-[2px] animate-in fade-in duration-200">
+                    <div className="bg-white rounded-xl shadow-xl w-full max-w-sm overflow-hidden border border-slate-200 slide-in-from-bottom-4 animate-in duration-300">
+                        <div className="p-6">
+                            <div className="w-12 h-12 rounded-full bg-rose-50 flex items-center justify-center mb-4 mx-auto">
+                                <AlertTriangle className="text-rose-500" size={24} />
+                            </div>
+                            <h3 className="text-lg font-bold text-slate-900 text-center mb-2">一括削除の確認</h3>
+                            <p className="text-sm text-slate-500 text-center mb-6">
+                                選択された <span className="font-bold text-rose-600">{selectedIds.length}名</span> のデータを削除しますか？<br />
+                                この操作は取り消せません。
+                            </p>
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => setIsDeleteDialogOpen(false)}
+                                    className="flex-1 h-10 rounded-lg border border-slate-200 text-slate-600 text-sm font-medium hover:bg-slate-50 transition-colors"
+                                >
+                                    キャンセル
+                                </button>
+                                <button
+                                    onClick={handleBulkDelete}
+                                    className="flex-1 h-10 rounded-lg bg-rose-600 text-white text-sm font-medium hover:bg-rose-700 shadow-md shadow-rose-200 transition-all active:scale-95"
+                                >
+                                    削除する
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             )}
         </div>
     );

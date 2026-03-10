@@ -34,10 +34,10 @@ export default function DashboardClient({ userName, dashboardData }: { userName:
 
             {/* Header Area */}
             <div className="flex flex-col gap-1">
-                <h1 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight">
+                <h1 className="text-2xl md:text-3xl font-normal text-gray-950 tracking-tight">
                     ホーム
                 </h1>
-                <p className="text-sm text-gray-500 font-medium">
+                <p className="text-sm text-gray-500 font-normal">
                     こんにちは、{userName}様。本日のアクションと最近の活動を確認しましょう。
                 </p>
             </div>
@@ -48,8 +48,8 @@ export default function DashboardClient({ userName, dashboardData }: { userName:
                     <section className="app-card overflow-hidden">
                         <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
                             <div className="flex items-center gap-2">
-                                <Sparkles className="text-blue-600" size={18} />
-                                <h2 className="text-base font-bold text-gray-800">クイックアクセス</h2>
+                                <Sparkles className="text-emerald-600" size={18} />
+                                <h2 className="text-base font-normal text-gray-800 uppercase tracking-wide">クイックアクセス</h2>
                             </div>
                             <button className="text-gray-400 hover:text-gray-600"><MoreHorizontal size={18} /></button>
                         </div>
@@ -61,18 +61,17 @@ export default function DashboardClient({ userName, dashboardData }: { userName:
                                 { id: "companies", name: "受入企業", href: "/companies", icon: <Building2 size={22} /> },
                                 { id: "audits", name: "監査・訪問", href: "/audits", icon: <ShieldCheck size={22} /> },
                                 { id: "routing", name: "位置情報マップ", href: "/routing", icon: <Map size={22} /> },
-                                { id: "chat", name: "AIチャット", href: "/chat", icon: <Sparkles size={22} /> },
                                 { id: "settings", name: "システム設定", href: "/settings", icon: <Settings size={22} /> },
                             ].map((item) => (
                                 <Link
                                     key={item.id}
                                     href={item.href}
-                                    className="p-4 rounded-xl hover:bg-blue-50 transition-all duration-300 flex flex-col items-center text-center gap-3 group border border-transparent hover:border-blue-100 shadow-sm hover:shadow-md hover:-translate-y-1"
+                                    className="p-4 rounded-xl hover:bg-emerald-50 transition-all duration-300 flex flex-col items-center text-center gap-3 group border border-transparent hover:border-emerald-100 shadow-sm hover:shadow-md hover:-translate-y-1"
                                 >
-                                    <div className={`w-14 h-14 rounded-2xl bg-white text-blue-700 flex items-center justify-center transition-all duration-300 group-hover:scale-110 shadow-sm border border-gray-100 group-hover:border-blue-200`}>
+                                    <div className={`w-14 h-14 rounded-2xl bg-white text-emerald-600 flex items-center justify-center transition-all duration-300 group-hover:scale-110 shadow-sm border border-gray-100 group-hover:border-emerald-200`}>
                                         {item.icon}
                                     </div>
-                                    <span className="text-[12px] font-black text-gray-700 leading-tight">
+                                    <span className="text-[12px] font-normal text-gray-700 leading-tight uppercase tracking-tight">
                                         {item.name}
                                     </span>
                                 </Link>
@@ -83,22 +82,22 @@ export default function DashboardClient({ userName, dashboardData }: { userName:
                     {/* Secondary Actions Section */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="app-card p-6 space-y-4 hover:shadow-md transition-shadow group border-l-4 border-l-orange-500">
-                            <h3 className="text-base font-bold text-gray-800">今月の巡回報告</h3>
-                            <p className="text-sm text-gray-500 leading-relaxed">
-                                未提出の定期訪問報告書が <span className="text-orange-600 font-bold">4件</span> あります。
+                            <h3 className="text-base font-normal text-gray-800 uppercase tracking-tight">今月の巡回報告</h3>
+                            <p className="text-sm text-gray-500 leading-relaxed font-normal">
+                                未提出の定期訪問報告書が <span className="text-orange-600 font-normal underline">4件</span> あります。
                             </p>
-                            <Link href="/audits" className="inline-flex items-center gap-2 text-sm font-bold text-blue-600 hover:text-blue-700 pt-2">
+                            <Link href="/audits" className="inline-flex items-center gap-2 text-sm font-normal text-emerald-600 hover:text-emerald-700 pt-2">
                                 報告書を作成する
                                 <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" />
                             </Link>
                         </div>
 
-                        <div className="app-card p-6 space-y-4 hover:shadow-md transition-shadow group border-l-4 border-l-blue-600">
-                            <h3 className="text-base font-bold text-gray-800">特定技能求人</h3>
-                            <p className="text-sm text-gray-500 leading-relaxed">
+                        <div className="app-card p-6 space-y-4 hover:shadow-md transition-shadow group border-l-4 border-l-emerald-600">
+                            <h3 className="text-base font-normal text-gray-800 uppercase tracking-tight">特定技能求人</h3>
+                            <p className="text-sm text-gray-500 leading-relaxed font-normal">
                                 新しい特定技能求人依頼が届いています。内容を確認してください。
                             </p>
-                            <Link href="/operations" className="inline-flex items-center gap-2 text-sm font-bold text-blue-600 hover:text-blue-700 pt-2">
+                            <Link href="/operations" className="inline-flex items-center gap-2 text-sm font-normal text-emerald-600 hover:text-emerald-700 pt-2">
                                 詳細を確認
                                 <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" />
                             </Link>
@@ -111,23 +110,23 @@ export default function DashboardClient({ userName, dashboardData }: { userName:
                     <section className="app-card overflow-hidden">
                         <div className="px-6 py-5 border-b border-gray-100 flex items-center gap-2">
                             <Activity className="text-gray-400" size={18} />
-                            <h2 className="text-base font-bold text-gray-800">最近の活動</h2>
+                            <h2 className="text-base font-normal text-gray-800">最近の活動</h2>
                         </div>
 
                         <div className="divide-y divide-gray-50">
-                            {dashboardData.alerts.length === 0 ? (
+                            {(!dashboardData?.alerts || dashboardData.alerts.length === 0) ? (
                                 <div className="py-12 text-center text-gray-400 text-sm">新しい活動はありません。</div>
                             ) : (
                                 dashboardData.alerts.slice(0, 5).map((alert: any) => (
-                                    <div key={alert.id} className="p-4 hover:bg-gray-50 transition-colors group cursor-pointer">
+                                    <div key={alert.id} className="p-4 hover:bg-emerald-50/20 transition-colors group cursor-pointer">
                                         <div className="flex items-start gap-3">
-                                            <div className={`mt-1.5 w-2 h-2 rounded-full shrink-0 ${alert.daysLeft <= 30 ? 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]' : 'bg-blue-500'}`} />
+                                            <div className={`mt-1.5 w-2 h-2 rounded-full shrink-0 ${alert.daysLeft <= 30 ? 'bg-rose-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]' : 'bg-emerald-500'}`} />
                                             <div className="space-y-1 flex-1">
-                                                <p className="text-sm font-bold text-gray-900 group-hover:text-blue-600 transition-colors leading-snug">
+                                                <p className="text-sm font-normal text-gray-900 group-hover:text-emerald-600 transition-colors leading-snug">
                                                     {alert.type}: {alert.name}
                                                 </p>
-                                                <p className="text-[11px] text-gray-400 font-bold uppercase tracking-wider">
-                                                    {alert.company} • 期限まで {alert.daysLeft} 日
+                                                <p className="text-[11px] text-gray-400 font-normal uppercase tracking-wider">
+                                                    {alert.company || '企業不明'} • 期限まで {alert.daysLeft} 日
                                                 </p>
                                             </div>
                                         </div>
@@ -136,24 +135,24 @@ export default function DashboardClient({ userName, dashboardData }: { userName:
                             )}
                         </div>
 
-                        <Link href="/operations" className="block text-center py-4 text-xs font-bold text-gray-400 hover:text-blue-600 transition-colors border-t border-gray-50">
+                        <Link href="/operations" className="block text-center py-4 text-xs font-normal text-gray-400 hover:text-emerald-600 transition-colors border-t border-gray-50 uppercase tracking-widest">
                             すべての活動を見る
                         </Link>
                     </section>
 
                     {/* Security/Info Info Card */}
-                    <section className="app-card p-6 bg-gradient-to-br from-blue-600 to-blue-700 text-white border-0 shadow-lg shadow-blue-200/50">
+                    <section className="app-card p-6 bg-gradient-to-br from-emerald-600 to-emerald-700 text-white border-0 shadow-lg shadow-emerald-200/50">
                         <div className="space-y-4">
                             <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
                                 <ShieldCheck size={28} className="text-white" />
                             </div>
                             <div>
-                                <h3 className="text-lg font-bold mb-1">システムセキュリティ</h3>
-                                <p className="text-sm text-blue-100 leading-relaxed font-medium">
+                                <h3 className="text-lg font-normal mb-1 uppercase tracking-tight">システムセキュリティ</h3>
+                                <p className="text-sm text-emerald-50 leading-relaxed font-normal opacity-90">
                                     データの安全性を高めるため、二要素認証（2FA）の設定を推奨しています。
                                 </p>
                             </div>
-                            <Link href="/settings" className="inline-block py-2.5 px-6 bg-white text-blue-600 rounded-xl text-xs font-black shadow-sm active:scale-95 transition-all">
+                            <Link href="/settings" className="inline-block py-2.5 px-6 bg-white text-emerald-600 rounded-xl text-xs font-normal shadow-sm active:scale-95 transition-all uppercase tracking-widest">
                                 設定を開く
                             </Link>
                         </div>

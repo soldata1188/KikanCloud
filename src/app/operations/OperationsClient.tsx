@@ -41,16 +41,16 @@ export default function OperationsClient({
     const [certFilter, setCertFilter] = useState('all');
 
     // Column widths (resizable)
-    const [companyWidth, setCompanyWidth] = useState(400);
-    const [workerWidth, setWorkerWidth] = useState(400);
+    const [companyWidth, setCompanyWidth] = useState(280);
+    const [workerWidth, setWorkerWidth] = useState(420);
     const isResizing = useRef(false);
 
     const startResize = useCallback((col: 'company' | 'worker', startX: number) => {
         isResizing.current = true;
         const startWidth = col === 'company' ? companyWidth : workerWidth;
         const setter = col === 'company' ? setCompanyWidth : setWorkerWidth;
-        const min = col === 'company' ? 200 : 200;
-        const max = col === 'company' ? 500 : 500;
+        const min = col === 'company' ? 180 : 200;
+        const max = col === 'company' ? 500 : 700;
 
         const onMouseMove = (e: MouseEvent) => {
             if (!isResizing.current) return;
@@ -95,7 +95,8 @@ export default function OperationsClient({
             address: w.address || '---',
             cert_start_date: w.cert_start_date,
             cert_end_date: w.cert_end_date,
-            entryBatch: w.entry_batch || '---'
+            entryBatch: w.entry_batch || '---',
+            entryDate: w.entry_date || '0000-00-00'
         }));
     }, [workers]);
 
@@ -125,7 +126,11 @@ export default function OperationsClient({
         if (selectedCompanyId) {
             list = list.filter(w => w.companyId === selectedCompanyId);
         }
-        return list;
+        return list.sort((a, b) => {
+            const ed = (b.entryDate || '0000-00-00').localeCompare(a.entryDate || '0000-00-00');
+            if (ed !== 0) return ed;
+            return (a.name || '').localeCompare(b.name || '', 'ja');
+        });
     }, [allMappedWorkers, searchTerm, visaFilter, batchFilter, certFilter, selectedCompanyId, selectedBatch]);
 
     // Derived Batch List
@@ -162,11 +167,14 @@ export default function OperationsClient({
         return Array.from(map.entries())
             .map(([label, { count, date, minDays, maxDays }]) => ({ label, count, date, minDays, maxDays }))
             .sort((a, b) => {
+                const dateA = a.date || '0000-00-00';
+                const dateB = b.date || '0000-00-00';
+                if (dateA !== dateB) return dateB.localeCompare(dateA);
+
                 const na = parseInt(a.label.match(/(\d+)/)?.[1] ?? '0', 10);
                 const nb = parseInt(b.label.match(/(\d+)/)?.[1] ?? '0', 10);
-                if (na === 0 && nb === 0) return a.label.localeCompare(b.label, 'ja');
-                if (na === 0) return 1; if (nb === 0) return -1;
-                return nb - na;
+                if (na !== nb) return nb - na;
+                return a.label.localeCompare(b.label, 'ja');
             });
     }, [allMappedWorkers]);
 
@@ -209,7 +217,17 @@ export default function OperationsClient({
             list = list.filter(c => companyIdsInBatch.has(c.id));
         }
 
-        if (!searchTerm) return list;
+        const cleanName = (name: string) => {
+            return name.replace(/株式会社|有限会社|合同会社|（株）|\(株\)|（有）|\(有\)|（同）|\(同\)/g, '').trim();
+        };
+
+        if (!searchTerm) {
+            return list.sort((a, b) => {
+                const nameA = cleanName(a.name_jp || '');
+                const nameB = cleanName(b.name_jp || '');
+                return nameA.localeCompare(nameB, 'ja');
+            });
+        }
 
         const lowSearch = searchTerm.toLowerCase();
         const matchingWorkerCompanyIds = new Set(
@@ -218,10 +236,16 @@ export default function OperationsClient({
                 .map(w => w.companyId)
         );
 
-        return list.filter(c =>
+        const result = list.filter(c =>
             c.name_jp.toLowerCase().includes(lowSearch) ||
             matchingWorkerCompanyIds.has(c.id)
         );
+
+        return result.sort((a, b) => {
+            const nameA = cleanName(a.name_jp || '');
+            const nameB = cleanName(b.name_jp || '');
+            return nameA.localeCompare(nameB, 'ja');
+        });
     }, [companies, searchTerm, allMappedWorkers, selectedBatch]);
 
     // Filter Options for Header
@@ -462,14 +486,14 @@ export default function OperationsClient({
             <div className="hidden lg:flex flex-1 overflow-x-auto thin-scrollbar bg-white">
                 <div className="flex w-full min-w-max h-full border-t border-gray-200 overflow-hidden bg-white">
 
-                    {/* Column -1: Entry Batches (Fixed 240px) */}
-                    <div className="w-[240px] flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-200">
-                        <div className="h-[48px] px-4 border-b border-gray-200 bg-white/50 flex items-center justify-between shrink-0">
-                            <div className="flex items-center gap-2">
-                                <Calendar size={14} className="text-gray-400" />
-                                <span className="text-[11px] font-black uppercase tracking-widest text-gray-900">入國期生</span>
+                    {/* Column -1: Entry Batches (Fixed 180px) */}
+                    <div className="w-[180px] flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-300">
+                        <div className="h-[48px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
+                            <div className="flex items-center gap-2 text-slate-900">
+                                <Calendar size={14} className="text-slate-400" />
+                                <span className="text-[15px] font-normal uppercase tracking-widest text-slate-950">入国期生</span>
                             </div>
-                            <span className="text-[11px] font-bold bg-white text-gray-900 px-1.5 py-0.5 rounded-[6px] border border-gray-200 shadow-sm">{batchItems.length}</span>
+                            <span className="text-[11px] font-bold bg-white text-slate-500 px-1.5 py-0.5 rounded-[6px] border border-gray-200 shadow-sm">{batchItems.length}</span>
                         </div>
                         <div className="flex-1 overflow-hidden">
                             <EntryBatchColumn
@@ -481,13 +505,13 @@ export default function OperationsClient({
                     </div>
 
                     {/* Column 0: Companies */}
-                    <div className="flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-200" style={{ width: companyWidth }}>
-                        <div className="h-[48px] px-4 border-b border-gray-200 bg-blue-50/20 flex items-center justify-between shrink-0">
-                            <div className="flex items-center gap-2">
-                                <Building2 size={14} className="text-blue-400" />
-                                <span className="text-[11px] font-black uppercase tracking-widest text-blue-700">企業リスト</span>
+                    <div className="flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-300" style={{ width: companyWidth }}>
+                        <div className="h-[48px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
+                            <div className="flex items-center gap-2 text-slate-900">
+                                <Building2 size={14} className="text-slate-400" />
+                                <span className="text-[15px] font-normal uppercase tracking-widest text-slate-950">企業リスト</span>
                             </div>
-                            <span className="text-[11px] font-bold bg-white text-blue-700 px-1.5 py-0.5 rounded-[6px] border border-blue-200 shadow-sm">{filteredCompanies.length}</span>
+                            <span className="text-[11px] font-bold bg-white text-slate-500 px-1.5 py-0.5 rounded-[6px] border border-gray-200 shadow-sm">{filteredCompanies.length}</span>
                         </div>
                         <div className="flex-1 overflow-hidden">
                             <CompanyColumn
@@ -512,14 +536,14 @@ export default function OperationsClient({
                         </div>
                     </div>
 
-                    {/* Column 1: Workers — fixed same width as company column */}
-                    <div className="flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-200" style={{ width: companyWidth }}>
-                        <div className="h-[48px] px-4 border-b border-gray-200 bg-white/50 flex items-center justify-between shrink-0">
-                            <div className="flex items-center gap-2">
-                                <Users2 size={14} className="text-gray-400" />
-                                <span className="text-[11px] font-black uppercase tracking-widest text-gray-900">労働者リスト</span>
+                    {/* Column 1: Workers */}
+                    <div className="flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-300" style={{ width: workerWidth }}>
+                        <div className="h-[48px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
+                            <div className="flex items-center gap-2 text-slate-900">
+                                <Users2 size={14} className="text-slate-400" />
+                                <span className="text-[15px] font-normal uppercase tracking-widest text-slate-950">労働者リスト</span>
                             </div>
-                            <span className="text-[11px] font-bold bg-white text-gray-900 px-1.5 py-0.5 rounded-[6px] border border-gray-200 shadow-sm">{filteredWorkers.length}</span>
+                            <span className="text-[11px] font-bold bg-white text-slate-500 px-1.5 py-0.5 rounded-[6px] border border-gray-200 shadow-sm">{filteredWorkers.length}</span>
                         </div>
                         <div className="flex-1 overflow-hidden">
                             <WorkerColumn
@@ -545,13 +569,13 @@ export default function OperationsClient({
                     </div>
 
                     <div className="flex-1 flex flex-col overflow-hidden min-w-[400px]">
-                        <div className="h-[48px] px-4 border-b border-gray-200 bg-white/50 flex items-center justify-between shrink-0">
-                            <div className="flex items-center gap-2">
-                                <Settings2 size={14} className="text-gray-400" />
-                                <span className="text-[11px] font-black uppercase tracking-widest text-gray-900">業務オペレーション</span>
+                        <div className="h-[48px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
+                            <div className="flex items-center gap-2 text-slate-900">
+                                <Settings2 size={14} className="text-slate-400" />
+                                <span className="text-[15px] font-normal uppercase tracking-widest text-slate-950">業務オペレーション</span>
                             </div>
                             {selectedWorkers.length > 0 && (
-                                <span className="text-[11px] font-black bg-blue-50 text-blue-700 px-2.5 py-1 rounded-[6px] border border-blue-200 shadow-sm">{selectedWorkers.length}名選択</span>
+                                <span className="text-[11px] font-bold bg-slate-900 text-white px-2.5 py-1 rounded-[6px] shadow-sm">{selectedWorkers.length}名選択</span>
                             )}
                         </div>
                         <div className="flex-1 overflow-hidden">

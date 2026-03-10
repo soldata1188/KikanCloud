@@ -94,10 +94,10 @@ export default function AuditTimelineBoard({ allCompletedAudits, companies, filt
                     <div className="flex items-center gap-3">
                         <div className="flex items-center gap-2 px-2 py-0.5 bg-slate-50 border border-slate-100 rounded-[4px]">
                             <ClipboardList size={14} className="text-blue-700" />
-                            <h2 className="text-[14px] font-black text-gray-900 tracking-tight">監査・訪問スケジュールボード</h2>
+                            <h2 className="text-[14px] font-normal text-gray-900 tracking-tight">監査・訪問スケジュールボード</h2>
                         </div>
                         <div className="h-4 border-l border-gray-300" />
-                        <p className="text-[11px] font-black text-gray-900 uppercase tracking-[.2em]">6ヶ月モニタリング概要</p>
+                        <p className="text-[11px] font-normal text-gray-900 uppercase tracking-widest">6ヶ月モニタリング概要</p>
                     </div>
                 </div>
             </div>
@@ -119,9 +119,9 @@ export default function AuditTimelineBoard({ allCompletedAudits, companies, filt
                                     }`}>
                                     <div className="flex items-center gap-2">
                                         <Calendar size={14} className={isCurrent ? 'text-blue-100' : 'text-blue-700'} />
-                                        <span className="text-[16px] font-black tabular-nums">{displayMonth}</span>
+                                        <span className="text-[16px] font-normal tabular-nums">{displayMonth}</span>
                                     </div>
-                                    <div className={`px-2 py-0.5 rounded-full text-[11px] font-black ${isCurrent ? 'bg-white/20 text-white' : 'bg-white border border-slate-300 text-gray-900'
+                                    <div className={`px-2 py-0.5 rounded-full text-[11px] font-normal ${isCurrent ? 'bg-white/20 text-white' : 'bg-white border border-slate-300 text-gray-900'
                                         }`}>
                                         {audits.length}
                                     </div>
@@ -146,24 +146,24 @@ export default function AuditTimelineBoard({ allCompletedAudits, companies, filt
                                                     className="w-full text-left bg-white px-3 py-1.5 hover:bg-blue-50/40 transition-all group relative active:bg-blue-100/30 flex flex-col gap-0.5"
                                                 >
                                                     <div className="flex items-center justify-between gap-1.5">
-                                                        <h4 className="text-[12px] font-black text-gray-900 truncate flex-1 group-hover:text-blue-800">
+                                                        <h4 className="text-[12px] font-normal text-gray-900 truncate flex-1 group-hover:text-blue-800">
                                                             {compName}
                                                         </h4>
-                                                        <span className="text-[11px] font-black text-gray-900 tabular-nums shrink-0">
+                                                        <span className="text-[11px] font-normal text-gray-900 tabular-nums shrink-0">
                                                             {day}
                                                         </span>
                                                     </div>
 
                                                     <div className="flex items-center justify-between gap-2">
                                                         <div className="flex items-center gap-1.5 min-w-0">
-                                                            <span className={`shrink-0 px-1 py-0 rounded-[2px] text-[8px] font-black uppercase tracking-tighter border ${cfg.bg} ${cfg.color} border-current/10`}>
+                                                            <span className={`shrink-0 px-1 py-0 rounded-[2px] text-[8px] font-normal uppercase tracking-tighter border ${cfg.bg} ${cfg.color} border-current/10`}>
                                                                 {cfg.label}
                                                             </span>
-                                                            <span className="text-[11px] font-black text-gray-900 truncate">{a.pic_name || '—'}</span>
+                                                            <span className="text-[11px] font-normal text-gray-900 truncate">{a.pic_name || '—'}</span>
                                                         </div>
                                                         <div className="flex items-center gap-0.5 text-emerald-500 shrink-0">
                                                             <CheckCircle2 size={9} />
-                                                            <span className="text-[8px] font-black uppercase tracking-tighter">完了</span>
+                                                            <span className="text-[8px] font-normal uppercase tracking-tighter">完了</span>
                                                         </div>
                                                     </div>
                                                 </button>
@@ -172,7 +172,7 @@ export default function AuditTimelineBoard({ allCompletedAudits, companies, filt
                                     ) : (
                                         <div className="flex-1 flex flex-col items-center justify-center py-12 text-center opacity-20 grayscale">
                                             <Calendar size={32} className="mb-2" />
-                                            <p className="text-[10px] font-black uppercase tracking-widest leading-loose">
+                                            <p className="text-[10px] font-normal uppercase tracking-widest leading-loose">
                                                 監査記録なし
                                             </p>
                                         </div>
@@ -193,8 +193,8 @@ export default function AuditTimelineBoard({ allCompletedAudits, companies, filt
                                     <ClipboardList size={18} />
                                 </div>
                                 <div>
-                                    <h3 className="text-[14px] font-black text-gray-900 tracking-tight">スケジュールの編集</h3>
-                                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{companyMap[editingAudit.company_id]}</p>
+                                    <h3 className="text-[14px] font-normal text-gray-900 tracking-tight">スケジュールの編集</h3>
+                                    <p className="text-[10px] font-normal text-gray-400 uppercase tracking-widest">{companyMap[editingAudit.company_id]}</p>
                                 </div>
                             </div>
                             <button onClick={() => setEditingAudit(null)} className="p-2 hover:bg-gray-200 rounded-[6px] text-gray-400 transition-colors"><X size={20} /></button>
@@ -203,8 +203,8 @@ export default function AuditTimelineBoard({ allCompletedAudits, companies, filt
                         <form onSubmit={handleQuickSave} className="p-6 space-y-5">
                             <div className="space-y-4">
                                 <div>
-                                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2 pl-1">種別</label>
-                                    <select name="audit_type" required defaultValue={editingAudit.audit_type} className="w-full bg-gray-50 border border-gray-200 rounded-[6px] px-4 py-2.5 outline-none text-[13px] font-bold focus:border-blue-600 appearance-none">
+                                    <label className="text-[10px] font-normal text-gray-400 uppercase tracking-widest block mb-2 pl-1">種別</label>
+                                    <select name="audit_type" required defaultValue={editingAudit.audit_type} className="w-full bg-gray-50 border border-gray-200 rounded-[6px] px-4 py-2.5 outline-none text-[13px] font-normal focus:border-blue-600 appearance-none">
                                         {Object.entries(TYPE_CONFIG).map(([key, cfg]) => (
                                             <option key={key} value={key}>{cfg.label}</option>
                                         ))}
@@ -212,22 +212,22 @@ export default function AuditTimelineBoard({ allCompletedAudits, companies, filt
                                 </div>
 
                                 <div>
-                                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2 pl-1">担当者</label>
-                                    <select name="pic_name" defaultValue={editingAudit.pic_name} className="w-full bg-gray-50 border border-gray-200 rounded-[6px] px-4 py-2.5 outline-none text-[13px] font-bold focus:border-blue-600 appearance-none">
+                                    <label className="text-[10px] font-normal text-gray-400 uppercase tracking-widest block mb-2 pl-1">担当者</label>
+                                    <select name="pic_name" defaultValue={editingAudit.pic_name} className="w-full bg-gray-50 border border-gray-200 rounded-[6px] px-4 py-2.5 outline-none text-[13px] font-normal focus:border-blue-600 appearance-none">
                                         <option value="">— 担当を選択 —</option>
                                         {staffList.map((s: any) => <option key={s.id} value={s.name}>{s.name}</option>)}
                                     </select>
                                 </div>
 
                                 <div>
-                                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2 pl-1">実施日</label>
-                                    <input name="scheduled_date" type="date" required defaultValue={editingAudit.actual_date || editingAudit.scheduled_date} className="w-full bg-gray-50 border border-gray-200 rounded-[6px] px-4 py-2.5 outline-none text-[13px] font-bold focus:border-blue-600" />
+                                    <label className="text-[10px] font-normal text-gray-400 uppercase tracking-widest block mb-2 pl-1">実施日</label>
+                                    <input name="scheduled_date" type="date" required defaultValue={editingAudit.actual_date || editingAudit.scheduled_date} className="w-full bg-gray-50 border border-gray-200 rounded-[6px] px-4 py-2.5 outline-none text-[13px] font-normal focus:border-blue-600" />
                                 </div>
                             </div>
 
                             <div className="pt-4 flex gap-3">
-                                <button type="button" onClick={() => setEditingAudit(null)} className="flex-1 py-3 text-[13px] font-bold text-gray-500 hover:bg-gray-50 rounded-[6px] transition-colors">キャンセル</button>
-                                <button type="submit" disabled={isSaving} className="flex-[2] py-3 bg-blue-600 text-white rounded-[6px] text-[13px] font-black flex items-center justify-center gap-2 active:scale-95 disabled:opacity-40 uppercase tracking-widest">
+                                <button type="button" onClick={() => setEditingAudit(null)} className="flex-1 py-3 text-[13px] font-normal text-gray-500 hover:bg-gray-50 rounded-[6px] transition-colors">キャンセル</button>
+                                <button type="submit" disabled={isSaving} className="flex-[2] py-3 bg-blue-600 text-white rounded-[6px] text-[13px] font-normal flex items-center justify-center gap-2 active:scale-95 disabled:opacity-40 uppercase tracking-widest">
                                     {isSaving ? <Clock size={16} className="animate-spin" /> : <Save size={16} />}
                                     {isSaving ? '保存中...' : '変更を保存'}
                                 </button>

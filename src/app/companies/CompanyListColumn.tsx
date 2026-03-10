@@ -23,9 +23,9 @@ export default function CompanyListColumn({ companies, selectedIds, onSelect }: 
     if (!companies.length) {
         return (
             <div className="flex flex-col items-center justify-center p-8 bg-white h-full">
-                <Building2 size={36} className="text-gray-200 mb-3" />
-                <p className="text-[12px] font-bold text-gray-400">該当する企業がありません</p>
-                <p className="text-[10px] text-gray-300 mt-1">条件を変更してください</p>
+                <Building2 size={28} className="text-gray-200 mb-2" />
+                <p className="text-[11px] font-normal text-gray-300">該当する企業がありません</p>
+                <p className="text-[10px] text-gray-200 mt-1 uppercase tracking-widest">条件を変更してください</p>
             </div>
         );
     }
@@ -39,25 +39,22 @@ export default function CompanyListColumn({ companies, selectedIds, onSelect }: 
                         <div
                             key={company.id}
                             onClick={(e) => onSelect(company.id, e)}
-                            className={`group relative h-[52px] flex items-center gap-3 px-3 border-b border-gray-100 cursor-pointer transition-all hover:bg-blue-50/30
-                                ${isSelected ? 'bg-blue-50/50' : 'bg-white'}`}
+                            className={`group relative text-left px-3 py-2.5 border-b border-gray-100 cursor-pointer transition-colors duration-150 flex items-center gap-2.5
+                                ${isSelected ? 'bg-emerald-50 border-l-[3px] border-emerald-500' : 'bg-white hover:bg-emerald-50/40 border-l-[3px] border-transparent'}`}
                         >
-                            {/* Selection style edge line */}
-                            {isSelected && (
-                                <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-blue-500" />
-                            )}
 
 
 
-                            <div className="flex-1 min-w-0 flex flex-col justify-center h-full">
+
+                            <div className="flex-1 min-w-0 flex flex-col justify-center">
                                 <div className="flex items-center justify-between gap-2 w-full">
-                                    <p className={`text-[13px] leading-tight truncate
-                                        ${isSelected ? 'text-blue-900 font-black' : 'text-gray-800 font-bold'}`}>
+                                    <p className={`text-[13px] font-normal truncate uppercase tracking-wide leading-none
+                                        ${isSelected ? 'text-emerald-900' : 'text-slate-900'}`}>
                                         {company.name_jp}
                                     </p>
-                                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded flex-shrink-0 whitespace-nowrap
-                                        ${company.active_worker_count! > 0 ? 'bg-blue-50 text-blue-600 border border-blue-100' : 'bg-gray-50 text-gray-400 border border-gray-200'}`}>
-                                        在籍: {company.active_worker_count || 0}
+                                    <span className={`text-[9px] font-normal font-mono px-1 py-0.5 rounded flex-shrink-0 whitespace-nowrap
+                                        ${isSelected ? 'bg-emerald-500 text-white' : (company.active_worker_count! > 0 ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 text-slate-400')}`}>
+                                        {company.active_worker_count || 0}
                                     </span>
                                 </div>
 

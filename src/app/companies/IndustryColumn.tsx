@@ -23,22 +23,19 @@ export default function IndustryColumn({ industries, selectedIndustry, onSelect 
                 {/* ALL button */}
                 <button
                     onClick={() => onSelect(null)}
-                    className={`w-full h-[52px] flex items-center justify-between px-4 border-b border-gray-100 transition-all group
+                    className={`w-full text-left px-3 py-2.5 border-b border-gray-100 transition-colors duration-150 flex items-center justify-between group
                         ${selectedIndustry === null
-                            ? 'bg-blue-50 text-blue-900 border-l-[3px] border-blue-500'
-                            : 'hover:bg-blue-50/40 text-slate-600 border-l-[3px] border-transparent'}`}
+                            ? 'bg-emerald-50 border-l-[3px] border-emerald-500'
+                            : 'hover:bg-emerald-50/40 border-l-[3px] border-transparent'}`}
                 >
-                    <div className="flex items-center gap-3">
-                        <div className={`w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-transform group-hover:scale-105
-                            ${selectedIndustry === null ? 'bg-blue-500 text-white' : 'bg-slate-100 text-slate-400'}`}>
-                            <Briefcase size={15} />
+                    <div className="flex items-center gap-2.5">
+                        <div className={`w-7 h-7 rounded-md flex items-center justify-center shrink-0
+                            ${selectedIndustry === null ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-400'}`}>
+                            <Briefcase size={14} />
                         </div>
-                        <span className="text-[12px] font-black uppercase tracking-tight">すべて (ALL)</span>
+                        <span className={`text-[13px] font-normal uppercase tracking-wide
+                            ${selectedIndustry === null ? 'text-emerald-900' : 'text-slate-900'}`}>すべて</span>
                     </div>
-                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded
-                        ${selectedIndustry === null ? 'bg-blue-500 text-white' : 'bg-slate-100 text-slate-500'}`}>
-                        {total}
-                    </span>
                 </button>
 
                 {/* Industry items */}
@@ -49,30 +46,20 @@ export default function IndustryColumn({ industries, selectedIndustry, onSelect 
                             <button
                                 key={item.label}
                                 onClick={() => onSelect(item.label)}
-                                className={`w-full h-[52px] flex items-center justify-between px-4 border-b border-gray-100 transition-all group
+                                className={`w-full text-left px-3 py-2.5 border-b border-gray-100 transition-colors duration-150 flex items-center justify-between group
                                     ${isSelected
-                                        ? 'bg-blue-50 text-blue-900 border-l-[3px] border-blue-500'
-                                        : 'hover:bg-blue-50/40 text-slate-600 border-l-[3px] border-transparent'}`}
+                                        ? 'bg-emerald-50 border-l-[3px] border-emerald-500'
+                                        : 'hover:bg-emerald-50/40 border-l-[3px] border-transparent'}`}
                             >
-                                <div className="flex items-center gap-3 min-w-0">
-                                    <div className={`w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-transform group-hover:scale-105
-                                        ${isSelected ? 'bg-blue-500 text-white' : 'bg-blue-50 text-blue-400'}`}>
-                                        <Briefcase size={15} />
-                                    </div>
-                                    <div className="flex flex-col items-start min-w-0">
-                                        <span className={`text-[12px] font-bold truncate text-left
-                                            ${isSelected ? 'text-blue-900 font-black' : 'text-slate-700'}`}>
-                                            {item.label}
-                                        </span>
-                                    </div>
+                                <div className="flex items-center min-w-0 flex-1">
+                                    <span className={`text-[13px] font-normal truncate uppercase text-left tracking-wide
+                                        ${isSelected ? 'text-emerald-900' : 'text-slate-900'}`}>
+                                        {item.label}
+                                    </span>
                                 </div>
                                 <div className="flex items-center gap-1.5 shrink-0">
-                                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded
-                                        ${isSelected ? 'bg-blue-500 text-white' : 'bg-slate-100 text-slate-500'}`}>
-                                        {item.count}
-                                    </span>
                                     <ChevronRight size={13} className={`transition-transform group-hover:translate-x-0.5
-                                        ${isSelected ? 'text-blue-500' : 'text-slate-300'}`} />
+                                        ${isSelected ? 'text-emerald-500' : 'text-slate-300'}`} />
                                 </div>
                             </button>
                         );
@@ -80,9 +67,9 @@ export default function IndustryColumn({ industries, selectedIndustry, onSelect 
                 </div>
 
                 {industries.length === 0 && (
-                    <div className="py-12 text-center">
-                        <Briefcase size={32} className="mx-auto text-gray-100 mb-3" />
-                        <p className="text-[11px] font-bold text-gray-300">データがありません</p>
+                    <div className="py-16 text-center">
+                        <Briefcase size={28} className="mx-auto text-gray-200 mb-2" />
+                        <p className="text-[11px] font-normal text-gray-300">データがありません</p>
                     </div>
                 )}
             </div>

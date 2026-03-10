@@ -30,28 +30,24 @@ export default function AuditStatusColumn({ counts, activeTab, onSelect }: Audit
                         <button
                             key={tab.key}
                             onClick={() => onSelect(tab.key)}
-                            className={`w-full flex items-center justify-between px-4 py-3 transition-all duration-150 relative group ${isActive ? 'bg-blue-50/60' : 'hover:bg-gray-50'
+                            className={`w-full flex items-center justify-between px-3 py-2.5 transition-colors duration-150 relative group ${isActive ? 'bg-emerald-50 border-l-[3px] border-emerald-500' : 'hover:bg-emerald-50/40 border-l-[3px] border-transparent'
                                 }`}
                         >
-                            <div className="flex items-center gap-3 overflow-hidden">
-                                <div className={`w-8 h-8 rounded-[6px] flex items-center justify-center shrink-0 border transition-all ${isActive ? 'bg-white border-blue-200' : `${tab.bg} ${tab.border} border-transparent group-hover:border-gray-300`
+                            <div className="flex items-center gap-2.5 overflow-hidden">
+                                <div className={`w-7 h-7 rounded-[6px] flex items-center justify-center shrink-0 border transition-all ${isActive ? 'bg-white border-emerald-200' : `${tab.bg} ${tab.border} border-transparent group-hover:border-gray-300`
                                     }`}>
-                                    <Icon size={15} className={isActive ? 'text-blue-600' : tab.color} />
+                                    <Icon size={14} className={isActive ? 'text-emerald-600' : tab.color} />
                                 </div>
-                                <span className={`text-[13px] truncate font-bold ${isActive ? 'text-blue-700' : 'text-gray-900'
+                                <span className={`text-[13px] truncate font-normal tracking-wide uppercase ${isActive ? 'text-emerald-900' : 'text-slate-900'
                                     }`}>
                                     {tab.label}
                                 </span>
                             </div>
 
-                            <div className={`px-2 py-0.5 rounded-full text-[11px] font-black transition-all ${isActive ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-900 group-hover:bg-gray-300'
+                            <div className={`px-1 py-0.5 rounded text-[9px] font-mono font-normal transition-all ${isActive ? 'bg-emerald-500 text-white' : 'bg-gray-200 text-gray-500 group-hover:bg-gray-300'
                                 }`}>
                                 {count}
                             </div>
-
-                            {isActive && (
-                                <div className="absolute right-0 top-1.5 bottom-1.5 w-[3px] bg-blue-600 rounded-l-full" />
-                            )}
                         </button>
                     );
                 })}

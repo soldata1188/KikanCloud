@@ -22,13 +22,18 @@ export default function CompanyColumn({ companies, selectedId, onSelect }: Compa
             <div className="flex-1 overflow-y-auto thin-scrollbar">
                 <button
                     onClick={() => onSelect(null)}
-                    className={`w-full h-[52px] flex items-center justify-between px-4 transition-all group ${selectedId === null ? 'bg-blue-50 text-blue-900 border-l-[3px] border-l-blue-500' : 'hover:bg-slate-50 text-slate-600 border-l-[3px] border-l-transparent'}`}
+                    className={`w-full text-left px-3 py-2.5 border-b border-gray-100 transition-colors duration-150 flex items-center justify-between group
+                        ${selectedId === null
+                            ? 'bg-emerald-50 border-l-[3px] border-emerald-500'
+                            : 'hover:bg-emerald-50/40 border-l-[3px] border-transparent'}`}
                 >
-                    <div className="flex items-center gap-3">
-                        <div className={`w-8 h-8 rounded-md flex items-center justify-center ${selectedId === null ? 'bg-blue-500 text-white' : 'bg-slate-100 text-slate-400'}`}>
-                            <Building2 size={16} />
+                    <div className="flex items-center gap-2.5">
+                        <div className={`w-7 h-7 rounded-md flex items-center justify-center shrink-0
+                            ${selectedId === null ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-400'}`}>
+                            <Building2 size={14} />
                         </div>
-                        <span className="text-[13px] font-black uppercase tracking-tight">すべて表示 (All)</span>
+                        <span className={`text-[13px] font-normal uppercase tracking-wide
+                            ${selectedId === null ? 'text-emerald-900' : 'text-slate-900'}`}>すべて表示</span>
                     </div>
                 </button>
 
@@ -37,23 +42,26 @@ export default function CompanyColumn({ companies, selectedId, onSelect }: Compa
                         <button
                             key={company.id}
                             onClick={() => onSelect(company.id)}
-                            className={`w-full h-[52px] flex items-center justify-between px-4 transition-all group ${selectedId === company.id ? 'bg-blue-50 text-blue-900 border-l-[3px] border-blue-500' : 'hover:bg-slate-50 text-slate-600 border-l-[3px] border-l-transparent'}`}
+                            className={`w-full text-left px-3 py-2.5 border-b border-gray-100 transition-colors duration-150 flex items-center justify-between group
+                                ${selectedId === company.id
+                                    ? 'bg-emerald-50 border-l-[3px] border-emerald-500'
+                                    : 'hover:bg-emerald-50/40 border-l-[3px] border-transparent'}`}
                         >
-                            <div className="flex items-center gap-3 min-w-0">
-                                <div className={`w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-transform group-hover:scale-105 ${selectedId === company.id ? 'bg-blue-500 text-white' : 'bg-blue-50 text-blue-400'}`}>
-                                    <Building2 size={16} />
-                                </div>
-                                <span className={`text-[13px] font-bold truncate text-left ${selectedId === company.id ? 'text-blue-900 font-black' : 'text-slate-700'}`}>{company.name_jp}</span>
+                            <div className="flex items-center min-w-0 flex-1">
+                                <span className={`text-[13px] font-normal truncate uppercase text-left tracking-wide
+                                    ${selectedId === company.id ? 'text-emerald-900' : 'text-slate-900'}`}>
+                                    {company.name_jp}
+                                </span>
                             </div>
-                            <ChevronRight size={14} className={`shrink-0 transition-transform group-hover:translate-x-0.5 ${selectedId === company.id ? 'text-blue-500' : 'text-slate-300'}`} />
+                            <ChevronRight size={13} className={`shrink-0 transition-transform group-hover:translate-x-0.5 ${selectedId === company.id ? 'text-emerald-500' : 'text-slate-300'}`} />
                         </button>
                     ))}
                 </div>
 
                 {companies.length === 0 && (
-                    <div className="py-12 text-center">
-                        <Building2 size={32} className="mx-auto text-gray-100 mb-3" />
-                        <p className="text-[12px] font-bold text-gray-300 px-4">該当する企業はありません</p>
+                    <div className="py-16 text-center">
+                        <Building2 size={28} className="mx-auto text-gray-200 mb-2" />
+                        <p className="text-[11px] font-normal text-gray-300">該当する企業はありません</p>
                     </div>
                 )}
             </div>

@@ -15,9 +15,9 @@ interface Worker {
     systemType?: string;
     entryBatch?: string;
     cert_end_date?: string;
-    nyukanStatus?: { progress: string };
-    kikouStatus?: { progress: string };
-    kenteiStatus?: { progress: string };
+    nyukan_status?: { progress: string };
+    kikou_status?: { progress: string };
+    kentei_status?: { progress: string };
 }
 
 interface WorkerColumnProps {
@@ -32,28 +32,7 @@ const SYSTEM_LABEL: Record<string, string> = {
     tokuteigino: '特定技能',
 };
 
-// Progress: count workers where at least 2 of 3 procedures = 完了
-function calcProgress(workers: Worker[]) {
-    const done = workers.filter(w => {
-        const count = [w.kikouStatus?.progress, w.nyukanStatus?.progress, w.kenteiStatus?.progress]
-            .filter(p => p === '完了').length;
-        return count >= 2;
-    }).length;
-    return workers.length > 0 ? Math.round((done / workers.length) * 100) : 0;
-}
 
-const StatusTag = ({ label, status, isSelected }: { label: string; status?: string; isSelected: boolean }) => {
-    const cls = status === '完了'
-        ? (isSelected ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : 'bg-emerald-50 text-emerald-600 border-emerald-100')
-        : status === '進行中'
-            ? (isSelected ? 'bg-blue-100 text-blue-700 border-blue-200' : 'bg-blue-50 text-blue-600 border-blue-100')
-            : (isSelected ? 'bg-gray-100 text-gray-400 border-gray-200' : 'bg-gray-100 text-gray-400 border-gray-200');
-    return (
-        <span className={`text-[9px] font-black px-1.5 py-0.5 rounded border tracking-tighter ${cls}`}>
-            {label}
-        </span>
-    );
-};
 
 export default function WorkerColumn({ workers, selectedIds, onSelect }: WorkerColumnProps) {
     const getDaysLeft = (dateStr: string) => {
@@ -75,66 +54,81 @@ export default function WorkerColumn({ workers, selectedIds, onSelect }: WorkerC
                 {sortedWorkers.map(worker => {
                     const daysLeft = getDaysLeft(worker.visaExpiry);
                     const isSelected = selectedIds.includes(worker.id);
+                    const status = worker.nyukan_status?.progress;
+
+                    let bgCls = 'bg-white hover:bg-emerald-50/40';
+                    let borderCls = 'border-transparent';
+
+                    if (status === '完了') {
+                        bgCls = isSelected ? 'bg-emerald-100' : 'bg-emerald-50/50 hover:bg-emerald-100/50';
+                        borderCls = isSelected ? 'border-emerald-500' : 'border-emerald-200';
+                    } else if (status === '進行中') {
+                        bgCls = isSelected ? 'bg-blue-100' : 'bg-blue-50/50 hover:bg-blue-100/50';
+                        borderCls = isSelected ? 'border-blue-500' : 'border-blue-200';
+                    } else if (isSelected) {
+                        bgCls = 'bg-emerald-50';
+                        borderCls = 'border-emerald-500';
+                    }
 
                     return (
                         <button
                             key={worker.id}
                             onClick={(e) => onSelect(worker.id, e)}
-                            className={`w-full h-[52px] text-left px-4 border-b border-gray-100 transition-all duration-150 group flex items-center gap-3
-                                ${isSelected
-                                    ? 'bg-blue-50 text-blue-900 border-l-[3px] border-blue-500'
-                                    : 'bg-white hover:bg-gray-50 border-l-[3px] border-l-transparent'}`}
+                            className={`w-full text-left px-3 py-2.5 border-b border-gray-100 transition-all duration-200 group flex items-center gap-2.5 border-l-[3px]
+                                ${bgCls} ${borderCls}`}
                         >
                             {/* Avatar */}
-                            <div className={`w-8 h-8 rounded-xl overflow-hidden flex items-center justify-center shrink-0 text-[12px] font-black
-                                ${isSelected ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-500'}`}>
+                            <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-[10px] font-normal
+                                ${isSelected ? 'bg-emerald-200/50 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>
                                 {worker.photoUrl
-                                    ? <img src={worker.photoUrl} alt="" className="w-full h-full object-cover" />
+                                    ? <img src={worker.photoUrl} alt="" className="w-full h-full object-cover rounded-full" />
                                     : worker.avatar}
                             </div>
 
                             {/* Info block */}
-                            <div className="flex-1 min-w-0 flex flex-col justify-center gap-[2px]">
-                                {/* Row 1: Name + Expiry */}
-                                <div className="flex items-center justify-between gap-2">
-                                    <span className="text-[12px] font-black truncate uppercase tracking-tight leading-none">
-                                        {worker.name}
-                                    </span>
-                                    {daysLeft !== null && (
-                                        <span className={`text-[10px] font-mono font-black shrink-0 leading-none
-                                            ${isSelected
-                                                ? 'text-blue-600'
-                                                : daysLeft <= 30
-                                                    ? 'text-red-500'
-                                                    : daysLeft <= 90
-                                                        ? 'text-amber-600'
-                                                        : 'text-gray-400'}`}>
-                                            {daysLeft <= 0 ? '期限切れ' : `あと${daysLeft}日`}
+                            <div className="flex-1 min-w-0 flex flex-col justify-center">
+                                {/* Row 1: Name (Furigana) & Expiry Info */}
+                                <div className="flex items-center justify-between gap-3">
+                                    <div className="flex items-baseline gap-1.5 min-w-0">
+                                        <span className={`text-[13px] font-normal truncate uppercase tracking-tight leading-none
+                                            ${isSelected ? 'text-emerald-900' : 'text-slate-900'}`}>
+                                            {worker.name}
                                         </span>
-                                    )}
-                                </div>
-
-                                {/* Row 2: Company + Status Tags + Visa Badge */}
-                                <div className="flex items-center justify-between gap-2">
-                                    <span className={`text-[10px] font-semibold truncate leading-none
-                                        ${isSelected ? 'text-blue-400' : 'text-gray-400'}`}>
-                                        {worker.company}
-                                    </span>
-                                    <div className="flex items-center gap-1 shrink-0">
-                                        <StatusTag label="機構" status={worker.kikouStatus?.progress} isSelected={isSelected} />
-                                        <StatusTag label="入管" status={worker.nyukanStatus?.progress} isSelected={isSelected} />
-                                        <StatusTag label="検定" status={worker.kenteiStatus?.progress} isSelected={isSelected} />
-                                        <span className={`text-[8px] font-black px-1.5 py-[2px] rounded border ml-1
-                                            ${isSelected
-                                                ? 'text-blue-600 bg-blue-100 border-blue-200'
-                                                : worker.systemType === 'ikusei_shuro'
-                                                    ? 'text-emerald-600 bg-emerald-50 border-emerald-100'
-                                                    : worker.systemType === 'tokuteigino'
-                                                        ? 'text-blue-600 bg-blue-50 border-blue-100'
-                                                        : 'text-gray-400 bg-gray-50 border-gray-100'}`}>
-                                            {SYSTEM_LABEL[worker.systemType || '']?.charAt(0) || '---'}
+                                        <span className={`text-[9px] truncate tracking-tight shrink-0
+                                            ${isSelected ? 'text-emerald-600/60' : 'text-slate-400'}`}>
+                                            {worker.furigana}
                                         </span>
                                     </div>
+                                    <div className="flex items-center gap-1.5 shrink-0">
+                                        <span className={`text-[9px] font-mono tracking-tighter opacity-70
+                                            ${isSelected ? 'text-emerald-700' : 'text-slate-400'}`}>
+                                            {worker.visaExpiry}
+                                        </span>
+                                        {daysLeft !== null && (
+                                            <span className={`text-[9px] font-mono font-normal shrink-0 leading-none px-1 py-0.5 rounded
+                                                ${isSelected
+                                                    ? 'bg-emerald-500 text-white shadow-sm'
+                                                    : daysLeft <= 30
+                                                        ? 'bg-red-500 text-white animate-pulse'
+                                                        : daysLeft <= 90
+                                                            ? 'bg-amber-100 text-amber-700'
+                                                            : 'bg-slate-100 text-slate-500'}`}>
+                                                {daysLeft <= 0 ? 'Exp' : `${daysLeft}d`}
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Row 2: Company & Full Visa Name */}
+                                <div className="flex items-center justify-between gap-2 mt-1.5">
+                                    <span className={`text-[10px] font-normal truncate leading-none
+                                        ${isSelected ? 'text-emerald-700' : 'text-slate-500'}`}>
+                                        {worker.company}
+                                    </span>
+                                    <span className={`text-[10px] font-normal shrink-0 tracking-tight leading-none
+                                        ${isSelected ? 'text-emerald-600' : 'text-emerald-600 opacity-90'}`}>
+                                        {SYSTEM_LABEL[worker.systemType || ''] || '---'}
+                                    </span>
                                 </div>
                             </div>
                         </button>
@@ -144,7 +138,7 @@ export default function WorkerColumn({ workers, selectedIds, onSelect }: WorkerC
                 {(workers?.length === 0) && (
                     <div className="py-16 text-center">
                         <User size={32} className="mx-auto text-gray-200 mb-3" />
-                        <p className="text-[12px] font-bold text-gray-300">該当する労働者はいません</p>
+                        <p className="text-[12px] font-normal text-gray-300">該当する労働者はいません</p>
                     </div>
                 )}
             </div>

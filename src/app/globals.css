@@ -56,6 +56,10 @@ body {
   background-size: var(--app-bg-dot-size) var(--app-bg-dot-size);
   color: var(--foreground);
   font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  letter-spacing: -0.0125em;
 }
 
 /* Dot grid opacity wrapper — applied via pseudo-element trick on body */
@@ -129,7 +133,8 @@ body {
 
   /* Custom thin scrollbar */
   .custom-scrollbar::-webkit-scrollbar {
-    width: 6px;
+    width: 2px;
+    height: 2px;
   }
 
   .custom-scrollbar::-webkit-scrollbar-track {
@@ -137,17 +142,20 @@ body {
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: #e2e8f0;
-    border-radius: 3px;
+    background: #9ca3af;
+    /* gray-400 */
+    border-radius: 99px;
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: #cbd5e1;
+    background: #6b7280;
+    /* gray-500 */
   }
 
   /* Thin subtle scrollbar — for detail panels */
   .thin-scrollbar::-webkit-scrollbar {
-    width: 3px;
+    width: 2px;
+    height: 2px;
   }
 
   .thin-scrollbar::-webkit-scrollbar-track {
@@ -155,18 +163,20 @@ body {
   }
 
   .thin-scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(203, 213, 225, 0.45);
+    background: #9ca3af;
+    /* gray-400 */
     border-radius: 99px;
     transition: background 0.2s ease;
   }
 
   .thin-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: rgba(148, 163, 184, 0.7);
+    background: #6b7280;
+    /* gray-500 */
   }
 
   .thin-scrollbar {
     scrollbar-width: thin;
-    scrollbar-color: rgba(203, 213, 225, 0.4) transparent;
+    scrollbar-color: #9ca3af transparent;
   }
 
   /* ── Seamless Block Design System ── */

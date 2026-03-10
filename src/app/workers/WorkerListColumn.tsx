@@ -75,7 +75,7 @@ export default function WorkerListColumn({ workers, selectedIds, onSelect }: Wor
                                     ? 'bg-emerald-50/60 border-l-[4px] border-emerald-500 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]'
                                     : 'hover:bg-slate-50 border-l-[4px] border-transparent'}`}
                         >
-                            {/* Khu 1: Mini avatar & Name (180px) */}
+                            {/* Khu 1: Avatar & Names (180px) */}
                             <div className="w-[180px] shrink-0 flex items-center gap-3 overflow-hidden">
                                 <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-[11px] font-medium shadow-sm
                                     ${isSelected ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-500 border border-slate-200'}`}>
@@ -83,36 +83,43 @@ export default function WorkerListColumn({ workers, selectedIds, onSelect }: Wor
                                         ? <img src={worker.avatar_url} alt="" className="w-full h-full object-cover rounded-full" />
                                         : (worker.full_name_romaji || 'U').charAt(0).toUpperCase()}
                                 </div>
-                                <div className="flex flex-col min-w-0">
-                                    <span className={`text-[13px] font-bold truncate uppercase tracking-tight leading-tight
-                                        ${isSelected ? 'text-emerald-900' : 'text-slate-900'}`}>
-                                        {worker.full_name_romaji || '---'}
-                                    </span>
-                                    <span className={`text-[9px] font-normal truncate tracking-tight
-                                        ${isSelected ? 'text-emerald-600/70' : 'text-slate-400'}`}>
-                                        {worker.full_name_kana || '---'}
-                                    </span>
+                                <div className="flex flex-col min-w-0 justify-center">
+                                    <div className="h-5 flex items-center">
+                                        <span className={`text-[13px] font-bold truncate uppercase tracking-tight leading-none
+                                            ${isSelected ? 'text-emerald-900' : 'text-slate-900'}`}>
+                                            {worker.full_name_romaji || '---'}
+                                        </span>
+                                    </div>
+                                    <div className="h-4 flex items-center">
+                                        <span className={`text-[9px] font-normal truncate tracking-tight leading-none
+                                            ${isSelected ? 'text-emerald-600/70' : 'text-slate-400'}`}>
+                                            {worker.full_name_kana || '---'}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
 
                             {/* Khu 2: Company (140px) */}
-                            <div className="w-[140px] shrink-0 overflow-hidden pr-2">
-                                <span className={`text-[11px] font-normal truncate block leading-none
-                                    ${isSelected ? 'text-emerald-700' : 'text-slate-600'}`}>
-                                    {worker.companies?.name_jp ? worker.companies.name_jp.replace(/株式会社|有限会社|（株）|\(株\)/g, '').trim() : '---'}
-                                </span>
+                            <div className="w-[140px] shrink-0 flex flex-col justify-center overflow-hidden pr-2">
+                                <div className="h-5 flex items-center">
+                                    <span className={`text-[11px] font-normal truncate block leading-none
+                                        ${isSelected ? 'text-emerald-700' : 'text-slate-600'}`}>
+                                        {worker.companies?.name_jp ? worker.companies.name_jp.replace(/株式会社|有限会社|（株）|\(株\)/g, '').trim() : '---'}
+                                    </span>
+                                </div>
+                                <div className="h-4" /> {/* Spacer to align with Kana name */}
                             </div>
 
                             {/* Khu 3: Time - Entry & Duration (120px) */}
                             <div className="w-[120px] shrink-0 flex flex-col justify-center gap-0.5">
-                                <div className="flex items-center gap-1.5 overflow-hidden">
+                                <div className="h-5 flex items-center gap-1.5 overflow-hidden">
                                     <span className="text-[7px] font-black text-slate-300 uppercase shrink-0">ENT</span>
                                     <span className={`text-[10px] font-mono tracking-tighter leading-none
                                         ${isSelected ? 'text-blue-700 font-bold' : 'text-slate-500'}`}>
                                         {fmtDate(worker.entry_date)}
                                     </span>
                                 </div>
-                                <div className="flex items-center gap-1.5 overflow-hidden">
+                                <div className="h-4 flex items-center gap-1.5 overflow-hidden">
                                     <span className="text-[7px] font-black text-rose-300/70 uppercase shrink-0">STAY</span>
                                     <span className={`text-[10px] font-medium leading-none tracking-tight
                                         ${isSelected ? 'text-emerald-700' : 'text-slate-500'}`}>
@@ -122,15 +129,18 @@ export default function WorkerListColumn({ workers, selectedIds, onSelect }: Wor
                             </div>
 
                             {/* Khu 4: Visa Status (80px) */}
-                            <div className="w-[80px] shrink-0 overflow-hidden text-center px-1">
-                                {worker.visa_status && (
-                                    <span className={`inline-block w-full py-0.5 rounded-[4px] text-[9px] font-bold uppercase tracking-tighter
-                                        ${isSelected
-                                            ? 'bg-emerald-100 text-emerald-700'
-                                            : 'bg-emerald-50 text-emerald-600/70 border border-emerald-100/50'}`}>
-                                        {(worker.visa_status === 'ikusei_shuro' ? '育成就労' : worker.visa_status === 'ginou_jisshu' ? '技能実習' : worker.visa_status === 'tokuteigino' ? '特定技能' : worker.visa_status).substring(0, 4)}
-                                    </span>
-                                )}
+                            <div className="w-[80px] shrink-0 flex flex-col justify-center overflow-hidden text-center px-1">
+                                <div className="h-5 flex items-center justify-center">
+                                    {worker.visa_status && (
+                                        <span className={`inline-block w-full py-0.5 rounded-[4px] text-[9px] font-bold uppercase tracking-tighter
+                                            ${isSelected
+                                                ? 'bg-emerald-100 text-emerald-700'
+                                                : 'bg-emerald-50 text-emerald-600/70 border border-emerald-100/50'}`}>
+                                            {(worker.visa_status === 'ikusei_shuro' ? '育成就労' : worker.visa_status === 'ginou_jisshu' ? '技能実習' : worker.visa_status === 'tokuteigino' ? '特定技能' : worker.visa_status).substring(0, 4)}
+                                        </span>
+                                    )}
+                                </div>
+                                <div className="h-4" />
                             </div>
 
                             {/* Khu 5: Alerts (50px) - Far Right */}

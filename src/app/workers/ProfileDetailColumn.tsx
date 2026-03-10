@@ -480,71 +480,88 @@ export default function ProfileDetailColumn({ workers, onUpdate, onBulkUpdate, b
             </div>
 
             {/* ── Scrollable body ── */}
-            <div className="flex-1 overflow-y-auto thin-scrollbar p-2">
-                <div className="grid grid-cols-2 gap-2">
-                    {/* --- Left Column --- */}
-                    <div className="flex flex-col gap-2">
-                        <div className="bg-white rounded-md border border-gray-300 overflow-hidden">
-                            <SectionHeader icon={<User size={13} className="text-blue-600" />} label="個人・雇用・住所" color="bg-white text-blue-900 border-b border-gray-300" />
+            <div className="flex-1 overflow-y-auto thin-scrollbar px-6 py-4">
+                <div className="max-w-2xl mx-auto flex flex-col space-y-8">
+
+                    {/* 1. Thông tin cá nhân & Cơ bản */}
+                    <section className="space-y-1">
+                        <SectionHeader icon={<User size={14} className="text-emerald-600" />} label="Cá nhân & Cơ bản" color="text-emerald-900 mb-2 border-b-0" />
+                        <div className="space-y-0 text-gray-800">
                             {renderField("生年月日", "dob", "date")}
                             {renderField("性別", "gender", "select", { male: '男性', female: '女性', other: 'その他' })}
                             {renderField("血液型", "blood_type", "select", { A: 'A型', B: 'B型', O: 'O型', AB: 'AB型' })}
                             {renderField("国籍", "nationality")}
                             {renderField("出身地", "birthplace")}
                             {renderField("配偶者", "has_spouse", "select", { true: '有', false: '無' })}
-                            {renderField("制度区分", "system_type", "select", { ginou_jisshu: '技能実習', ikusei_shuro: '育成就労', tokuteigino: '特定技能' })}
-                            {renderField("職種区分", "industry_field")}
-                            {renderField("日本語レベル", "japanese_level")}
                             {renderField("送出機関", "sending_org")}
                             {renderField("社宅住所", "japan_residence")}
                         </div>
-                    </div>
+                    </section>
 
-                    {/* --- Right Column --- */}
-                    <div className="flex flex-col gap-2">
-                        <div className="bg-white rounded-md border border-gray-300 overflow-hidden">
-                            <SectionHeader icon={<Shield size={13} className="text-blue-600" />} label="入国・在留・書類" color="bg-white text-blue-900 border-b border-gray-300" />
+                    {/* 2. Hợp đồng & Việc làm */}
+                    <section className="space-y-1">
+                        <SectionHeader icon={<Briefcase size={14} className="text-emerald-600" />} label="Hợp đồng & Việc làm" color="text-emerald-900 mb-2 border-b-0" />
+                        <div className="space-y-0 text-gray-800">
+                            {renderField("制度区分", "system_type", "select", { ginou_jisshu: '技能実習', ikusei_shuro: '育成就労', tokuteigino: '特定技能' })}
+                            {renderField("職種区分", "industry_field")}
+                            {renderField("日本語レベル", "japanese_level")}
+                        </div>
+                    </section>
+
+                    {/* 3. Nhập cảnh & Cư trú */}
+                    <section className="space-y-1">
+                        <SectionHeader icon={<Globe size={14} className="text-emerald-600" />} label="Nhập cảnh & Cư trú" color="text-emerald-900 mb-2 border-b-0" />
+                        <div className="space-y-0 text-gray-800">
                             {renderField("入国期生", "entry_batch")}
                             {renderField("入国日", "entry_date", "date")}
                             {!isEditing && worker.entry_date && (
                                 <Row
-                                    label="在日日数"
+                                    label="在日期間"
                                     value={`${Math.floor((Date.now() - new Date(worker.entry_date).getTime()) / 86400000)}日`}
-                                    valueClass="text-amber-600 font-mono"
+                                    valueClass="text-emerald-700 font-mono font-medium"
                                 />
                             )}
                             {renderField("在留資格", "visa_status")}
                             {renderField("在留カード番号", "zairyu_no")}
                             {renderExpiryField("在留期限", "zairyu_exp")}
+                        </div>
+                    </section>
+
+                    {/* 4. Giấy tờ quan trọng */}
+                    <section className="space-y-1">
+                        <SectionHeader icon={<CreditCard size={14} className="text-emerald-600" />} label="Giấy tờ quan trọng" color="text-emerald-900 mb-2 border-b-0" />
+                        <div className="space-y-0 text-gray-800">
                             {renderField("パスポート番号", "passport_no")}
                             {renderExpiryField("パスポート期限", "passport_exp")}
                             {renderField("認定開始日", "cert_start_date", "date")}
                             {renderExpiryField("認定終了日", "cert_end_date")}
                             {renderExpiryField("保険期限", "insurance_exp")}
                         </div>
-                    </div>
+                    </section>
 
-                    {/* 7. 備考 */}
-                    <div className="bg-white rounded-md border border-gray-300 overflow-hidden col-span-2">
-                        <SectionHeader icon={<MessageSquare size={13} className="text-blue-600" />} label="備考" color="bg-white text-blue-900 border-b border-gray-300" />
-                        {isEditing ? (
-                            <div className="p-2 bg-white">
+                    {/* 6. Ghi chú */}
+                    <section className="space-y-1">
+                        <SectionHeader icon={<MessageSquare size={14} className="text-emerald-600" />} label="Ghi chú & Phản hồi" color="text-emerald-900 mb-2 border-b-0" />
+                        <div className="mt-2 min-h-[100px]">
+                            {isEditing ? (
                                 <textarea
                                     value={editForm.remarks || ''}
                                     onChange={e => setEditForm({ ...editForm, remarks: e.target.value })}
-                                    className="w-full min-h-[80px] p-3 border border-gray-200 rounded text-[11px] outline-none focus:border-blue-500 bg-white"
+                                    className="w-full min-h-[120px] p-4 bg-slate-50 border border-gray-100 rounded-xl text-[12px] font-medium outline-none focus:border-emerald-500 transition-all text-gray-700"
                                     placeholder="備考・メモを入力..."
                                 />
-                            </div>
-                        ) : worker.remarks ? (
-                            <p className="px-3 py-3 text-[11px] text-gray-700 font-medium leading-relaxed whitespace-pre-wrap">{worker.remarks}</p>
-                        ) : (
-                            <p className="px-3 py-3 text-[11px] text-gray-400 italic">備考なし</p>
-                        )}
-                    </div>
-                </div>
+                            ) : worker.remarks ? (
+                                <div className="p-4 bg-slate-50/50 rounded-xl border border-gray-50">
+                                    <p className="text-[12px] text-gray-700 leading-relaxed whitespace-pre-wrap">{worker.remarks}</p>
+                                </div>
+                            ) : (
+                                <p className="text-[11px] text-gray-300 italic px-1">Ghi chú trống</p>
+                            )}
+                        </div>
+                    </section>
 
-                <div className="h-4" />
+                </div>
+                <div className="h-20" />
             </div>
         </div>
     );

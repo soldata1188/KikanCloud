@@ -108,6 +108,8 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
     const [filterNationality, setFilterNationality] = useState('all')
     const [filterEntryBatch, setFilterEntryBatch] = useState('all')
     const [filterEntryYear, setFilterEntryYear] = useState('all')
+    const [filterEntryDate, setFilterEntryDate] = useState('all')
+    const [filterSendingOrg, setFilterSendingOrg] = useState('all')
     const [sortKey, setSortKey] = useState<'entry_date' | 'zairyu_exp' | 'cert_end_date'>('entry_date')
     const [sortDir, setSortDir] = useState<'desc' | 'asc'>('asc')
     const [currentPage, setCurrentPage] = useState(1)
@@ -211,6 +213,8 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
             .filter(Boolean)
             .map((d: string) => d.substring(0, 4))
     )).sort().reverse() as string[]
+    const entryDateList = Array.from(new Set(workers.map(w => (w as any).entry_date).filter(Boolean))).sort().reverse() as string[]
+    const sendingOrgList = Array.from(new Set(workers.map(w => (w as any).sending_org).filter(Boolean))) as string[]
 
     useEffect(() => { setWorkers(initialWorkers); }, [initialWorkers])
 
@@ -263,6 +267,14 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
             result = result.filter(w => ((w as any).entry_date || '').startsWith(filterEntryYear))
         }
 
+        if (filterEntryDate !== 'all') {
+            result = result.filter(w => (w as any).entry_date === filterEntryDate)
+        }
+
+        if (filterSendingOrg !== 'all') {
+            result = result.filter(w => (w as any).sending_org === filterSendingOrg)
+        }
+
         // 入国期生でグループ化 → グループを最新の入国日で降順ソート → グループ内: 企業名を昇順ソート
         const batchMap = new Map<string, any[]>()
         result.forEach(w => {
@@ -300,7 +312,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
         setFiltered(result)
         setSelectedIds([])
         setCurrentPage(1)
-    }, [searchTerm, filterCompany, filterIndustry, filterVisaStatus, filterNationality, filterEntryBatch, filterEntryYear, sortKey, sortDir, activeTab, workers, selectedBatch, selectedCompanyId])
+    }, [searchTerm, filterCompany, filterIndustry, filterVisaStatus, filterNationality, filterEntryBatch, filterEntryYear, filterEntryDate, filterSendingOrg, sortKey, sortDir, activeTab, workers, selectedBatch, selectedCompanyId])
 
     const totalPages = Math.ceil(filtered.length / PAGE_SIZE)
     const paginated = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
@@ -465,18 +477,43 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                     {/* Filters */}
                     <div className="hidden xl:flex items-center gap-3">
                         <div className="flex items-center gap-2 bg-gray-50 px-2 py-1 rounded-[6px] border border-gray-200">
-                            <select value={filterEntryYear} onChange={e => setFilterEntryYear(e.target.value)}
+                            {/* Entry Date Filter */}
+                            <select value={filterEntryDate} onChange={e => setFilterEntryDate(e.target.value)}
                                 suppressHydrationWarning
-                                className="bg-transparent text-[11px] font-normal uppercase text-gray-600 outline-none pr-4 cursor-pointer">
-                                <option value="all">すべての入国年</option>
-                                {entryYearList.map(y => <option key={y} value={y}>{y}年</option>)}
+                                className="bg-transparent text-[11px] font-normal uppercase text-gray-600 outline-none pr-4 cursor-pointer max-w-[110px]">
+                                <option value="all">入国年月日</option>
+                                {entryDateList.map(d => <option key={d} value={d}>{d.replace(/-/g, '/')}</option>)}
                             </select>
                             <div className="w-px h-3 bg-gray-300" />
-                            <select value={filterEntryBatch} onChange={e => setFilterEntryBatch(e.target.value)}
+
+                            {/* Visa Status Filter */}
+                            <select value={filterVisaStatus} onChange={e => setFilterVisaStatus(e.target.value)}
                                 suppressHydrationWarning
-                                className="bg-transparent text-[11px] font-normal uppercase text-gray-600 outline-none pr-2 cursor-pointer">
-                                <option value="all">すべての期生</option>
-                                {entryBatchList.sort().map(b => <option key={b} value={b}>{b}期生</option>)}
+                                className="bg-transparent text-[11px] font-normal uppercase text-gray-600 outline-none pr-4 cursor-pointer max-w-[90px]">
+                                <option value="all">在留資格</option>
+                                {visaStatusList.map(v => (
+                                    <option key={v} value={v}>
+                                        {v === 'ikusei_shuro' ? '育成就労' : v === 'ginou_jisshu' ? '技能実習' : v === 'tokuteigino' ? '特定技能' : v}
+                                    </option>
+                                ))}
+                            </select>
+                            <div className="w-px h-3 bg-gray-300" />
+
+                            {/* Nationality Filter */}
+                            <select value={filterNationality} onChange={e => setFilterNationality(e.target.value)}
+                                suppressHydrationWarning
+                                className="bg-transparent text-[11px] font-normal uppercase text-gray-600 outline-none pr-4 cursor-pointer max-w-[80px]">
+                                <option value="all">国籍</option>
+                                {nationalityList.map(n => <option key={n} value={n}>{n}</option>)}
+                            </select>
+                            <div className="w-px h-3 bg-gray-300" />
+
+                            {/* Sending Org Filter */}
+                            <select value={filterSendingOrg} onChange={e => setFilterSendingOrg(e.target.value)}
+                                suppressHydrationWarning
+                                className="bg-transparent text-[11px] font-normal uppercase text-gray-600 outline-none pr-2 cursor-pointer max-w-[120px]">
+                                <option value="all">送出機関</option>
+                                {sendingOrgList.map(o => <option key={o} value={o}>{o}</option>)}
                             </select>
                         </div>
                     </div>
@@ -609,14 +646,14 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                     </div>
 
                     {/* Column 4: Documents */}
-                    <div className="w-[280px] flex-shrink-0 flex flex-col overflow-hidden">
-                        <div className="h-[48px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
+                    <div className="flex-1 min-w-0 flex flex-col overflow-hidden">
+                        <div className="h-[48px] px-4 border-b border-gray-300 bg-white flex items-center justify-center gap-3 shrink-0 relative">
                             <div className="flex items-center gap-2 text-slate-800">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" /><path d="M14 2v4a2 2 0 0 0 2 2h4" /></svg>
                                 <span className="text-[14px] font-normal uppercase tracking-widest text-gray-900">関連書類</span>
                             </div>
                             {selectedIds.length === 1 && (
-                                <span className="text-[11px] font-normal text-blue-700 bg-blue-50 px-2 py-0.5 rounded-[6px] border border-blue-100 shadow-sm">1名選択</span>
+                                <span className="absolute right-4 text-[11px] font-normal text-blue-700 bg-blue-50 px-2 py-0.5 rounded-[6px] border border-blue-100 shadow-sm">1名選択</span>
                             )}
                         </div>
                         <div className="flex-1 overflow-hidden">

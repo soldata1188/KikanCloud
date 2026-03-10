@@ -224,7 +224,7 @@ export default function DocumentsColumn({ workerId }: DocumentsColumnProps) {
 
             {/* ── Upload Bar ── */}
             <div className="px-4 py-3 bg-white border-b border-gray-100 shrink-0">
-                <div className="max-w-[400px] mx-auto w-full space-y-2">
+                <div className="max-w-[600px] mx-auto w-full space-y-2">
                     {!pendingFile ? (
                         // Default State: Select file button only
                         <div className="flex items-center gap-2">
@@ -300,7 +300,7 @@ export default function DocumentsColumn({ workerId }: DocumentsColumnProps) {
 
             {/* ── Document List ── */}
             <div className="flex-1 overflow-y-auto thin-scrollbar">
-                <div className="max-w-[400px] mx-auto w-full">
+                <div className="max-w-[600px] mx-auto w-full">
                     {loading ? (
                         <div className="flex items-center justify-center h-20">
                             <span className="w-5 h-5 border-2 border-slate-100 border-t-slate-500 rounded-full animate-spin" />

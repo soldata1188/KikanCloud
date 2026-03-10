@@ -31,34 +31,103 @@ export default function CompanyListColumn({ companies, selectedIds, onSelect }: 
     }
 
     return (
-        <div className="w-full h-full flex flex-col bg-white overflow-hidden p-[1px]">
-            <div className="flex-1 overflow-y-auto thin-scrollbar">
+        <div className="w-full h-full flex flex-col bg-white lg:bg-transparent overflow-hidden">
+            <div className="flex-1 overflow-y-auto thin-scrollbar lg:bg-white p-2 lg:p-0 space-y-2 lg:space-y-0">
                 {companies.map(company => {
                     const isSelected = selectedIds.includes(company.id);
                     return (
-                        <div
-                            key={company.id}
-                            onClick={(e) => onSelect(company.id, e)}
-                            className={`group relative text-left px-3 py-2.5 border-b border-gray-100 cursor-pointer transition-colors duration-150 flex items-center gap-2.5
-                                ${isSelected ? 'bg-emerald-50 border-l-[3px] border-emerald-500' : 'bg-white hover:bg-emerald-50/40 border-l-[3px] border-transparent'}`}
-                        >
-
-
-
-
-                            <div className="flex-1 min-w-0 flex flex-col justify-center">
-                                <div className="flex items-center justify-between gap-2 w-full">
-                                    <p className={`text-[13px] font-normal truncate uppercase tracking-wide leading-none
-                                        ${isSelected ? 'text-emerald-900' : 'text-slate-900'}`}>
-                                        {company.name_jp}
-                                    </p>
-                                    <span className={`text-[9px] font-normal font-mono px-1 py-0.5 rounded flex-shrink-0 whitespace-nowrap
-                                        ${isSelected ? 'bg-emerald-500 text-white' : (company.active_worker_count! > 0 ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 text-slate-400')}`}>
-                                        {company.active_worker_count || 0}
-                                    </span>
+                        <div key={company.id} className="relative group">
+                            {/* Desktop List Layout (Hidden on Mobile) */}
+                            <button
+                                onClick={(e) => onSelect(company.id, e)}
+                                className={`hidden lg:flex w-full text-left px-4 py-3 border-b border-gray-100 transition-all duration-150 items-center gap-4
+                                    ${isSelected
+                                        ? 'bg-emerald-50/60 border-l-[4px] border-emerald-500 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]'
+                                        : 'hover:bg-slate-50 border-l-[4px] border-transparent'}`}
+                            >
+                                {/* Section 1: Icon & Name (Flex-1) */}
+                                <div className="flex-1 shrink-0 flex items-center gap-3 overflow-hidden">
+                                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 text-[11px] font-medium shadow-sm
+                                        ${isSelected ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-500 border border-slate-200'}`}>
+                                        <Building2 size={14} />
+                                    </div>
+                                    <div className="flex flex-col min-w-0 justify-center">
+                                        <div className="h-5 flex items-center">
+                                            <span className={`text-[13px] font-bold truncate uppercase tracking-tight leading-none
+                                                ${isSelected ? 'text-emerald-900' : 'text-slate-900'}`}>
+                                                {company.name_jp || '---'}
+                                            </span>
+                                        </div>
+                                        <div className="h-4 flex items-center">
+                                            <span className={`text-[9px] font-normal truncate tracking-tight leading-none
+                                                ${isSelected ? 'text-emerald-600/70' : 'text-slate-400'}`}>
+                                                {company.representative ? `代表: ${company.representative}` : '---'}
+                                            </span>
+                                        </div>
+                                    </div>
                                 </div>
 
-                            </div>
+                                {/* Section 2: Worker Count (80px) */}
+                                <div className="w-[80px] shrink-0 flex flex-col items-end justify-center">
+                                    <div className="flex items-center gap-1.5">
+                                        <span className={`text-[11px] font-mono font-bold px-2 py-0.5 rounded-[4px] shadow-sm
+                                            ${isSelected
+                                                ? 'bg-emerald-500 text-white'
+                                                : company.active_worker_count! > 0
+                                                    ? 'bg-emerald-50 text-emerald-600'
+                                                    : 'bg-slate-100 text-slate-400'}`}>
+                                            {company.active_worker_count || 0}
+                                        </span>
+                                    </div>
+                                    <span className="text-[8px] text-gray-400 uppercase font-black tracking-tighter mt-1">Workers</span>
+                                </div>
+                            </button>
+
+                            {/* Mobile Card Layout (Visible only on Mobile) */}
+                            <button
+                                onClick={(e) => onSelect(company.id, e)}
+                                className={`lg:hidden w-full flex flex-col bg-white rounded-lg border p-4 transition-all
+                                    ${isSelected ? 'border-emerald-500 ring-1 ring-emerald-500 bg-emerald-50/30' : 'border-gray-200 shadow-sm'}`}
+                            >
+                                <div className="flex gap-4 mb-3 w-full">
+                                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 text-white shadow-md
+                                        ${isSelected ? 'bg-emerald-500' : 'bg-blue-600'}`}>
+                                        <Building2 size={24} />
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex justify-between items-start">
+                                            <span className="text-[14px] font-black text-slate-900 uppercase truncate pr-2">
+                                                {company.name_jp || '---'}
+                                            </span>
+                                            <div className="flex flex-col items-end">
+                                                <span className={`text-[12px] font-mono font-bold text-blue-600`}>
+                                                    {company.active_worker_count || 0}
+                                                </span>
+                                                <span className="text-[7px] text-gray-400 font-black tracking-tighter">人材数</span>
+                                            </div>
+                                        </div>
+                                        <div className="text-[10px] text-slate-400 mb-1">
+                                            {company.name_romaji || '---'}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-y-2 border-t border-gray-100 pt-3">
+                                    <div className="flex flex-col">
+                                        <span className="text-[9px] text-gray-400 uppercase font-black tracking-widest">代表者</span>
+                                        <span className="text-[11px] font-bold text-gray-700">
+                                            {company.representative || '---'}
+                                        </span>
+                                    </div>
+                                    <div className="flex flex-col items-end">
+                                        <span className="text-[9px] text-gray-400 uppercase font-black tracking-widest">ステータス</span>
+                                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded
+                                            ${company.status === 'active' ? 'bg-emerald-50 text-emerald-600' : 'bg-gray-100 text-gray-500'}`}>
+                                            {company.status === 'active' ? '受入中' : '停止中'}
+                                        </span>
+                                    </div>
+                                </div>
+                            </button>
                         </div>
                     );
                 })}

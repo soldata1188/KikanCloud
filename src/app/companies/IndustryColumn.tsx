@@ -19,13 +19,13 @@ export default function IndustryColumn({ industries, selectedIndustry, onSelect 
 
     return (
         <div className="w-full h-full flex flex-col bg-white overflow-hidden">
-            <div className="flex-1 overflow-y-auto thin-scrollbar">
+            <div className="flex-1 overflow-y-auto no-scrollbar">
                 {/* ALL button */}
                 <button
                     onClick={() => onSelect(null)}
                     className={`w-full text-left px-3 py-2.5 border-b border-gray-100 transition-colors duration-150 flex items-center justify-between group
                         ${selectedIndustry === null
-                            ? 'bg-emerald-50 border-l-[3px] border-emerald-500'
+                            ? 'bg-emerald-50 border-l-[3px] border-emerald-500 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]'
                             : 'hover:bg-emerald-50/40 border-l-[3px] border-transparent'}`}
                 >
                     <div className="flex items-center gap-2.5">
@@ -36,6 +36,10 @@ export default function IndustryColumn({ industries, selectedIndustry, onSelect 
                         <span className={`text-[13px] font-normal uppercase tracking-wide
                             ${selectedIndustry === null ? 'text-emerald-900' : 'text-slate-900'}`}>すべて</span>
                     </div>
+                    <span className={`text-[9px] font-mono font-normal px-1 py-0.5 rounded leading-none
+                        ${selectedIndustry === null ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-500'}`}>
+                        {total}
+                    </span>
                 </button>
 
                 {/* Industry items */}
@@ -48,7 +52,7 @@ export default function IndustryColumn({ industries, selectedIndustry, onSelect 
                                 onClick={() => onSelect(item.label)}
                                 className={`w-full text-left px-3 py-2.5 border-b border-gray-100 transition-colors duration-150 flex items-center justify-between group
                                     ${isSelected
-                                        ? 'bg-emerald-50 border-l-[3px] border-emerald-500'
+                                        ? 'bg-emerald-50 border-l-[3px] border-emerald-500 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]'
                                         : 'hover:bg-emerald-50/40 border-l-[3px] border-transparent'}`}
                             >
                                 <div className="flex items-center min-w-0 flex-1">
@@ -58,6 +62,10 @@ export default function IndustryColumn({ industries, selectedIndustry, onSelect 
                                     </span>
                                 </div>
                                 <div className="flex items-center gap-1.5 shrink-0">
+                                    <span className={`text-[9px] font-mono font-normal px-1 py-0.5 rounded leading-none
+                                        ${isSelected ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-500'}`}>
+                                        {item.count}
+                                    </span>
                                     <ChevronRight size={13} className={`transition-transform group-hover:translate-x-0.5
                                         ${isSelected ? 'text-emerald-500' : 'text-slate-300'}`} />
                                 </div>

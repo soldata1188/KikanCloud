@@ -1,4 +1,5 @@
 'use client'
+// Trigger redeploy for i18n verification
 
 import React, { useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';

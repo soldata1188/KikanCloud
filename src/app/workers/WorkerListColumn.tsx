@@ -75,7 +75,7 @@ export default function WorkerListColumn({ workers, selectedIds, onSelect }: Wor
                                     ? 'bg-emerald-50/60 border-l-[4px] border-emerald-500 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]'
                                     : 'hover:bg-slate-50 border-l-[4px] border-transparent'}`}
                         >
-                            {/* Khu 1: Avatar & Names (180px) */}
+                            {/* セクション 1: アバター & 氏名 (180px) */}
                             <div className="w-[180px] shrink-0 flex items-center gap-3 overflow-hidden">
                                 <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-[11px] font-medium shadow-sm
                                     ${isSelected ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-500 border border-slate-200'}`}>
@@ -99,7 +99,7 @@ export default function WorkerListColumn({ workers, selectedIds, onSelect }: Wor
                                 </div>
                             </div>
 
-                            {/* Khu 2: Company (140px) */}
+                            {/* セクション 2: 受入企業 (140px) */}
                             <div className="w-[140px] shrink-0 flex flex-col justify-center overflow-hidden pr-2">
                                 <div className="h-5 flex items-center">
                                     <span className={`text-[11px] font-normal truncate block leading-none
@@ -110,7 +110,7 @@ export default function WorkerListColumn({ workers, selectedIds, onSelect }: Wor
                                 <div className="h-4" /> {/* Spacer to align with Kana name */}
                             </div>
 
-                            {/* Khu 3: Time - Entry & Duration (120px) */}
+                            {/* セクション 3: 入国日 & 在日期間 (120px) */}
                             <div className="w-[120px] shrink-0 flex flex-col justify-center gap-0.5">
                                 <div className="h-5 flex items-center gap-1.5 overflow-hidden">
                                     <span className="text-[7px] font-black text-slate-300 uppercase shrink-0">ENT</span>
@@ -128,7 +128,7 @@ export default function WorkerListColumn({ workers, selectedIds, onSelect }: Wor
                                 </div>
                             </div>
 
-                            {/* Khu 4: Visa Status (80px) */}
+                            {/* セクション 4: 在留資格 (80px) */}
                             <div className="w-[80px] shrink-0 flex flex-col justify-center overflow-hidden text-center px-1">
                                 <div className="h-5 flex items-center justify-center">
                                     {worker.visa_status && (
@@ -143,7 +143,7 @@ export default function WorkerListColumn({ workers, selectedIds, onSelect }: Wor
                                 <div className="h-4" />
                             </div>
 
-                            {/* Khu 5: Alerts (50px) - Far Right */}
+                            {/* セクション 5: アラート (50px) */}
                             <div className="flex-1 flex items-center gap-1.5 justify-end pl-2">
                                 {isPassportWarn && (
                                     <span title="パスポート期限" className={`${isSelected ? 'text-rose-400' : 'text-rose-500'} shrink-0`}>

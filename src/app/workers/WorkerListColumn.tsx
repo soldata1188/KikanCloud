@@ -90,14 +90,6 @@ export default function WorkerListColumn({ workers, selectedIds, onSelect }: Wor
                                                 {fmtDate(worker.entry_date).substring(2)}
                                             </span>
                                         </div>
-                                        <div className="w-[1px] h-2 bg-gray-100" />
-                                        <div className="flex items-center gap-1">
-                                            <span className="text-[7px] font-black text-gray-300 uppercase scale-90">EXP</span>
-                                            <span className={`text-[9px] font-mono tracking-tighter leading-none w-[55px] text-right
-                                                ${isSelected ? 'text-emerald-700 font-bold' : 'text-slate-400'}`}>
-                                                {fmtDate(worker.zairyu_exp).substring(2)}
-                                            </span>
-                                        </div>
                                     </div>
                                 </div>
                             </div>

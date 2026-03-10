@@ -76,8 +76,8 @@ export default function WorkerListColumn({ workers, selectedIds, onSelect }: Wor
                                         ? 'bg-emerald-50/60 border-l-[4px] border-emerald-500 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]'
                                         : 'hover:bg-slate-50 border-l-[4px] border-transparent'}`}
                             >
-                                {/* セクション 1: アバター & 氏名 (180px) */}
-                                <div className="w-[180px] shrink-0 flex items-center gap-3 overflow-hidden">
+                                {/* セクション 1: アバター & 氏名 (160px) */}
+                                <div className="w-[160px] shrink-0 flex items-center gap-3 overflow-hidden">
                                     <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-[11px] font-medium shadow-sm
                                         ${isSelected ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-500 border border-slate-200'}`}>
                                         {worker.avatar_url
@@ -100,8 +100,8 @@ export default function WorkerListColumn({ workers, selectedIds, onSelect }: Wor
                                     </div>
                                 </div>
 
-                                {/* セクション 2: 受入企業 (140px) */}
-                                <div className="w-[140px] shrink-0 flex flex-col justify-center overflow-hidden pr-2">
+                                {/* セクション 2: 受入企業 (110px) */}
+                                <div className="w-[110px] shrink-0 flex flex-col justify-center overflow-hidden pr-2">
                                     <div className="h-5 flex items-center">
                                         <span className={`text-[11px] font-normal truncate block leading-none
                                             ${isSelected ? 'text-emerald-700' : 'text-slate-600'}`}>
@@ -111,8 +111,8 @@ export default function WorkerListColumn({ workers, selectedIds, onSelect }: Wor
                                     <div className="h-4" />
                                 </div>
 
-                                {/* セクション 3: 入国日 & 在日期間 (120px) */}
-                                <div className="w-[120px] shrink-0 flex flex-col justify-center gap-0.5">
+                                {/* セクション 3: 入国日 & 在日期間 (100px) */}
+                                <div className="w-[100px] shrink-0 flex flex-col justify-center gap-0.5">
                                     <div className="h-5 flex items-center gap-1.5 overflow-hidden">
                                         <span className="text-[7px] font-black text-slate-300 uppercase shrink-0">ENT</span>
                                         <span className={`text-[10px] font-mono tracking-tighter leading-none
@@ -129,8 +129,8 @@ export default function WorkerListColumn({ workers, selectedIds, onSelect }: Wor
                                     </div>
                                 </div>
 
-                                {/* セクション 4: 在留資格 (80px) */}
-                                <div className="w-[80px] shrink-0 flex flex-col justify-center overflow-hidden text-center px-1">
+                                {/* セクション 4: 在留資格 (70px) */}
+                                <div className="w-[70px] shrink-0 flex flex-col justify-center overflow-hidden text-center px-1">
                                     <div className="h-5 flex items-center justify-center">
                                         {worker.visa_status && (
                                             <span className={`inline-block w-full py-0.5 rounded-[4px] text-[9px] font-bold uppercase tracking-tighter

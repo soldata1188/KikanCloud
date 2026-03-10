@@ -555,7 +555,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                 <div className="flex w-full min-w-max h-full border-t border-gray-300 overflow-hidden bg-white">
 
                     {/* Column 0: Entry Batch */}
-                    <div className="w-[180px] flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-300">
+                    <div className="w-[150px] flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-300">
                         <div className="h-[48px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
                             <div className="flex items-center gap-2">
                                 <Calendar size={20} className="text-gray-400" />
@@ -572,7 +572,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                     </div>
 
                     {/* Column 1: Companies */}
-                    <div className="w-[280px] flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-300">
+                    <div className="w-[220px] flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-300">
                         <div className="h-[48px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
                             <div className="flex items-center gap-2">
                                 <Building2 size={20} className="text-blue-400" />
@@ -592,7 +592,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                     </div>
 
                     {/* Column 2: Workers */}
-                    <div className="w-[600px] flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-300">
+                    <div className="w-[520px] flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-300">
                         <div className="h-[48px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
                             <div className="flex items-center gap-2">
                                 <Users size={20} className="text-gray-400" />
@@ -624,7 +624,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                     </div>
 
                     {/* Column 3: Profile Detail */}
-                    <div className="w-[480px] flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-300">
+                    <div className="w-[440px] flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-300">
                         <div className="h-[48px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
                             <div className="flex items-center gap-2">
                                 <User size={20} className="text-gray-400" />

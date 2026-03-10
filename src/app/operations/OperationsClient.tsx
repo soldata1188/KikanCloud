@@ -7,6 +7,7 @@ import CompanyColumn from './CompanyColumn';
 import WorkerColumn from './WorkerColumn';
 import OperationColumn from './OperationColumn';
 import EntryBatchColumn from '../workers/EntryBatchColumn';
+import OperationListItem from './OperationListItem';
 
 interface OperationsClientProps {
     initialWorkers: any[];
@@ -639,12 +640,38 @@ export default function OperationsClient({
                         </div>
                     )}
                     {viewState === 'workers' && (
-                        <div className="absolute inset-0">
-                            <WorkerColumn
-                                workers={filteredWorkers}
-                                selectedIds={selectedWorkerIds}
-                                onSelect={handleSelectWorker}
-                            />
+                        <div className="absolute inset-0 overflow-y-auto p-4 space-y-4">
+                            {filteredWorkers.map(w => (
+                                <OperationListItem
+                                    key={w.id}
+                                    worker={{
+                                        id: w.id,
+                                        full_name_romaji: w.name,
+                                        full_name_kana: w.furigana,
+                                        company_name: w.company,
+                                        visa_status: w.systemType === 'ginou_jisshu' ? '技能実習' : w.systemType === 'ikusei_shuro' ? '育成就労' : '特定技能',
+                                        zairyu_exp: w.visaExpiry,
+                                        entry_date: w.entryDate,
+                                        address: w.address,
+                                        kikou_status: {
+                                            progress: w.kikou_status?.progress || '未着手',
+                                            type: w.kikou_status?.type || '---',
+                                            application_date: w.kikou_status?.application_date || '---',
+                                            assignee: w.kikou_status?.assignee || '---'
+                                        },
+                                        nyukan_status: {
+                                            progress: w.nyukan_status?.progress || '未着手',
+                                            application_date: w.nyukan_status?.application_date || '---',
+                                            receipt_number: w.nyukan_status?.receipt_number || '---'
+                                        },
+                                        remarks: w.remarks
+                                    }}
+                                    onEditMemo={(id) => {
+                                        setSelectedWorkerIds([id]);
+                                        setViewState('operations');
+                                    }}
+                                />
+                            ))}
                         </div>
                     )}
                     {viewState === 'operations' && (
@@ -662,3 +689,4 @@ export default function OperationsClient({
         </div >
     );
 }
+

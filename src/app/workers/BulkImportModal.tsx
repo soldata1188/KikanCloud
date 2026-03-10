@@ -44,13 +44,14 @@ export function BulkImportModal({
                 gender: cols[3],
                 has_spouse: cols[4] === '有' || cols[4] === 'true' || cols[4] === '1' || cols[4] === '既婚',
                 nationality: cols[5],
-                entry_date: cols[6],
-                visa_status: cols[7],
-                industry_field: cols[8],
-                address: cols[9],
-                // Remaining optional fields are defaulted or omitted
-                passport_no: null,
-                passport_exp: null,
+                birthplace: cols[6],
+                entry_date: cols[7],
+                zairyu_exp: cols[8],
+                passport_exp: cols[9],
+                visa_status: cols[10],
+                industry_field: cols[11],
+                japan_residence: cols[12],
+                // Computed fields or others handled in action
             }))
 
             startTransition(async () => {
@@ -101,7 +102,7 @@ export function BulkImportModal({
                         </div>
                         <p className="text-[11px] text-emerald-600 leading-relaxed font-bold">
                             以下の順序で入力してください。1行目はヘッダーとして残してください。<br />
-                            <span className="text-emerald-800">受入企業名*, 氏名(英字), 生年月日, 性別, 既婚, 国籍, 入国日, 在留資格, 職種, 社宅住所</span>
+                            <span className="text-emerald-800">受入企業名*, 氏名(英字), 生年月日, 性別, 既婚, 国籍, 出生地, 入国日, 在留期限, パスポート期限, 在留資格, 職種, 社宅住所</span>
                         </p>
                     </div>
 

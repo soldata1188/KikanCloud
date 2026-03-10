@@ -34,7 +34,7 @@ export function CompaniesClient({ companies: initialCompanies, userRole }: Compa
     // Column widths (resizable)
     const [industryWidth, setIndustryWidth] = useState(150);
     const [listWidth, setListWidth] = useState(300);
-    const [detailWidth, setDetailWidth] = useState(600);
+    const [detailWidth, setDetailWidth] = useState(440);
     const [workerListWidth, setWorkerListWidth] = useState(400);
     const isResizing = useRef(false);
 
@@ -42,7 +42,7 @@ export function CompaniesClient({ companies: initialCompanies, userRole }: Compa
         isResizing.current = true;
         const startWidth = col === 'industry' ? industryWidth : col === 'list' ? listWidth : col === 'detail' ? detailWidth : workerListWidth;
         const setter = col === 'industry' ? setIndustryWidth : col === 'list' ? setListWidth : col === 'detail' ? setDetailWidth : setWorkerListWidth;
-        const min = col === 'industry' ? 100 : col === 'list' ? 200 : col === 'detail' ? 400 : 300;
+        const min = col === 'industry' ? 100 : col === 'list' ? 200 : col === 'detail' ? 350 : 300;
         const max = col === 'industry' ? 300 : col === 'list' ? 500 : col === 'detail' ? 1000 : 800;
 
         const onMouseMove = (e: MouseEvent) => {
@@ -336,8 +336,8 @@ export function CompaniesClient({ companies: initialCompanies, userRole }: Compa
                         </div>
                     </div>
 
-                    {/* Column 2.5: Worker List (Newly Added) */}
-                    <div className="flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-300 bg-gray-50/30" style={{ width: workerListWidth }}>
+                    {/* Column 2.5: Worker List (Seamless Design) */}
+                    <div className="flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-300 bg-white" style={{ width: workerListWidth }}>
                         <div className="h-[48px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
                             <div className="flex items-center gap-2">
                                 <Users size={20} className="text-gray-400" />
@@ -360,7 +360,7 @@ export function CompaniesClient({ companies: initialCompanies, userRole }: Compa
                                         </div>
                                         <div className="grid gap-1">
                                             {list.map(worker => (
-                                                <div key={worker.id} className="flex items-center gap-3 p-2 bg-white rounded-lg border border-gray-100 hover:border-emerald-200 hover:shadow-sm transition-all group">
+                                                <div key={worker.id} className="flex items-center gap-3 p-2 bg-white border-b border-gray-50 hover:bg-slate-50/50 transition-all group">
                                                     <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-[11px] font-bold text-slate-500 overflow-hidden shrink-0 border border-white shadow-sm">
                                                         {worker.avatar_url
                                                             ? <img src={worker.avatar_url} alt="" className="w-full h-full object-cover" />

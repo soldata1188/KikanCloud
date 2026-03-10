@@ -652,7 +652,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                     </div>
 
                     {/* Column 2: Workers */}
-                    <div className="flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-300" style={{ width: workerWidth }}>
+                    <div className="flex-1 flex flex-col overflow-hidden border-r border-gray-300" style={{ minWidth: workerWidth }}>
                         <div className="h-[48px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
                             <div className="flex items-center gap-2">
                                 <Users size={20} className="text-gray-400" />

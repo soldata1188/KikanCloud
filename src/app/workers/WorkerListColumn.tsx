@@ -71,13 +71,13 @@ export default function WorkerListColumn({ workers, selectedIds, onSelect }: Wor
                             {/* Desktop List Layout (Hidden on Mobile) */}
                             <button
                                 onClick={(e) => onSelect(worker.id, e)}
-                                className={`hidden lg:flex w-full text-left px-4 py-3 border-b border-gray-100 transition-all duration-150 items-center gap-4
+                                className={`hidden lg:flex w-full text-left pl-4 pr-1.5 py-3 border-b border-gray-100 transition-all duration-150 items-center gap-3
                                     ${isSelected
                                         ? 'bg-emerald-50/60 border-l-[4px] border-emerald-500 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]'
                                         : 'hover:bg-slate-50 border-l-[4px] border-transparent'}`}
                             >
-                                {/* セクション 1: アバター & 氏名 (160px) */}
-                                <div className="w-[160px] shrink-0 flex items-center gap-3 overflow-hidden">
+                                {/* セクション 1: アバター & 氏名 (Flexible) */}
+                                <div className="flex-[2] min-w-[160px] flex items-center gap-3 overflow-hidden">
                                     <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-[11px] font-medium shadow-sm
                                         ${isSelected ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-500 border border-slate-200'}`}>
                                         {worker.avatar_url
@@ -100,8 +100,8 @@ export default function WorkerListColumn({ workers, selectedIds, onSelect }: Wor
                                     </div>
                                 </div>
 
-                                {/* セクション 2: 受入企業 (110px) */}
-                                <div className="w-[110px] shrink-0 flex flex-col justify-center overflow-hidden pr-2">
+                                {/* セクション 2: 受入企業 (Flexible) */}
+                                <div className="flex-[1.2] min-w-[110px] flex flex-col justify-center overflow-hidden pr-2">
                                     <div className="h-5 flex items-center">
                                         <span className={`text-[11px] font-normal truncate block leading-none
                                             ${isSelected ? 'text-emerald-700' : 'text-slate-600'}`}>
@@ -111,8 +111,8 @@ export default function WorkerListColumn({ workers, selectedIds, onSelect }: Wor
                                     <div className="h-4" />
                                 </div>
 
-                                {/* セクション 3: 入国日 & 在日期間 (100px) */}
-                                <div className="w-[100px] shrink-0 flex flex-col justify-center gap-0.5">
+                                {/* セクション 3: 入国日 & 在日期間 (Flexible) */}
+                                <div className="flex-[1.2] min-w-[100px] flex flex-col justify-center gap-0.5">
                                     <div className="h-5 flex items-center gap-1.5 overflow-hidden">
                                         <span className="text-[7px] font-black text-slate-300 uppercase shrink-0">ENT</span>
                                         <span className={`text-[10px] font-mono tracking-tighter leading-none
@@ -129,8 +129,8 @@ export default function WorkerListColumn({ workers, selectedIds, onSelect }: Wor
                                     </div>
                                 </div>
 
-                                {/* セクション 4: 在留資格 (70px) */}
-                                <div className="w-[70px] shrink-0 flex flex-col justify-center overflow-hidden text-center px-1">
+                                {/* セクション 4: 在留資格 (Flexible) */}
+                                <div className="flex-[0.8] min-w-[70px] flex flex-col justify-center overflow-hidden text-center px-1">
                                     <div className="h-5 flex items-center justify-center">
                                         {worker.visa_status && (
                                             <span className={`inline-block w-full py-0.5 rounded-[4px] text-[9px] font-bold uppercase tracking-tighter
@@ -144,14 +144,8 @@ export default function WorkerListColumn({ workers, selectedIds, onSelect }: Wor
                                     <div className="h-4" />
                                 </div>
 
-                                {/* セクション 5: アラート (50px) */}
-                                <div className="flex-1 flex items-center gap-1.5 justify-end pl-2">
-                                    {isPassportWarn && (
-                                        <span title="パスポート期限" className={`${isSelected ? 'text-rose-400' : 'text-rose-500'} shrink-0`}>
-                                            <ShieldCheck size={14} />
-                                        </span>
-                                    )}
-                                </div>
+                                {/* セクション 5: アラート/スペーサー */}
+                                <div className="flex-[0.2] shrink-0" />
                             </button>
 
                             {/* Mobile Card Layout (Visible only on Mobile) */}
@@ -193,12 +187,7 @@ export default function WorkerListColumn({ workers, selectedIds, onSelect }: Wor
                                             {fmtInJapanDuration(worker.entry_date)} ({fmtDate(worker.entry_date)})
                                         </span>
                                     </div>
-                                    {isPassportWarn && (
-                                        <div className="col-span-2 mt-1 flex items-center gap-1.5 text-rose-500 bg-rose-50 rounded px-2 py-1">
-                                            <ShieldCheck size={12} />
-                                            <span className="text-[10px] font-bold">パスポート更新要確認</span>
-                                        </div>
-                                    )}
+
                                 </div>
                             </button>
                         </div>

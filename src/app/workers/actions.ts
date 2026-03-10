@@ -130,6 +130,7 @@ export type ImportWorkerPayload = {
     nationality?: string;
     birthplace?: string;
     entry_date?: string;
+    zairyu_exp?: string | null;
     visa_status?: string;
     industry_field?: string;
     passport_no?: string | null;
@@ -195,21 +196,25 @@ export async function importWorkers(workersData: ImportWorkerPayload[]) {
             nationality: mapNationality(w.nationality),
             birthplace: w.birthplace ? String(w.birthplace).trim() : null,
             entry_date: parseDate(w.entry_date),
+            zairyu_exp: parseDate(w.zairyu_exp),
             visa_status: w.visa_status ? String(w.visa_status).trim() : null,
             industry_field: w.industry_field ? String(w.industry_field).trim() : null,
             passport_no: w.passport_no ? String(w.passport_no).trim() : null,
             passport_exp: parseDate(w.passport_exp),
-            address: w.address ? String(w.address).trim() : null,
+            address: w.birthplace ? String(w.birthplace).trim() : null, // Birthplace mapped to address
             japan_residence: w.japan_residence ? String(w.japan_residence).trim() : null,
             status: 'working',
             system_type: 'ikusei_shuro'
         }
     })
 
-    // 3. Bulk insert (save array to DB at once)
-    const { error } = await supabase.from('workers').insert(payload)
+    // 3. Bulk upsert (save array to DB at once, overwrite if conflict on tenant+name+dob)
+    const { error } = await supabase.from('workers').upsert(payload, {
+        onConflict: 'tenant_id,full_name_romaji,dob'
+    })
     if (error) {
-        throw new Error('インポートに失敗しました。日付の形式（YYYY/MM/DD）等を確認してください。')
+        console.error('Import error:', error)
+        throw new Error('インポートに失敗しました。日付の形式（YYYY/MM/DD）や重複データを確認してください。')
     }
 
     // RPA: Automatically schedule routine audits for the inserted workers

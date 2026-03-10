@@ -58,8 +58,8 @@ interface RowProps {
 function Row({ label, name, value, isEditing, onChange, type = 'text', placeholder, valueClass }: RowProps) {
     if (isEditing) {
         return (
-            <div className="flex justify-between items-center px-3 py-2 border-b border-gray-50 bg-white">
-                <span className="text-[10px] font-normal text-gray-400 shrink-0 min-w-[120px]">{label}</span>
+            <div className="flex justify-between items-center px-3 py-1.5 border-b border-gray-50 bg-white">
+                <span className="text-[10px] font-normal text-gray-400 shrink-0 min-w-[100px]">{label}</span>
                 <input
                     name={name}
                     type={type}
@@ -73,8 +73,8 @@ function Row({ label, name, value, isEditing, onChange, type = 'text', placehold
     }
 
     return (
-        <div className="flex justify-between items-center px-3 py-2 border-b border-gray-50 last:border-0 hover:bg-emerald-50/10 transition-colors">
-            <span className="text-[10px] font-normal text-gray-400 shrink-0 min-w-[120px]">{label}</span>
+        <div className="flex justify-between items-center px-3 py-1.5 border-b border-gray-50 last:border-0 hover:bg-emerald-50/10 transition-colors">
+            <span className="text-[10px] font-normal text-gray-400 shrink-0 min-w-[100px]">{label}</span>
             <span className={`text-[11px] font-normal text-right break-all ${valueClass || 'text-gray-800'}`}>{value || '---'}</span>
         </div>
     );
@@ -144,8 +144,8 @@ export default function CompanyDetailColumn({ companies }: CompanyDetailColumnPr
         <div className="h-full flex flex-col bg-white overflow-hidden relative">
 
             {/* ── Header ── */}
-            <div className="px-6 py-6 border-b border-gray-100 shrink-0 sticky top-0 z-20 bg-white/95 backdrop-blur-sm">
-                <div className="flex items-start justify-between max-w-2xl mx-auto w-full">
+            <div className="px-4 py-4 border-b border-gray-100 shrink-0 sticky top-0 z-20 bg-white/95 backdrop-blur-sm">
+                <div className="flex items-start justify-between max-w-lg mx-auto w-full">
                     <div className="flex items-center gap-4 min-w-0">
                         <div className="w-[52px] h-[52px] rounded-xl bg-gray-50 flex items-center justify-center shrink-0 text-emerald-600 border border-gray-100">
                             <Building2 size={24} />
@@ -218,8 +218,8 @@ export default function CompanyDetailColumn({ companies }: CompanyDetailColumnPr
             </div>
 
             {/* ── Scrollable body ── */}
-            <div className="flex-1 overflow-y-auto thin-scrollbar px-6 py-6">
-                <div className="max-w-2xl mx-auto flex flex-col space-y-8">
+            <div className="flex-1 overflow-y-auto thin-scrollbar px-4 py-4">
+                <div className="max-w-lg mx-auto flex flex-col space-y-6">
 
                     {/* 1. 企業情報・連絡先 */}
                     <section className="space-y-1">

@@ -68,11 +68,11 @@ export default function WorkerListColumn({ workers, selectedIds, onSelect }: Wor
                             {/* Name, Furigana, Company & Expiry */}
                             <div className="flex-1 min-w-0 flex flex-col justify-center overflow-hidden">
                                 <div className="flex items-baseline gap-1.5">
-                                    <span className={`text-[12px] font-black truncate uppercase tracking-tight leading-none
+                                    <span className={`text-[12px] font-normal truncate uppercase tracking-tight leading-none
                                         ${isSelected ? 'text-emerald-900' : 'text-slate-900'}`}>
                                         {worker.full_name_romaji || '---'}
                                     </span>
-                                    <span className={`text-[8px] font-bold truncate tracking-tighter shrink-0
+                                    <span className={`text-[8px] font-normal truncate tracking-tighter shrink-0
                                         ${isSelected ? 'text-emerald-600/60' : 'text-slate-400'}`}>
                                         {worker.full_name_kana}
                                     </span>

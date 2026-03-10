@@ -35,10 +35,11 @@ interface CompanyDetailColumnProps {
 }
 
 // ── Sub-components ────────────────────────────────────────
-function SectionHeader({ label }: { label: string }) {
+function SectionHeader({ icon, label }: { icon: React.ReactNode; label: string }) {
     return (
-        <div className={`flex items-center gap-2 px-4 py-2 border-b border-emerald-100 bg-emerald-50/10`}>
-            <span className="text-[10px] font-normal uppercase tracking-widest text-emerald-900">{label}</span>
+        <div className="flex items-center gap-2 px-3 py-2 mb-2 border-b border-gray-100">
+            <span className="text-emerald-600 opacity-60">{icon}</span>
+            <span className="text-[10px] font-normal uppercase tracking-[0.18em] text-emerald-900">{label}</span>
         </div>
     );
 }
@@ -57,24 +58,24 @@ interface RowProps {
 function Row({ label, name, value, isEditing, onChange, type = 'text', placeholder, valueClass }: RowProps) {
     if (isEditing) {
         return (
-            <div className="flex flex-col sm:flex-row justify-between sm:items-center px-5 py-2 border-b border-gray-50 bg-white">
-                <span className="text-[11px] font-normal text-gray-400 shrink-0 min-w-[130px] mb-1 sm:mb-0">{label}</span>
+            <div className="flex justify-between items-center px-3 py-2 border-b border-gray-50 bg-white">
+                <span className="text-[10px] font-normal text-gray-400 shrink-0 min-w-[120px]">{label}</span>
                 <input
                     name={name}
                     type={type}
                     value={value || ''}
                     onChange={onChange}
                     placeholder={placeholder}
-                    className="flex-1 h-7 px-2 bg-white border border-gray-200 rounded text-[12px] font-normal text-gray-800 outline-none focus:border-emerald-500 transition-colors"
+                    className="flex-1 h-7 px-2 bg-white border border-gray-200 rounded text-[11px] font-normal text-gray-800 outline-none focus:border-emerald-500 transition-colors"
                 />
             </div>
         );
     }
 
     return (
-        <div className="flex justify-between items-center px-5 py-2.5 border-b border-gray-50 last:border-0 hover:bg-emerald-50/20 transition-colors">
-            <span className="text-[11px] font-normal text-gray-400 shrink-0 min-w-[130px]">{label}</span>
-            <span className={`text-[12px] font-normal text-right break-all ${valueClass || 'text-gray-800'}`}>{value || '---'}</span>
+        <div className="flex justify-between items-center px-3 py-2 border-b border-gray-50 last:border-0 hover:bg-emerald-50/10 transition-colors">
+            <span className="text-[10px] font-normal text-gray-400 shrink-0 min-w-[120px]">{label}</span>
+            <span className={`text-[11px] font-normal text-right break-all ${valueClass || 'text-gray-800'}`}>{value || '---'}</span>
         </div>
     );
 }
@@ -86,7 +87,6 @@ export default function CompanyDetailColumn({ companies }: CompanyDetailColumnPr
 
     const c = companies[0];
 
-    // Reset editing state when company selection changes
     useEffect(() => {
         setIsEditing(false);
         if (c) {
@@ -129,9 +129,7 @@ export default function CompanyDetailColumn({ companies }: CompanyDetailColumnPr
                     formData.append(key, val.toString());
                 }
             });
-            // Ensure ID is passed
             formData.set('id', c.id);
-
             await updateCompany(formData);
             setIsEditing(false);
         } catch (error) {
@@ -146,10 +144,10 @@ export default function CompanyDetailColumn({ companies }: CompanyDetailColumnPr
         <div className="h-full flex flex-col bg-white overflow-hidden relative">
 
             {/* ── Header ── */}
-            <div className="px-5 py-5 bg-white border-b border-gray-100 shrink-0 sticky top-0 z-10">
-                <div className="flex items-start justify-between">
+            <div className="px-6 py-6 border-b border-gray-100 shrink-0 sticky top-0 z-20 bg-white/95 backdrop-blur-sm">
+                <div className="flex items-start justify-between max-w-2xl mx-auto w-full">
                     <div className="flex items-center gap-4 min-w-0">
-                        <div className="w-14 h-14 rounded-xl border border-gray-200 bg-gray-50 flex items-center justify-center shrink-0 text-gray-400">
+                        <div className="w-[52px] h-[52px] rounded-xl bg-gray-50 flex items-center justify-center shrink-0 text-emerald-600 border border-gray-100">
                             <Building2 size={24} />
                         </div>
                         <div className="min-w-0 flex-1">
@@ -159,14 +157,14 @@ export default function CompanyDetailColumn({ companies }: CompanyDetailColumnPr
                                         name="name_jp"
                                         value={editData.name_jp || ''}
                                         onChange={handleInputChange}
-                                        className="text-[18px] font-normal text-gray-900 border-b-2 border-emerald-500 outline-none w-full bg-transparent"
+                                        className="text-[16px] font-black text-gray-900 border-b border-emerald-500 outline-none w-full bg-transparent p-0"
                                         placeholder="企業名を入力"
                                     />
                                 ) : (
                                     <>
-                                        <h2 className="text-[18px] font-normal text-gray-900 tracking-tight leading-none truncate uppercase">{c.name_jp || '---'}</h2>
-                                        <span className={`text-[10px] font-normal px-2 py-0.5 rounded
-                                                ${(c.active_worker_count || 0) > 0 ? 'bg-emerald-500 text-white shadow-sm' : 'bg-slate-100 text-slate-500'}
+                                        <h2 className="text-[16px] font-black text-gray-900 tracking-tight leading-none truncate uppercase">{c.name_jp || '---'}</h2>
+                                        <span className={`text-[9px] font-black px-2 py-0.5 rounded-full
+                                                ${(c.active_worker_count || 0) > 0 ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-500'}
                                             `}>
                                             {c.active_worker_count! > 0 ? '受入中' : '未受入'}
                                         </span>
@@ -179,126 +177,109 @@ export default function CompanyDetailColumn({ companies }: CompanyDetailColumnPr
                                     name="name_romaji"
                                     value={editData.name_romaji || ''}
                                     onChange={handleInputChange}
-                                    className="text-[11px] text-gray-400 font-normal uppercase tracking-wider w-full mt-2 border-b border-gray-200 outline-none bg-transparent"
+                                    className="text-[10px] text-gray-400 font-bold uppercase tracking-wider w-full mt-1 border-b border-gray-100 outline-none bg-transparent"
                                     placeholder="ROMAN NAME"
                                 />
                             ) : (
-                                <p className="text-[11px] text-gray-400 font-normal uppercase tracking-wider truncate mt-1.5">{c.name_romaji || '---'}</p>
-                            )}
-
-                            {!isEditing && (
-                                <div className="flex items-center gap-1.5 mt-2 text-[10px] font-normal text-gray-500 uppercase tracking-tight">
-                                    <MapPin size={11} className="text-gray-400" />
-                                    <span className="truncate">{c.address || '所在地未登録'}</span>
-                                </div>
+                                <p className="text-[11px] text-gray-400 font-bold uppercase tracking-wider truncate mt-1.5">{c.name_romaji || '---'}</p>
                             )}
                         </div>
                     </div>
 
                     <div className="shrink-0 ml-4 flex gap-2">
-                        {isEditing ? (
-                            <>
-                                <button
-                                    onClick={() => { setIsEditing(false); setEditData(c); }}
-                                    className="h-8 px-4 bg-white border border-gray-200 hover:bg-gray-50 text-gray-500 rounded-md text-[11px] font-normal transition-all flex items-center gap-1.5 active:scale-95 uppercase tracking-widest"
-                                >
-                                    <X size={13} />
-                                    キャンセル
-                                </button>
+                        {!isEditing ? (
+                            <button
+                                onClick={() => { setIsEditing(true); setEditData(c); }}
+                                className="h-8 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md text-[11px] font-bold transition-all flex items-center gap-1.5 active:scale-95 uppercase tracking-widest"
+                            >
+                                <Edit size={13} />
+                                編集する
+                            </button>
+                        ) : (
+                            <div className="flex flex-col gap-1.5">
                                 <button
                                     onClick={handleSave}
                                     disabled={isSaving}
-                                    className="h-8 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md text-[11px] font-normal transition-all flex items-center gap-1.5 active:scale-95 disabled:opacity-50 uppercase tracking-widest"
+                                    className="h-8 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md text-[11px] font-bold transition-all flex items-center justify-center gap-1.5 active:scale-95 disabled:opacity-50 uppercase tracking-widest"
                                 >
                                     {isSaving ? <Loader2 size={13} className="animate-spin" /> : <Save size={13} />}
-                                    保存
+                                    保存する
                                 </button>
-                            </>
-                        ) : (
-                            <button
-                                onClick={() => { setIsEditing(true); setEditData(c); }}
-                                className="h-8 px-4 bg-gray-50 hover:bg-emerald-50 border border-gray-200 hover:border-emerald-200 text-gray-600 hover:text-emerald-700 rounded-md text-[11px] font-normal transition-all flex items-center gap-1.5 active:scale-95 uppercase tracking-widest"
-                            >
-                                <Edit size={13} />
-                                編集
-                            </button>
+                                <button
+                                    onClick={() => { setIsEditing(false); setEditData(c); }}
+                                    className="h-7 px-3 bg-white border border-gray-200 hover:bg-gray-50 text-gray-500 rounded-md text-[11px] font-bold transition-all uppercase tracking-widest"
+                                >
+                                    キャンセル
+                                </button>
+                            </div>
                         )}
                     </div>
                 </div>
             </div>
 
             {/* ── Scrollable body ── */}
-            <div className="flex-1 overflow-y-auto thin-scrollbar p-3">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="flex-1 overflow-y-auto thin-scrollbar px-6 py-6">
+                <div className="max-w-2xl mx-auto flex flex-col space-y-8">
 
-                    {/* --- Left Column --- */}
-                    <div className="flex flex-col gap-3">
-                        {/* 1. Corporate Info & Contact */}
-                        <div className="bg-white rounded-md border border-gray-300 overflow-hidden">
-                            <SectionHeader label="企業情報・連絡先" />
+                    {/* 1. 企業情報・連絡先 */}
+                    <section className="space-y-1">
+                        <SectionHeader icon={<Building2 size={14} />} label="企業情報・連絡先" />
+                        <div className="space-y-0 text-gray-800">
                             <Row label="企業名" name="name_jp" value={isEditing ? editData.name_jp : c.name_jp} isEditing={isEditing} onChange={handleInputChange} />
                             <Row label="フリガナ" name="name_kana" value={isEditing ? editData.name_kana : c.name_kana} isEditing={isEditing} onChange={handleInputChange} />
-                            <Row label="ローマ字" name="name_romaji" value={isEditing ? editData.name_romaji : c.name_romaji} isEditing={isEditing} onChange={handleInputChange} valueClass="font-normal uppercase tracking-wide" />
-                            <Row label="法人番号(13桁)" name="corporate_number" value={isEditing ? editData.corporate_number : c.corporate_number} isEditing={isEditing} onChange={handleInputChange} valueClass="font-mono text-gray-700" />
-                            <Row label="登録支援機関番号" name="registration_number" value={isEditing ? editData.registration_number : c.registration_number} isEditing={isEditing} onChange={handleInputChange} valueClass="font-mono text-gray-700" />
-
-                            <div className="h-2 bg-slate-50 border-t border-b border-gray-100" />{/* Separator */}
-
-                            <Row label="郵便番号" name="postal_code" value={isEditing ? editData.postal_code : c.postal_code} isEditing={isEditing} onChange={handleInputChange} valueClass="font-mono text-gray-700" />
+                            <Row label="ローマ字" name="name_romaji" value={isEditing ? editData.name_romaji : c.name_romaji} isEditing={isEditing} onChange={handleInputChange} valueClass="font-bold uppercase tracking-wide" />
+                            <Row label="法人番号(13桁)" name="corporate_number" value={isEditing ? editData.corporate_number : c.corporate_number} isEditing={isEditing} onChange={handleInputChange} valueClass="font-mono text-gray-600" />
+                            <Row label="登録支援機関番号" name="registration_number" value={isEditing ? editData.registration_number : c.registration_number} isEditing={isEditing} onChange={handleInputChange} valueClass="font-mono text-gray-600" />
                             <Row label="所在地（住所）" name="address" value={isEditing ? editData.address : c.address} isEditing={isEditing} onChange={handleInputChange} />
-                            <Row label="電話番号" name="phone" value={isEditing ? editData.phone : c.phone} isEditing={isEditing} onChange={handleInputChange} valueClass="font-mono text-gray-700" />
+                            <Row label="電話番号" name="phone" value={isEditing ? editData.phone : c.phone} isEditing={isEditing} onChange={handleInputChange} valueClass="font-mono text-gray-600" />
                             <Row label="メールアドレス" name="email" value={isEditing ? editData.email : c.email} isEditing={isEditing} onChange={handleInputChange} />
                             <Row label="担当者" name="pic_name" value={isEditing ? editData.pic_name : c.pic_name} isEditing={isEditing} onChange={handleInputChange} />
                         </div>
-                    </div>
+                    </section>
 
-                    {/* --- Right Column --- */}
-                    <div className="flex flex-col gap-3">
-                        {/* 2. Executive & Business */}
-                        <div className="bg-white rounded-md border border-gray-300 overflow-hidden">
-                            <SectionHeader label="役員・業種・受入" />
+                    {/* 2. 役員・業種・受入 */}
+                    <section className="space-y-1">
+                        <SectionHeader icon={<Briefcase size={14} />} label="役員・業種・受入" />
+                        <div className="space-y-0 text-gray-800">
                             <Row label="代表者名" name="representative" value={isEditing ? editData.representative : c.representative} isEditing={isEditing} onChange={handleInputChange} />
                             <Row label="代表者フリガナ" name="representative_kana" value={isEditing ? editData.representative_kana : c.representative_kana} isEditing={isEditing} onChange={handleInputChange} />
                             <Row label="責任者" name="manager_name" value={isEditing ? editData.manager_name : c.manager_name} isEditing={isEditing} onChange={handleInputChange} />
                             <Row label="講習受講日" name="training_date" type="date" value={isEditing ? editData.training_date : (c.training_date ? c.training_date.replace(/-/g, '/') : null)} isEditing={isEditing} onChange={handleInputChange} valueClass="font-mono" />
                             <Row label="生活指導員" name="life_advisor" value={isEditing ? editData.life_advisor : c.life_advisor} isEditing={isEditing} onChange={handleInputChange} />
                             <Row label="技能指導員" name="tech_advisor" value={isEditing ? editData.tech_advisor : c.tech_advisor} isEditing={isEditing} onChange={handleInputChange} />
-
-                            <div className="h-2 bg-slate-50 border-t border-b border-gray-100" />{/* Separator */}
-
                             <Row label="業種" name="industry" value={isEditing ? editData.industry : c.industry} isEditing={isEditing} onChange={handleInputChange} />
                             <Row label="受入職種" name="accepted_occupations" value={isEditing ? editData.accepted_occupations : c.accepted_occupations} isEditing={isEditing} onChange={handleInputChange} />
                             <Row label="従業員数" name="employee_count" type="number" value={isEditing ? editData.employee_count : (c.employee_count ? `${c.employee_count} 名` : null)} isEditing={isEditing} onChange={handleInputChange} />
                             {!isEditing && (
-                                <Row label="受入中実習生・特定技能" name="active_worker_count" value={c.active_worker_count ? `${c.active_worker_count} 名` : '0 名'} isEditing={false} onChange={() => { }} valueClass={c.active_worker_count! > 0 ? 'text-emerald-600 font-normal' : ''} />
+                                <Row label="受入実習生・特定技能" name="active_worker_count" value={c.active_worker_count ? `${c.active_worker_count} 名` : '0 名'} isEditing={false} onChange={() => { }} valueClass={c.active_worker_count! > 0 ? 'text-emerald-600 font-bold' : ''} />
                             )}
                         </div>
-                    </div>
+                    </section>
 
-                    {/* Remarks */}
-                    <div className="bg-white rounded-md border border-gray-300 overflow-hidden md:col-span-2">
-                        <SectionHeader label="備考" />
-                        {isEditing ? (
-                            <div className="p-3 bg-white">
+                    {/* 3. 備考 */}
+                    <section className="space-y-1">
+                        <SectionHeader icon={<AlignLeft size={14} />} label="備考・メモ" />
+                        <div className="mt-2 min-h-[100px]">
+                            {isEditing ? (
                                 <textarea
                                     name="remarks"
                                     value={editData.remarks || ''}
                                     onChange={handleInputChange}
-                                    className="w-full min-h-[120px] p-3 border border-gray-200 rounded text-[12px] font-normal text-gray-800 outline-none focus:border-emerald-500 transition-colors"
-                                    placeholder="備考を入力..."
+                                    className="w-full min-h-[120px] p-4 bg-slate-50 border border-gray-100 rounded-xl text-[12px] font-medium outline-none focus:border-emerald-500 transition-all text-gray-700"
+                                    placeholder="備考・メモを入力..."
                                 />
-                            </div>
-                        ) : (
-                            c.remarks ? (
-                                <p className="px-5 py-4 text-[12px] text-gray-700 font-medium leading-relaxed whitespace-pre-wrap">{c.remarks}</p>
+                            ) : c.remarks ? (
+                                <div className="p-4 bg-slate-50/50 rounded-xl border border-gray-50">
+                                    <p className="text-[12px] text-gray-700 leading-relaxed whitespace-pre-wrap">{c.remarks}</p>
+                                </div>
                             ) : (
-                                <p className="px-5 py-4 text-[12px] text-gray-400 italic">備考・メモはありません</p>
-                            )
-                        )}
-                    </div>
+                                <p className="text-[11px] text-gray-300 italic px-1">備考なし</p>
+                            )}
+                        </div>
+                    </section>
 
                 </div>
-                <div className="h-4" />
+                <div className="h-20" />
             </div>
         </div>
     );

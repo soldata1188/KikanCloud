@@ -139,114 +139,123 @@ export type ImportWorkerPayload = {
     japan_residence?: string | null;
 };
 
-export async function importWorkers(workersData: ImportWorkerPayload[]) {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) throw new Error('Unauthorized')
-    const { data: userData } = await supabase.from('users').select('tenant_id, role').eq('id', user.id).single()
-    if (userData?.role !== 'admin') throw new Error('管理者権限が必要です。(Admin only)')
-    if (!userData?.tenant_id) throw new Error('Tenant ID not found')
-
-    // 1. Retrieve all host companies and automatically map company names to IDs
-    const { data: companies } = await supabase.from('companies').select('id, name_jp').eq('is_deleted', false)
-    const companyMap = new Map<string, string>() // name_jp -> id
-    companies?.forEach(c => companyMap.set(c.name_jp, c.id))
-
-    // Helper function for data processing
-    const parseDate = (dateStr?: string | null) => {
-        if (!dateStr || String(dateStr).trim() === '') return null;
-        const cleanStr = String(dateStr).replace(/\//g, '-');
-        const d = new Date(cleanStr);
-        return isNaN(d.getTime()) ? null : d.toISOString().split('T')[0];
-    }
-
-    const mapGender = (text?: string | null) => {
-        const t = String(text || '');
-        if (t.includes('男')) return 'male'
-        if (t.includes('女')) return 'female'
-        return 'other'
-    }
-
-    const mapNationality = (text?: string | null) => {
-        const t = String(text || '');
-        if (t.includes('インドネシア')) return 'インドネシア'
-        if (t.includes('フィリピン')) return 'フィリピン'
-        if (t.includes('カンボジア')) return 'カンボジア'
-        return t.trim() || 'ベトナム'
-    }
-
-    // 2. Auto-create missing companies before mapping workers
-    const newCompanyNames = new Set<string>()
-    workersData.forEach(w => {
-        const name = w.company_name ? String(w.company_name).trim() : ''
-        if (name && !companyMap.has(name)) {
-            newCompanyNames.add(name)
-        }
-    })
-
-    if (newCompanyNames.size > 0) {
-        const newCompanies = Array.from(newCompanyNames).map(name => ({
-            tenant_id: userData?.tenant_id,
-            name_jp: name,
-        }))
-        const { data: inserted, error: insertErr } = await supabase
-            .from('companies')
-            .insert(newCompanies)
-            .select('id, name_jp')
-        if (!insertErr && inserted) {
-            inserted.forEach(c => companyMap.set(c.name_jp, c.id))
-        }
-    }
-
-    // 3. Normalize data and convert types
-    const payload = workersData.map(w => {
-        const companyName = w.company_name ? String(w.company_name).trim() : ''
-        const companyId = companyName ? (companyMap.get(companyName) || null) : null
-
-        return {
-            tenant_id: userData?.tenant_id,
-            company_id: companyId,
-            full_name_romaji: w.full_name_romaji ? String(w.full_name_romaji).toUpperCase().trim() : 'UNKNOWN',
-            full_name_kana: '-', // Required by DB Schema
-            dob: parseDate(w.dob) || '2000-01-01', // DOB is mandatory
-            gender: mapGender(w.gender),
-            has_spouse: !!w.has_spouse,
-            nationality: mapNationality(w.nationality),
-            birthplace: w.birthplace ? String(w.birthplace).trim() : null,
-            entry_date: parseDate(w.entry_date),
-            zairyu_exp: parseDate(w.zairyu_exp),
-            residence_card_exp_date: parseDate(w.zairyu_exp), // Support both column versions
-            visa_status: w.visa_status ? String(w.visa_status).trim() : 'ikusei_shuro',
-            industry_field: w.industry_field ? String(w.industry_field).trim() : null,
-            passport_no: w.passport_no ? String(w.passport_no).trim() : null,
-            passport_exp: parseDate(w.passport_exp),
-            passport_exp_date: parseDate(w.passport_exp), // Support both column versions
-            address: w.birthplace ? String(w.birthplace).trim() : (w.japan_residence ? String(w.japan_residence).trim() : null),
-            japan_residence: w.japan_residence ? String(w.japan_residence).trim() : null,
-            status: 'working',
-            system_type: 'ikusei_shuro'
-        }
-    })
-
-    // 4. Bulk upsert (save array to DB at once, overwrite if conflict on tenant+name+dob)
-    const { error } = await supabase.from('workers').upsert(payload, {
-        onConflict: 'tenant_id,full_name_romaji,dob'
-    })
-    if (error) {
-        console.error('Import error:', error)
-        throw new Error('インポートに失敗しました。日付の形式（YYYY/MM/DD）や重複データを確認してください。')
-    }
-
-    // RPA: Automatically schedule routine audits for the inserted workers
+export async function importWorkers(workersData: ImportWorkerPayload[]): Promise<{ success: boolean; count?: number; newCompanies?: number; error?: string }> {
     try {
-        await autoScheduleAuditsForWorkers(payload as Partial<Worker>[])
-    } catch (e) {
-        // Don't block import if RPA fails
-        console.error('RPA auto-schedule failed (non-blocking):', e)
-    }
+        const supabase = await createClient()
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) return { success: false, error: '認証エラー：ログインしてください。' }
 
-    revalidatePath('/workers')
-    revalidatePath('/companies')
-    revalidatePath('/')
-    return { success: true, count: payload.length, newCompanies: newCompanyNames.size }
+        const { data: userData } = await supabase.from('users').select('tenant_id, role').eq('id', user.id).single()
+        if (userData?.role !== 'admin') return { success: false, error: '管理者権限が必要です。(Admin only)' }
+        if (!userData?.tenant_id) return { success: false, error: 'テナントIDが見つかりません。' }
+
+        // 1. Retrieve all host companies and automatically map company names to IDs
+        const { data: companies } = await supabase.from('companies').select('id, name_jp').eq('is_deleted', false)
+        const companyMap = new Map<string, string>()
+        companies?.forEach(c => companyMap.set(c.name_jp, c.id))
+
+        // Helper function for data processing
+        const parseDate = (dateStr?: string | null) => {
+            if (!dateStr || String(dateStr).trim() === '') return null;
+            const cleanStr = String(dateStr).replace(/\//g, '-');
+            const d = new Date(cleanStr);
+            return isNaN(d.getTime()) ? null : d.toISOString().split('T')[0];
+        }
+
+        const mapGender = (text?: string | null) => {
+            const t = String(text || '');
+            if (t.includes('男')) return 'male'
+            if (t.includes('女')) return 'female'
+            return 'other'
+        }
+
+        const mapNationality = (text?: string | null) => {
+            const t = String(text || '');
+            if (t.includes('インドネシア')) return 'インドネシア'
+            if (t.includes('フィリピン')) return 'フィリピン'
+            if (t.includes('カンボジア')) return 'カンボジア'
+            return t.trim() || 'ベトナム'
+        }
+
+        // 2. Auto-create missing companies before mapping workers
+        const newCompanyNames = new Set<string>()
+        workersData.forEach(w => {
+            const name = w.company_name ? String(w.company_name).trim() : ''
+            if (name && !companyMap.has(name)) {
+                newCompanyNames.add(name)
+            }
+        })
+
+        if (newCompanyNames.size > 0) {
+            const newCompanies = Array.from(newCompanyNames).map(name => ({
+                tenant_id: userData?.tenant_id,
+                name_jp: name,
+            }))
+            const { data: inserted, error: insertErr } = await supabase
+                .from('companies')
+                .insert(newCompanies)
+                .select('id, name_jp')
+            if (insertErr) {
+                return { success: false, error: `企業の自動作成に失敗: ${insertErr.message}` }
+            }
+            if (inserted) {
+                inserted.forEach(c => companyMap.set(c.name_jp, c.id))
+            }
+        }
+
+        // 3. Normalize data and convert types
+        const payload = workersData.map(w => {
+            const companyName = w.company_name ? String(w.company_name).trim() : ''
+            const companyId = companyName ? (companyMap.get(companyName) || null) : null
+
+            return {
+                tenant_id: userData?.tenant_id,
+                company_id: companyId,
+                full_name_romaji: w.full_name_romaji ? String(w.full_name_romaji).toUpperCase().trim() : 'UNKNOWN',
+                full_name_kana: '-',
+                dob: parseDate(w.dob) || '2000-01-01',
+                gender: mapGender(w.gender),
+                has_spouse: !!w.has_spouse,
+                nationality: mapNationality(w.nationality),
+                birthplace: w.birthplace ? String(w.birthplace).trim() : null,
+                entry_date: parseDate(w.entry_date),
+                zairyu_exp: parseDate(w.zairyu_exp),
+                residence_card_exp_date: parseDate(w.zairyu_exp),
+                visa_status: w.visa_status ? String(w.visa_status).trim() : 'ikusei_shuro',
+                industry_field: w.industry_field ? String(w.industry_field).trim() : null,
+                passport_no: w.passport_no ? String(w.passport_no).trim() : null,
+                passport_exp: parseDate(w.passport_exp),
+                passport_exp_date: parseDate(w.passport_exp),
+                address: w.birthplace ? String(w.birthplace).trim() : (w.japan_residence ? String(w.japan_residence).trim() : null),
+                japan_residence: w.japan_residence ? String(w.japan_residence).trim() : null,
+                status: 'working',
+                system_type: 'ikusei_shuro'
+            }
+        })
+
+        // 4. Bulk upsert
+        const { error } = await supabase.from('workers').upsert(payload, {
+            onConflict: 'tenant_id,full_name_romaji,dob'
+        })
+        if (error) {
+            console.error('Import error:', error)
+            return { success: false, error: `DBエラー: ${error.message}` }
+        }
+
+        // RPA: Automatically schedule routine audits
+        try {
+            await autoScheduleAuditsForWorkers(payload as Partial<Worker>[])
+        } catch (e) {
+            console.error('RPA auto-schedule failed (non-blocking):', e)
+        }
+
+        revalidatePath('/workers')
+        revalidatePath('/companies')
+        revalidatePath('/')
+        return { success: true, count: payload.length, newCompanies: newCompanyNames.size }
+
+    } catch (e: any) {
+        console.error('importWorkers fatal error:', e)
+        return { success: false, error: `予期せぬエラー: ${e?.message || String(e)}` }
+    }
 }

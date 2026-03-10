@@ -54,15 +54,16 @@ export function BulkImportModal({
                     });
 
                     startTransition(async () => {
-                        try {
-                            const res = await importWorkers(data)
-                            if (res.success) {
-                                alert(`${res.count}名のデータをインポートしました。`)
-                                onSuccess()
-                                router.refresh()
-                            }
-                        } catch (err: any) {
-                            setError(err.message || 'インポート中にエラーが発生しました。')
+                        const res = await importWorkers(data)
+                        if (res.success) {
+                            const msg = res.newCompanies && res.newCompanies > 0
+                                ? `${res.count}名のデータをインポートしました。（新規企業${res.newCompanies}社を自動作成）`
+                                : `${res.count}名のデータをインポートしました。`
+                            alert(msg)
+                            onSuccess()
+                            router.refresh()
+                        } else {
+                            setError(res.error || 'インポート中にエラーが発生しました。')
                         }
                     })
                 },

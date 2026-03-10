@@ -541,11 +541,12 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                     <button onClick={() => { setIsRefreshing(true); setTimeout(() => setIsRefreshing(false), 800); }} className={`p-1.5 rounded-[6px] bg-gray-50 text-gray-400 border border-gray-200 transition-all active:scale-95 ${isRefreshing ? 'animate-spin text-blue-600' : 'hover:bg-white hover:text-blue-600'}`}>
                         <RefreshCw size={14} />
                     </button>
-                    <Link href="/workers/new"
-                        className="h-7 px-3 bg-blue-700 hover:bg-blue-800 text-white rounded-[6px] flex items-center gap-1.5 text-[12px] font-normal transition-all active:scale-95 shadow-sm">
-                        <Plus size={13} />
-                        新規登録
-                    </Link>
+                    {(role === 'admin' || role === 'staff') && (
+                        <Link href="/workers/new" className="h-7 px-3 bg-blue-700 hover:bg-blue-800 text-white rounded-[6px] text-[12px] font-normal hidden md:flex items-center gap-1.5 active:scale-95 transition-all shadow-sm">
+                            <Plus size={13} />
+                            <span>新規登録</span>
+                        </Link>
+                    )}
                 </div>
             </header>
 

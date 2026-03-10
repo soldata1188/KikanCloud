@@ -15,11 +15,6 @@ export default async function DashboardPage() {
     const { data: userProfile } = await supabase.from('users').select('full_name, role, tenant_id').eq('id', user.id).single()
     if (userProfile?.role === 'company_admin') redirect('/portal')
 
-    // ── Mobile redirect ──────────────────────────────────────
-    const headersList = await headers()
-    const ua = headersList.get('user-agent') || ''
-    const isMobile = /android|iphone|ipad|ipod|mobile|tablet/i.test(ua)
-    if (isMobile) redirect('/workers')
     // ─────────────────────────────────────────────────────────
 
     const tenantId = userProfile?.tenant_id

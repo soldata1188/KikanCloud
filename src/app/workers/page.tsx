@@ -11,8 +11,10 @@ export default async function WorkersPage() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) redirect('/login')
 
-    const { data: userProfile } = await supabase.from('users').select('role').eq('id', user.id).single()
-    const { data: workers } = await supabase.from('workers').select('*, companies(name_jp)').eq('is_deleted', false).order('created_at', { ascending: false })
+    const { data: userProfile, error: profileError } = await supabase.from('users').select('role').eq('id', user.id).single()
+    const { data: workers, error: workersError } = await supabase.from('workers').select('*, companies(name_jp)').eq('is_deleted', false).order('created_at', { ascending: false })
+
+    if (workersError) console.error('Error fetching workers:', workersError);
 
     const next90Days = new Date();
     next90Days.setDate(next90Days.getDate() + 90);

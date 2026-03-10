@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import Link from 'next/link'
 import { headers } from 'next/headers'
 import { Sidebar } from '@/components/Sidebar'
 import { TopNav } from '@/components/TopNav'
@@ -12,18 +13,28 @@ export default async function DashboardPage() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) redirect('/login')
 
-    const { data: userProfile } = await supabase.from('users').select('full_name, role, tenant_id').eq('id', user.id).single()
+    const { data: userProfile, error: profileError } = await supabase.from('users').select('full_name, role, tenant_id').eq('id', user.id).single()
+    if (profileError || !userProfile) {
+        return (
+            <div className="flex h-screen items-center justify-center bg-white p-4 text-center">
+                <div className="max-w-md space-y-4">
+                    <h1 className="text-xl font-bold text-gray-900">プロフィールが見つかりません</h1>
+                    <p className="text-gray-500">アカウントの設定が完了していない可能性があります。管理者に問い合わせてください。</p>
+                    <Link href="/login" className="inline-block px-4 py-2 bg-emerald-600 text-white rounded-md">ログインに戻る</Link>
+                </div>
+            </div>
+        )
+    }
+
     if (userProfile?.role === 'company_admin') redirect('/portal')
 
-    // ─────────────────────────────────────────────────────────
-
-    const tenantId = userProfile?.tenant_id
+    const tenantId = userProfile.tenant_id
 
     // Fetch Stats (Dùng Promise.all tăng tốc)
     const [workersRes, companiesRes, workersDataRes] = await Promise.all([
-        supabase.from('workers').select('id', { count: 'exact', head: true }).eq('tenant_id', tenantId),
+        supabase.from('workers').select('id', { count: 'exact', head: true }).eq('tenant_id', tenantId).eq('is_deleted', false),
         supabase.from('companies').select('id', { count: 'exact', head: true }).eq('tenant_id', tenantId).eq('is_deleted', false),
-        supabase.from('workers').select('id, full_name_romaji, nationality, status, residence_card_exp_date, passport_exp_date, industry_field, companies(name_jp)').eq('tenant_id', tenantId)
+        supabase.from('workers').select('id, full_name_romaji, nationality, status, residence_card_exp_date, passport_exp_date, industry_field, companies(name_jp)').eq('tenant_id', tenantId).eq('is_deleted', false)
     ])
 
     const workers = workersDataRes.data || []

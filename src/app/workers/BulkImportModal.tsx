@@ -1,8 +1,10 @@
 'use client'
 import { useState, useTransition } from 'react'
 import { X, Upload, Save, CheckCircle2, AlertCircle, FileText } from 'lucide-react'
-import { importWorkers, ImportWorkerPayload } from '@/app/workers/actions'
+import { importWorkers } from '@/app/workers/actions'
+import type { ImportWorkerPayload } from '@/app/workers/actions'
 import { useRouter } from 'next/navigation'
+import Papa from 'papaparse'
 
 export function BulkImportModal({
     onClose,
@@ -25,51 +27,48 @@ export function BulkImportModal({
         reader.onload = async (event) => {
             const text = event.target?.result as string
 
-            // Using a more robust parsing logic (simple CSV split for now like before, but safer)
-            // Ideally we'd use Papaparse here since it's in package.json
-            import('papaparse').then((Papa) => {
-                Papa.parse(text, {
-                    header: true,
-                    skipEmptyLines: true,
-                    complete: async (results) => {
-                        const data: ImportWorkerPayload[] = results.data.map((row: any) => {
-                            // Map values by matching header names or indices
-                            // The user's template has: 受入企業名, 氏名(英字), 生年月日, 性別, 既婚, 国籍, 出生地, 入国日, 在留期限, パスポート期限, 在留資格, 職種, 社宅住所
-                            const values = Object.values(row);
-                            return {
-                                company_name: values[0] as string,
-                                full_name_romaji: values[1] as string,
-                                dob: values[2] as string,
-                                gender: values[3] as string,
-                                has_spouse: String(values[4]).includes('有') || String(values[4]).includes('あり') || String(values[4]).includes('既婚'),
-                                nationality: values[5] as string,
-                                birthplace: values[6] as string,
-                                entry_date: values[7] as string,
-                                zairyu_exp: values[8] as string,
-                                passport_exp: values[9] as string,
-                                visa_status: values[10] as string,
-                                industry_field: values[11] as string,
-                                japan_residence: values[12] as string,
-                            };
-                        });
+            Papa.parse(text, {
+                header: true,
+                skipEmptyLines: true,
+                complete: async (results) => {
+                    const data: ImportWorkerPayload[] = results.data.map((row: any) => {
+                        // Safe access attempt: by name (Japanese) or by index
+                        const vals = Object.values(row);
+                        const getV = (name: string, idx: number) => String(row[name] || vals[idx] || '').trim();
 
-                        startTransition(async () => {
-                            try {
-                                const res = await importWorkers(data)
-                                if (res.success) {
-                                    alert(`${res.count}名のデータをインポートしました。`)
-                                    onSuccess()
-                                    router.refresh()
-                                }
-                            } catch (err: any) {
-                                setError(err.message || 'インポート中にエラーが発生しました。')
+                        return {
+                            company_name: getV('受入企業名', 0),
+                            full_name_romaji: getV('氏名(英字)', 1),
+                            dob: getV('生年月日', 2),
+                            gender: getV('性別', 3),
+                            has_spouse: getV('既婚', 4).includes('有') || getV('既婚', 4).includes('既婚') || getV('既婚', 4).includes('true'),
+                            nationality: getV('国籍', 5),
+                            birthplace: getV('出生地', 6),
+                            entry_date: getV('入国日', 7),
+                            zairyu_exp: getV('在留期限', 8),
+                            passport_exp: getV('パスポート期限', 9),
+                            visa_status: getV('在留資格', 10),
+                            industry_field: getV('職種', 11),
+                            japan_residence: getV('社宅住所', 12),
+                        };
+                    });
+
+                    startTransition(async () => {
+                        try {
+                            const res = await importWorkers(data)
+                            if (res.success) {
+                                alert(`${res.count}名のデータをインポートしました。`)
+                                onSuccess()
+                                router.refresh()
                             }
-                        })
-                    },
-                    error: (error) => {
-                        setError(`CSV解析エラー: ${error.message}`);
-                    }
-                });
+                        } catch (err: any) {
+                            setError(err.message || 'インポート中にエラーが発生しました。')
+                        }
+                    })
+                },
+                error: (error: any) => {
+                    setError(`CSV解析エラー: ${error.message}`);
+                }
             });
         }
         reader.readAsText(file)

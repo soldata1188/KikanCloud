@@ -87,6 +87,9 @@ export async function createCompany(formData: FormData) {
 // ─────────────────────────────────────────────────────────────────────────────
 export async function updateCompany(formData: FormData) {
     const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('Unauthorized')
+
     const id = formData.get('id') as string
     const address = formData.get('address') as string || null
 
@@ -117,10 +120,11 @@ export async function updateCompany(formData: FormData) {
         latitude,
         longitude,
         phone: formData.get('phone') as string || null,
+        email: formData.get('email') as string || null,
         industry: formData.get('industry') as string || null,
         accepted_occupations: formData.get('accepted_occupations') as string || null,
         representative: formData.get('representative') as string || null,
-        representative_romaji: formData.get('representative_romaji') as string || null,
+        representative_romaji: (formData.get('representative_romaji') || formData.get('representative_kana')) as string || null,
         manager_name: formData.get('manager_name') as string || null,
         training_date: formData.get('training_date') as string || null,
         pic_name: formData.get('pic_name') as string || null,
@@ -130,7 +134,7 @@ export async function updateCompany(formData: FormData) {
         employee_count: formData.get('employee_count') ? parseInt(formData.get('employee_count') as string) : null,
         labor_insurance_number: formData.get('labor_insurance_number') as string || null,
         employment_insurance_number: formData.get('employment_insurance_number') as string || null,
-        acceptance_notification_number: formData.get('acceptance_notification_number') as string || null,
+        acceptance_notification_number: (formData.get('acceptance_notification_number') || formData.get('registration_number')) as string || null,
         acceptance_notification_date: formData.get('acceptance_notification_date') as string || null,
         general_supervision_fee: formData.get('general_supervision_fee') ? parseFloat(formData.get('general_supervision_fee') as string) : null,
         category_3_supervision_fee: formData.get('category_3_supervision_fee') ? parseFloat(formData.get('category_3_supervision_fee') as string) : null,
@@ -138,11 +142,14 @@ export async function updateCompany(formData: FormData) {
         remarks: formData.get('remarks') as string || null,
     }
 
-    await supabase.from('companies').update(updatedData).eq('id', id)
+    const { error } = await supabase.from('companies').update(updatedData).eq('id', id)
+    if (error) throw error
+
     revalidatePath('/companies')
     revalidatePath('/workers')
     revalidatePath('/')
-    redirect('/companies')
+
+    return { success: true }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

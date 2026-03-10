@@ -16,14 +16,6 @@ export function BulkImportModal({
     const router = useRouter()
     const [error, setError] = useState<string | null>(null)
 
-    const parseCSV = (text: string): string[][] => {
-        return text.split(/\r?\n/).filter(line => line.trim()).map(line => {
-            // Split by comma BUT only if it's not inside quotes
-            const row = line.match(/(".*?"|[^",\r\n]*)(?=\s*,|\s*$)/g);
-            return (row || []).map(m => m.replace(/^"|"$/g, '').trim());
-        })
-    }
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         if (!file) return
@@ -32,40 +24,53 @@ export function BulkImportModal({
         const reader = new FileReader()
         reader.onload = async (event) => {
             const text = event.target?.result as string
-            const rows = parseCSV(text)
 
-            // Skip header if it exists (assuming first row is header)
-            const dataRows = rows.slice(1)
+            // Using a more robust parsing logic (simple CSV split for now like before, but safer)
+            // Ideally we'd use Papaparse here since it's in package.json
+            import('papaparse').then((Papa) => {
+                Papa.parse(text, {
+                    header: true,
+                    skipEmptyLines: true,
+                    complete: async (results) => {
+                        const data: ImportWorkerPayload[] = results.data.map((row: any) => {
+                            // Map values by matching header names or indices
+                            // The user's template has: 受入企業名, 氏名(英字), 生年月日, 性別, 既婚, 国籍, 出生地, 入国日, 在留期限, パスポート期限, 在留資格, 職種, 社宅住所
+                            const values = Object.values(row);
+                            return {
+                                company_name: values[0] as string,
+                                full_name_romaji: values[1] as string,
+                                dob: values[2] as string,
+                                gender: values[3] as string,
+                                has_spouse: String(values[4]).includes('有') || String(values[4]).includes('あり') || String(values[4]).includes('既婚'),
+                                nationality: values[5] as string,
+                                birthplace: values[6] as string,
+                                entry_date: values[7] as string,
+                                zairyu_exp: values[8] as string,
+                                passport_exp: values[9] as string,
+                                visa_status: values[10] as string,
+                                industry_field: values[11] as string,
+                                japan_residence: values[12] as string,
+                            };
+                        });
 
-            const data: ImportWorkerPayload[] = dataRows.map(cols => ({
-                company_name: cols[0],
-                full_name_romaji: cols[1],
-                dob: cols[2],
-                gender: cols[3],
-                has_spouse: cols[4] === '有' || cols[4] === 'true' || cols[4] === '1' || cols[4] === '既婚',
-                nationality: cols[5],
-                birthplace: cols[6],
-                entry_date: cols[7],
-                zairyu_exp: cols[8],
-                passport_exp: cols[9],
-                visa_status: cols[10],
-                industry_field: cols[11],
-                japan_residence: cols[12],
-                // Computed fields or others handled in action
-            }))
-
-            startTransition(async () => {
-                try {
-                    const res = await importWorkers(data)
-                    if (res.success) {
-                        alert(`${res.count}名のデータをインポートしました。`)
-                        onSuccess()
-                        router.refresh()
+                        startTransition(async () => {
+                            try {
+                                const res = await importWorkers(data)
+                                if (res.success) {
+                                    alert(`${res.count}名のデータをインポートしました。`)
+                                    onSuccess()
+                                    router.refresh()
+                                }
+                            } catch (err: any) {
+                                setError(err.message || 'インポート中にエラーが発生しました。')
+                            }
+                        })
+                    },
+                    error: (error) => {
+                        setError(`CSV解析エラー: ${error.message}`);
                     }
-                } catch (err: any) {
-                    setError(err.message || 'インポート中にエラーが発生しました。')
-                }
-            })
+                });
+            });
         }
         reader.readAsText(file)
     }

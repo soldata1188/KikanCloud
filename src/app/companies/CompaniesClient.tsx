@@ -376,7 +376,7 @@ export function CompaniesClient({ companies: initialCompanies, userRole }: Compa
                                                     </div>
                                                     <div className="shrink-0 text-right">
                                                         <div className="text-[9px] font-mono font-bold text-slate-400">
-                                                            {worker.zairyu_exp?.replace(/-/g, '/') || '---'}
+                                                            {worker.zairyu_exp ? String(worker.zairyu_exp).replace(/-/g, '/') : '---'}
                                                         </div>
                                                         <div className={`text-[9px] font-bold ${worker.status === 'working' ? 'text-emerald-500' : 'text-amber-500'}`}>
                                                             {worker.status === 'working' ? '就業中' : '準備中'}

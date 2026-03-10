@@ -192,16 +192,18 @@ export async function importWorkers(workersData: ImportWorkerPayload[]) {
             full_name_kana: '-', // Required by DB Schema
             dob: parseDate(w.dob) || '2000-01-01', // DOB is mandatory
             gender: mapGender(w.gender),
-            has_spouse: w.has_spouse,
+            has_spouse: !!w.has_spouse,
             nationality: mapNationality(w.nationality),
             birthplace: w.birthplace ? String(w.birthplace).trim() : null,
             entry_date: parseDate(w.entry_date),
             zairyu_exp: parseDate(w.zairyu_exp),
-            visa_status: w.visa_status ? String(w.visa_status).trim() : null,
+            residence_card_exp_date: parseDate(w.zairyu_exp), // Support both column versions
+            visa_status: w.visa_status ? String(w.visa_status).trim() : 'ikusei_shuro',
             industry_field: w.industry_field ? String(w.industry_field).trim() : null,
             passport_no: w.passport_no ? String(w.passport_no).trim() : null,
             passport_exp: parseDate(w.passport_exp),
-            address: w.birthplace ? String(w.birthplace).trim() : null, // Birthplace mapped to address
+            passport_exp_date: parseDate(w.passport_exp), // Support both column versions
+            address: w.birthplace ? String(w.birthplace).trim() : (w.japan_residence ? String(w.japan_residence).trim() : null),
             japan_residence: w.japan_residence ? String(w.japan_residence).trim() : null,
             status: 'working',
             system_type: 'ikusei_shuro'

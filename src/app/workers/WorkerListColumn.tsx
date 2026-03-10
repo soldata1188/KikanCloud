@@ -137,7 +137,13 @@ export default function WorkerListColumn({ workers, selectedIds, onSelect }: Wor
                                                 ${isSelected
                                                     ? 'bg-emerald-100 text-emerald-700'
                                                     : 'bg-emerald-50 text-emerald-600/70 border border-emerald-100/50'}`}>
-                                                {(worker.visa_status === 'ikusei_shuro' ? '育成就労' : worker.visa_status === 'ginou_jisshu' ? '技能実習' : worker.visa_status === 'tokuteigino' ? '特定技能' : worker.visa_status).substring(0, 4)}
+                                                {(() => {
+                                                    const s = worker.visa_status === 'ikusei_shuro' ? '育成就労'
+                                                        : worker.visa_status === 'ginou_jisshu' ? '技能実習'
+                                                            : worker.visa_status === 'tokuteigino' ? '特定技能'
+                                                                : String(worker.visa_status);
+                                                    return s.length > 4 ? s.substring(0, 4) : s;
+                                                })()}
                                             </span>
                                         )}
                                     </div>

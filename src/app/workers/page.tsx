@@ -7,25 +7,43 @@ import WorkersListClient from './WorkersListClient'
 export const dynamic = 'force-dynamic';
 
 export default async function WorkersPage() {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) redirect('/login')
+    try {
+        const supabase = await createClient()
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) redirect('/login')
 
-    const { data: userProfile, error: profileError } = await supabase.from('users').select('role').eq('id', user.id).single()
-    const { data: workers, error: workersError } = await supabase.from('workers').select('*, companies(name_jp)').eq('is_deleted', false).order('created_at', { ascending: false })
+        const { data: userProfile } = await supabase.from('users').select('role').eq('id', user.id).single()
+        const { data: workers } = await supabase.from('workers').select('*, companies(name_jp)').eq('is_deleted', false).order('created_at', { ascending: false })
 
-    if (workersError) console.error('Error fetching workers:', workersError);
+        const next90Days = new Date();
+        next90Days.setDate(next90Days.getDate() + 90);
+        const next90DaysStr = next90Days.toISOString().split('T')[0];
 
-    const next90Days = new Date();
-    next90Days.setDate(next90Days.getDate() + 90);
-    const next90DaysStr = next90Days.toISOString().split('T')[0];
-
-    return (
-        <div className="flex h-screen font-sans text-[#1f1f1f] overflow-hidden selection:bg-[#24b47e]/20">
-            <Sidebar active="workers" />
-            <div className="flex-1 flex flex-col relative min-w-0 overflow-hidden">
-                <WorkersListClient initialWorkers={workers || []} role={userProfile?.role || 'staff'} next90DaysStr={next90DaysStr} />
+        return (
+            <div className="flex h-screen font-sans text-[#1f1f1f] overflow-hidden selection:bg-[#24b47e]/20">
+                <Sidebar active="workers" />
+                <div className="flex-1 flex flex-col relative min-w-0 overflow-hidden">
+                    <WorkersListClient initialWorkers={workers || []} role={userProfile?.role || 'staff'} next90DaysStr={next90DaysStr} />
+                </div>
             </div>
-        </div>
-    )
+        )
+    } catch (error: any) {
+        // If it's a redirect (NEXT_REDIRECT), re-throw it
+        if (error?.digest?.includes('NEXT_REDIRECT')) {
+            throw error;
+        }
+        console.error('[WorkersPage] Server render error:', error);
+        return (
+            <div className="flex h-screen items-center justify-center bg-white p-8 text-center">
+                <div className="max-w-lg space-y-4">
+                    <h1 className="text-xl font-bold text-gray-900">ページの読み込みに失敗しました</h1>
+                    <p className="text-gray-500 text-sm">サーバーエラーが発生しました。ページを再読み込みしてください。</p>
+                    <p className="text-xs text-red-400 font-mono bg-red-50 p-3 rounded-lg text-left break-all">
+                        {String(error?.message || error || 'Unknown error')}
+                    </p>
+                    <a href="/workers" className="inline-block px-4 py-2 bg-emerald-600 text-white rounded-md text-sm">再読み込み</a>
+                </div>
+            </div>
+        )
+    }
 }

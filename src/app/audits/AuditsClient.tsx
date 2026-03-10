@@ -4,7 +4,7 @@ import React, { useState, useMemo, useEffect, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import {
     Search, RefreshCw, Plus, FileDown, Building2, ClipboardList,
-    X, CalendarPlus, CheckCircle2, CalendarCheck, Check, Clock, Save
+    X, CalendarPlus, CheckCircle2, CalendarCheck, Check, Clock, Save, ArrowLeft
 } from 'lucide-react';
 
 import AuditStatusColumn from './AuditStatusColumn';
@@ -227,6 +227,25 @@ export function AuditsClient({ matrixData, filterMonth, userRole, companies = []
         return c;
     }, [matrixData]);
 
+    // Mobile View State
+    const [mobileView, setMobileView] = useState<'status' | 'list' | 'detail'>('status');
+
+    // Handlers for Drill-down
+    const handleSelectStatus = (tab: string) => {
+        setActiveTab(tab);
+        setMobileView('list');
+    };
+
+    const handleSelectCompany = (id: string | null) => {
+        setSelectedCompanyId(id);
+        if (id) setMobileView('detail');
+    };
+
+    const handleBack = () => {
+        if (mobileView === 'detail') setMobileView('list');
+        else if (mobileView === 'list') setMobileView('status');
+    };
+
     const handleRefresh = () => {
         setIsRefreshing(true);
         setSelectedCompanyId(null);
@@ -236,8 +255,8 @@ export function AuditsClient({ matrixData, filterMonth, userRole, companies = []
 
     return (
         <div className="flex flex-col h-screen bg-white overflow-hidden text-gray-900 antialiased selection:bg-blue-100">
-            {/* Header */}
-            <header className="h-[42px] bg-white border-b border-gray-200 flex items-center justify-between px-4 z-40 shrink-0">
+            {/* 1. Header Desktop (Hidden on Mobile) */}
+            <header className="hidden md:flex h-[42px] bg-white border-b border-gray-200 flex items-center justify-between px-4 z-40 shrink-0">
                 <div className="flex items-center gap-4 flex-1">
                     <h2 className="text-[14px] font-normal tracking-tight text-gray-950 border-r border-gray-200 pr-4 shrink-0">
                         監査<span className="text-blue-700">訪問</span>
@@ -272,9 +291,10 @@ export function AuditsClient({ matrixData, filterMonth, userRole, companies = []
                 </div>
             </header>
 
-            {/* Main Content Area (3-Column) */}
+            {/* 2. Content Area */}
             <div className="flex-1 flex overflow-hidden bg-white p-0">
-                <div className="flex-1 flex border-t border-gray-200 overflow-hidden bg-white">
+                {/* ── DESKTOP LAYOUT ── */}
+                <div className="hidden lg:flex flex-1 border-t border-gray-200 overflow-hidden bg-white">
                     {/* Column 1: Status Tabs (260px) */}
                     <div className="w-[260px] shrink-0 border-r border-gray-300 flex flex-col bg-white">
                         <div className="h-[48px] px-4 flex items-center border-b border-gray-300 bg-white shrink-0">
@@ -283,7 +303,7 @@ export function AuditsClient({ matrixData, filterMonth, userRole, companies = []
                         <AuditStatusColumn
                             counts={counts}
                             activeTab={activeTab}
-                            onSelect={setActiveTab}
+                            onSelect={handleSelectStatus}
                         />
                     </div>
 
@@ -308,7 +328,7 @@ export function AuditsClient({ matrixData, filterMonth, userRole, companies = []
                         <AuditCompanyListColumn
                             companies={filtered}
                             selectedId={selectedCompanyId}
-                            onSelect={setSelectedCompanyId}
+                            onSelect={handleSelectCompany}
                         />
                     </div>
 
@@ -340,6 +360,63 @@ export function AuditsClient({ matrixData, filterMonth, userRole, companies = []
                         )}
                     </div>
                 </div>
+
+                {/* ── MOBILE LAYOUT (Drill-down) ── */}
+                <div className="lg:hidden flex-1 flex flex-col bg-[#F5F5F7] pb-20">
+                    {/* Headers Mobile */}
+                    <div className="bg-white border-b border-gray-100 px-4 py-3 flex items-center gap-3 sticky top-0 z-20">
+                        {mobileView !== 'status' && (
+                            <button
+                                onClick={handleBack}
+                                className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-50 text-gray-600"
+                            >
+                                <ArrowLeft size={16} />
+                            </button>
+                        )}
+                        <h1 className="text-[15px] font-normal tracking-tight">
+                            {mobileView === 'status' ? '監査ステータス' : mobileView === 'list' ? `${TAB_CONFIG_LOCAL[activeTab] || '企業一覧'}` : 'スケジュール詳細'}
+                        </h1>
+                        {mobileView === 'status' && (
+                            <button onClick={handleRefresh} className="ml-auto p-2 text-gray-400">
+                                <RefreshCw size={16} className={isRefreshing ? 'animate-spin' : ''} />
+                            </button>
+                        )}
+                    </div>
+
+                    <div className="flex-1 overflow-hidden relative">
+                        {mobileView === 'status' && (
+                            <div className="absolute inset-0 bg-white">
+                                <AuditStatusColumn
+                                    counts={counts}
+                                    activeTab={activeTab}
+                                    onSelect={handleSelectStatus}
+                                />
+                            </div>
+                        )}
+                        {mobileView === 'list' && (
+                            <div className="absolute inset-0 bg-white">
+                                <AuditCompanyListColumn
+                                    companies={filtered}
+                                    selectedId={selectedCompanyId}
+                                    onSelect={handleSelectCompany}
+                                />
+                            </div>
+                        )}
+                        {mobileView === 'detail' && selectedRow && (
+                            <div className="absolute inset-0 bg-white flex flex-col">
+                                <div className="flex-1 overflow-y-auto">
+                                    <AuditScheduleColumn
+                                        row={selectedRow}
+                                        filterMonth={filterMonth}
+                                        staffList={staffList}
+                                        onSaved={() => router.refresh()}
+                                        onOpenAddModal={(cid, type) => { setPreAuditData({ cid, type }); setShowAddModal(true); }}
+                                    />
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
             </div>
 
             {/* Modals */}
@@ -348,3 +425,11 @@ export function AuditsClient({ matrixData, filterMonth, userRole, companies = []
         </div>
     );
 }
+
+const TAB_CONFIG_LOCAL: Record<string, string> = {
+    all: 'すべて',
+    overdue: '予定超過',
+    today_due: '今月予定',
+    future: '次月以降',
+    no_data: '予定未作'
+};

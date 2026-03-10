@@ -119,6 +119,29 @@ export function SidebarClient({ active, userRole, userProfile }: SidebarClientPr
                     </div>
                 </div>
             </aside>
+
+            {/* Mobile Bottom Navigation */}
+            <nav className="fixed bottom-0 left-0 right-0 h-16 bg-white/80 backdrop-blur-md border-t border-gray-200 z-[100] md:hidden px-4 flex items-center justify-around pb-safe">
+                {ALL_NAV_ITEMS.map((item) => {
+                    const isActive = active === item.id;
+                    const Icon = item.icon;
+                    return (
+                        <Link
+                            key={item.id}
+                            href={item.href}
+                            className={`flex flex-col items-center gap-1 transition-all ${isActive ? "text-blue-600 scale-110" : "text-gray-400"
+                                }`}
+                        >
+                            <div className={`p-1.5 rounded-xl transition-all ${isActive ? "bg-blue-50" : ""}`}>
+                                <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
+                            </div>
+                            <span className={`text-[9px] font-black uppercase tracking-tighter ${isActive ? "opacity-100" : "opacity-60"}`}>
+                                {item.name === "位置情報マップ" ? "マップ" : item.name === "監査・訪問" ? "監査" : item.name}
+                            </span>
+                        </Link>
+                    );
+                })}
+            </nav>
         </>
     );
 }

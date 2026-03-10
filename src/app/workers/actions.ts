@@ -149,6 +149,8 @@ export async function importWorkers(workersData: ImportWorkerPayload[]) {
 
     // 1. Retrieve all host companies and automatically map company names to IDs
     const { data: companies } = await supabase.from('companies').select('id, name_jp').eq('is_deleted', false)
+    const companyMap = new Map<string, string>() // name_jp -> id
+    companies?.forEach(c => companyMap.set(c.name_jp, c.id))
 
     // Helper function for data processing
     const parseDate = (dateStr?: string | null) => {
@@ -173,21 +175,37 @@ export async function importWorkers(workersData: ImportWorkerPayload[]) {
         return t.trim() || 'ベトナム'
     }
 
-    // 2. Normalize data and convert types
-    const payload = workersData.map(w => {
-        // STRICT COMPANY MATCHING
-        if (!w.company_name || String(w.company_name).trim() === '') {
-            throw new Error(`エラー: 配属先企業（Company Name）が未入力の行が存在します。`)
+    // 2. Auto-create missing companies before mapping workers
+    const newCompanyNames = new Set<string>()
+    workersData.forEach(w => {
+        const name = w.company_name ? String(w.company_name).trim() : ''
+        if (name && !companyMap.has(name)) {
+            newCompanyNames.add(name)
         }
+    })
 
-        const foundCompany = companies?.find(c => c.name_jp === String(w.company_name).trim())
-        if (!foundCompany) {
-            throw new Error(`エラー: 「${w.company_name}」という企業名はシステムに登録されていません。受入企業一覧を先に確認・登録してください。`)
+    if (newCompanyNames.size > 0) {
+        const newCompanies = Array.from(newCompanyNames).map(name => ({
+            tenant_id: userData?.tenant_id,
+            name_jp: name,
+        }))
+        const { data: inserted, error: insertErr } = await supabase
+            .from('companies')
+            .insert(newCompanies)
+            .select('id, name_jp')
+        if (!insertErr && inserted) {
+            inserted.forEach(c => companyMap.set(c.name_jp, c.id))
         }
+    }
+
+    // 3. Normalize data and convert types
+    const payload = workersData.map(w => {
+        const companyName = w.company_name ? String(w.company_name).trim() : ''
+        const companyId = companyName ? (companyMap.get(companyName) || null) : null
 
         return {
             tenant_id: userData?.tenant_id,
-            company_id: foundCompany.id,
+            company_id: companyId,
             full_name_romaji: w.full_name_romaji ? String(w.full_name_romaji).toUpperCase().trim() : 'UNKNOWN',
             full_name_kana: '-', // Required by DB Schema
             dob: parseDate(w.dob) || '2000-01-01', // DOB is mandatory
@@ -210,7 +228,7 @@ export async function importWorkers(workersData: ImportWorkerPayload[]) {
         }
     })
 
-    // 3. Bulk upsert (save array to DB at once, overwrite if conflict on tenant+name+dob)
+    // 4. Bulk upsert (save array to DB at once, overwrite if conflict on tenant+name+dob)
     const { error } = await supabase.from('workers').upsert(payload, {
         onConflict: 'tenant_id,full_name_romaji,dob'
     })
@@ -220,10 +238,15 @@ export async function importWorkers(workersData: ImportWorkerPayload[]) {
     }
 
     // RPA: Automatically schedule routine audits for the inserted workers
-    await autoScheduleAuditsForWorkers(payload as Partial<Worker>[])
+    try {
+        await autoScheduleAuditsForWorkers(payload as Partial<Worker>[])
+    } catch (e) {
+        // Don't block import if RPA fails
+        console.error('RPA auto-schedule failed (non-blocking):', e)
+    }
 
     revalidatePath('/workers')
     revalidatePath('/companies')
     revalidatePath('/')
-    return { success: true, count: payload.length }
+    return { success: true, count: payload.length, newCompanies: newCompanyNames.size }
 }

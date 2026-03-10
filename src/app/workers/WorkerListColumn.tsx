@@ -13,6 +13,7 @@ interface Worker {
     avatar_url: string | null;
     visa_status?: string;
     entry_batch?: string;
+    entry_date?: string;
     passport_exp?: string;
     insurance_exp?: string;
     nationality?: string;
@@ -29,6 +30,11 @@ export default function WorkerListColumn({ workers, selectedIds, onSelect }: Wor
         if (!dateStr || dateStr === '---') return null;
         const diff = new Date(dateStr).getTime() - new Date().getTime();
         return Math.ceil(diff / (1000 * 60 * 60 * 24));
+    };
+
+    const fmtDate = (d?: string) => {
+        if (!d || d === '---') return '---';
+        return d.replace(/-/g, '/');
     };
 
     return (
@@ -62,33 +68,46 @@ export default function WorkerListColumn({ workers, selectedIds, onSelect }: Wor
                             {/* Name, Furigana, Company & Expiry */}
                             <div className="flex-1 min-w-0 flex flex-col justify-center overflow-hidden">
                                 <div className="flex items-baseline gap-1.5">
-                                    <span className={`text-[13px] font-normal truncate uppercase tracking-tight leading-none
+                                    <span className={`text-[12px] font-black truncate uppercase tracking-tight leading-none
                                         ${isSelected ? 'text-emerald-900' : 'text-slate-900'}`}>
                                         {worker.full_name_romaji || '---'}
                                     </span>
-                                    <span className={`text-[9px] truncate tracking-tighter shrink-0
+                                    <span className={`text-[8px] font-bold truncate tracking-tighter shrink-0
                                         ${isSelected ? 'text-emerald-600/60' : 'text-slate-400'}`}>
                                         {worker.full_name_kana}
                                     </span>
                                 </div>
-                                <div className="flex items-center gap-2 mt-1 overflow-hidden">
+                                <div className="flex items-center justify-between mt-1 overflow-hidden">
                                     <span className={`text-[10px] font-normal truncate leading-none
                                         ${isSelected ? 'text-emerald-700' : 'text-slate-500'}`}>
                                         {worker.companies?.name_jp || '---'}
                                     </span>
-                                    <span className={`text-[9px] font-mono tracking-tighter opacity-60 leading-none shrink-0
-                                        ${isSelected ? 'text-emerald-700' : 'text-slate-400'}`}>
-                                        {worker.zairyu_exp}
-                                    </span>
+                                    <div className="flex items-center gap-2 ml-2 shrink-0">
+                                        <div className="flex items-center gap-1">
+                                            <span className="text-[7px] font-black text-gray-300 uppercase scale-90">ENT</span>
+                                            <span className={`text-[9px] font-mono tracking-tighter leading-none w-[55px] text-right
+                                                ${isSelected ? 'text-blue-700 font-bold' : 'text-slate-500'}`}>
+                                                {fmtDate(worker.entry_date).substring(2)}
+                                            </span>
+                                        </div>
+                                        <div className="w-[1px] h-2 bg-gray-100" />
+                                        <div className="flex items-center gap-1">
+                                            <span className="text-[7px] font-black text-gray-300 uppercase scale-90">EXP</span>
+                                            <span className={`text-[9px] font-mono tracking-tighter leading-none w-[55px] text-right
+                                                ${isSelected ? 'text-emerald-700 font-bold' : 'text-slate-400'}`}>
+                                                {fmtDate(worker.zairyu_exp).substring(2)}
+                                            </span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
                             {/* Visa Status — aligned to right before alerts */}
-                            <div className="shrink-0 w-[80px] text-right px-1">
+                            <div className="shrink-0 w-[60px] text-right px-1">
                                 {worker.visa_status && (
-                                    <span className={`text-[10px] font-normal truncate uppercase tracking-tighter
-                                        ${isSelected ? 'text-emerald-600' : 'text-emerald-600'}`}>
-                                        {worker.visa_status}
+                                    <span className={`text-[9px] font-black truncate uppercase tracking-tighter leading-none
+                                        ${isSelected ? 'text-emerald-600' : 'text-emerald-600/60'}`}>
+                                        {(worker.visa_status === 'ikusei_shuro' ? '育成就労' : worker.visa_status === 'ginou_jisshu' ? '技能実習' : worker.visa_status === 'tokuteigino' ? '特定技能' : worker.visa_status).substring(0, 4)}
                                     </span>
                                 )}
                             </div>

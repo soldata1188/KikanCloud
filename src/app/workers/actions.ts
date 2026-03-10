@@ -233,13 +233,51 @@ export async function importWorkers(workersData: ImportWorkerPayload[]): Promise
             }
         })
 
-        // 4. Bulk upsert
-        const { error } = await supabase.from('workers').upsert(payload, {
-            onConflict: 'tenant_id,full_name_romaji,dob'
+        // 4. Smart insert: check duplicates manually then insert/update
+        // Fetch existing workers for this tenant to detect duplicates
+        const { data: existingWorkers } = await supabase
+            .from('workers')
+            .select('id, full_name_romaji, dob')
+            .eq('tenant_id', userData.tenant_id)
+            .eq('is_deleted', false)
+
+        const existingMap = new Map<string, string>() // "NAME|DOB" -> id
+        existingWorkers?.forEach(w => {
+            const key = `${w.full_name_romaji}|${w.dob}`
+            existingMap.set(key, w.id)
         })
-        if (error) {
-            console.error('Import error:', error)
-            return { success: false, error: `DBエラー: ${error.message}` }
+
+        const toInsert: typeof payload = []
+        const toUpdate: { id: string; data: (typeof payload)[0] }[] = []
+
+        for (const row of payload) {
+            const key = `${row.full_name_romaji}|${row.dob}`
+            const existingId = existingMap.get(key)
+            if (existingId) {
+                toUpdate.push({ id: existingId, data: row })
+            } else {
+                toInsert.push(row)
+            }
+        }
+
+        // Insert new workers
+        if (toInsert.length > 0) {
+            const { error: insertError } = await supabase.from('workers').insert(toInsert)
+            if (insertError) {
+                console.error('Insert error:', insertError)
+                return { success: false, error: `新規登録エラー: ${insertError.message}` }
+            }
+        }
+
+        // Update existing workers (overwrite)
+        for (const item of toUpdate) {
+            const { id, data: rowData } = item
+            const { tenant_id, ...updateFields } = rowData
+            const { error: updateError } = await supabase.from('workers').update(updateFields).eq('id', id)
+            if (updateError) {
+                console.error('Update error:', updateError)
+                // Don't stop on update errors, continue with others
+            }
         }
 
         // RPA: Automatically schedule routine audits

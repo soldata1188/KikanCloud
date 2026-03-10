@@ -1,6 +1,6 @@
 ﻿'use client'
 
-import React, { useState, useTransition, useEffect, useRef } from 'react'
+import React, { useState, useTransition, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
 import {
     Search, Clock, Briefcase, AlertTriangle, ChevronLeft, ChevronRight,
@@ -130,6 +130,38 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
         passport_exp: '',
         insurance_exp: '',
     })
+
+    // Column widths (resizable)
+    const [batchWidth, setBatchWidth] = useState(150);
+    const [companyWidth, setCompanyWidth] = useState(220);
+    const [workerWidth, setWorkerWidth] = useState(520);
+    const [profileWidth, setProfileWidth] = useState(440);
+    const isResizing = useRef(false);
+
+    const startResize = useCallback((col: 'batch' | 'company' | 'worker' | 'profile', startX: number) => {
+        isResizing.current = true;
+        const startWidth = col === 'batch' ? batchWidth : col === 'company' ? companyWidth : col === 'worker' ? workerWidth : profileWidth;
+        const setter = col === 'batch' ? setBatchWidth : col === 'company' ? setCompanyWidth : col === 'worker' ? setWorkerWidth : setProfileWidth;
+        const min = col === 'batch' ? 100 : col === 'company' ? 150 : col === 'worker' ? 300 : 300;
+        const max = col === 'batch' ? 300 : col === 'company' ? 500 : col === 'worker' ? 1000 : 800;
+
+        const onMouseMove = (e: MouseEvent) => {
+            if (!isResizing.current) return;
+            const delta = e.clientX - startX;
+            setter(Math.min(max, Math.max(min, startWidth + delta)));
+        };
+        const onMouseUp = () => {
+            isResizing.current = false;
+            window.removeEventListener('mousemove', onMouseMove);
+            window.removeEventListener('mouseup', onMouseUp);
+            document.body.style.cursor = '';
+            document.body.style.userSelect = '';
+        };
+        document.body.style.cursor = 'col-resize';
+        document.body.style.userSelect = 'none';
+        window.addEventListener('mousemove', onMouseMove);
+        window.addEventListener('mouseup', onMouseUp);
+    }, [batchWidth, companyWidth, workerWidth, profileWidth]);
 
     const handleBulkDelete = async () => {
         if (selectedIds.length === 0) return;
@@ -555,7 +587,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                 <div className="flex w-full min-w-max h-full border-t border-gray-300 overflow-hidden bg-white">
 
                     {/* Column 0: Entry Batch */}
-                    <div className="w-[150px] flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-300">
+                    <div className="flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-300" style={{ width: batchWidth }}>
                         <div className="h-[48px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
                             <div className="flex items-center gap-2">
                                 <Calendar size={20} className="text-gray-400" />
@@ -571,8 +603,22 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                         </div>
                     </div>
 
+                    {/* Resize Handle: Batch | Company */}
+                    <div
+                        className="relative flex-shrink-0 w-[1px] bg-gray-200 group/resize hover:bg-blue-300 transition-colors cursor-col-resize z-10"
+                        onMouseDown={(e) => startResize('batch', e.clientX)}
+                    >
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover/resize:opacity-100 transition-opacity pointer-events-none">
+                            <div className="flex flex-col gap-[3px] py-2 px-1">
+                                {[...Array(5)].map((_, i) => (
+                                    <div key={i} className="w-[3px] h-[3px] rounded-full bg-blue-400" />
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
                     {/* Column 1: Companies */}
-                    <div className="w-[220px] flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-300">
+                    <div className="flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-300" style={{ width: companyWidth }}>
                         <div className="h-[48px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
                             <div className="flex items-center gap-2">
                                 <Building2 size={20} className="text-blue-400" />
@@ -591,8 +637,22 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                         </div>
                     </div>
 
+                    {/* Resize Handle: Company | Worker */}
+                    <div
+                        className="relative flex-shrink-0 w-[1px] bg-gray-200 group/resize hover:bg-blue-300 transition-colors cursor-col-resize z-10"
+                        onMouseDown={(e) => startResize('company', e.clientX)}
+                    >
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover/resize:opacity-100 transition-opacity pointer-events-none">
+                            <div className="flex flex-col gap-[3px] py-2 px-1">
+                                {[...Array(5)].map((_, i) => (
+                                    <div key={i} className="w-[3px] h-[3px] rounded-full bg-blue-400" />
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
                     {/* Column 2: Workers */}
-                    <div className="flex-1 min-w-[520px] flex flex-col overflow-hidden border-r border-gray-300">
+                    <div className="flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-300" style={{ width: workerWidth }}>
                         <div className="h-[48px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
                             <div className="flex items-center gap-2">
                                 <Users size={20} className="text-gray-400" />
@@ -623,8 +683,22 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                         </div>
                     </div>
 
+                    {/* Resize Handle: Worker | Profile Detail */}
+                    <div
+                        className="relative flex-shrink-0 w-[1px] bg-gray-200 group/resize hover:bg-blue-300 transition-colors cursor-col-resize z-10"
+                        onMouseDown={(e) => startResize('worker', e.clientX)}
+                    >
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover/resize:opacity-100 transition-opacity pointer-events-none">
+                            <div className="flex flex-col gap-[3px] py-2 px-1">
+                                {[...Array(5)].map((_, i) => (
+                                    <div key={i} className="w-[3px] h-[3px] rounded-full bg-blue-400" />
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
                     {/* Column 3: Profile Detail */}
-                    <div className="w-[440px] flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-300">
+                    <div className="flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-300" style={{ width: profileWidth }}>
                         <div className="h-[48px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
                             <div className="flex items-center gap-2">
                                 <User size={20} className="text-gray-400" />
@@ -643,6 +717,20 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                                 onBulkUpdate={applyBatch}
                                 companies={uniqueCompanies}
                             />
+                        </div>
+                    </div>
+
+                    {/* Resize Handle: Profile | Documents */}
+                    <div
+                        className="relative flex-shrink-0 w-[1px] bg-gray-200 group/resize hover:bg-blue-300 transition-colors cursor-col-resize z-10"
+                        onMouseDown={(e) => startResize('profile', e.clientX)}
+                    >
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover/resize:opacity-100 transition-opacity pointer-events-none">
+                            <div className="flex flex-col gap-[3px] py-2 px-1">
+                                {[...Array(5)].map((_, i) => (
+                                    <div key={i} className="w-[3px] h-[3px] rounded-full bg-blue-400" />
+                                ))}
+                            </div>
                         </div>
                     </div>
 

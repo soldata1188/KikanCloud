@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
-import { RefreshCw, Search, Building2, Plus, Briefcase, FileText, ArrowLeft, List } from 'lucide-react';
+import { RefreshCw, Search, Building2, Plus, Briefcase, FileText, ArrowLeft, List, Users, ChevronDown } from 'lucide-react';
 import { BulkImportModal } from './BulkImportModal';
 
 import IndustryColumn from './IndustryColumn';
@@ -30,6 +30,38 @@ export function CompaniesClient({ companies: initialCompanies, userRole }: Compa
     // Mobile view state
     const [mobileView, setMobileView] = useState<'industry' | 'list' | 'detail' | 'docs'>('list');
     const [isBulkImportModalOpen, setIsBulkImportModalOpen] = useState(false);
+
+    // Column widths (resizable)
+    const [industryWidth, setIndustryWidth] = useState(150);
+    const [listWidth, setListWidth] = useState(300);
+    const [detailWidth, setDetailWidth] = useState(600);
+    const [workerListWidth, setWorkerListWidth] = useState(400);
+    const isResizing = useRef(false);
+
+    const startResize = useCallback((col: 'industry' | 'list' | 'detail' | 'workerList', startX: number) => {
+        isResizing.current = true;
+        const startWidth = col === 'industry' ? industryWidth : col === 'list' ? listWidth : col === 'detail' ? detailWidth : workerListWidth;
+        const setter = col === 'industry' ? setIndustryWidth : col === 'list' ? setListWidth : col === 'detail' ? setDetailWidth : setWorkerListWidth;
+        const min = col === 'industry' ? 100 : col === 'list' ? 200 : col === 'detail' ? 400 : 300;
+        const max = col === 'industry' ? 300 : col === 'list' ? 500 : col === 'detail' ? 1000 : 800;
+
+        const onMouseMove = (e: MouseEvent) => {
+            if (!isResizing.current) return;
+            const delta = e.clientX - startX;
+            setter(Math.min(max, Math.max(min, startWidth + delta)));
+        };
+        const onMouseUp = () => {
+            isResizing.current = false;
+            window.removeEventListener('mousemove', onMouseMove);
+            window.removeEventListener('mouseup', onMouseUp);
+            document.body.style.cursor = '';
+            document.body.style.userSelect = '';
+        };
+        document.body.style.cursor = 'col-resize';
+        document.body.style.userSelect = 'none';
+        window.addEventListener('mousemove', onMouseMove);
+        window.addEventListener('mouseup', onMouseUp);
+    }, [industryWidth, listWidth, detailWidth]);
 
     // ── Data Processing ──
     const mappedCompanies = useMemo(() => {
@@ -110,6 +142,26 @@ export function CompaniesClient({ companies: initialCompanies, userRole }: Compa
         return mappedCompanies.find(c => c.id === selectedCompanyId) || null;
     }, [mappedCompanies, selectedCompanyId]);
 
+    // Grouped Workers for selection
+    const groupedWorkers = useMemo(() => {
+        if (!selectedCompany) return {};
+        const groups: Record<string, any[]> = {};
+        selectedCompany.workers?.forEach((w: any) => {
+            if (w.is_deleted) return;
+            const status = w.visa_status || 'other';
+            if (!groups[status]) groups[status] = [];
+            groups[status].push(w);
+        });
+        return groups;
+    }, [selectedCompany]);
+
+    const VISA_LABELS: Record<string, string> = {
+        ginou_jisshu: '技能実習',
+        ikusei_shuro: '育成就労',
+        tokuteigino: '特定技能',
+        other: 'その他'
+    };
+
     // Handlers for Drill-down
     const handleSelectIndustry = (industry: string | null) => {
         setSelectedIndustry(industry);
@@ -180,8 +232,8 @@ export function CompaniesClient({ companies: initialCompanies, userRole }: Compa
             <div className="flex-1 flex overflow-hidden bg-white p-0">
                 {/* ── DESKTOP LAYOUT ── */}
                 <div className="hidden lg:flex flex-1 border-t border-gray-200 overflow-hidden bg-white">
-                    {/* Column 0: Industry (150px) */}
-                    <div className="w-[150px] shrink-0 flex flex-col overflow-hidden border-r border-gray-300">
+                    {/* Column 0: Industry */}
+                    <div className="flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-300" style={{ width: industryWidth }}>
                         <div className="h-[48px] px-4 border-b border-gray-300 bg-white flex items-center shrink-0">
                             <div className="flex items-center gap-2">
                                 <Briefcase size={20} className="text-gray-400" />
@@ -197,8 +249,22 @@ export function CompaniesClient({ companies: initialCompanies, userRole }: Compa
                         </div>
                     </div>
 
-                    {/* Column 1: Company List (300px) */}
-                    <div className="w-[300px] shrink-0 flex flex-col overflow-hidden border-r border-gray-300">
+                    {/* Resize Handle: Industry | List */}
+                    <div
+                        className="relative flex-shrink-0 w-[1px] bg-gray-200 group/resize hover:bg-blue-300 transition-colors cursor-col-resize z-10"
+                        onMouseDown={(e) => startResize('industry', e.clientX)}
+                    >
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover/resize:opacity-100 transition-opacity pointer-events-none">
+                            <div className="flex flex-col gap-[3px] py-2 px-1">
+                                {[...Array(5)].map((_, i) => (
+                                    <div key={i} className="w-[3px] h-[3px] rounded-full bg-blue-400" />
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Column 1: Company List */}
+                    <div className="flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-300" style={{ width: listWidth }}>
                         <div className="h-[48px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
                             <div className="flex items-center gap-2 text-slate-900">
                                 <Building2 size={20} className="text-emerald-400" />
@@ -231,15 +297,117 @@ export function CompaniesClient({ companies: initialCompanies, userRole }: Compa
                         <div className="flex-1 overflow-hidden">
                             <CompanyListColumn
                                 companies={filteredCompanies}
-                                selectedIds={selectedCompanyId ? [selectedCompanyId] : []}
+                                selectedIds={selectedCompanyId ? [selectedCompanyId as string] : []}
                                 onSelect={handleSelectCompany}
                             />
                         </div>
                     </div>
 
-                    {/* Column 2: Detail (600px) */}
-                    <div className="w-[600px] shrink-0 flex flex-col overflow-hidden border-r border-gray-300 bg-white">
+                    {/* Resize Handle: List | Detail */}
+                    <div
+                        className="relative flex-shrink-0 w-[1px] bg-gray-200 group/resize hover:bg-blue-300 transition-colors cursor-col-resize z-10"
+                        onMouseDown={(e) => startResize('list', e.clientX)}
+                    >
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover/resize:opacity-100 transition-opacity pointer-events-none">
+                            <div className="flex flex-col gap-[3px] py-2 px-1">
+                                {[...Array(5)].map((_, i) => (
+                                    <div key={i} className="w-[3px] h-[3px] rounded-full bg-blue-400" />
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Column 2: Detail */}
+                    <div className="flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-300 bg-white" style={{ width: detailWidth }}>
                         <CompanyDetailColumn companies={selectedCompany ? [selectedCompany] : []} />
+                    </div>
+
+                    {/* Resize Handle: Detail | Worker List */}
+                    <div
+                        className="relative flex-shrink-0 w-[1px] bg-gray-200 group/resize hover:bg-blue-300 transition-colors cursor-col-resize z-10"
+                        onMouseDown={(e) => startResize('detail', e.clientX)}
+                    >
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover/resize:opacity-100 transition-opacity pointer-events-none">
+                            <div className="flex flex-col gap-[3px] py-2 px-1">
+                                {[...Array(5)].map((_, i) => (
+                                    <div key={i} className="w-[3px] h-[3px] rounded-full bg-blue-400" />
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Column 2.5: Worker List (Newly Added) */}
+                    <div className="flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-300 bg-gray-50/30" style={{ width: workerListWidth }}>
+                        <div className="h-[48px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
+                            <div className="flex items-center gap-2">
+                                <Users size={20} className="text-gray-400" />
+                                <span className="text-[15px] font-normal uppercase tracking-widest text-gray-900">人材リスト</span>
+                            </div>
+                            <span className="text-[11px] font-normal bg-gray-50 px-1.5 py-0.5 rounded-[6px] text-slate-600 border border-gray-200 shadow-sm">
+                                {selectedCompany?.workers?.filter((w: any) => !w.is_deleted).length || 0}
+                            </span>
+                        </div>
+                        <div className="flex-1 overflow-y-auto thin-scrollbar p-3 space-y-6">
+                            {Object.keys(groupedWorkers).length > 0 ? (
+                                Object.entries(groupedWorkers).map(([status, list]) => (
+                                    <div key={status} className="space-y-2">
+                                        <div className="flex items-center gap-2 px-2">
+                                            <span className="text-[11px] font-black uppercase tracking-widest text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
+                                                {VISA_LABELS[status] || status}
+                                            </span>
+                                            <div className="flex-1 h-px bg-emerald-100" />
+                                            <span className="text-[10px] font-bold text-emerald-600/50">{list.length}</span>
+                                        </div>
+                                        <div className="grid gap-1">
+                                            {list.map(worker => (
+                                                <div key={worker.id} className="flex items-center gap-3 p-2 bg-white rounded-lg border border-gray-100 hover:border-emerald-200 hover:shadow-sm transition-all group">
+                                                    <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-[11px] font-bold text-slate-500 overflow-hidden shrink-0 border border-white shadow-sm">
+                                                        {worker.avatar_url
+                                                            ? <img src={worker.avatar_url} alt="" className="w-full h-full object-cover" />
+                                                            : (worker.full_name_romaji || 'U').charAt(0)}
+                                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <div className="text-[12px] font-black text-slate-900 uppercase truncate">
+                                                            {worker.full_name_romaji || '---'}
+                                                        </div>
+                                                        <div className="text-[9px] text-slate-400 truncate uppercase tracking-tighter">
+                                                            {worker.full_name_kana || '---'}
+                                                        </div>
+                                                    </div>
+                                                    <div className="shrink-0 text-right">
+                                                        <div className="text-[9px] font-mono font-bold text-slate-400">
+                                                            {worker.zairyu_exp?.replace(/-/g, '/') || '---'}
+                                                        </div>
+                                                        <div className={`text-[9px] font-bold ${worker.status === 'working' ? 'text-emerald-500' : 'text-amber-500'}`}>
+                                                            {worker.status === 'working' ? '就業中' : '準備中'}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="flex flex-col items-center justify-center py-12 opacity-40">
+                                    <Users size={32} className="text-gray-300 mb-2" />
+                                    <p className="text-[12px]">該当者なし</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Resize Handle: Worker List | Documents */}
+                    <div
+                        className="relative flex-shrink-0 w-[1px] bg-gray-200 group/resize hover:bg-blue-300 transition-colors cursor-col-resize z-10"
+                        onMouseDown={(e) => startResize('workerList', e.clientX)}
+                    >
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover/resize:opacity-100 transition-opacity pointer-events-none">
+                            <div className="flex flex-col gap-[3px] py-2 px-1">
+                                {[...Array(5)].map((_, i) => (
+                                    <div key={i} className="w-[3px] h-[3px] rounded-full bg-blue-400" />
+                                ))}
+                            </div>
+                        </div>
                     </div>
 
                     {/* Column 3: Documents (Flexible wide) */}
@@ -308,7 +476,7 @@ export function CompaniesClient({ companies: initialCompanies, userRole }: Compa
                                 <div className="flex-1 overflow-hidden">
                                     <CompanyListColumn
                                         companies={filteredCompanies}
-                                        selectedIds={selectedCompanyId ? [selectedCompanyId] : []}
+                                        selectedIds={selectedCompanyId ? [selectedCompanyId as string] : []}
                                         onSelect={handleSelectCompany}
                                     />
                                 </div>

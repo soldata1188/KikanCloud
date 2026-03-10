@@ -151,16 +151,6 @@ export default function WorkerListColumn({ workers, selectedIds, onSelect }: Wor
                                             <ShieldCheck size={14} />
                                         </span>
                                     )}
-                                    {isVizaWarn && (
-                                        <span className={`text-[9px] font-mono font-bold px-1.5 py-1 rounded-[4px] leading-none shrink-0 shadow-sm
-                                            ${isSelected
-                                                ? 'bg-emerald-500 text-white'
-                                                : isVizaAlert
-                                                    ? 'bg-rose-500 text-white animate-pulse'
-                                                    : 'bg-amber-100 text-amber-700'}`}>
-                                            {daysLeft}d
-                                        </span>
-                                    )}
                                 </div>
                             </button>
 
@@ -182,12 +172,6 @@ export default function WorkerListColumn({ workers, selectedIds, onSelect }: Wor
                                             <span className="text-[14px] font-black text-slate-900 uppercase truncate pr-2">
                                                 {worker.full_name_romaji || '---'}
                                             </span>
-                                            {isVizaWarn && (
-                                                <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded leading-none shrink-0
-                                                    ${isVizaAlert ? 'bg-rose-500 text-white' : 'bg-amber-100 text-amber-700'}`}>
-                                                    {daysLeft}d
-                                                </span>
-                                            )}
                                         </div>
                                         <div className="text-[10px] text-slate-400 mb-1">{worker.full_name_kana}</div>
                                         <div className="text-[11px] font-bold text-blue-600 truncate">

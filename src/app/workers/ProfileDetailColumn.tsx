@@ -483,9 +483,9 @@ export default function ProfileDetailColumn({ workers, onUpdate, onBulkUpdate, b
             <div className="flex-1 overflow-y-auto thin-scrollbar px-6 py-4">
                 <div className="max-w-2xl mx-auto flex flex-col space-y-8">
 
-                    {/* 1. Thông tin cá nhân & Cơ bản */}
+                    {/* 1. 基本情報 */}
                     <section className="space-y-1">
-                        <SectionHeader icon={<User size={14} className="text-emerald-600" />} label="Cá nhân & Cơ bản" color="text-emerald-900 mb-2 border-b-0" />
+                        <SectionHeader icon={<User size={14} className="text-emerald-600" />} label="プロフィール・住所" color="text-emerald-900 mb-2 border-b-0" />
                         <div className="space-y-0 text-gray-800">
                             {renderField("生年月日", "dob", "date")}
                             {renderField("性別", "gender", "select", { male: '男性', female: '女性', other: 'その他' })}
@@ -498,9 +498,9 @@ export default function ProfileDetailColumn({ workers, onUpdate, onBulkUpdate, b
                         </div>
                     </section>
 
-                    {/* 2. Hợp đồng & Việc làm */}
+                    {/* 2. 契約・雇用情報 */}
                     <section className="space-y-1">
-                        <SectionHeader icon={<Briefcase size={14} className="text-emerald-600" />} label="Hợp đồng & Việc làm" color="text-emerald-900 mb-2 border-b-0" />
+                        <SectionHeader icon={<Briefcase size={14} className="text-emerald-600" />} label="契約・雇用情報" color="text-emerald-900 mb-2 border-b-0" />
                         <div className="space-y-0 text-gray-800">
                             {renderField("制度区分", "system_type", "select", { ginou_jisshu: '技能実習', ikusei_shuro: '育成就労', tokuteigino: '特定技能' })}
                             {renderField("職種区分", "industry_field")}
@@ -508,9 +508,9 @@ export default function ProfileDetailColumn({ workers, onUpdate, onBulkUpdate, b
                         </div>
                     </section>
 
-                    {/* 3. Nhập cảnh & Cư trú */}
+                    {/* 3. 入国・在留管理 */}
                     <section className="space-y-1">
-                        <SectionHeader icon={<Globe size={14} className="text-emerald-600" />} label="Nhập cảnh & Cư trú" color="text-emerald-900 mb-2 border-b-0" />
+                        <SectionHeader icon={<Globe size={14} className="text-emerald-600" />} label="入国・在留管理" color="text-emerald-900 mb-2 border-b-0" />
                         <div className="space-y-0 text-gray-800">
                             {renderField("入国期生", "entry_batch")}
                             {renderField("入国日", "entry_date", "date")}
@@ -527,9 +527,9 @@ export default function ProfileDetailColumn({ workers, onUpdate, onBulkUpdate, b
                         </div>
                     </section>
 
-                    {/* 4. Giấy tờ quan trọng */}
+                    {/* 4. 重要書類・認定 */}
                     <section className="space-y-1">
-                        <SectionHeader icon={<CreditCard size={14} className="text-emerald-600" />} label="Giấy tờ quan trọng" color="text-emerald-900 mb-2 border-b-0" />
+                        <SectionHeader icon={<CreditCard size={14} className="text-emerald-600" />} label="重要書類・認定" color="text-emerald-900 mb-2 border-b-0" />
                         <div className="space-y-0 text-gray-800">
                             {renderField("パスポート番号", "passport_no")}
                             {renderExpiryField("パスポート期限", "passport_exp")}
@@ -539,9 +539,9 @@ export default function ProfileDetailColumn({ workers, onUpdate, onBulkUpdate, b
                         </div>
                     </section>
 
-                    {/* 6. Ghi chú */}
+                    {/* 6. 備考 */}
                     <section className="space-y-1">
-                        <SectionHeader icon={<MessageSquare size={14} className="text-emerald-600" />} label="Ghi chú & Phản hồi" color="text-emerald-900 mb-2 border-b-0" />
+                        <SectionHeader icon={<MessageSquare size={14} className="text-emerald-600" />} label="備考・フィードバック" color="text-emerald-900 mb-2 border-b-0" />
                         <div className="mt-2 min-h-[100px]">
                             {isEditing ? (
                                 <textarea
@@ -555,7 +555,7 @@ export default function ProfileDetailColumn({ workers, onUpdate, onBulkUpdate, b
                                     <p className="text-[12px] text-gray-700 leading-relaxed whitespace-pre-wrap">{worker.remarks}</p>
                                 </div>
                             ) : (
-                                <p className="text-[11px] text-gray-300 italic px-1">Ghi chú trống</p>
+                                <p className="text-[11px] text-gray-300 italic px-1">備考なし</p>
                             )}
                         </div>
                     </section>

@@ -37,7 +37,6 @@ interface Worker {
     entry_date?: string;
     // Visa / Residency
     visa_status?: string;
-    zairyu_no?: string;
     zairyu_exp?: string;
     residence_card_exp_date?: string;
     // Documents
@@ -523,7 +522,6 @@ export default function ProfileDetailColumn({ workers, onUpdate, onBulkUpdate, b
                                 />
                             )}
                             {renderField("在留資格", "visa_status")}
-                            {renderField("在留カード番号", "zairyu_no")}
                             {renderExpiryField("在留期限", "zairyu_exp")}
                         </div>
                     </section>

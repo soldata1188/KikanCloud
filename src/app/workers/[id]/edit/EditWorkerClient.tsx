@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useRef } from 'react';
-import { ArrowLeft, UploadCloud, FileText, Loader2, Sparkles, Image as ImageIcon, X, User, IdCard, Briefcase, Save, FileBadge2 } from 'lucide-react';
+import { ArrowLeft, UploadCloud, FileText, Loader2, Image as ImageIcon, X, User, IdCard, Briefcase, Save, FileBadge2 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -10,7 +10,7 @@ interface WorkerData {
     blood_type: string; nationality: string; address: string; company_id: string;
     industry_field: string; sending_org: string; system_type: string; status: string;
     entry_batch: string; entry_date: string; insurance_exp: string; visa_status: string;
-    zairyu_no: string; zairyu_exp: string; passport_no: string; passport_exp: string;
+    zairyu_exp: string; passport_no: string; passport_exp: string;
     cert_no: string; cert_start_date: string; cert_end_date: string; remarks: string;
     has_spouse: string; birthplace: string; japan_residence: string;
 }
@@ -40,7 +40,6 @@ interface EditWorkerProps {
         entry_date?: string;
         insurance_exp?: string;
         visa_status?: string;
-        zairyu_no?: string;
         zairyu_exp?: string;
         passport_no?: string;
         passport_exp?: string;
@@ -56,18 +55,18 @@ interface EditWorkerProps {
 }
 
 const DOC_TYPES = [
-    { id: 'avatar', label: '顔写真', ai: false },
-    { id: 'zairyu_card', label: '在留カード', ai: true },
-    { id: 'passport', label: 'パスポート', ai: true },
-    { id: 'resume', label: '履歴書', ai: false },
-    { id: 'cert_notice', label: '認定通知', ai: false },
-    { id: 'insurance', label: '総合保険', ai: false },
-    { id: 'my_number', label: '個人番号', ai: false },
-    { id: 'pension', label: '年金番号', ai: false },
-    { id: 'bank', label: '銀行口座', ai: false },
-    { id: 'health_check', label: '健康診断', ai: false },
-    { id: 'skill_test', label: '検定合格', ai: false },
-    { id: 'ccus', label: 'CCUSカード', ai: false },
+    { id: 'avatar', label: '顔写真' },
+    { id: 'zairyu_card', label: '在留カード' },
+    { id: 'passport', label: 'パスポート' },
+    { id: 'resume', label: '履歴書' },
+    { id: 'cert_notice', label: '認定通知' },
+    { id: 'insurance', label: '総合保険' },
+    { id: 'my_number', label: '個人番号' },
+    { id: 'pension', label: '年金番号' },
+    { id: 'bank', label: '銀行口座' },
+    { id: 'health_check', label: '健康診断' },
+    { id: 'skill_test', label: '検定合格' },
+    { id: 'ccus', label: 'CCUSカード' },
 ];
 
 const FormRow = ({ label, required, children, isLast = false }: {
@@ -117,7 +116,6 @@ export default function EditWorkerClient({ companies, worker }: EditWorkerProps)
         entry_date: worker.entry_date || '',
         insurance_exp: worker.insurance_exp || '',
         visa_status: worker.visa_status || '',
-        zairyu_no: worker.zairyu_no || '',
         zairyu_exp: worker.zairyu_exp || '',
         passport_no: worker.passport_no || '',
         passport_exp: worker.passport_exp || '',
@@ -131,10 +129,8 @@ export default function EditWorkerClient({ companies, worker }: EditWorkerProps)
     });
 
     const [files, setFiles] = useState<Record<string, { id: string; file: File; timestamp: string }[]>>({});
-    const [customDocTypes, setCustomDocTypes] = useState<{ id: string; label: string; ai: boolean }[]>([]);
+    const [customDocTypes, setCustomDocTypes] = useState<{ id: string; label: string }[]>([]);
     const [newCustomCategory, setNewCustomCategory] = useState('');
-    const [isScanning, setIsScanning] = useState<string | null>(null);
-    const [highlightedFields, setHighlightedFields] = useState<string[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [toastError, setToastError] = useState<string | null>(null);
     const [stagedFile, setStagedFile] = useState<File | null>(null);
@@ -173,7 +169,7 @@ export default function EditWorkerClient({ companies, worker }: EditWorkerProps)
         let finalTargetDoc = stagedTargetDoc;
         if (stagedTargetDoc === 'new_custom' && newCustomCategory.trim()) {
             const newId = `custom_${Date.now()}`;
-            setCustomDocTypes(prev => [...prev, { id: newId, label: newCustomCategory.trim(), ai: false }]);
+            setCustomDocTypes(prev => [...prev, { id: newId, label: newCustomCategory.trim() }]);
             finalTargetDoc = newId;
             setNewCustomCategory('');
         }
@@ -204,39 +200,15 @@ export default function EditWorkerClient({ companies, worker }: EditWorkerProps)
 
     const processFile = async (file: File, docId: string) => {
         const fileId = Math.random().toString(36).substring(7);
-        const timestamp = new Date().toLocaleString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
-        setFiles(prev => ({ ...prev, [docId]: [...(prev[docId] || []), { id: fileId, file, timestamp }] }));
-        if (docId === 'zairyu_card' || docId === 'passport') await extractDataWithAI(file, docId);
-    };
+        const timestamp = new Date().toLocaleString('ja-JP', {
+            year: 'numeric', month: '2-digit', day: '2-digit',
+            hour: '2-digit', minute: '2-digit'
+        });
 
-    const extractDataWithAI = async (file: File, docId: string) => {
-        setIsScanning(docId);
-        try {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = async () => {
-                const base64str = (reader.result as string).split(',')[1];
-                const res = await fetch('/api/ai/extract', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ base64str, mimeType: file.type }) });
-                if (!res.ok) { const d = await res.json().catch(() => ({})); throw new Error(d.error || 'AI extraction failed'); }
-                const result = await res.json();
-                if (result.data) {
-                    const newData: Partial<WorkerData> = {};
-                    const fields: string[] = [];
-                    const map: [string, keyof WorkerData][] = [
-                        ['nameRomaji', 'full_name_romaji'], ['nameKana', 'full_name_kana'], ['dob', 'dob'],
-                        ['nationality', 'nationality'], ['zairyuStatus', 'visa_status'],
-                        ['zairyuCardNumber', 'zairyu_no'], ['zairyuExpiration', 'zairyu_exp'],
-                        ['passportNumber', 'passport_no'], ['passportExpiration', 'passport_exp'],
-                    ];
-                    map.forEach(([k, fld]) => { if (result.data[k]) { (newData as any)[fld] = result.data[k]; fields.push(fld); } });
-                    if (result.data.gender) { newData.gender = result.data.gender.toLowerCase() === 'male' ? 'male' : 'female'; fields.push('gender'); }
-                    setFormData(prev => ({ ...prev, ...newData }));
-                    setHighlightedFields(fields);
-                    setTimeout(() => setHighlightedFields([]), 2500);
-                }
-            };
-        } catch (e: any) { alert(`AIスキャンに失敗しました: ${e.message}`); }
-        finally { setIsScanning(null); }
+        setFiles(prev => ({
+            ...prev,
+            [docId]: [...(prev[docId] || []), { id: fileId, file, timestamp }]
+        }));
     };
 
     const handleSubmit = async () => {
@@ -244,22 +216,37 @@ export default function EditWorkerClient({ companies, worker }: EditWorkerProps)
         try {
             const payload = new FormData();
             payload.append('id', worker.id);
-            Object.entries(formData).forEach(([k, v]) => payload.append(k, v));
-            Object.entries(files).forEach(([docId, arr]) => arr.forEach(f => payload.append(`file_${docId}`, f.file)));
-            const res = await fetch('/api/company_workers/update_with_files', { method: 'POST', body: payload });
+            Object.entries(formData).forEach(([k, v]) => {
+                if (v !== undefined && v !== null) {
+                    payload.append(k, String(v));
+                }
+            });
+
+            Object.entries(files).forEach(([docId, arr]) => {
+                arr.forEach(f => payload.append(`file_${docId}`, f.file));
+            });
+
+            const res = await fetch('/api/company_workers/update_with_files', {
+                method: 'POST',
+                body: payload
+            });
+
             const result = await res.json();
-            if (result.success) { router.push(`/workers/${worker.id}`); router.refresh(); }
-            else throw new Error(result.error || '保存システムエラーが発生しました');
+            if (result.success) {
+                router.push(`/workers/${worker.id}`);
+                router.refresh();
+            } else {
+                throw new Error(result.error || '保存システムエラーが発生しました');
+            }
         } catch (e: any) {
             setToastError(`保存に失敗しました: ${e.message}`);
             setTimeout(() => setToastError(null), 5000);
-        } finally { setIsSubmitting(false); }
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
-    const inputCls = (name: string) => {
-        const base = 'w-full bg-transparent focus:bg-gray-50 border border-transparent hover:border-gray-200 rounded-md px-3 py-2 text-[13px] outline-none text-gray-900 font-bold transition-all focus:border-[#0067b8] focus:ring-1 focus:ring-blue-500/10 placeholder:text-gray-300 placeholder:font-normal';
-        return highlightedFields.includes(name) ? base + ' bg-blue-50 !border-[#0067b8] !text-[#0067b8] ring-1 ring-blue-100 animate-pulse' : base;
-    };
+    const inputCls = (fieldName?: string) => "w-full bg-transparent focus:bg-gray-50 border border-transparent hover:border-gray-200 rounded-md px-3 py-2 text-[13px] outline-none text-gray-900 font-bold transition-all focus:border-[#0067b8] focus:ring-1 focus:ring-blue-500/10 placeholder:text-gray-300 placeholder:font-normal";
 
     const formatSystemType = (sys: string) => {
         if (sys === 'ikusei_shuro') return '育成就労';
@@ -350,7 +337,6 @@ export default function EditWorkerClient({ companies, worker }: EditWorkerProps)
                                             {companies?.find(c => c.id === formData.company_id)?.name_jp || '未配属'}
                                         </div>
                                         <div className="inline-flex items-center gap-2.5 px-4 py-2 bg-gray-50 text-gray-900 text-[11px] font-black rounded border border-gray-200 uppercase tracking-widest">
-                                            <Sparkles size={12} className="text-[#0067b8]" />
                                             {formatSystemType(formData.system_type)}
                                         </div>
                                     </div>
@@ -471,9 +457,6 @@ export default function EditWorkerClient({ companies, worker }: EditWorkerProps)
                                         <FormRow label="保険期限">
                                             <input name="insurance_exp" type="date" value={formData.insurance_exp} onChange={handleInputChange} className={inputCls('insurance_exp')} />
                                         </FormRow>
-                                        <FormRow label="在留カード番号">
-                                            <input name="zairyu_no" value={formData.zairyu_no} onChange={handleInputChange} className={inputCls('zairyu_no')} maxLength={12} placeholder="AB12345678CD" />
-                                        </FormRow>
                                         <FormRow label="在留期限">
                                             <input name="zairyu_exp" type="date" value={formData.zairyu_exp} onChange={handleInputChange} className={inputCls('zairyu_exp')} />
                                         </FormRow>
@@ -506,7 +489,7 @@ export default function EditWorkerClient({ companies, worker }: EditWorkerProps)
                             <div className="p-1.5 bg-[#0067b8] text-white rounded">
                                 <FileBadge2 size={14} />
                             </div>
-                            <h3 className="text-[12px] font-black text-gray-900 uppercase tracking-widest">AI ワークスペース</h3>
+                            <h3 className="text-[12px] font-black text-gray-900 uppercase tracking-widest">ドキュメント保管</h3>
                         </div>
                         {Object.values(files).reduce((a, arr) => a + arr.length, 0) > 0 && (
                             <span className="text-[10px] font-black text-[#0067b8] bg-blue-50 px-2 py-0.5 rounded border border-blue-100 uppercase tracking-widest">
@@ -516,7 +499,6 @@ export default function EditWorkerClient({ companies, worker }: EditWorkerProps)
                     </div>
 
                     <div className="flex-1 overflow-y-auto p-5 space-y-8 no-scrollbar">
-                        {/* 1. Upload Zone */}
                         <div className="space-y-3">
                             <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">新規ドキュメント追加</p>
                             <div
@@ -561,67 +543,49 @@ export default function EditWorkerClient({ companies, worker }: EditWorkerProps)
                                     <button type="button" onClick={stageToStorage}
                                         disabled={!stagedTargetDoc || (stagedTargetDoc === 'new_custom' && !newCustomCategory.trim())}
                                         className="w-full py-2.5 bg-[#0067b8] hover:bg-blue-700 disabled:bg-gray-100 disabled:text-gray-300 text-white text-[11px] font-black rounded-md transition-all uppercase tracking-[0.2em]">
-                                        割当とスキャン実行
+                                        割当と保存
                                     </button>
                                 </div>
                             )}
                         </div>
 
-                        {/* 2. Storage & Extraction */}
                         <div className="space-y-3">
-                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">保管と抽出</p>
+                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">保管済みドキュメント</p>
                             <div className="space-y-2">
-                                {Object.keys(files).length === 0 && !isScanning && (
+                                {Object.keys(files).length === 0 && (
                                     <div className="py-12 flex flex-col items-center justify-center text-center opacity-30 border-2 border-dashed border-gray-200 rounded-md">
                                         <FileText size={32} className="text-gray-300 mb-2" />
                                         <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">空</span>
                                     </div>
                                 )}
-                                {allDocTypes.map(doc => {
-                                    const arr = files[doc.id] || [];
-                                    const scanning = isScanning === doc.id;
-                                    if (arr.length === 0 && !scanning) return null;
-                                    return (
-                                        <div key={doc.id} className="space-y-2">
-                                            {arr.map((f, idx) => (
-                                                <div key={f.id} className="p-2.5 bg-white border border-gray-200 rounded-md flex items-center justify-between group relative hover:border-[#0067b8] transition-all">
-                                                    <div className="flex items-center gap-3 overflow-hidden flex-1">
-                                                        <div className="w-8 h-8 rounded-md flex items-center justify-center shrink-0 bg-gray-50 text-gray-400 border border-gray-100 group-hover:bg-[#0067b8] group-hover:text-white transition-all">
-                                                            {doc.id === 'avatar' ? <ImageIcon size={14} /> : <FileText size={14} />}
-                                                        </div>
-                                                        <div className="truncate flex-1">
-                                                            <div className="text-[10px] font-black text-gray-900 truncate uppercase tracking-tight group-hover:text-[#0067b8]">{doc.label}{arr.length > 1 ? ` #${idx + 1}` : ''}</div>
-                                                            <div className="text-[9px] text-gray-400 font-mono truncate uppercase mt-0.5">{f.file.name}</div>
-                                                        </div>
-                                                    </div>
-                                                    <button type="button" onClick={() => removeFromStorage(doc.id, f.id)}
-                                                        className="p-1.5 text-gray-300 hover:text-white hover:bg-rose-500 rounded transition-all opacity-0 group-hover:opacity-100 shrink-0">
-                                                        <X size={12} strokeWidth={3} />
-                                                    </button>
-                                                </div>
-                                            ))}
-                                            {scanning && (
-                                                <div className="p-2.5 bg-blue-50 border border-blue-200 rounded-md flex items-center gap-3 relative overflow-hidden">
-                                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent translate-x-[-100%] animate-[shimmer_2s_infinite]" />
-                                                    <div className="w-8 h-8 rounded-md flex items-center justify-center bg-blue-600 text-white shrink-0">
-                                                        <Loader2 size={14} className="animate-spin" />
-                                                    </div>
-                                                    <div>
-                                                        <div className="text-[10px] font-black text-[#0067b8] uppercase tracking-tight">{doc.label}</div>
-                                                        <div className="text-[9px] text-blue-600 font-black flex items-center gap-1 uppercase tracking-widest mt-0.5">
-                                                            <Sparkles size={8} /> スキャン中...
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            )}
+                                {Object.entries(files).map(([docId, arr]) => (
+                                    <div key={docId} className="space-y-1">
+                                        <div className="text-[9px] font-black text-[#0067b8] uppercase tracking-widest pl-1 mb-1">
+                                            {allDocTypes.find(d => d.id === docId)?.label || docId}
                                         </div>
-                                    );
-                                })}
+                                        {arr.map(f => (
+                                            <div key={f.id} className="group flex items-center justify-between p-2.5 bg-gray-50 hover:bg-white border hover:border-blue-200 rounded transition-all">
+                                                <div className="flex items-center gap-2.5 min-w-0">
+                                                    <div className="w-7 h-7 bg-white border border-gray-100 rounded flex items-center justify-center text-blue-400 group-hover:text-blue-600 transition-colors">
+                                                        <FileText size={14} />
+                                                    </div>
+                                                    <div className="min-w-0">
+                                                        <div className="text-[11px] font-black text-gray-900 truncate uppercase tracking-tight">{f.file.name}</div>
+                                                        <div className="text-[9px] text-gray-400 font-bold">{f.timestamp}</div>
+                                                    </div>
+                                                </div>
+                                                <button type="button" onClick={() => removeFromStorage(docId, f.id)} className="w-6 h-6 flex items-center justify-center text-gray-300 hover:text-rose-500 hover:bg-rose-50 rounded transition-all">
+                                                    <X size={12} />
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 }

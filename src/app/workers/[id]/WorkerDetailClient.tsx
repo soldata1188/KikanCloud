@@ -30,7 +30,6 @@ interface Worker {
     entry_batch: string;
     entry_date: string;
     visa_status: string;
-    zairyu_no: string;
     zairyu_exp: string;
     passport_no: string;
     passport_exp: string;
@@ -307,7 +306,6 @@ export default function WorkerDetailClient({ worker, documents }: { worker: Work
 
                                     <SectionCard icon={<IdCard size={14} />} iconColor="text-[#0067b8]" title="証明書・期限">
                                         <DataRow label="在留資格" value={worker.visa_status} />
-                                        <DataRow label="在留カード番号" value={worker.zairyu_no} />
                                         <DataRow label="在留期限" value={
                                             worker.zairyu_exp
                                                 ? <span className="font-mono font-bold text-gray-900 bg-blue-50 px-2 py-0.5 rounded text-[11px] border border-blue-100">{worker.zairyu_exp}</span>

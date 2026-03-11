@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useRef } from 'react';
-import { ArrowLeft, UploadCloud, FileText, Loader2, Sparkles, Image as ImageIcon, X, User, Shield, MessageSquare } from 'lucide-react';
+import { ArrowLeft, UploadCloud, FileText, Loader2, Image as ImageIcon, X, User, Shield, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
 
 interface WorkerData {
@@ -21,7 +21,6 @@ interface WorkerData {
     entry_date: string;
     insurance_exp: string;
     visa_status: string;
-    zairyu_no: string;
     zairyu_exp: string;
     passport_no: string;
     passport_exp: string;
@@ -38,23 +37,23 @@ const initialWorkerData: WorkerData = {
     full_name_romaji: '', full_name_kana: '', dob: '', gender: '', blood_type: '',
     nationality: 'ベトナム', address: '', company_id: '', industry_field: '', sending_org: '',
     system_type: 'ikusei_shuro', status: 'waiting', entry_batch: '', entry_date: '', insurance_exp: '',
-    visa_status: '', zairyu_no: '', zairyu_exp: '', passport_no: '', passport_exp: '', cert_no: '', cert_start_date: '', cert_end_date: '',
+    visa_status: '', zairyu_exp: '', passport_no: '', passport_exp: '', cert_no: '', cert_start_date: '', cert_end_date: '',
     remarks: '', has_spouse: 'false', birthplace: '', japan_residence: ''
 };
 
 const DOC_TYPES = [
-    { id: 'avatar', label: '顔写真', ai: false },
-    { id: 'zairyu_card', label: '在留カード', ai: true },
-    { id: 'passport', label: 'パスポート', ai: true },
-    { id: 'resume', label: '履歴書', ai: false },
-    { id: 'cert_notice', label: '認定通知', ai: false },
-    { id: 'insurance', label: '総合保険', ai: false },
-    { id: 'my_number', label: '個人番号', ai: false },
-    { id: 'pension', label: '年金番号', ai: false },
-    { id: 'bank', label: '銀行口座', ai: false },
-    { id: 'health_check', label: '健康診断', ai: false },
-    { id: 'skill_test', label: '検定合格', ai: false },
-    { id: 'ccus', label: 'CCUSカード', ai: false }
+    { id: 'avatar', label: '顔写真' },
+    { id: 'zairyu_card', label: '在留カード' },
+    { id: 'passport', label: 'パスポート' },
+    { id: 'resume', label: '履歴書' },
+    { id: 'cert_notice', label: '認定通知' },
+    { id: 'insurance', label: '総合保険' },
+    { id: 'my_number', label: '個人番号' },
+    { id: 'pension', label: '年金番号' },
+    { id: 'bank', label: '銀行口座' },
+    { id: 'health_check', label: '健康診断' },
+    { id: 'skill_test', label: '検定合格' },
+    { id: 'ccus', label: 'CCUSカード' }
 ];
 
 const FormRow = ({ label, children, isLast = false }: { label: React.ReactNode, children: React.ReactNode, isLast?: boolean }) => (
@@ -79,10 +78,8 @@ function SectionHeader({ icon, label, color }: { icon: React.ReactNode; label: s
 export default function NewWorkerClient({ companies }: { companies: any[] }) {
     const [formData, setFormData] = useState<WorkerData>(initialWorkerData);
     const [files, setFiles] = useState<Record<string, { id: string, file: File, timestamp: string }[]>>({});
-    const [customDocTypes, setCustomDocTypes] = useState<{ id: string, label: string, ai: boolean }[]>([]);
+    const [customDocTypes, setCustomDocTypes] = useState<{ id: string, label: string }[]>([]);
     const [newCustomCategory, setNewCustomCategory] = useState<string>('');
-    const [isScanning, setIsScanning] = useState<string | null>(null);
-    const [highlightedFields, setHighlightedFields] = useState<string[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [toastError, setToastError] = useState<string | null>(null);
 
@@ -121,7 +118,7 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
 
         if (stagedTargetDoc === 'new_custom' && newCustomCategory.trim()) {
             const newId = `custom_${Date.now()}`;
-            setCustomDocTypes(prev => [...prev, { id: newId, label: newCustomCategory.trim(), ai: false }]);
+            setCustomDocTypes(prev => [...prev, { id: newId, label: newCustomCategory.trim() }]);
             finalTargetDoc = newId;
             setNewCustomCategory('');
         }
@@ -168,60 +165,6 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
             ...prev,
             [docId]: [...(prev[docId] || []), { id: fileId, file, timestamp: currentTimestamp }]
         }));
-
-        // Auto trigger AI OCR for Zairyu Card and Passport
-        if (docId === 'zairyu_card' || docId === 'passport') {
-            await extractDataWithAI(file, docId);
-        }
-    };
-
-    const extractDataWithAI = async (file: File, docId: string) => {
-        setIsScanning(docId);
-        try {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = async () => {
-                const base64str = (reader.result as string).split(',')[1];
-
-                const res = await fetch('/api/ai/extract', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ base64str, mimeType: file.type })
-                });
-
-                if (!res.ok) {
-                    const errorData = await res.json().catch(() => ({}));
-                    throw new Error(errorData.error || "AI extraction failed");
-                }
-
-                const result = await res.json();
-                if (result.data) {
-                    const newData: Partial<WorkerData> = {};
-                    const fieldsToHighlight = [];
-
-                    if (result.data.nameRomaji) { newData.full_name_romaji = result.data.nameRomaji; fieldsToHighlight.push('full_name_romaji'); }
-                    if (result.data.nameKana) { newData.full_name_kana = result.data.nameKana; fieldsToHighlight.push('full_name_kana'); }
-                    if (result.data.dob) { newData.dob = result.data.dob; fieldsToHighlight.push('dob'); }
-                    if (result.data.gender) { newData.gender = result.data.gender.toLowerCase() === 'male' ? 'male' : 'female'; fieldsToHighlight.push('gender'); }
-                    if (result.data.nationality) { newData.nationality = result.data.nationality; fieldsToHighlight.push('nationality'); }
-                    if (result.data.zairyuStatus) { newData.visa_status = result.data.zairyuStatus; fieldsToHighlight.push('visa_status'); }
-                    if (result.data.zairyuCardNumber) { newData.zairyu_no = result.data.zairyuCardNumber; fieldsToHighlight.push('zairyu_no'); }
-                    if (result.data.zairyuExpiration) { newData.zairyu_exp = result.data.zairyuExpiration; fieldsToHighlight.push('zairyu_exp'); }
-                    if (result.data.passportNumber) { newData.passport_no = result.data.passportNumber; fieldsToHighlight.push('passport_no'); }
-                    if (result.data.passportExpiration) { newData.passport_exp = result.data.passportExpiration; fieldsToHighlight.push('passport_exp'); }
-
-                    setFormData(prev => ({ ...prev, ...newData }));
-                    setHighlightedFields(fieldsToHighlight);
-
-                    setTimeout(() => setHighlightedFields([]), 2000);
-                }
-            };
-        } catch (e: unknown) {
-            const msg = e instanceof Error ? e.message : 'AIスキャンエラー'
-            alert(`AIスキャンに失敗いたしました: ${msg}`);
-        } finally {
-            setIsScanning(null);
-        }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -250,7 +193,6 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
             } else {
                 throw new Error(result.error || "保存システムエラーが発生いたしました。");
             }
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: unknown) {
             const msg = error instanceof Error ? error.message : '保存システムエラーが発生いたしました。'
             setToastError(`保存に失敗いたしました: ${msg}`);
@@ -260,13 +202,7 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
         }
     };
 
-    const getInputClass = (name: string) => {
-        const baseClass = "flex-1 h-7 w-full px-2 bg-white border border-indigo-200 rounded text-[12px] font-bold text-gray-800 outline-none focus:border-indigo-500";
-        if (highlightedFields.includes(name)) {
-            return baseClass + " !bg-emerald-50 !text-emerald-700 !border-emerald-300";
-        }
-        return baseClass;
-    };
+    const inputClass = "flex-1 h-7 w-full px-2 bg-white border border-indigo-200 rounded text-[12px] font-bold text-gray-800 outline-none focus:border-indigo-500";
 
     return (
         <div className="flex-1 flex flex-col h-full bg-slate-50 relative anim-page">
@@ -313,29 +249,29 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
                             <div className="bg-white rounded border border-slate-200 overflow-hidden">
                                 <SectionHeader icon={<User size={13} />} label="個人・雇用・住所" color="bg-blue-600 text-white" />
                                 <FormRow label={<span>氏名(ローマ字)<span className="text-[10px] text-red-600 ml-1">必須</span></span>}>
-                                    <input name="full_name_romaji" value={formData.full_name_romaji} onChange={handleInputChange} className={getInputClass("full_name_romaji")} placeholder="例: NGUYEN VAN A" />
+                                    <input name="full_name_romaji" value={formData.full_name_romaji} onChange={handleInputChange} className={inputClass} placeholder="例: NGUYEN VAN A" />
                                 </FormRow>
                                 <FormRow label="氏名（カナ）">
-                                    <input name="full_name_kana" value={formData.full_name_kana} onChange={handleInputChange} className={getInputClass("full_name_kana")} placeholder="例: グエン ヴァン ア" />
+                                    <input name="full_name_kana" value={formData.full_name_kana} onChange={handleInputChange} className={inputClass} placeholder="例: グエン ヴァン ア" />
                                 </FormRow>
                                 <FormRow label="生年月日">
-                                    <input name="dob" type="date" value={formData.dob} onChange={handleInputChange} className={getInputClass("dob")} />
+                                    <input name="dob" type="date" value={formData.dob} onChange={handleInputChange} className={inputClass} />
                                 </FormRow>
                                 <FormRow label="性別">
-                                    <select name="gender" value={formData.gender} onChange={handleInputChange} className={getInputClass("gender")}>
+                                    <select name="gender" value={formData.gender} onChange={handleInputChange} className={inputClass}>
                                         <option value="">選択してください</option>
                                         <option value="male">男性</option>
                                         <option value="female">女性</option>
                                     </select>
                                 </FormRow>
                                 <FormRow label="血液型">
-                                    <select name="blood_type" value={formData.blood_type} onChange={handleInputChange} className={getInputClass("blood_type")}>
+                                    <select name="blood_type" value={formData.blood_type} onChange={handleInputChange} className={inputClass}>
                                         <option value="">選択してください</option>
                                         <option value="A">A</option><option value="B">B</option><option value="O">O</option><option value="AB">AB</option>
                                     </select>
                                 </FormRow>
                                 <FormRow label="国籍">
-                                    <select name="nationality" value={formData.nationality} onChange={handleInputChange} className={getInputClass("nationality")}>
+                                    <select name="nationality" value={formData.nationality} onChange={handleInputChange} className={inputClass}>
                                         <option value="ベトナム">ベトナム</option>
                                         <option value="インドネシア">インドネシア</option>
                                         <option value="フィリピン">フィリピン</option>
@@ -343,25 +279,25 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
                                     </select>
                                 </FormRow>
                                 <FormRow label="出身地">
-                                    <input name="birthplace" value={formData.birthplace} onChange={handleInputChange} className={getInputClass("birthplace")} placeholder="例: ハノイ市" />
+                                    <input name="birthplace" value={formData.birthplace} onChange={handleInputChange} className={inputClass} placeholder="例: ハノイ市" />
                                 </FormRow>
                                 <FormRow label="配偶者">
-                                    <select name="has_spouse" value={formData.has_spouse} onChange={handleInputChange} className={getInputClass("has_spouse")}>
+                                    <select name="has_spouse" value={formData.has_spouse} onChange={handleInputChange} className={inputClass}>
                                         <option value="false">無</option>
                                         <option value="true">有</option>
                                     </select>
                                 </FormRow>
                                 <FormRow label="送出機関">
-                                    <input name="sending_org" value={formData.sending_org} onChange={handleInputChange} className={getInputClass("sending_org")} placeholder="例: VINAJAPAN JSC" />
+                                    <input name="sending_org" value={formData.sending_org} onChange={handleInputChange} className={inputClass} placeholder="例: VINAJAPAN JSC" />
                                 </FormRow>
                                 <FormRow label="配属先企業">
-                                    <select name="company_id" value={formData.company_id} onChange={handleInputChange} className={getInputClass("company_id")}>
+                                    <select name="company_id" value={formData.company_id} onChange={handleInputChange} className={inputClass}>
                                         <option value="">未配属</option>
                                         {companies?.map(c => <option key={c.id} value={c.id}>{c.name_jp}</option>)}
                                     </select>
                                 </FormRow>
                                 <FormRow label="ステータス">
-                                    <select name="status" value={formData.status} onChange={handleInputChange} className={getInputClass("status")}>
+                                    <select name="status" value={formData.status} onChange={handleInputChange} className={inputClass}>
                                         <option value="waiting">未入国</option>
                                         <option value="standby">対応中</option>
                                         <option value="working">就業中</option>
@@ -371,59 +307,54 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
                                     </select>
                                 </FormRow>
                                 <FormRow label="社宅住所" isLast={true}>
-                                    <input name="japan_residence" value={formData.japan_residence} onChange={handleInputChange} className={getInputClass("japan_residence")} placeholder="例: 東京都新宿区大久保1-1-1..." />
+                                    <input name="japan_residence" value={formData.japan_residence} onChange={handleInputChange} className={inputClass} placeholder="例: 東京都新宿区大久保1-1-1..." />
                                 </FormRow>
                             </div>
                         </div>
 
-                        {/* --- Right Column --- */}
                         <div className="flex flex-col gap-2">
                             <div className="bg-white rounded border border-slate-200 overflow-hidden">
                                 <SectionHeader icon={<Shield size={13} />} label="入国・在留・書類" color="bg-blue-600 text-white" />
                                 <FormRow label="制度区分">
-                                    <select name="system_type" value={formData.system_type} onChange={handleInputChange} className={getInputClass("system_type")}>
+                                    <select name="system_type" value={formData.system_type} onChange={handleInputChange} className={inputClass}>
                                         <option value="ikusei_shuro">育成就労</option>
                                         <option value="tokuteigino">特定技能</option>
                                         <option value="ginou_jisshu">技能実習</option>
                                     </select>
                                 </FormRow>
                                 <FormRow label="職種区分">
-                                    <input name="industry_field" value={formData.industry_field} onChange={handleInputChange} className={getInputClass("industry_field")} placeholder="例: 溶接、建設" />
+                                    <input name="industry_field" value={formData.industry_field} onChange={handleInputChange} className={inputClass} placeholder="例: 溶接、建設" />
                                 </FormRow>
                                 <FormRow label="入国期生">
-                                    <input name="entry_batch" value={formData.entry_batch} onChange={handleInputChange} className={getInputClass("entry_batch")} placeholder="例: 第15期生" />
+                                    <input name="entry_batch" value={formData.entry_batch} onChange={handleInputChange} className={inputClass} placeholder="例: 第15期生" />
                                 </FormRow>
                                 <FormRow label="入国日">
-                                    <input name="entry_date" type="date" value={formData.entry_date} onChange={handleInputChange} className={getInputClass("entry_date")} />
+                                    <input name="entry_date" type="date" value={formData.entry_date} onChange={handleInputChange} className={inputClass} />
                                 </FormRow>
                                 <FormRow label="在留資格">
-                                    <input name="visa_status" value={formData.visa_status} onChange={handleInputChange} className={getInputClass("visa_status")} placeholder="例: 技能実習第1号イ" />
-                                </FormRow>
-                                <FormRow label="在留カード番号">
-                                    <input name="zairyu_no" value={formData.zairyu_no} onChange={handleInputChange} className={getInputClass("zairyu_no")} maxLength={12} placeholder="例: AB12345678CD" />
+                                    <input name="visa_status" value={formData.visa_status} onChange={handleInputChange} className={inputClass} placeholder="例: 技能実習第1号イ" />
                                 </FormRow>
                                 <FormRow label="在留期限">
-                                    <input name="zairyu_exp" type="date" value={formData.zairyu_exp} onChange={handleInputChange} className={getInputClass("zairyu_exp")} />
+                                    <input name="zairyu_exp" type="date" value={formData.zairyu_exp} onChange={handleInputChange} className={inputClass} />
                                 </FormRow>
                                 <FormRow label="パスポート番号">
-                                    <input name="passport_no" value={formData.passport_no} onChange={handleInputChange} className={getInputClass("passport_no")} placeholder="例: C1234567" />
+                                    <input name="passport_no" value={formData.passport_no} onChange={handleInputChange} className={inputClass} placeholder="例: C1234567" />
                                 </FormRow>
                                 <FormRow label="パスポート期限">
-                                    <input name="passport_exp" type="date" value={formData.passport_exp} onChange={handleInputChange} className={getInputClass("passport_exp")} />
+                                    <input name="passport_exp" type="date" value={formData.passport_exp} onChange={handleInputChange} className={inputClass} />
                                 </FormRow>
                                 <FormRow label="認定開始日">
-                                    <input name="cert_start_date" type="date" value={formData.cert_start_date} onChange={handleInputChange} className={getInputClass("cert_start_date")} />
+                                    <input name="cert_start_date" type="date" value={formData.cert_start_date} onChange={handleInputChange} className={inputClass} />
                                 </FormRow>
                                 <FormRow label="認定終了日">
-                                    <input name="cert_end_date" type="date" value={formData.cert_end_date} onChange={handleInputChange} className={getInputClass("cert_end_date")} />
+                                    <input name="cert_end_date" type="date" value={formData.cert_end_date} onChange={handleInputChange} className={inputClass} />
                                 </FormRow>
                                 <FormRow label="保険期限" isLast={true}>
-                                    <input name="insurance_exp" type="date" value={formData.insurance_exp} onChange={handleInputChange} className={getInputClass("insurance_exp")} />
+                                    <input name="insurance_exp" type="date" value={formData.insurance_exp} onChange={handleInputChange} className={inputClass} />
                                 </FormRow>
                             </div>
                         </div>
 
-                        {/* 7. 備考 */}
                         <div className="bg-white rounded border border-slate-200 overflow-hidden col-span-2">
                             <SectionHeader icon={<MessageSquare size={13} />} label="備考" color="bg-slate-50 text-slate-500" />
                             <div className="p-2 bg-white">
@@ -432,19 +363,13 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
                                     value={formData.remarks}
                                     onChange={handleInputChange}
                                     className="w-full min-h-[80px] p-3 border border-indigo-200 bg-white rounded text-[12px] outline-none focus:border-indigo-500 font-medium text-gray-800"
-                                    placeholder="実習生に関する特記事項やメモを自由にご入力ください。"
+                                    placeholder="実習生に関する特記事項やメモ"
                                 />
                             </div>
                         </div>
-
                     </div>
                 </div>
-
-                {/* RIGHT PANE: Document Kanban Flow removed per request */}
-
             </div>
-
-
         </div>
     );
 }

@@ -37,9 +37,9 @@ interface CompanyDetailColumnProps {
 // ── Sub-components ────────────────────────────────────────
 function SectionHeader({ icon, label }: { icon: React.ReactNode; label: string }) {
     return (
-        <div className="flex items-center gap-2 px-3 py-2 mb-2 border-b border-gray-100">
-            <span className="text-emerald-600 opacity-60">{icon}</span>
-            <span className="text-[10px] font-normal uppercase tracking-[0.18em] text-emerald-900">{label}</span>
+        <div className="flex items-center gap-2 px-3 py-1.5 border-b border-gray-100">
+            <span className="text-emerald-600 opacity-60 scale-95">{icon}</span>
+            <span className="text-[10px] font-normal uppercase tracking-[0.1em] text-emerald-900">{label}</span>
         </div>
     );
 }
@@ -58,24 +58,24 @@ interface RowProps {
 function Row({ label, name, value, isEditing, onChange, type = 'text', placeholder, valueClass }: RowProps) {
     if (isEditing) {
         return (
-            <div className="flex justify-between items-center px-3 py-1.5 border-b border-gray-50 bg-white">
-                <span className="text-[10px] font-normal text-gray-400 shrink-0 min-w-[100px]">{label}</span>
+            <div className="flex justify-between items-center px-4 py-1 border-b border-gray-50 bg-white">
+                <span className="text-[10px] font-normal text-gray-400 shrink-0 min-w-[90px] uppercase tracking-tighter">{label}</span>
                 <input
                     name={name}
                     type={type}
                     value={value || ''}
                     onChange={onChange}
                     placeholder={placeholder}
-                    className="flex-1 h-7 px-2 bg-white border border-gray-200 rounded text-[11px] font-normal text-gray-800 outline-none focus:border-emerald-500 transition-colors"
+                    className="flex-1 h-7 px-2 bg-white border border-gray-200 rounded text-[12px] font-normal text-gray-800 outline-none focus:border-emerald-500 transition-colors"
                 />
             </div>
         );
     }
 
     return (
-        <div className="flex justify-between items-center px-3 py-1.5 border-b border-gray-50 last:border-0 hover:bg-emerald-50/10 transition-colors">
-            <span className="text-[10px] font-normal text-gray-400 shrink-0 min-w-[100px]">{label}</span>
-            <span className={`text-[11px] font-normal text-right break-all ${valueClass || 'text-gray-800'}`}>{value || '---'}</span>
+        <div className="flex justify-between items-center px-4 py-1 border-b border-gray-50 last:border-0 hover:bg-emerald-50/10 transition-colors">
+            <span className="text-[10px] font-normal text-gray-400 shrink-0 min-w-[90px] uppercase tracking-tighter">{label}</span>
+            <span className={`text-[12px] font-normal text-right break-all ${valueClass || 'text-gray-800'}`}>{value || '---'}</span>
         </div>
     );
 }
@@ -144,10 +144,10 @@ export default function CompanyDetailColumn({ companies }: CompanyDetailColumnPr
         <div className="h-full flex flex-col bg-white overflow-hidden relative">
 
             {/* ── Header ── */}
-            <div className="px-4 py-4 border-b border-gray-100 shrink-0 sticky top-0 z-20 bg-white/95 backdrop-blur-sm">
-                <div className="flex items-start justify-between max-w-lg mx-auto w-full">
+            <div className="px-5 py-2.5 border-b border-gray-300 shrink-0 sticky top-0 z-20 bg-white">
+                <div className="flex items-start justify-between max-w-2xl mx-auto w-full">
                     <div className="flex items-center gap-4 min-w-0">
-                        <div className="w-[52px] h-[52px] rounded-xl bg-gray-50 flex items-center justify-center shrink-0 text-emerald-600 border border-gray-100">
+                        <div className="w-12 h-12 rounded-xl border-2 border-gray-100 bg-gray-50 flex items-center justify-center shrink-0 text-emerald-600">
                             <Building2 size={24} />
                         </div>
                         <div className="min-w-0 flex-1">
@@ -157,13 +157,13 @@ export default function CompanyDetailColumn({ companies }: CompanyDetailColumnPr
                                         name="name_jp"
                                         value={editData.name_jp || ''}
                                         onChange={handleInputChange}
-                                        className="text-[16px] font-black text-gray-900 border-b border-emerald-500 outline-none w-full bg-transparent p-0"
+                                        className="text-[16px] font-normal text-gray-900 border-b border-emerald-500 outline-none w-full bg-transparent p-0"
                                         placeholder="企業名を入力"
                                     />
                                 ) : (
                                     <>
-                                        <h2 className="text-[16px] font-black text-gray-900 tracking-tight leading-none truncate uppercase">{c.name_jp || '---'}</h2>
-                                        <span className={`text-[9px] font-black px-2 py-0.5 rounded-full
+                                        <h2 className="text-[16px] font-normal text-gray-900 tracking-tight leading-none truncate uppercase">{c.name_jp || '---'}</h2>
+                                        <span className={`text-[9px] font-normal px-2 py-0.5 rounded-full
                                                 ${(c.active_worker_count || 0) > 0 ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-500'}
                                             `}>
                                             {c.active_worker_count! > 0 ? '受入中' : '未受入'}
@@ -177,11 +177,11 @@ export default function CompanyDetailColumn({ companies }: CompanyDetailColumnPr
                                     name="name_romaji"
                                     value={editData.name_romaji || ''}
                                     onChange={handleInputChange}
-                                    className="text-[10px] text-gray-400 font-bold uppercase tracking-wider w-full mt-1 border-b border-gray-100 outline-none bg-transparent"
+                                    className="text-[10px] text-gray-400 font-normal uppercase tracking-wide w-full mt-1 border-b border-gray-100 outline-none bg-transparent"
                                     placeholder="ROMAN NAME"
                                 />
                             ) : (
-                                <p className="text-[11px] text-gray-400 font-bold uppercase tracking-wider truncate mt-1.5">{c.name_romaji || '---'}</p>
+                                <p className="text-[11px] text-gray-400 font-normal uppercase tracking-wider truncate mt-1.5">{c.name_romaji || '---'}</p>
                             )}
                         </div>
                     </div>
@@ -190,7 +190,7 @@ export default function CompanyDetailColumn({ companies }: CompanyDetailColumnPr
                         {!isEditing ? (
                             <button
                                 onClick={() => { setIsEditing(true); setEditData(c); }}
-                                className="h-8 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md text-[11px] font-bold transition-all flex items-center gap-1.5 active:scale-95 uppercase tracking-widest"
+                                className="h-8 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md text-[11px] font-normal transition-all flex items-center gap-1.5 active:scale-95 uppercase tracking-widest shadow-sm"
                             >
                                 <Edit size={13} />
                                 編集する
@@ -200,14 +200,14 @@ export default function CompanyDetailColumn({ companies }: CompanyDetailColumnPr
                                 <button
                                     onClick={handleSave}
                                     disabled={isSaving}
-                                    className="h-8 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md text-[11px] font-bold transition-all flex items-center justify-center gap-1.5 active:scale-95 disabled:opacity-50 uppercase tracking-widest"
+                                    className="h-8 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md text-[11px] font-normal transition-all flex items-center justify-center gap-1.5 active:scale-95 disabled:opacity-50 uppercase tracking-widest shadow-sm"
                                 >
                                     {isSaving ? <Loader2 size={13} className="animate-spin" /> : <Save size={13} />}
                                     保存する
                                 </button>
                                 <button
                                     onClick={() => { setIsEditing(false); setEditData(c); }}
-                                    className="h-7 px-3 bg-white border border-gray-200 hover:bg-gray-50 text-gray-500 rounded-md text-[11px] font-bold transition-all uppercase tracking-widest"
+                                    className="h-7 px-3 bg-white border border-gray-200 hover:bg-gray-50 text-gray-500 rounded-md text-[11px] font-normal transition-all uppercase tracking-widest shadow-sm"
                                 >
                                     キャンセル
                                 </button>
@@ -218,8 +218,8 @@ export default function CompanyDetailColumn({ companies }: CompanyDetailColumnPr
             </div>
 
             {/* ── Scrollable body ── */}
-            <div className="flex-1 overflow-y-auto thin-scrollbar px-4 py-4">
-                <div className="max-w-lg mx-auto flex flex-col space-y-6">
+            <div className="flex-1 overflow-y-auto thin-scrollbar px-6 py-3">
+                <div className="max-w-2xl mx-auto flex flex-col space-y-4">
 
                     {/* 1. 企業情報・連絡先 */}
                     <section className="space-y-1">
@@ -227,7 +227,7 @@ export default function CompanyDetailColumn({ companies }: CompanyDetailColumnPr
                         <div className="space-y-0 text-gray-800">
                             <Row label="企業名" name="name_jp" value={isEditing ? editData.name_jp : c.name_jp} isEditing={isEditing} onChange={handleInputChange} />
                             <Row label="フリガナ" name="name_kana" value={isEditing ? editData.name_kana : c.name_kana} isEditing={isEditing} onChange={handleInputChange} />
-                            <Row label="ローマ字" name="name_romaji" value={isEditing ? editData.name_romaji : c.name_romaji} isEditing={isEditing} onChange={handleInputChange} valueClass="font-bold uppercase tracking-wide" />
+                            <Row label="ローマ字" name="name_romaji" value={isEditing ? editData.name_romaji : c.name_romaji} isEditing={isEditing} onChange={handleInputChange} valueClass="font-normal uppercase tracking-wide" />
                             <Row label="法人番号(13桁)" name="corporate_number" value={isEditing ? editData.corporate_number : c.corporate_number} isEditing={isEditing} onChange={handleInputChange} valueClass="font-mono text-gray-600" />
                             <Row label="受理届出番号" name="acceptance_notification_number" value={isEditing ? editData.acceptance_notification_number : c.acceptance_notification_number} isEditing={isEditing} onChange={handleInputChange} valueClass="font-mono text-gray-600" />
                             <Row label="所在地（住所）" name="address" value={isEditing ? editData.address : c.address} isEditing={isEditing} onChange={handleInputChange} />
@@ -251,7 +251,7 @@ export default function CompanyDetailColumn({ companies }: CompanyDetailColumnPr
                             <Row label="受入職種" name="accepted_occupations" value={isEditing ? editData.accepted_occupations : c.accepted_occupations} isEditing={isEditing} onChange={handleInputChange} />
                             <Row label="従業員数" name="employee_count" type="number" value={isEditing ? editData.employee_count : (c.employee_count ? `${c.employee_count} 名` : null)} isEditing={isEditing} onChange={handleInputChange} />
                             {!isEditing && (
-                                <Row label="受入実習生・特定技能" name="active_worker_count" value={c.active_worker_count ? `${c.active_worker_count} 名` : '0 名'} isEditing={false} onChange={() => { }} valueClass={c.active_worker_count! > 0 ? 'text-emerald-600 font-bold' : ''} />
+                                <Row label="受入実習生" name="active_worker_count" value={c.active_worker_count ? `${c.active_worker_count} 名` : '0 名'} isEditing={false} onChange={() => { }} valueClass={c.active_worker_count! > 0 ? 'text-emerald-600' : ''} />
                             )}
                         </div>
                     </section>
@@ -265,7 +265,7 @@ export default function CompanyDetailColumn({ companies }: CompanyDetailColumnPr
                                     name="remarks"
                                     value={editData.remarks || ''}
                                     onChange={handleInputChange}
-                                    className="w-full min-h-[120px] p-4 bg-slate-50 border border-gray-100 rounded-xl text-[12px] font-medium outline-none focus:border-emerald-500 transition-all text-gray-700"
+                                    className="w-full min-h-[100px] p-4 bg-slate-50 border border-gray-100 rounded-xl text-[12px] font-normal outline-none focus:border-emerald-500 transition-all text-gray-700"
                                     placeholder="備考・メモを入力..."
                                 />
                             ) : c.remarks ? (

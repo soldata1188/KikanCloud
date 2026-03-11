@@ -199,10 +199,10 @@ export default function SettingsPageClient({ currentUser, usersList, companiesLi
                                     ${isActive
                                         ? "bg-emerald-50 text-emerald-700 shadow-sm border border-emerald-100"
                                         : "text-gray-400 hover:bg-gray-50 hover:text-gray-600 border border-transparent"}`}>
-                                <Icon size={14} className={isActive ? "text-emerald-700" : "text-gray-400"} strokeWidth={isActive ? 2.5 : 2} />
+                                <Icon size={14} className={isActive ? "text-emerald-700" : "text-gray-400"} strokeWidth={1.5} />
                                 {tab.label}
                             </button>
-                        );
+                       );
                     })}
 
                     <div className="h-px bg-gray-100 my-1.5 mx-2" />
@@ -215,10 +215,10 @@ export default function SettingsPageClient({ currentUser, usersList, companiesLi
                         }}
                         className="flex items-center gap-3 px-4 py-2 text-xs font-normal rounded-md transition-all duration-300 text-red-600 bg-red-50 hover:bg-red-100 shadow-sm active:scale-95 group w-full uppercase tracking-widest"
                     >
-                        <LogOut size={14} strokeWidth={2.5} className="group-hover:rotate-12 transition-transform" />
+                        <LogOut size={14} strokeWidth={1.5} className="group-hover:rotate-12 transition-transform" />
                         <span>ログアウト</span>
                     </button>
-                </nav>
+               </nav>
 
                 {/* ── Content Panel ── */}
                 <div className="flex-1 min-h-[600px] overflow-hidden">

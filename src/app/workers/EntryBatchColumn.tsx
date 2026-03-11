@@ -15,12 +15,12 @@ interface EntryBatchColumnProps {
     onSelect: (batch: string | null) => void;
 }
 
-export default function EntryBatchColumn({ batches, selectedBatch, onSelect }: EntryBatchColumnProps) {
-    const total = batches.reduce((sum, b) => sum + b.count, 0);
+function EntryBatchColumn({ batches, selectedBatch, onSelect }: EntryBatchColumnProps) {
+    const total = React.useMemo(() => batches.reduce((sum, b) => sum + b.count, 0), [batches]);
 
     return (
         <div className="w-full h-full flex flex-col bg-white overflow-hidden">
-            <div className="flex-1 overflow-y-auto no-scrollbar">
+            <div className="flex-1 overflow-y-auto thin-scrollbar">
                 {/* ALL button */}
                 <button
                     onClick={() => onSelect(null)}
@@ -93,3 +93,5 @@ export default function EntryBatchColumn({ batches, selectedBatch, onSelect }: E
         </div>
     );
 }
+
+export default React.memo(EntryBatchColumn);

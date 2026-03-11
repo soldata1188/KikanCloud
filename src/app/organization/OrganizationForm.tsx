@@ -5,8 +5,8 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 // ── Shared styles ──────────────────────────────────────────────────
-const L = "block text-[11px] font-black text-gray-500 uppercase tracking-widest mb-2 px-1"
-const I = "w-full h-10 pl-10 pr-4 bg-gray-50 border border-gray-200 rounded-lg text-sm outline-none focus:border-blue-600 focus:bg-white transition-all placeholder:text-gray-300 font-bold"
+const L = "block text-[11px] font-normal text-gray-500 uppercase tracking-widest mb-2 px-1"
+const I = "w-full h-10 pl-10 pr-4 bg-gray-50 border border-gray-200 rounded-lg text-sm outline-none focus:border-blue-600 focus:bg-white transition-all placeholder:text-gray-300 font-normal"
 
 export default function OrganizationForm({ initialData }: { initialData: any }) {
     const router = useRouter()
@@ -60,7 +60,7 @@ export default function OrganizationForm({ initialData }: { initialData: any }) 
         <div className="max-w-3xl mx-auto py-2">
             {/* ── Status Message ── */}
             {message.text && (
-                <div className={`p-4 mb-8 rounded-md text-sm font-bold flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-300 border
+                <div className={`p-4 mb-8 rounded-md text-sm font-normal flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-300 border
                     ${message.type === 'success'
                         ? 'bg-blue-50 text-blue-700 border-blue-200'
                         : 'bg-rose-50 text-rose-700 border-rose-200'}`}>
@@ -76,10 +76,10 @@ export default function OrganizationForm({ initialData }: { initialData: any }) 
                         <Building2 size={18} />
                     </div>
                     <div>
-                        <h2 className="text-sm font-bold text-gray-900">機関情報の編集</h2>
-                        <p className="text-[11px] text-gray-400 mt-0.5">組合・機関の公開情報および連絡先を設定します。</p>
+                        <h2 className="text-sm font-normal text-gray-900">機関情報の編集</h2>
+                        <p className="text-[11px] text-gray-400 mt-0.5 font-normal">組合・機関の公開情報および連絡先を設定します。</p>
                     </div>
-                </div>
+               </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                     {/* Organization Name */}
@@ -146,7 +146,7 @@ export default function OrganizationForm({ initialData }: { initialData: any }) 
                 {/* ── Actions ── */}
                 <div className="pt-8 flex justify-center border-t border-gray-100">
                     <button type="submit" disabled={isLoading}
-                        className="w-full md:w-[320px] bg-blue-700 hover:bg-blue-800 text-white rounded-lg h-12 font-black transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-blue-50">
+                        className="w-full md:w-[320px] bg-blue-700 hover:bg-blue-800 text-white rounded-lg h-12 font-normal transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-blue-50">
                         {isLoading
                             ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                             : (
@@ -157,7 +157,7 @@ export default function OrganizationForm({ initialData }: { initialData: any }) 
                             )}
                     </button>
                 </div>
-            </form>
+           </form>
         </div>
     )
 }

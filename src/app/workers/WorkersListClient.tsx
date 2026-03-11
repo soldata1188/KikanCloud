@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import React, { useState, useTransition, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
@@ -131,11 +131,11 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
         insurance_exp: '',
     })
 
-    // Column widths (resizable)
-    const [batchWidth, setBatchWidth] = useState(150);
-    const [companyWidth, setCompanyWidth] = useState(220);
-    const [workerWidth, setWorkerWidth] = useState(520);
-    const [profileWidth, setProfileWidth] = useState(440);
+    // Column widths (resizable) - Balanced for Option B
+    const [batchWidth, setBatchWidth] = useState(165);
+    const [companyWidth, setCompanyWidth] = useState(240);
+    const [workerWidth, setWorkerWidth] = useState(510);
+    const [profileWidth, setProfileWidth] = useState(480);
     const isResizing = useRef(false);
 
     const startResize = useCallback((col: 'batch' | 'company' | 'worker' | 'profile', startX: number) => {
@@ -307,39 +307,20 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
             result = result.filter(w => (w as any).sending_org === filterSendingOrg)
         }
 
-        // 入国期生でグループ化 → グループを最新の入国日で降順ソート → グループ内: 企業名を昇順ソート
-        const batchMap = new Map<string, any[]>()
-        result.forEach(w => {
-            const batch = (w as any).entry_batch || '未設定'
-            if (!batchMap.has(batch)) batchMap.set(batch, [])
-            batchMap.get(batch)!.push(w)
-        })
-        batchMap.forEach(arr => arr.sort((a, b) => {
-            // 入国日 降順 (新しい順)
-            const ed = ((b as any).entry_date || '0000-00-00').localeCompare((a as any).entry_date || '0000-00-00')
-            if (ed !== 0) return ed
-            // 同日の場合: 企業名 昇順
-            const cleanName = (name: string) => name.replace(/株式会社|有限会社|合同会社|（株）|\(株\)|（有）|\(有\)|（同）|\(同\)/g, '').trim();
-            return cleanName((a as any).companies?.name_jp || '').localeCompare(cleanName((b as any).companies?.name_jp || ''), 'ja')
-        }))
-        const sortedBatches = Array.from(batchMap.entries()).sort(([keyA, workersA], [keyB, workersB]) => {
-            // グループ内の最新入国日でソート (workersAは既に降順ソート済み)
-            const dateA = (workersA[0] as any)?.entry_date || '0000-00-00'
-            const dateB = (workersB[0] as any)?.entry_date || '0000-00-00'
+        // Global Sort: 1. Entry Date (Desc) -> 2. Company Name (Asc)
+        result = [...result].sort((a, b) => {
+            const dateA = (a as any).entry_date || '0000-00-00'
+            const dateB = (b as any).entry_date || '0000-00-00'
 
-            if (dateA !== dateB) {
-                return dateB.localeCompare(dateA) // 最新日を上に
+            if (dateB !== dateA) {
+                return dateB.localeCompare(dateA) // Latest date first
             }
 
-            // 日付が同じ場合、期生数で比較 (例: 20期生 > 19期生)
-            const numA = parseInt(keyA.match(/(\d+)/)?.[1] ?? '0', 10)
-            const numB = parseInt(keyB.match(/(\d+)/)?.[1] ?? '0', 10)
-            if (numA !== numB) return numB - numA
-
-            // 最終手段として文字列比較
-            return keyA.localeCompare(keyB, 'ja')
+            // Secondary sort: Company name (cleaned)
+            const cleanNameA = cleanName((a as any).companies?.name_jp || '')
+            const cleanNameB = cleanName((b as any).companies?.name_jp || '')
+            return cleanNameA.localeCompare(cleanNameB, 'ja')
         })
-        result = sortedBatches.flatMap(([, workers]) => workers)
 
         setFiltered(result)
         setSelectedIds([])
@@ -368,8 +349,6 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
         setWorkers(prev => prev.map(w => w.id === id ? { ...w, [field]: value } : w))
         try { await updateWorkerStatus(id, field, value) } catch { alert("更新エラー") }
     }
-
-
 
     const applyBatch = async () => {
         const ids = selectedIds;
@@ -414,22 +393,22 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
         setBatchForm({ worker_status: '', system_type: '', industry_field: '', japanese_level: '', sending_org: '', nationality: '', entry_batch: '', entry_date: '', visa_status: '', zairyu_exp: '', cert_start_date: '', cert_end_date: '', passport_exp: '', insurance_exp: '' });
     };
 
-    const handleSelectBatch = (batch: string | null) => {
+    const handleSelectBatch = useCallback((batch: string | null) => {
         setSelectedBatch(batch);
         setSelectedCompanyId(null);
         setSelectedIds([]);
         setLastSelectedId(null);
         setViewState('companies');
-    };
+    }, []);
 
-    const handleSelectCompany = (id: string | null) => {
+    const handleSelectCompany = useCallback((id: string | null) => {
         setSelectedCompanyId(id);
         setSelectedIds([]);
         setLastSelectedId(null);
         setViewState('workers');
-    };
+    }, []);
 
-    const handleSelectWorker = (id: string, event?: React.MouseEvent) => {
+    const handleSelectWorker = useCallback((id: string, event?: React.MouseEvent) => {
         if (!event || (!event.ctrlKey && !event.metaKey && !event.shiftKey)) {
             setSelectedIds([id]);
             setLastSelectedId(id);
@@ -447,12 +426,12 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
             setLastSelectedId(id);
         }
         setViewState('profile');
-    };
+    }, [filtered, lastSelectedId, selectedIds, setSelectedIds, setLastSelectedId, setViewState]);
 
-    const countByTab = (key: string) => {
+    const countByTab = useCallback((key: string) => {
         const statuses = key === 'active' ? ['working', 'standby'] : (key === 'waiting' ? ['waiting'] : ['missing', 'returned', 'transferred'])
         return workers.filter(w => statuses.includes(w.status || '')).length
-    }
+    }, [workers]);
 
     const Pagination = () => totalPages > 1 ? (
         <div className="max-w-[1440px] mx-auto w-full flex justify-center items-center gap-2 mt-8 pb-4">
@@ -487,41 +466,41 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
     return (
         <div className="flex flex-col h-full bg-white overflow-hidden text-gray-900 antialiased">
             {/* 1. Header */}
-            <header className="h-[42px] bg-white border-b border-gray-300 flex items-center justify-between px-4 z-40 shrink-0">
+            <header className="h-[44px] bg-white border-b border-gray-300 flex items-center justify-between px-4 z-40 shrink-0">
                 <div className="flex items-center gap-4 flex-1">
-                    <h2 className="text-[14px] font-normal tracking-tight text-gray-950 border-r border-gray-300 pr-4 shrink-0">
+                    <h2 className="text-[15px] font-normal tracking-tight text-gray-950 border-r border-gray-300 pr-4 shrink-0">
                         人材<span className="text-blue-700">管理</span>
                     </h2>
 
                     {/* Global Search */}
                     <div className="relative flex-1 max-w-sm group">
-                        <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
+                        <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
                         <input
                             type="text"
                             placeholder="名前、企業名で検索..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             suppressHydrationWarning
-                            className="w-full h-7 pl-9 pr-3 bg-gray-50 border border-gray-200 rounded-[6px] text-[13px] font-normal text-gray-900 placeholder:text-gray-500 outline-none focus:border-blue-500 focus:bg-white transition-all"
+                            className="w-full h-7.5 pl-9 pr-3 bg-gray-50 border border-gray-200 rounded-[6px] text-[13px] font-normal text-gray-900 placeholder:text-gray-500 outline-none focus:border-blue-500 focus:bg-white transition-all shadow-sm"
                         />
                     </div>
 
                     {/* Filters */}
                     <div className="hidden xl:flex items-center gap-3">
-                        <div className="flex items-center gap-2 bg-gray-50 px-2 py-1 rounded-[6px] border border-gray-200">
+                        <div className="flex items-center gap-2 bg-gray-50 px-2.5 py-1 rounded-[6px] border border-gray-200">
                             {/* Entry Date Filter */}
                             <select value={filterEntryDate} onChange={e => setFilterEntryDate(e.target.value)}
                                 suppressHydrationWarning
-                                className="bg-transparent text-[11px] font-normal uppercase text-gray-600 outline-none pr-4 cursor-pointer max-w-[110px]">
+                                className="bg-transparent text-[11px] font-normal uppercase text-gray-600 outline-none pr-4 cursor-pointer max-w-[120px]">
                                 <option value="all">入国年月日</option>
                                 {entryDateList.map(d => <option key={d} value={d}>{d.replace(/-/g, '/')}</option>)}
                             </select>
-                            <div className="w-px h-3 bg-gray-300" />
+                            <div className="w-px h-3.5 bg-gray-300" />
 
                             {/* Visa Status Filter */}
                             <select value={filterVisaStatus} onChange={e => setFilterVisaStatus(e.target.value)}
                                 suppressHydrationWarning
-                                className="bg-transparent text-[11px] font-normal uppercase text-gray-600 outline-none pr-4 cursor-pointer max-w-[90px]">
+                                className="bg-transparent text-[11px] font-normal uppercase text-gray-600 outline-none pr-4 cursor-pointer max-w-[100px]">
                                 <option value="all">在留資格</option>
                                 {visaStatusList.map(v => (
                                     <option key={v} value={v}>
@@ -529,21 +508,21 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                                     </option>
                                 ))}
                             </select>
-                            <div className="w-px h-3 bg-gray-300" />
+                            <div className="w-px h-3.5 bg-gray-300" />
 
                             {/* Nationality Filter */}
                             <select value={filterNationality} onChange={e => setFilterNationality(e.target.value)}
                                 suppressHydrationWarning
-                                className="bg-transparent text-[11px] font-normal uppercase text-gray-600 outline-none pr-4 cursor-pointer max-w-[80px]">
+                                className="bg-transparent text-[11px] font-normal uppercase text-gray-600 outline-none pr-4 cursor-pointer max-w-[90px]">
                                 <option value="all">国籍</option>
                                 {nationalityList.map(n => <option key={n} value={n}>{n}</option>)}
                             </select>
-                            <div className="w-px h-3 bg-gray-300" />
+                            <div className="w-px h-3.5 bg-gray-300" />
 
                             {/* Sending Org Filter */}
                             <select value={filterSendingOrg} onChange={e => setFilterSendingOrg(e.target.value)}
                                 suppressHydrationWarning
-                                className="bg-transparent text-[11px] font-normal uppercase text-gray-600 outline-none pr-2 cursor-pointer max-w-[120px]">
+                                className="bg-transparent text-[11px] font-normal uppercase text-gray-600 outline-none pr-2 cursor-pointer max-w-[130px]">
                                 <option value="all">送出機関</option>
                                 {sendingOrgList.map(o => <option key={o} value={o}>{o}</option>)}
                             </select>
@@ -551,31 +530,31 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                     </div>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                     {selectedIds.length > 0 && (
                         <>
                             <button
                                 onClick={() => setIsDeleteDialogOpen(true)}
-                                className="h-7 px-3 bg-white border border-rose-200 text-rose-600 hover:bg-rose-50 rounded-[6px] flex items-center gap-1.5 text-[12px] font-normal transition-all active:scale-95 shadow-sm"
+                                className="h-8 px-4 bg-white border border-rose-200 text-rose-600 hover:bg-rose-50 rounded-[6px] flex items-center gap-2 text-sm font-medium transition-all active:scale-95 shadow-sm"
                             >
-                                <Trash2 size={13} />
+                                <Trash2 size={14} />
                                 削除
                             </button>
                         </>
                     )}
                     <button
                         onClick={() => setIsBulkImportModalOpen(true)}
-                        className="h-7 px-3 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 rounded-[6px] flex items-center gap-1.5 text-[12px] font-normal transition-all active:scale-95 shadow-sm"
+                        className="h-7.5 px-3.5 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 rounded-[6px] flex items-center gap-2 text-[13px] font-normal transition-all active:scale-95 shadow-sm"
                     >
-                        <List size={13} />
+                        <List size={13.5} />
                         一括入力
                     </button>
                     <button onClick={() => { setIsRefreshing(true); setTimeout(() => setIsRefreshing(false), 800); }} className={`p-1.5 rounded-[6px] bg-gray-50 text-gray-400 border border-gray-200 transition-all active:scale-95 ${isRefreshing ? 'animate-spin text-blue-600' : 'hover:bg-white hover:text-blue-600'}`}>
                         <RefreshCw size={14} />
                     </button>
                     {(role === 'admin' || role === 'staff') && (
-                        <Link href="/workers/new" className="h-7 px-3 bg-blue-700 hover:bg-blue-800 text-white rounded-[6px] text-[12px] font-normal hidden md:flex items-center gap-1.5 active:scale-95 transition-all shadow-sm">
-                            <Plus size={13} />
+                        <Link href="/workers/new" className="h-7.5 px-3.5 bg-blue-700 hover:bg-blue-800 text-white rounded-[6px] text-[13px] font-normal hidden md:flex items-center gap-2 active:scale-95 transition-all shadow-md shadow-blue-100">
+                            <Plus size={14} />
                             <span>新規登録</span>
                         </Link>
                     )}
@@ -588,10 +567,10 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
 
                     {/* Column 0: Entry Batch */}
                     <div className="flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-300" style={{ width: batchWidth }}>
-                        <div className="h-[48px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
+                        <div className="h-[44px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
                             <div className="flex items-center gap-2">
-                                <Calendar size={20} className="text-gray-400" />
-                                <span className="text-[15px] font-normal uppercase tracking-widest text-gray-900">入国期生</span>
+                                <Calendar size={18} className="text-gray-400" />
+                                <span className="text-[13px] font-normal uppercase tracking-widest text-gray-900">入国期生</span>
                             </div>
                         </div>
                         <div className="flex-1 overflow-hidden">
@@ -619,10 +598,10 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
 
                     {/* Column 1: Companies */}
                     <div className="flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-300" style={{ width: companyWidth }}>
-                        <div className="h-[48px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
+                        <div className="h-[44px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
                             <div className="flex items-center gap-2">
-                                <Building2 size={20} className="text-blue-400" />
-                                <span className="text-[15px] font-normal uppercase tracking-widest text-blue-700">企業リスト</span>
+                                <Building2 size={18} className="text-blue-400" />
+                                <span className="text-[13px] font-normal uppercase tracking-widest text-blue-700">企業リスト</span>
                             </div>
                             {selectedBatch && (
                                 <span className="text-[11px] font-normal bg-white text-blue-700 px-1.5 py-0.5 rounded-[6px] border border-blue-200 shadow-sm">{filteredCompanies.length}</span>
@@ -653,10 +632,10 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
 
                     {/* Column 2: Workers */}
                     <div className="flex-1 flex flex-col overflow-hidden border-r border-gray-300" style={{ minWidth: workerWidth }}>
-                        <div className="h-[48px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
+                        <div className="h-[44px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
                             <div className="flex items-center gap-2">
-                                <Users size={20} className="text-gray-400" />
-                                <span className="text-[15px] font-normal uppercase tracking-widest text-gray-900">人材リスト</span>
+                                <Users size={18} className="text-gray-400" />
+                                <span className="text-[13px] font-normal uppercase tracking-widest text-gray-900">人材リスト</span>
                             </div>
                             <span className="text-[11px] font-normal bg-gray-50 text-gray-900 px-1.5 py-0.5 rounded-[6px] border border-gray-200 shadow-sm">{filtered.length}</span>
                         </div>
@@ -667,7 +646,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                                 const cfg = TAB_CONFIG[key]
                                 return (
                                     <button key={key} onClick={() => setActiveTab(key)}
-                                        className={`flex-1 h-[48px] flex items-center justify-center text-[10px] font-normal uppercase tracking-widest transition-all border-b-2
+                                        className={`flex-1 h-[44px] flex items-center justify-center text-[10px] font-normal uppercase tracking-widest transition-all border-b-2
                                         ${isActive ? cfg.activeBg : cfg.inactiveText + ' border-transparent'}`}>
                                         {cfg.label}
                                     </button>
@@ -699,10 +678,10 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
 
                     {/* Column 3: Profile Detail */}
                     <div className="flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-300" style={{ width: profileWidth }}>
-                        <div className="h-[48px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
+                        <div className="h-[44px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
                             <div className="flex items-center gap-2">
-                                <User size={20} className="text-gray-400" />
-                                <span className="text-[14px] font-normal uppercase tracking-widest text-gray-900">人材詳細</span>
+                                <User size={18} className="text-gray-400" />
+                                <span className="text-[13px] font-normal uppercase tracking-widest text-gray-900">人材詳細</span>
                             </div>
                             {selectedIds.length > 1 && (
                                 <span className="text-[11px] font-normal bg-blue-50 text-blue-700 px-2.5 py-1 rounded-[6px] border border-blue-200 shadow-sm">{selectedIds.length}名一括選択中</span>
@@ -736,10 +715,10 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
 
                     {/* Column 4: Documents */}
                     <div className="flex-1 min-w-0 flex flex-col overflow-hidden">
-                        <div className="h-[48px] px-4 border-b border-gray-300 bg-white flex items-center justify-center gap-3 shrink-0 relative">
+                        <div className="h-[44px] px-4 border-b border-gray-300 bg-white flex items-center justify-center gap-3 shrink-0 relative">
                             <div className="flex items-center gap-2 text-slate-800">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" /><path d="M14 2v4a2 2 0 0 0 2 2h4" /></svg>
-                                <span className="text-[14px] font-normal uppercase tracking-widest text-gray-900">関連書類</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" /><path d="M14 2v4a2 2 0 0 0 2 2h4" /></svg>
+                                <span className="text-[13px] font-normal uppercase tracking-widest text-gray-900">関連書類</span>
                             </div>
                             {selectedIds.length === 1 && (
                                 <span className="absolute right-4 text-[11px] font-normal text-blue-700 bg-blue-50 px-2 py-0.5 rounded-[6px] border border-blue-100 shadow-sm">1名選択</span>

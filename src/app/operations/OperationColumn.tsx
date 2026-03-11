@@ -24,8 +24,8 @@ const KENTEI_OPTIONS = ['---', '初級', '基礎級', '専門級', '随時３級
 const SYSTEM_OPTIONS = ['---', '就労認可', '変更届出'];
 
 const InlineField = ({ label, value, type = "text", options = [], onChange }: any) => (
-    <div className="flex items-center gap-3 px-4 py-2 border-b border-slate-200 last:border-0 hover:bg-slate-50/50 transition-all group">
-        <label className="text-[10px] font-normal text-slate-400 uppercase tracking-widest w-[80px] shrink-0">{label}</label>
+    <div className="flex items-center gap-3 px-4 py-1 border-b border-slate-200 last:border-0 hover:bg-slate-50/50 transition-all group">
+        <label className="text-[10px] font-normal text-slate-400 uppercase tracking-tighter w-[80px] shrink-0">{label}</label>
         <div className="flex-1 min-w-0">
             {type === "select" ? (
                 <div className="relative">
@@ -180,7 +180,7 @@ export default function OperationColumn({ workers, staff, onUpdate, onBulkUpdate
                         </div>
                         <div className="flex flex-col gap-2">
                             <div className="flex items-center gap-3">
-                                <h1 className="text-xl font-normal text-slate-800 tracking-tighter">
+                                <h1 className="text-[18px] font-normal text-slate-800 tracking-tighter">
                                     {isBulkMode ? `${workers.length} 名の労働者を選択中` : worker.name}
                                 </h1>
                                 {!isBulkMode && (
@@ -279,7 +279,7 @@ export default function OperationColumn({ workers, staff, onUpdate, onBulkUpdate
 
                         {/* Cell: Kikou */}
                         <div className="flex flex-col group">
-                            <div className="px-5 py-3 flex items-center justify-between border-b border-gray-300 bg-white transition-all">
+                            <div className="px-5 py-2 flex items-center justify-between border-b border-gray-300 bg-white transition-all">
                                 <div className="flex items-center gap-2.5 text-slate-900">
                                     <ClipboardList size={15} className="text-slate-400" />
                                     <span className="text-[12px] font-normal uppercase tracking-widest">機構業務</span>
@@ -297,7 +297,7 @@ export default function OperationColumn({ workers, staff, onUpdate, onBulkUpdate
 
                         {/* Cell: Nyukan */}
                         <div className="flex flex-col group">
-                            <div className="px-5 py-3 flex items-center justify-between border-b border-gray-300 bg-white transition-all">
+                            <div className="px-5 py-2 flex items-center justify-between border-b border-gray-300 bg-white transition-all">
                                 <div className="flex items-center gap-2.5 text-slate-900">
                                     <FileText size={15} className="text-slate-400" />
                                     <span className="text-[12px] font-normal uppercase tracking-widest">入管業務</span>
@@ -320,7 +320,7 @@ export default function OperationColumn({ workers, staff, onUpdate, onBulkUpdate
 
                         {/* Cell: Kentei */}
                         <div className="flex flex-col group">
-                            <div className="px-5 py-3 flex items-center justify-between border-b border-gray-300 bg-white transition-all">
+                            <div className="px-5 py-2 flex items-center justify-between border-b border-gray-300 bg-white transition-all">
                                 <div className="flex items-center gap-2.5 text-slate-900">
                                     <ShieldCheck size={15} className="text-slate-400" />
                                     <span className="text-[12px] font-normal uppercase tracking-widest">検定業務</span>
@@ -346,7 +346,7 @@ export default function OperationColumn({ workers, staff, onUpdate, onBulkUpdate
 
                         {/* Cell: System */}
                         <div className="flex flex-col group">
-                            <div className="px-5 py-3 flex items-center justify-between border-b border-gray-300 bg-white transition-all">
+                            <div className="px-5 py-2 flex items-center justify-between border-b border-gray-300 bg-white transition-all">
                                 <div className="flex items-center gap-2.5 text-slate-900">
                                     <Building size={15} className="text-slate-400" />
                                     <span className="text-[12px] font-normal uppercase tracking-widest">既存システム</span>

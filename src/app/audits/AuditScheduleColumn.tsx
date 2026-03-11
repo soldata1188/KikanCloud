@@ -65,13 +65,13 @@ function InlineEditor({
     const isDone = existingAudit?.status === 'completed';
 
     return (
-        <div className="flex flex-col gap-2 p-4 bg-white rounded-[6px] border border-gray-200 shadow-sm hover:shadow-md hover:border-emerald-100 transition-all group">
+        <div className="flex flex-col gap-1 p-3 bg-white rounded-[6px] border border-gray-200 shadow-sm hover:shadow-md hover:border-emerald-100 transition-all group">
             <div className="flex items-center justify-between mb-1">
                 <div className="flex items-center gap-2">
-                    <div className={`p-1.5 rounded-[6px] ${typeBadge} bg-white shadow-sm border border-transparent group-hover:border-emerald-200`}>
+                    <div className={`p-1 rounded-[6px] ${typeBadge} bg-white shadow-sm border border-transparent group-hover:border-emerald-200`}>
                         <ClipboardList size={14} className="text-emerald-600" />
                     </div>
-                    <span className="text-[15px] font-normal text-gray-900 tracking-tight">{typeLabel}</span>
+                    <span className="text-[14px] font-normal text-gray-900 tracking-tight">{typeLabel}</span>
                 </div>
                 {isDone ? (
                     <div className="flex items-center gap-1.5 px-2 py-0.5 bg-emerald-50 text-emerald-600 rounded-full border border-emerald-100 italic">
@@ -97,7 +97,7 @@ function InlineEditor({
                         value={date}
                         onChange={e => { setDate(e.target.value); setIsDirty(true); setSaved(false); }}
                         readOnly={isDone}
-                        className={`h-9 px-3 text-[13px] font-normal rounded-[6px] border outline-none transition-all w-full
+                        className={`h-8 px-3 text-[12px] font-normal rounded-[6px] border outline-none transition-all w-full
                             ${isDone ? 'bg-gray-50 border-gray-200 text-gray-500 opacity-80 cursor-not-allowed' : 'bg-white border-gray-300 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/5 text-gray-900'}`}
                     />
                 </div>
@@ -111,7 +111,7 @@ function InlineEditor({
                         value={person}
                         disabled={isDone}
                         onChange={e => { setPerson(e.target.value); setIsDirty(true); setSaved(false); }}
-                        className={`h-9 px-1 text-[13px] font-normal rounded-[6px] border outline-none transition-all w-full appearance-none cursor-pointer
+                        className={`h-8 px-1 text-[12px] font-normal rounded-[6px] border outline-none transition-all w-full appearance-none cursor-pointer
                             ${isDone ? 'bg-gray-50 border-gray-100 text-gray-400 opacity-80 cursor-not-allowed' : 'bg-white border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/5 text-gray-800'}`}
                     >
                         <option value="">— 担当 —</option>
@@ -228,7 +228,7 @@ export default function AuditScheduleColumn({ row, filterMonth, staffList, onSav
                                 <Building2 size={24} />
                             </div>
                             <div className="overflow-hidden">
-                                <h2 className="text-[18px] font-normal text-gray-900 truncate leading-snug" title={row.company.name_jp}>
+                                <h2 className="text-[17px] font-normal text-gray-900 truncate leading-snug" title={row.company.name_jp}>
                                     {row.company.name_jp}
                                 </h2>
                                 <p className="text-[11px] font-normal uppercase tracking-widest text-[#B4C0D1] flex items-center gap-1.5">
@@ -324,10 +324,10 @@ export default function AuditScheduleColumn({ row, filterMonth, staffList, onSav
                                                 </div>
                                             </div>
                                             {audit.notes && (
-                                                <p className="mt-2 pl-2 text-[12px] text-gray-900 leading-relaxed font-normal border-l-2 border-blue-200 ml-1.5">
+                                                <p className="mt-2 pl-2 text-[12px] text-gray-900 leading-relaxed font-normal border-l border-blue-200 ml-1.5">
                                                     {audit.notes}
                                                 </p>
-                                            )}
+                                           )}
                                         </div>
                                     </div>
                                 ))

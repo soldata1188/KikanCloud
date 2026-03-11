@@ -99,18 +99,18 @@ function expiryColor(d?: string | null) {
 // ── Sub-components ────────────────────────────────────────
 function SectionHeader({ icon, label, color }: { icon: React.ReactNode; label: string; color: string }) {
     return (
-        <div className={`flex items-center gap-2 px-3 py-2 border-b ${color.includes('blue') ? color.replace('blue', 'emerald') : color}`}>
-            <span className="opacity-60">{icon}</span>
-            <span className="text-[10px] font-normal uppercase tracking-[0.18em]">{label}</span>
+        <div className={`flex items-center gap-2 px-3 py-1.5 border-b ${color.includes('blue') ? color.replace('blue', 'emerald') : color}`}>
+            <span className="opacity-70 scale-95">{icon}</span>
+            <span className="text-[10px] font-normal uppercase tracking-[0.1em] text-emerald-800">{label}</span>
         </div>
     );
 }
 
 function Row({ label, value, valueClass }: { label: string; value: React.ReactNode; valueClass?: string }) {
     return (
-        <div className="flex justify-between items-center px-3 py-2 border-b border-gray-50 last:border-0 hover:bg-emerald-50/10 transition-colors">
-            <span className="text-[10px] font-normal text-gray-400 shrink-0 min-w-[80px]">{label}</span>
-            <span className={`text-[11px] font-normal text-right ${valueClass || 'text-gray-800'}`}>{value || '---'}</span>
+        <div className="flex justify-between items-center px-4 py-1 border-b border-gray-50 last:border-0 hover:bg-emerald-50/10 transition-colors">
+            <span className="text-[10px] font-normal text-gray-400 shrink-0 min-w-[90px] uppercase tracking-tighter">{label}</span>
+            <span className={`text-[12px] font-normal text-right ${valueClass || 'text-gray-800'}`}>{value || '---'}</span>
         </div>
     );
 }
@@ -118,14 +118,14 @@ function Row({ label, value, valueClass }: { label: string; value: React.ReactNo
 function ExpiryRow({ label, value }: { label: string; value?: string | null }) {
     const n = daysLeft(value);
     const badge = n !== null && n <= 90 ? (
-        <span className={`ml-2 text-[9px] font-normal px-1.5 py-0.5 rounded ${n <= 30 ? 'bg-rose-500 text-white animate-pulse' : 'bg-amber-100 text-amber-700'}`}>
+        <span className={`ml-2 text-[9px] font-normal px-1 py-0.5 rounded shadow-sm ${n <= 30 ? 'bg-rose-500 text-white animate-pulse' : 'bg-amber-100 text-amber-700'}`}>
             {n <= 0 ? '期限切れ' : `${n}日`}
         </span>
     ) : null;
     return (
-        <div className="flex justify-between items-center px-3 py-2 border-b border-gray-50 last:border-0 hover:bg-emerald-50/10 transition-colors">
-            <span className="text-[10px] font-normal text-gray-400 shrink-0 min-w-[80px]">{label}</span>
-            <span className={`text-[11px] font-mono ${expiryColor(value)} flex items-center font-normal`}>
+        <div className="flex justify-between items-center px-4 py-1 border-b border-gray-50 last:border-0 hover:bg-emerald-50/10 transition-colors">
+            <span className="text-[10px] font-normal text-gray-400 shrink-0 min-w-[90px] uppercase tracking-tighter">{label}</span>
+            <span className={`text-[12px] font-mono ${expiryColor(value)} flex items-center font-normal`}>
                 {fmt(value)}{badge}
             </span>
         </div>
@@ -217,13 +217,13 @@ export default function ProfileDetailColumn({ workers, onUpdate, onBulkUpdate, b
             return <Row label={label} value={displayVal} />;
         }
         return (
-            <div className="flex justify-between items-center px-3 py-2 border-b border-gray-50 last:border-0 bg-white">
-                <span className="text-[10px] font-bold text-gray-400 shrink-0 min-w-[80px]">{label}</span>
+            <div className="flex justify-between items-center px-4 py-1 border-b border-gray-50 last:border-0 bg-white">
+                <span className="text-[10px] font-normal text-gray-400 shrink-0 min-w-[90px] uppercase tracking-tighter">{label}</span>
                 {type === 'select' ? (
                     <select
                         value={String(val)}
                         onChange={e => setEditForm(prev => ({ ...prev, [field]: e.target.value === 'true' ? true : e.target.value === 'false' ? false : e.target.value }))}
-                        className="flex-1 h-7 px-2 bg-white border border-gray-200 rounded text-[11px] font-normal text-gray-800 outline-none focus:border-emerald-500"
+                        className="flex-1 h-7 px-2 bg-gray-50 border border-gray-200 rounded text-[12px] font-normal text-gray-800 outline-none focus:border-emerald-500 transition-all"
                     >
                         <option value="">---</option>
                         {Object.entries(options).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
@@ -232,14 +232,14 @@ export default function ProfileDetailColumn({ workers, onUpdate, onBulkUpdate, b
                     <textarea
                         value={String(val)}
                         onChange={e => setEditForm(prev => ({ ...prev, [field]: e.target.value }))}
-                        className="flex-1 min-h-[60px] p-2 bg-white border border-gray-200 rounded text-[11px] font-normal text-gray-800 outline-none focus:border-emerald-500"
+                        className="flex-1 min-h-[60px] p-2 bg-gray-50 border border-gray-200 rounded text-[12px] font-normal text-gray-800 outline-none focus:border-emerald-500 transition-all"
                     />
                 ) : (
                     <input
                         type={type}
                         value={String(val)}
                         onChange={e => setEditForm(prev => ({ ...prev, [field]: e.target.value }))}
-                        className="flex-1 h-7 px-2 bg-white border border-gray-200 rounded text-[11px] font-normal text-gray-800 outline-none focus:border-emerald-500"
+                        className="flex-1 h-7 px-2 bg-gray-50 border border-gray-200 rounded text-[12px] font-normal text-gray-800 outline-none focus:border-emerald-500 transition-all"
                     />
                 )}
             </div>
@@ -286,10 +286,10 @@ export default function ProfileDetailColumn({ workers, onUpdate, onBulkUpdate, b
                         </div>
                     </div>
                 </div>
-                <div className="flex-1 overflow-y-auto p-6 space-y-4">
-                    <div className="bg-white rounded-md border border-gray-200 overflow-hidden">
-                        <p className="text-[11px] font-normal text-gray-400 px-5 py-3 border-b border-gray-50 uppercase tracking-tight">変更したい項目のみ入力してください</p>
-                        <div className="p-5 grid grid-cols-2 gap-4">
+                <div className="flex-1 overflow-y-auto p-5 space-y-5">
+                    <div className="bg-white rounded-md border border-gray-200 overflow-hidden shadow-sm">
+                        <p className="text-[13px] font-normal text-gray-500 px-5 py-3 border-b border-gray-50 uppercase tracking-tight bg-slate-50/50">変更したい項目のみ入力してください</p>
+                        <div className="p-5 grid grid-cols-2 gap-x-5 gap-y-3.5">
                             {[
                                 { label: 'ステータス', field: 'worker_status', type: 'select', options: [['', '変更なし'], ['working', '就業中'], ['standby', '対応中'], ['waiting', '未入国'], ['missing', '失踪'], ['returned', '帰国']] },
                                 { label: '国籍', field: 'nationality', type: 'text', placeholder: '例: ベトナム' },
@@ -306,16 +306,16 @@ export default function ProfileDetailColumn({ workers, onUpdate, onBulkUpdate, b
                                 { label: '保険期限', field: 'insurance_exp', type: 'date', placeholder: '' },
                             ].map(({ label, field, type, options, placeholder }: any) => (
                                 <div key={field}>
-                                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 block">{label}</label>
+                                    <label className="text-[10px] font-normal text-gray-400 uppercase tracking-widest mb-1 block">{label}</label>
                                     {type === 'select' ? (
                                         <select value={batchForm[field]} onChange={e => setBatchForm({ ...batchForm, [field]: e.target.value })}
-                                            className="w-full h-10 px-3 bg-gray-50 border border-gray-200 rounded-lg text-[13px] font-bold outline-none focus:border-blue-500 transition-all">
+                                            className="w-full h-10 px-3 bg-gray-50 border border-gray-200 rounded-lg text-[15px] font-normal outline-none focus:border-blue-500 transition-all shadow-sm">
                                             {options.map(([v, l]: string[]) => <option key={v} value={v}>{l}</option>)}
                                         </select>
                                     ) : (
                                         <input type={type} value={batchForm[field]} placeholder={placeholder}
                                             onChange={e => setBatchForm({ ...batchForm, [field]: e.target.value })}
-                                            className="w-full h-10 px-3 bg-gray-50 border border-gray-200 rounded-lg text-[13px] font-bold outline-none focus:border-blue-500 transition-all" />
+                                            className="w-full h-10 px-3 bg-gray-50 border border-gray-200 rounded-lg text-[15px] font-normal outline-none focus:border-blue-500 transition-all shadow-sm" />
                                     )}
                                 </div>
                             ))}
@@ -340,10 +340,10 @@ export default function ProfileDetailColumn({ workers, onUpdate, onBulkUpdate, b
         <div className="h-full flex flex-col bg-white overflow-hidden">
 
             {/* ── Header ── */}
-            <div className="px-5 py-4 bg-white border-b border-gray-300 shrink-0 z-10">
+            <div className="px-5 py-2.5 bg-white border-b border-gray-300 shrink-0 z-10">
                 <div className="flex items-start justify-between">
                     <div className="flex items-center gap-4">
-                        <div className="relative group w-14 h-14 rounded-xl border-2 border-gray-100 bg-gray-50 overflow-hidden flex items-center justify-center shrink-0">
+                        <div className="relative group w-12 h-12 rounded-xl border-2 border-gray-100 bg-gray-50 overflow-hidden flex items-center justify-center shrink-0">
                             {(worker.avatar_url || previewUrl || editForm.avatar_url) ? (
                                 <img
                                     src={previewUrl || (isEditing ? (editForm.avatar_url || '') : (worker.avatar_url || ''))}
@@ -398,7 +398,7 @@ export default function ProfileDetailColumn({ workers, onUpdate, onBulkUpdate, b
                                         placeholder="ROMAJI NAME"
                                     />
                                 ) : (
-                                    <h2 className="text-[16px] font-black text-gray-900 uppercase tracking-tight leading-none">{worker.full_name_romaji || '---'}</h2>
+                                    <h2 className="text-lg font-normal text-gray-900 uppercase tracking-tight leading-none">{worker.full_name_romaji || '---'}</h2>
                                 )}
                                 {isEditing ? (
                                     <select
@@ -411,7 +411,7 @@ export default function ProfileDetailColumn({ workers, onUpdate, onBulkUpdate, b
                                         ))}
                                     </select>
                                 ) : (
-                                    <span className={`text-[9px] font-black px-2 py-0.5 rounded-full ${statusInfo.cls}`}>{statusInfo.label}</span>
+                                    <span className={`text-[10px] font-normal px-2.5 py-1 rounded-full shadow-sm ${statusInfo.cls}`}>{statusInfo.label}</span>
                                 )}
                             </div>
 
@@ -420,30 +420,12 @@ export default function ProfileDetailColumn({ workers, onUpdate, onBulkUpdate, b
                                     type="text"
                                     value={editForm.full_name_kana || ''}
                                     onChange={e => setEditForm({ ...editForm, full_name_kana: e.target.value })}
-                                    className="h-6 mt-1 px-1 border border-gray-200 rounded text-[11px] font-bold outline-none focus:border-blue-500 w-full max-w-[200px]"
+                                    className="h-6 mt-1.5 px-1 border border-gray-200 rounded text-[11px] font-normal outline-none focus:border-blue-500 w-full max-w-[200px]"
                                     placeholder="カナ名"
                                 />
                             ) : (
-                                <p className="text-[11px] text-gray-400 font-bold mt-1">{worker.full_name_kana || '---'}</p>
+                                <p className="text-sm text-gray-400 font-normal mt-2">{worker.full_name_kana || '---'}</p>
                             )}
-
-                            <div className="flex items-center gap-1.5 mt-1.5 text-[10px] font-bold text-blue-600">
-                                <Building2 size={11} />
-                                {isEditing ? (
-                                    <select
-                                        value={editForm.company_id || ''}
-                                        onChange={e => setEditForm({ ...editForm, company_id: e.target.value })}
-                                        className="h-6 px-1 border border-gray-200 rounded text-[10px] font-bold outline-none focus:border-blue-500 bg-white min-w-[120px]"
-                                    >
-                                        <option value="">未所属</option>
-                                        {companies.map(c => (
-                                            <option key={c.id} value={c.id}>{c.name_jp}</option>
-                                        ))}
-                                    </select>
-                                ) : (
-                                    <span className="truncate">{worker.companies?.name_jp || '未所属'}</span>
-                                )}
-                            </div>
                         </div>
                     </div>
 
@@ -452,24 +434,24 @@ export default function ProfileDetailColumn({ workers, onUpdate, onBulkUpdate, b
                         {!isEditing ? (
                             <button
                                 onClick={() => setIsEditing(true)}
-                                className="h-8 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md text-[11px] font-bold transition-all flex items-center gap-1"
+                                className="h-9 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md text-xs font-normal transition-all flex items-center gap-1.5 shadow-sm active:scale-95"
                             >
-                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" /><path d="m15 5 4 4" /></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" /><path d="m15 5 4 4" /></svg>
                                 編集する
                             </button>
                         ) : (
-                            <div className="flex items-center gap-1.5 flex-col">
+                            <div className="flex items-center gap-2 flex-col">
                                 <button
                                     onClick={handleSave}
                                     disabled={uploading}
-                                    className="w-full h-8 px-3 bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-400 text-white rounded-md text-[11px] font-bold transition-all flex items-center justify-center gap-1.5"
+                                    className="w-full h-9 px-4 bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-400 text-white rounded-md text-xs font-normal transition-all flex items-center justify-center gap-2 shadow-sm active:scale-95"
                                 >
-                                    {uploading && <Loader2 size={12} className="animate-spin" />}
+                                    {uploading && <Loader2 size={14} className="animate-spin" />}
                                     保存する
                                 </button>
                                 <button
                                     onClick={handleCancel}
-                                    className="w-full h-7 px-3 bg-white border border-gray-200 hover:bg-gray-50 text-gray-500 rounded-md text-[11px] font-bold transition-all"
+                                    className="w-full h-8 px-4 bg-white border border-gray-200 hover:bg-gray-50 text-gray-500 rounded-md text-[11px] font-normal transition-all active:scale-95 shadow-sm"
                                 >
                                     キャンセル
                                 </button>
@@ -480,8 +462,8 @@ export default function ProfileDetailColumn({ workers, onUpdate, onBulkUpdate, b
             </div>
 
             {/* ── Scrollable body ── */}
-            <div className="flex-1 overflow-y-auto thin-scrollbar px-6 py-4">
-                <div className="max-w-2xl mx-auto flex flex-col space-y-8">
+            <div className="flex-1 overflow-y-auto thin-scrollbar px-6 py-3">
+                <div className="max-w-2xl mx-auto flex flex-col space-y-4">
 
                     {/* 1. 基本情報 */}
                     <section className="space-y-1">
@@ -502,6 +484,7 @@ export default function ProfileDetailColumn({ workers, onUpdate, onBulkUpdate, b
                     <section className="space-y-1">
                         <SectionHeader icon={<Briefcase size={14} className="text-emerald-600" />} label="契約・雇用情報" color="text-emerald-900 mb-2 border-b-0" />
                         <div className="space-y-0 text-gray-800">
+                            {renderField("受入企業", "company_id", "select", companies.reduce((acc, c) => ({ ...acc, [c.id]: c.name_jp }), {}))}
                             {renderField("制度区分", "system_type", "select", { ginou_jisshu: '技能実習', ikusei_shuro: '育成就労', tokuteigino: '特定技能' })}
                             {renderField("職種区分", "industry_field")}
                             {renderField("日本語レベル", "japanese_level")}
@@ -518,7 +501,7 @@ export default function ProfileDetailColumn({ workers, onUpdate, onBulkUpdate, b
                                 <Row
                                     label="在日期間"
                                     value={`${Math.floor((Date.now() - new Date(worker.entry_date).getTime()) / 86400000)}日`}
-                                    valueClass="text-emerald-700 font-mono font-medium"
+                                    valueClass="text-emerald-700 font-mono font-normal"
                                 />
                             )}
                             {renderField("在留資格", "visa_status")}
@@ -526,9 +509,8 @@ export default function ProfileDetailColumn({ workers, onUpdate, onBulkUpdate, b
                         </div>
                     </section>
 
-                    {/* 4. 重要書類・認定 */}
-                    <section className="space-y-1">
-                        <SectionHeader icon={<CreditCard size={14} className="text-emerald-600" />} label="重要書類・認定" color="text-emerald-900 mb-2 border-b-0" />
+                    <section>
+                        <SectionHeader icon={<CreditCard size={14} className="text-emerald-600" />} label="重要書類・認定" color="text-emerald-900 border-b-0" />
                         <div className="space-y-0 text-gray-800">
                             {renderField("パスポート番号", "passport_no")}
                             {renderExpiryField("パスポート期限", "passport_exp")}
@@ -546,7 +528,7 @@ export default function ProfileDetailColumn({ workers, onUpdate, onBulkUpdate, b
                                 <textarea
                                     value={editForm.remarks || ''}
                                     onChange={e => setEditForm({ ...editForm, remarks: e.target.value })}
-                                    className="w-full min-h-[120px] p-4 bg-slate-50 border border-gray-100 rounded-xl text-[12px] font-medium outline-none focus:border-emerald-500 transition-all text-gray-700"
+                                    className="w-full min-h-[120px] p-4 bg-slate-50 border border-gray-100 rounded-xl text-[12px] font-normal outline-none focus:border-emerald-500 transition-all text-gray-700"
                                     placeholder="備考・メモを入力..."
                                 />
                             ) : worker.remarks ? (

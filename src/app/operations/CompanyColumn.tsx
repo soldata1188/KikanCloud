@@ -15,7 +15,7 @@ interface CompanyColumnProps {
     onSelect: (id: string | null) => void;
 }
 
-export default function CompanyColumn({ companies, selectedId, onSelect }: CompanyColumnProps) {
+function CompanyColumn({ companies, selectedId, onSelect }: CompanyColumnProps) {
     return (
         <div className="w-full h-full flex flex-col bg-white overflow-hidden">
             {/* List */}
@@ -68,3 +68,5 @@ export default function CompanyColumn({ companies, selectedId, onSelect }: Compa
         </div>
     );
 }
+
+export default React.memo(CompanyColumn);

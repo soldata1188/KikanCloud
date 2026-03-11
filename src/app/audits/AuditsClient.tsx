@@ -256,12 +256,12 @@ export function AuditsClient({ matrixData, filterMonth, userRole, companies = []
     return (
         <div className="flex flex-col h-screen bg-white overflow-hidden text-gray-900 antialiased selection:bg-blue-100">
             {/* 1. Header Desktop (Hidden on Mobile) */}
-            <header className="hidden md:flex h-[42px] bg-white border-b border-gray-200 flex items-center justify-between px-4 z-40 shrink-0">
+            <header className="hidden md:flex h-[44px] bg-white border-b border-gray-300 flex items-center justify-between px-4 z-40 shrink-0">
                 <div className="flex items-center gap-4 flex-1">
-                    <h2 className="text-[14px] font-normal tracking-tight text-gray-950 border-r border-gray-200 pr-4 shrink-0">
-                        監査<span className="text-blue-700">訪問</span>
+                    <h2 className="text-[15px] font-normal tracking-tight text-gray-950 border-r border-gray-300 pr-4 shrink-0">
+                        監査<span className="text-blue-700 font-normal">訪問</span>
                     </h2>
-                    <div className="relative flex-1 max-w-sm group">
+                   <div className="relative flex-1 max-w-sm group">
                         <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
                         <input
                             type="text"
@@ -269,8 +269,8 @@ export function AuditsClient({ matrixData, filterMonth, userRole, companies = []
                             value={searchTerm}
                             onChange={e => setSearchTerm(e.target.value)}
                             suppressHydrationWarning
-                            className="w-full h-7 pl-9 pr-3 bg-gray-50 border border-gray-200 rounded-[6px] text-[13px] font-normal text-gray-900 placeholder:text-gray-500 outline-none focus:border-blue-500 focus:bg-white transition-all"
-                        />
+                            className="w-full h-7 pl-9 pr-3 bg-gray-50 border border-gray-200 rounded-[6px] text-[13px] font-normal text-gray-900 placeholder:text-gray-500 outline-none focus:border-blue-500 focus:bg-white transition-all shadow-sm"
+                       />
                     </div>
                 </div>
                 <div className="flex items-center gap-3">
@@ -297,10 +297,10 @@ export function AuditsClient({ matrixData, filterMonth, userRole, companies = []
                 <div className="hidden lg:flex flex-1 border-t border-gray-200 overflow-hidden bg-white">
                     {/* Column 1: Status Tabs (260px) */}
                     <div className="w-[260px] shrink-0 border-r border-gray-300 flex flex-col bg-white">
-                        <div className="h-[48px] px-4 flex items-center border-b border-gray-300 bg-white shrink-0">
+                        <div className="h-[44px] px-4 flex items-center border-b border-gray-300 bg-white shrink-0">
                             <span className="text-[11px] font-normal text-gray-900 uppercase tracking-widest">モニタリングステータス</span>
                         </div>
-                        <AuditStatusColumn
+                       <AuditStatusColumn
                             counts={counts}
                             activeTab={activeTab}
                             onSelect={handleSelectStatus}
@@ -309,10 +309,10 @@ export function AuditsClient({ matrixData, filterMonth, userRole, companies = []
 
                     {/* Column 2: Company List (260px) */}
                     <div className="w-[260px] shrink-0 border-r border-gray-300 flex flex-col bg-white">
-                        <div className="h-[48px] px-4 border-b border-gray-300 bg-white flex items-center shrink-0">
+                        <div className="h-[44px] px-4 border-b border-gray-300 bg-white flex items-center shrink-0">
                             <div className="flex items-center justify-between w-full">
                                 <span className="text-[11px] font-normal text-slate-900 uppercase tracking-widest">対象企業一覧</span>
-                                <div className="flex items-center gap-2">
+                               <div className="flex items-center gap-2">
                                     {selectedCompanyId && (
                                         <button
                                             onClick={() => setSelectedCompanyId(null)}

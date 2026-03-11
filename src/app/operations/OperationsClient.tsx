@@ -413,10 +413,10 @@ export default function OperationsClient({
     return (
         <div className="flex flex-col h-screen bg-white overflow-hidden text-gray-900 antialiased">
             {/* 1. Unified Global Header */}
-            <header className="h-[42px] bg-white border-b border-gray-200 flex items-center justify-between px-4 z-40 shrink-0">
+            <header className="h-[44px] bg-white border-b border-gray-300 flex items-center justify-between px-4 z-40 shrink-0">
                 <div className="flex items-center gap-4 flex-1">
-                    <h2 className="text-[14px] font-black tracking-tight text-gray-950 border-r border-gray-200 pr-4 shrink-0">
-                        業務<span className="text-blue-700">管理</span>
+                    <h2 className="text-[15px] font-normal tracking-tight text-gray-950 border-r border-gray-300 pr-4 shrink-0">
+                        業務<span className="text-blue-700 font-normal">管理</span>
                     </h2>
 
                     {/* Global Search */}
@@ -424,11 +424,11 @@ export default function OperationsClient({
                         <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
                         <input
                             type="text"
-                            placeholder="企業名、労働者名で一搬検索..."
+                            placeholder="企業名、労働者名で検索..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             suppressHydrationWarning
-                            className="w-full h-7 pl-9 pr-3 bg-gray-50 border border-gray-200 rounded-[6px] text-[13px] font-bold text-gray-900 placeholder:text-gray-500 outline-none focus:border-blue-500 focus:bg-white transition-all"
+                            className="w-full h-7 pl-9 pr-3 bg-gray-50 border border-gray-200 rounded-[6px] text-[13px] font-normal text-gray-900 placeholder:text-gray-500 outline-none focus:border-blue-500 focus:bg-white transition-all shadow-sm"
                         />
                     </div>
 
@@ -439,7 +439,7 @@ export default function OperationsClient({
                                 value={visaFilter}
                                 onChange={(e) => setVisaFilter(e.target.value)}
                                 suppressHydrationWarning
-                                className="bg-transparent text-[11px] font-black uppercase text-gray-600 outline-none pr-4 cursor-pointer"
+                                className="bg-transparent text-[11px] font-normal uppercase text-gray-600 outline-none pr-4 cursor-pointer"
                             >
                                 <option value="all">すべての在留資格</option>
                                 {filterOptions.visas.map(v => (
@@ -451,7 +451,7 @@ export default function OperationsClient({
                                 value={batchFilter}
                                 onChange={(e) => setBatchFilter(e.target.value)}
                                 suppressHydrationWarning
-                                className="bg-transparent text-[11px] font-black uppercase text-gray-600 outline-none pr-4 cursor-pointer"
+                                className="bg-transparent text-[11px] font-normal uppercase text-gray-600 outline-none pr-4 cursor-pointer"
                             >
                                 <option value="all">すべての期生</option>
                                 {filterOptions.batches.map(b => <option key={b} value={b}>{b}</option>)}
@@ -461,7 +461,7 @@ export default function OperationsClient({
                                 value={certFilter}
                                 onChange={(e) => setCertFilter(e.target.value)}
                                 suppressHydrationWarning
-                                className="bg-transparent text-[11px] font-black uppercase text-gray-600 outline-none pr-2 cursor-pointer"
+                                className="bg-transparent text-[11px] font-normal uppercase text-gray-600 outline-none pr-2 cursor-pointer"
                             >
                                 <option value="all">すべての修了月</option>
                                 {filterOptions.certs.map(c => <option key={c} value={c}>{c}</option>)}
@@ -477,7 +477,7 @@ export default function OperationsClient({
                     >
                         <RefreshCw size={14} />
                     </button>
-                    <div className="w-7 h-7 rounded-full bg-blue-700 text-white flex items-center justify-center font-black text-[11px] shadow-sm">
+                    <div className="w-7 h-7 rounded-full bg-blue-700 text-white flex items-center justify-center font-normal text-[11px] shadow-sm">
                         {staff?.[0]?.full_name?.charAt(0) || 'A'}
                     </div>
                 </div>
@@ -489,12 +489,12 @@ export default function OperationsClient({
 
                     {/* Column -1: Entry Batches (Fixed 180px) */}
                     <div className="w-[180px] flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-300">
-                        <div className="h-[48px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
+                        <div className="h-[44px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
                             <div className="flex items-center gap-2 text-slate-900">
                                 <Calendar size={14} className="text-slate-400" />
-                                <span className="text-[15px] font-normal uppercase tracking-widest text-slate-950">入国期生</span>
+                                <span className="text-[13px] font-normal uppercase tracking-widest text-slate-950">入国期生</span>
                             </div>
-                            <span className="text-[11px] font-bold bg-white text-slate-500 px-1.5 py-0.5 rounded-[6px] border border-gray-200 shadow-sm">{batchItems.length}</span>
+                            <span className="text-[10px] font-normal bg-white text-slate-500 px-1.5 py-0.5 rounded-[6px] border border-gray-200 shadow-sm">{batchItems.length}</span>
                         </div>
                         <div className="flex-1 overflow-hidden">
                             <EntryBatchColumn
@@ -507,12 +507,12 @@ export default function OperationsClient({
 
                     {/* Column 0: Companies */}
                     <div className="flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-300" style={{ width: companyWidth }}>
-                        <div className="h-[48px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
+                        <div className="h-[44px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
                             <div className="flex items-center gap-2 text-slate-900">
                                 <Building2 size={14} className="text-slate-400" />
-                                <span className="text-[15px] font-normal uppercase tracking-widest text-slate-950">企業リスト</span>
+                                <span className="text-[13px] font-normal uppercase tracking-widest text-slate-950">企業リスト</span>
                             </div>
-                            <span className="text-[11px] font-bold bg-white text-slate-500 px-1.5 py-0.5 rounded-[6px] border border-gray-200 shadow-sm">{filteredCompanies.length}</span>
+                            <span className="text-[10px] font-normal bg-white text-slate-500 px-1.5 py-0.5 rounded-[6px] border border-gray-200 shadow-sm">{filteredCompanies.length}</span>
                         </div>
                         <div className="flex-1 overflow-hidden">
                             <CompanyColumn
@@ -539,12 +539,12 @@ export default function OperationsClient({
 
                     {/* Column 1: Workers */}
                     <div className="flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-300" style={{ width: workerWidth }}>
-                        <div className="h-[48px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
+                        <div className="h-[44px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
                             <div className="flex items-center gap-2 text-slate-900">
                                 <Users2 size={14} className="text-slate-400" />
-                                <span className="text-[15px] font-normal uppercase tracking-widest text-slate-950">労働者リスト</span>
+                                <span className="text-[13px] font-normal uppercase tracking-widest text-slate-950">労働者リスト</span>
                             </div>
-                            <span className="text-[11px] font-bold bg-white text-slate-500 px-1.5 py-0.5 rounded-[6px] border border-gray-200 shadow-sm">{filteredWorkers.length}</span>
+                            <span className="text-[10px] font-normal bg-white text-slate-500 px-1.5 py-0.5 rounded-[6px] border border-gray-200 shadow-sm">{filteredWorkers.length}</span>
                         </div>
                         <div className="flex-1 overflow-hidden">
                             <WorkerColumn
@@ -570,13 +570,13 @@ export default function OperationsClient({
                     </div>
 
                     <div className="flex-1 flex flex-col overflow-hidden min-w-[400px]">
-                        <div className="h-[48px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
+                        <div className="h-[44px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
                             <div className="flex items-center gap-2 text-slate-900">
                                 <Settings2 size={14} className="text-slate-400" />
-                                <span className="text-[15px] font-normal uppercase tracking-widest text-slate-950">業務オペレーション</span>
+                                <span className="text-[13px] font-normal uppercase tracking-widest text-slate-950">業務オペレーション</span>
                             </div>
                             {selectedWorkers.length > 0 && (
-                                <span className="text-[11px] font-bold bg-slate-900 text-white px-2.5 py-1 rounded-[6px] shadow-sm">{selectedWorkers.length}名選択</span>
+                                <span className="text-[10px] font-normal bg-slate-900 text-white px-2.5 py-1 rounded-[6px] shadow-sm">{selectedWorkers.length}名選択</span>
                             )}
                         </div>
                         <div className="flex-1 overflow-hidden">
@@ -608,7 +608,7 @@ export default function OperationsClient({
                                 <ArrowLeft size={18} />
                             </button>
                         )}
-                        <h1 className="text-[17px] font-black tracking-tight">
+                        <h1 className="text-[15px] font-normal tracking-tight uppercase">
                             {viewState === 'batches' ? '入国期生' : viewState === 'companies' ? '企業選択' : viewState === 'workers' ? '労働者選択' : '業務内容'}
                         </h1>
                     </div>

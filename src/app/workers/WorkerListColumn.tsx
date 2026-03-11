@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react';
-import { User, ShieldCheck } from 'lucide-react';
+import { User } from 'lucide-react';
 
 interface Worker {
     id: string;
@@ -25,7 +25,7 @@ interface WorkerListColumnProps {
     onSelect: (id: string, event: React.MouseEvent) => void;
 }
 
-export default function WorkerListColumn({ workers, selectedIds, onSelect }: WorkerListColumnProps) {
+function WorkerListColumn({ workers, selectedIds, onSelect }: WorkerListColumnProps) {
     const getDaysLeft = (dateStr: string) => {
         if (!dateStr || dateStr === '---') return null;
         const diff = new Date(dateStr).getTime() - new Date().getTime();
@@ -57,72 +57,65 @@ export default function WorkerListColumn({ workers, selectedIds, onSelect }: Wor
 
     return (
         <div className="w-full h-full flex flex-col bg-white lg:bg-transparent overflow-hidden">
-            <div className="flex-1 overflow-y-auto thin-scrollbar lg:bg-white p-2 lg:p-0 space-y-2 lg:space-y-0">
+            <div className="flex-1 overflow-y-auto thin-scrollbar lg:bg-white space-y-0">
                 {(workers || []).map(worker => {
-                    const daysLeft = getDaysLeft(worker.zairyu_exp);
-                    const passportDays = getDaysLeft(worker.passport_exp || '');
                     const isSelected = selectedIds.includes(worker.id);
-                    const isVizaWarn = daysLeft !== null && daysLeft <= 90;
-                    const isVizaAlert = daysLeft !== null && daysLeft <= 30;
-                    const isPassportWarn = passportDays !== null && passportDays <= 180;
 
                     return (
                         <div key={worker.id} className="relative group">
                             {/* Desktop List Layout (Hidden on Mobile) */}
                             <button
                                 onClick={(e) => onSelect(worker.id, e)}
-                                className={`hidden lg:flex w-full text-left pl-4 pr-1.5 py-3 border-b border-gray-100 transition-all duration-150 items-center gap-3
+                                className={`hidden lg:flex w-full text-left pl-4 pr-1.5 py-1.5 border-b border-slate-200 transition-all duration-150 items-center gap-3
                                     ${isSelected
                                         ? 'bg-emerald-50/60 border-l-[4px] border-emerald-500 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]'
                                         : 'hover:bg-slate-50 border-l-[4px] border-transparent'}`}
                             >
                                 {/* セクション 1: アバター & 氏名 (Flexible) */}
-                                <div className="flex-[2] min-w-[160px] flex items-center gap-3 overflow-hidden">
-                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-[11px] font-medium shadow-sm
-                                        ${isSelected ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-500 border border-slate-200'}`}>
-                                        {worker.avatar_url
-                                            ? <img src={worker.avatar_url} alt="" className="w-full h-full object-cover rounded-full" />
-                                            : (worker.full_name_romaji || 'U').charAt(0).toUpperCase()}
-                                    </div>
-                                    <div className="flex flex-col min-w-0 justify-center">
-                                        <div className="h-5 flex items-center">
-                                            <span className={`text-[13px] font-bold truncate uppercase tracking-tight leading-none
-                                                ${isSelected ? 'text-emerald-900' : 'text-slate-900'}`}>
-                                                {worker.full_name_romaji || '---'}
-                                            </span>
-                                        </div>
-                                        <div className="h-4 flex items-center">
-                                            <span className={`text-[9px] font-normal truncate tracking-tight leading-none
-                                                ${isSelected ? 'text-emerald-600/70' : 'text-slate-400'}`}>
-                                                {worker.full_name_kana || '---'}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
+                                <div className="flex-[2] min-w-[170px] flex items-center gap-3.5 overflow-hidden">
+                                    <div className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 text-[11px] font-normal shadow-sm
+                                         ${isSelected ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-500 border border-slate-200'}`}>
+                                         {worker.avatar_url
+                                             ? <img src={worker.avatar_url} alt="" className="w-full h-full object-cover rounded-full" />
+                                             : (worker.full_name_romaji || 'U').charAt(0).toUpperCase()}
+                                     </div>
+                                     <div className="flex flex-col min-w-0 justify-center">
+                                         <div className="h-5 flex items-center">
+                                             <span className={`text-[14px] font-normal truncate uppercase tracking-tight leading-none
+                                                 ${isSelected ? 'text-emerald-900' : 'text-slate-900'}`}>
+                                                 {worker.full_name_romaji || '---'}
+                                             </span>
+                                         </div>
+                                         <div className="h-4.5 flex items-center">
+                                             <span className={`text-[10px] font-normal truncate tracking-tight leading-none
+                                                 ${isSelected ? 'text-emerald-600/70' : 'text-slate-400'}`}>
+                                                 {worker.full_name_kana || '---'}
+                                             </span>
+                                         </div>
+                                     </div>
+                                 </div>
 
                                 {/* セクション 2: 受入企業 (Flexible) */}
-                                <div className="flex-[1.2] min-w-[110px] flex flex-col justify-center overflow-hidden pr-2">
+                                <div className="flex-[1.4] min-w-[120px] flex flex-col justify-center overflow-hidden pr-2">
                                     <div className="h-5 flex items-center">
-                                        <span className={`text-[11px] font-normal truncate block leading-none
+                                        <span className={`text-[12px] font-normal truncate block leading-none
                                             ${isSelected ? 'text-emerald-700' : 'text-slate-600'}`}>
                                             {worker.companies?.name_jp ? worker.companies.name_jp.replace(/株式会社|有限会社|（株）|\(株\)/g, '').trim() : '---'}
                                         </span>
                                     </div>
-                                    <div className="h-4" />
+                                    <div className="h-4.5" />
                                 </div>
 
                                 {/* セクション 3: 入国日 & 在日期間 (Flexible) */}
-                                <div className="flex-[1.2] min-w-[100px] flex flex-col justify-center gap-0.5">
-                                    <div className="h-5 flex items-center gap-1.5 overflow-hidden">
-                                        <span className="text-[7px] font-black text-slate-300 uppercase shrink-0">ENT</span>
-                                        <span className={`text-[10px] font-mono tracking-tighter leading-none
-                                            ${isSelected ? 'text-blue-700 font-bold' : 'text-slate-500'}`}>
+                                <div className="flex-[1.1] min-w-[110px] flex flex-col justify-center gap-0.5 items-end pr-4">
+                                    <div className="h-4 flex items-center overflow-hidden">
+                                        <span className={`text-[12px] font-mono tracking-tighter leading-none text-right
+                                            ${isSelected ? 'text-blue-700 font-normal' : 'text-slate-500'}`}>
                                             {fmtDate(worker.entry_date)}
                                         </span>
                                     </div>
-                                    <div className="h-4 flex items-center gap-1.5 overflow-hidden">
-                                        <span className="text-[7px] font-black text-rose-300/70 uppercase shrink-0">STAY</span>
-                                        <span className={`text-[10px] font-medium leading-none tracking-tight
+                                    <div className="h-4 flex items-center overflow-hidden">
+                                        <span className={`text-[11px] font-normal leading-none tracking-tight text-right
                                             ${isSelected ? 'text-emerald-700' : 'text-slate-500'}`}>
                                             {fmtInJapanDuration(worker.entry_date)}
                                         </span>
@@ -130,10 +123,10 @@ export default function WorkerListColumn({ workers, selectedIds, onSelect }: Wor
                                 </div>
 
                                 {/* セクション 4: 在留資格 (Flexible) */}
-                                <div className="flex-[0.8] min-w-[70px] flex flex-col justify-center overflow-hidden text-center px-1">
+                                <div className="flex-[0.7] min-w-[75px] flex flex-col justify-center overflow-hidden text-center mr-2">
                                     <div className="h-5 flex items-center justify-center">
                                         {worker.visa_status && (
-                                            <span className={`inline-block w-full py-0.5 rounded-[4px] text-[9px] font-bold uppercase tracking-tighter
+                                            <span className={`inline-block w-full py-0.5 rounded-[4px] text-[10.5px] font-normal uppercase tracking-tighter
                                                 ${isSelected
                                                     ? 'bg-emerald-100 text-emerald-700'
                                                     : 'bg-emerald-50 text-emerald-600/70 border border-emerald-100/50'}`}>
@@ -147,7 +140,7 @@ export default function WorkerListColumn({ workers, selectedIds, onSelect }: Wor
                                             </span>
                                         )}
                                     </div>
-                                    <div className="h-4" />
+                                    <div className="h-4.5" />
                                 </div>
 
                                 {/* セクション 5: アラート/スペーサー */}
@@ -157,43 +150,42 @@ export default function WorkerListColumn({ workers, selectedIds, onSelect }: Wor
                             {/* Mobile Card Layout (Visible only on Mobile) */}
                             <button
                                 onClick={(e) => onSelect(worker.id, e)}
-                                className={`lg:hidden w-full flex flex-col bg-white rounded-lg border p-4 transition-all
-                                    ${isSelected ? 'border-emerald-500 ring-1 ring-emerald-500 bg-emerald-50/30' : 'border-gray-200 shadow-sm'}`}
+                                className={`lg:hidden w-full flex flex-col bg-white p-3 transition-all border-b border-slate-200
+                                    ${isSelected ? 'bg-emerald-50/30' : ''}`}
                             >
                                 <div className="flex gap-4 mb-3 w-full">
-                                    <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 text-lg font-bold
+                                    <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 text-lg font-normal shadow-sm
                                         ${isSelected ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-500'}`}>
                                         {worker.avatar_url
                                             ? <img src={worker.avatar_url} alt="" className="w-full h-full object-cover rounded-full" />
                                             : (worker.full_name_romaji || 'U').charAt(0).toUpperCase()}
                                     </div>
-                                    <div className="flex-1 min-w-0">
+                                    <div className="flex-1 min-w-0 flex flex-col justify-center">
                                         <div className="flex justify-between items-start">
-                                            <span className="text-[14px] font-black text-slate-900 uppercase truncate pr-2">
+                                            <span className="text-sm font-normal text-slate-900 uppercase truncate pr-2">
                                                 {worker.full_name_romaji || '---'}
                                             </span>
                                         </div>
-                                        <div className="text-[10px] text-slate-400 mb-1">{worker.full_name_kana}</div>
-                                        <div className="text-[11px] font-bold text-blue-600 truncate">
+                                        <div className="text-[11px] text-slate-400 mb-0.5">{worker.full_name_kana}</div>
+                                        <div className="text-[13px] font-normal text-blue-600 truncate">
                                             {worker.companies?.name_jp || '---'}
                                         </div>
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-y-2 border-t border-gray-100 pt-3">
-                                    <div className="flex flex-col">
-                                        <span className="text-[9px] text-gray-400 uppercase font-black tracking-widest">VISA / 育成・実習</span>
-                                        <span className="text-[11px] font-bold text-gray-700">
+                                <div className="grid grid-cols-2 gap-y-2 border-t border-slate-50 pt-3">
+                                    <div className="flex flex-col gap-0.5">
+                                        <span className="text-[9px] text-gray-400 uppercase font-normal tracking-widest">VISA / 育成・実習</span>
+                                        <span className="text-[12px] font-normal text-gray-700">
                                             {worker.visa_status === 'ikusei_shuro' ? '育成就労' : worker.visa_status === 'ginou_jisshu' ? '技能実習' : worker.visa_status === 'tokuteigino' ? '特定技能' : worker.visa_status || '---'}
                                         </span>
                                     </div>
-                                    <div className="flex flex-col">
-                                        <span className="text-[9px] text-gray-400 uppercase font-black tracking-widest text-right">在日期間 / 入国日</span>
-                                        <span className="text-[11px] font-bold text-gray-700 text-right">
+                                    <div className="flex flex-col gap-0.5">
+                                        <span className="text-[9px] text-gray-400 uppercase font-normal tracking-widest text-right">在日期間 / 入国日</span>
+                                        <span className="text-[12px] font-normal text-gray-700 text-right">
                                             {fmtInJapanDuration(worker.entry_date)} ({fmtDate(worker.entry_date)})
                                         </span>
                                     </div>
-
                                 </div>
                             </button>
                         </div>
@@ -210,3 +202,5 @@ export default function WorkerListColumn({ workers, selectedIds, onSelect }: Wor
         </div>
     );
 }
+
+export default React.memo(WorkerListColumn);

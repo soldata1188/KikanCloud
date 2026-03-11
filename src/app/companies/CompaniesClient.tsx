@@ -187,10 +187,10 @@ export function CompaniesClient({ companies: initialCompanies, userRole }: Compa
     return (
         <div className="flex flex-col h-screen bg-white overflow-hidden text-gray-900 antialiased selection:bg-blue-100 uppercase tracking-tight">
             {/* 1. Header Desktop (Hidden on Mobile) */}
-            <header className="hidden md:flex h-[42px] bg-white border-b border-gray-100 flex items-center justify-between px-4 z-40 shrink-0">
+            <header className="hidden md:flex h-[44px] bg-white border-b border-gray-300 flex items-center justify-between px-4 z-40 shrink-0">
                 <div className="flex items-center gap-4 flex-1">
-                    <h2 className="text-[14px] font-normal tracking-tight text-gray-950 border-r border-gray-200 pr-4 shrink-0">
-                        企業<span className="text-emerald-600">管理</span>
+                    <h2 className="text-[15px] font-normal tracking-tight text-gray-950 border-r border-gray-300 pr-4 shrink-0">
+                        企業<span className="text-emerald-600 font-normal">管理</span>
                     </h2>
                     <div className="relative flex-1 max-w-sm group">
                         <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-600 transition-colors" />
@@ -234,10 +234,10 @@ export function CompaniesClient({ companies: initialCompanies, userRole }: Compa
                 <div className="hidden lg:flex flex-1 border-t border-gray-200 overflow-hidden bg-white">
                     {/* Column 0: Industry */}
                     <div className="flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-300" style={{ width: industryWidth }}>
-                        <div className="h-[48px] px-4 border-b border-gray-300 bg-white flex items-center shrink-0">
+                        <div className="h-[44px] px-4 border-b border-gray-300 bg-white flex items-center shrink-0">
                             <div className="flex items-center gap-2">
-                                <Briefcase size={20} className="text-gray-400" />
-                                <span className="text-[15px] font-normal uppercase tracking-widest text-gray-900">業種区分</span>
+                                <Briefcase size={16} className="text-gray-400" />
+                                <span className="text-[13px] font-normal uppercase tracking-widest text-gray-900">業種区分</span>
                             </div>
                         </div>
                         <div className="flex-1 overflow-hidden">
@@ -265,12 +265,12 @@ export function CompaniesClient({ companies: initialCompanies, userRole }: Compa
 
                     {/* Column 1: Company List */}
                     <div className="flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-300" style={{ width: listWidth }}>
-                        <div className="h-[48px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
+                        <div className="h-[44px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
                             <div className="flex items-center gap-2 text-slate-900">
-                                <Building2 size={20} className="text-emerald-400" />
-                                <span className="text-[15px] font-normal uppercase tracking-widest text-emerald-700">企業リスト</span>
+                                <Building2 size={16} className="text-emerald-400" />
+                                <span className="text-[13px] font-normal uppercase tracking-widest text-emerald-700">企業リスト</span>
                             </div>
-                            <span className="text-[11px] font-normal bg-gray-50 px-1.5 py-0.5 rounded-[6px] text-slate-600 border border-gray-200 shadow-sm">
+                            <span className="text-[10px] font-normal bg-gray-50 px-1.5 py-0.5 rounded-[6px] text-slate-600 border border-gray-200 shadow-sm">
                                 {filteredCompanies.length}
                             </span>
                         </div>
@@ -278,17 +278,17 @@ export function CompaniesClient({ companies: initialCompanies, userRole }: Compa
                         {/* Tabs - Synchronized with Workers style */}
                         <div className="flex border-b border-gray-300 bg-white shrink-0">
                             <button onClick={() => setActiveTab('active')}
-                                className={`flex-1 h-[48px] flex items-center justify-center text-[10px] font-normal uppercase tracking-widest transition-all border-b-2
+                                className={`flex-1 h-[44px] flex items-center justify-center text-[10px] font-normal uppercase tracking-widest transition-all border-b-2
                                 ${activeTab === 'active' ? 'bg-slate-900 text-white border-slate-900' : 'text-gray-400 hover:text-gray-600 border-transparent'}`}>
                                 受入中
                             </button>
                             <button onClick={() => setActiveTab('inactive')}
-                                className={`flex-1 h-[48px] flex items-center justify-center text-[10px] font-normal uppercase tracking-widest transition-all border-b-2
+                                className={`flex-1 h-[44px] flex items-center justify-center text-[10px] font-normal uppercase tracking-widest transition-all border-b-2
                                 ${activeTab === 'inactive' ? 'bg-slate-900 text-white border-slate-900' : 'text-gray-400 hover:text-gray-600 border-transparent'}`}>
                                 未受入
                             </button>
                             <button onClick={() => setActiveTab('all')}
-                                className={`flex-1 h-[48px] flex items-center justify-center text-[10px] font-normal uppercase tracking-widest transition-all border-b-2
+                                className={`flex-1 h-[44px] flex items-center justify-center text-[10px] font-normal uppercase tracking-widest transition-all border-b-2
                                 ${activeTab === 'all' ? 'bg-slate-900 text-white border-slate-900' : 'text-gray-400 hover:text-gray-600 border-transparent'}`}>
                                 すべて
                             </button>
@@ -338,12 +338,12 @@ export function CompaniesClient({ companies: initialCompanies, userRole }: Compa
 
                     {/* Column 2.5: Worker List (Seamless Design) */}
                     <div className="flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-300 bg-white" style={{ width: workerListWidth }}>
-                        <div className="h-[48px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
+                        <div className="h-[44px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
                             <div className="flex items-center gap-2">
-                                <Users size={20} className="text-gray-400" />
-                                <span className="text-[15px] font-normal uppercase tracking-widest text-gray-900">人材リスト</span>
+                                <Users size={16} className="text-gray-400" />
+                                <span className="text-[13px] font-normal uppercase tracking-widest text-gray-900">人材リスト</span>
                             </div>
-                            <span className="text-[11px] font-normal bg-gray-50 px-1.5 py-0.5 rounded-[6px] text-slate-600 border border-gray-200 shadow-sm">
+                            <span className="text-[10px] font-normal bg-gray-50 px-1.5 py-0.5 rounded-[6px] text-slate-600 border border-gray-200 shadow-sm">
                                 {selectedCompany?.workers?.filter((w: any) => !w.is_deleted).length || 0}
                             </span>
                         </div>
@@ -352,22 +352,22 @@ export function CompaniesClient({ companies: initialCompanies, userRole }: Compa
                                 Object.entries(groupedWorkers).map(([status, list]) => (
                                     <div key={status} className="space-y-2">
                                         <div className="flex items-center gap-2 px-2">
-                                            <span className="text-[11px] font-black uppercase tracking-widest text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
+                                            <span className="text-[11px] font-normal uppercase tracking-widest text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
                                                 {VISA_LABELS[status] || status}
                                             </span>
                                             <div className="flex-1 h-px bg-emerald-100" />
-                                            <span className="text-[10px] font-bold text-emerald-600/50">{list.length}</span>
+                                            <span className="text-[10px] font-normal text-emerald-600/50">{list.length}</span>
                                         </div>
                                         <div className="grid gap-1">
                                             {list.map(worker => (
                                                 <div key={worker.id} className="flex items-center gap-3 p-2 bg-white border-b border-gray-50 hover:bg-slate-50/50 transition-all group">
-                                                    <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-[11px] font-bold text-slate-500 overflow-hidden shrink-0 border border-white shadow-sm">
+                                                    <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-[11px] font-normal text-slate-500 overflow-hidden shrink-0 border border-white shadow-sm">
                                                         {worker.avatar_url
                                                             ? <img src={worker.avatar_url} alt="" className="w-full h-full object-cover" />
                                                             : (worker.full_name_romaji || 'U').charAt(0)}
                                                     </div>
                                                     <div className="flex-1 min-w-0">
-                                                        <div className="text-[12px] font-black text-slate-900 uppercase truncate">
+                                                        <div className="text-[12px] font-normal text-slate-900 uppercase truncate">
                                                             {worker.full_name_romaji || '---'}
                                                         </div>
                                                         <div className="text-[9px] text-slate-400 truncate uppercase tracking-tighter">
@@ -375,10 +375,10 @@ export function CompaniesClient({ companies: initialCompanies, userRole }: Compa
                                                         </div>
                                                     </div>
                                                     <div className="shrink-0 text-right">
-                                                        <div className="text-[9px] font-mono font-bold text-slate-400">
+                                                        <div className="text-[9px] font-mono font-normal text-slate-400">
                                                             {worker.zairyu_exp ? String(worker.zairyu_exp).replace(/-/g, '/') : '---'}
                                                         </div>
-                                                        <div className={`text-[9px] font-bold ${worker.status === 'working' ? 'text-emerald-500' : 'text-amber-500'}`}>
+                                                        <div className={`text-[9px] font-normal ${worker.status === 'working' ? 'text-emerald-500' : 'text-amber-500'}`}>
                                                             {worker.status === 'working' ? '就業中' : '準備中'}
                                                         </div>
                                                     </div>
@@ -412,10 +412,10 @@ export function CompaniesClient({ companies: initialCompanies, userRole }: Compa
 
                     {/* Column 3: Documents (Flexible wide) */}
                     <div className="flex-1 min-w-[320px] flex flex-col overflow-hidden">
-                        <div className="h-[48px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
+                        <div className="h-[44px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
                             <div className="flex items-center gap-2">
-                                <FileText size={20} className="text-gray-400" />
-                                <span className="text-[15px] font-normal uppercase tracking-widest text-gray-900 truncate">書類・資料 ({selectedCompany?.name_jp || '未選択'})</span>
+                                <FileText size={16} className="text-gray-400" />
+                                <span className="text-[13px] font-normal uppercase tracking-widest text-gray-900 truncate">書類・資料 ({selectedCompany?.name_jp || '未選択'})</span>
                             </div>
                         </div>
                         <div className="flex-1 overflow-hidden bg-white">
@@ -447,7 +447,7 @@ export function CompaniesClient({ companies: initialCompanies, userRole }: Compa
                         {mobileView === 'detail' && (
                             <button
                                 onClick={() => setMobileView('docs')}
-                                className="ml-auto px-3 py-1.5 text-[10px] font-bold bg-blue-50 text-blue-600 rounded flex items-center gap-1.5"
+                                className="ml-auto px-3 py-1.5 text-[10px] font-normal bg-blue-50 text-blue-600 rounded flex items-center gap-1.5"
                             >
                                 書類 <FileText size={12} />
                             </button>
@@ -468,9 +468,9 @@ export function CompaniesClient({ companies: initialCompanies, userRole }: Compa
                             <div className="absolute inset-0 bg-white flex flex-col">
                                 <div className="px-4 py-2 border-b border-gray-100 bg-gray-50 flex-shrink-0">
                                     <div className="flex bg-white rounded-md border border-gray-200 p-[2px]">
-                                        <button onClick={() => setActiveTab('active')} className={`flex-1 text-[10px] uppercase font-bold py-1.5 rounded transition-colors ${activeTab === 'active' ? 'bg-slate-900 text-white shadow-sm' : 'text-gray-400'}`}>受入中</button>
-                                        <button onClick={() => setActiveTab('inactive')} className={`flex-1 text-[10px] uppercase font-bold py-1.5 rounded transition-colors ${activeTab === 'inactive' ? 'bg-slate-900 text-white shadow-sm' : 'text-gray-400'}`}>未受入</button>
-                                        <button onClick={() => setActiveTab('all')} className={`flex-1 text-[10px] uppercase font-bold py-1.5 rounded transition-colors ${activeTab === 'all' ? 'bg-slate-900 text-white shadow-sm' : 'text-gray-400'}`}>すべて</button>
+                                        <button onClick={() => setActiveTab('active')} className={`flex-1 text-[10px] uppercase font-normal py-1.5 rounded transition-colors ${activeTab === 'active' ? 'bg-slate-900 text-white shadow-sm' : 'text-gray-400'}`}>受入中</button>
+                                        <button onClick={() => setActiveTab('inactive')} className={`flex-1 text-[10px] uppercase font-normal py-1.5 rounded transition-colors ${activeTab === 'inactive' ? 'bg-slate-900 text-white shadow-sm' : 'text-gray-400'}`}>未受入</button>
+                                        <button onClick={() => setActiveTab('all')} className={`flex-1 text-[10px] uppercase font-normal py-1.5 rounded transition-colors ${activeTab === 'all' ? 'bg-slate-900 text-white shadow-sm' : 'text-gray-400'}`}>すべて</button>
                                     </div>
                                 </div>
                                 <div className="flex-1 overflow-hidden">

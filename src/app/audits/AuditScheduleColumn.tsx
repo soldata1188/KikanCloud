@@ -296,7 +296,7 @@ export default function AuditScheduleColumn({ row, filterMonth, staffList, onSav
                                             <div className="flex items-center justify-between mb-2">
                                                 <div className="flex items-center gap-2">
                                                     <div className="flex items-center gap-2">
-                                                        <span className={`px-1.5 py-0.5 rounded-[4px] text-[8px] font-normal uppercase tracking-widest border ${audit.audit_type === 'kansa' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-emerald-50/50 text-emerald-500 border-emerald-100'}`}>
+                                                        <span className={`px-1.5 py-0.5 rounded-[4px] text-xs font-bold uppercase tracking-widest border ${audit.audit_type === 'kansa' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-emerald-50/50 text-emerald-500 border-emerald-100'}`}>
                                                             {audit.audit_type === 'kansa' ? '監査' : '訪問'}
                                                         </span>
                                                         <span className="text-[13px] font-normal text-gray-900">
@@ -311,7 +311,7 @@ export default function AuditScheduleColumn({ row, filterMonth, staffList, onSav
                                                     </button>
                                                 </div>
                                                 {idx === 0 && (
-                                                    <span className="text-[9px] font-normal text-white bg-blue-600 px-1.5 py-0.5 rounded-[4px] uppercase shadow-blue-100">最新</span>
+                                                    <span className="text-xs font-bold text-white bg-blue-600 px-1.5 py-0.5 rounded-[4px] uppercase shadow-blue-100">最新</span>
                                                 )}
                                             </div>
                                             <div className="flex items-center gap-3 text-gray-900 ml-1">

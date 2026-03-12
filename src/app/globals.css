@@ -23,8 +23,15 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: 'Inter', 'Noto Sans JP', 'Hiragino Sans', 'Meiryo', 'Yu Gothic UI', sans-serif;
+  --font-sans: 'Noto Sans JP', 'Inter', 'Hiragino Sans', 'Meiryo', 'Yu Gothic UI', sans-serif;
   --font-mono: var(--font-geist-mono);
+
+  /* Typography Scale Overrides (Tailwind 4) */
+  --font-size-xs: 0.75rem;     /* 12px */
+  --font-size-sm: 0.875rem;    /* 14px */
+  --font-size-base: 1rem;      /* 16px */
+  --font-size-lg: 1.125rem;    /* 18px */
+  --font-size-xl: 1.25rem;     /* 20px */
 
   --color-primary-50: #eff6ff;
   --color-primary-100: #dbeafe;
@@ -193,15 +200,15 @@ body {
   }
 
   .seamless-column-header {
-    @apply h-[48px] px-4 border-b border-gray-200 bg-white flex items-center justify-between shrink-0 font-black text-[11px] uppercase tracking-widest text-gray-900;
+    @apply h-[52px] px-5 border-b border-gray-200 bg-white flex items-center justify-between shrink-0 font-bold text-xs uppercase tracking-widest text-gray-900;
   }
 
   .seamless-search-input {
-    @apply w-full h-7 pl-9 pr-3 bg-gray-50 border border-gray-200 rounded-[6px] text-[13px] font-bold text-gray-900 placeholder:text-gray-500 outline-none focus:border-blue-500 focus:bg-white transition-all;
+    @apply w-full h-9 pl-10 pr-4 bg-gray-50 border border-gray-200 rounded-[8px] text-sm font-medium text-gray-900 placeholder:text-gray-400 outline-none focus:border-blue-500 focus:bg-white transition-all;
   }
 
   .seamless-action-btn {
-    @apply p-1.5 rounded-[6px] bg-gray-50 text-gray-400 border border-gray-200 transition-all hover:bg-white hover:text-blue-600 active:scale-95 disabled:opacity-50;
+    @apply p-2 rounded-[8px] bg-gray-50 text-gray-400 border border-gray-200 transition-all hover:bg-white hover:text-blue-600 active:scale-95 disabled:opacity-50;
   }
 }
 

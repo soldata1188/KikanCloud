@@ -61,7 +61,7 @@ export function SidebarClient({ active, userRole, userProfile }: SidebarClientPr
             )}
 
             <aside
-                className={`fixed inset-y-0 left-0 z-[150] w-[180px] bg-white border-r border-gray-200 flex flex-col shrink-0 overflow-y-auto transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+                className={`fixed inset-y-0 left-0 z-[150] w-[200px] bg-white border-r border-gray-200 flex flex-col shrink-0 overflow-y-auto transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
                     }`}
             >
                 {/* Nút đóng Sidebar trên Mobile */}
@@ -79,8 +79,8 @@ export function SidebarClient({ active, userRole, userProfile }: SidebarClientPr
                             {orgInitial}
                         </div>
                         <div className="min-w-0">
-                            <p className="text-xs font-bold text-gray-900 leading-tight truncate">Solution</p>
-                            <p className="text-[9px] text-gray-400 font-medium uppercase tracking-wider truncate">Cooperative</p>
+                            <p className="text-sm font-bold text-gray-900 leading-tight truncate">Solution</p>
+                            <p className="text-xs text-gray-400 font-bold uppercase tracking-widest truncate">Cooperative</p>
                         </div>
                     </div>
                 </div>
@@ -94,12 +94,12 @@ export function SidebarClient({ active, userRole, userProfile }: SidebarClientPr
                             <Link
                                 key={item.id}
                                 href={item.href}
-                                className={`flex items-center gap-2.5 px-3 py-2 rounded-[6px] text-[12px] font-bold transition-all ${isActive
+                                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-[8px] text-sm font-bold transition-all ${isActive
                                     ? "bg-blue-50 text-blue-700 shadow-sm"
                                     : "text-gray-500 hover:bg-gray-50 hover:text-gray-800"
                                     }`}
                             >
-                                <Icon size={16} strokeWidth={isActive ? 2.5 : 2} />
+                                <Icon size={18} strokeWidth={isActive ? 2.5 : 2} />
                                 <span className="truncate">{item.name}</span>
                             </Link>
                         );
@@ -107,14 +107,14 @@ export function SidebarClient({ active, userRole, userProfile }: SidebarClientPr
                 </nav>
 
                 {/* Footer Info */}
-                <div className="p-2 border-t border-gray-50 bg-gray-50/30">
-                    <div className="flex items-center gap-2 px-2 py-2">
-                        <div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 shrink-0">
-                            <User size={14} />
+                <div className="p-3 border-t border-gray-50 bg-gray-50/30">
+                    <div className="flex items-center gap-3 px-1 py-2">
+                        <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 shrink-0">
+                            <User size={16} />
                         </div>
                         <div className="flex-1 min-w-0">
-                            <p className="text-[11px] font-bold text-gray-900 truncate">{userProfile?.full_name || 'User'}</p>
-                            <p className="text-[9px] text-gray-400 truncate uppercase">{userRole}</p>
+                            <p className="text-xs font-bold text-gray-900 truncate">{userProfile?.full_name || 'User'}</p>
+                            <p className="text-xs text-gray-400 font-bold truncate uppercase">{userRole}</p>
                         </div>
                     </div>
                 </div>
@@ -133,9 +133,9 @@ export function SidebarClient({ active, userRole, userProfile }: SidebarClientPr
                                 }`}
                         >
                             <div className={`p-1.5 rounded-xl transition-all ${isActive ? "bg-blue-50" : ""}`}>
-                                <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
+                                <Icon size={22} strokeWidth={isActive ? 2.5 : 2} />
                             </div>
-                            <span className={`text-[9px] font-black uppercase tracking-tighter ${isActive ? "opacity-100" : "opacity-60"}`}>
+                            <span className={`text-xs font-bold uppercase tracking-tight ${isActive ? "opacity-100" : "opacity-60"}`}>
                                 {item.name === "位置情報マップ" ? "マップ" : item.name === "監査・訪問" ? "監査" : item.name}
                             </span>
                         </Link>

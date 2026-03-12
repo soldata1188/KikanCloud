@@ -36,7 +36,7 @@ export default function IndustryColumn({ industries, selectedIndustry, onSelect 
                         <span className={`text-[13px] font-normal uppercase tracking-wide
                             ${selectedIndustry === null ? 'text-emerald-900' : 'text-slate-900'}`}>すべて</span>
                     </div>
-                    <span className={`text-[9px] font-mono font-normal px-1 py-0.5 rounded leading-none
+                    <span className={`text-xs font-mono font-bold px-1 py-0.5 rounded leading-none
                         ${selectedIndustry === null ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-500'}`}>
                         {total}
                     </span>
@@ -62,7 +62,7 @@ export default function IndustryColumn({ industries, selectedIndustry, onSelect 
                                     </span>
                                 </div>
                                 <div className="flex items-center gap-1.5 shrink-0">
-                                    <span className={`text-[9px] font-mono font-normal px-1 py-0.5 rounded leading-none
+                                    <span className={`text-xs font-mono font-bold px-1 py-0.5 rounded leading-none
                                         ${isSelected ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-500'}`}>
                                         {item.count}
                                     </span>

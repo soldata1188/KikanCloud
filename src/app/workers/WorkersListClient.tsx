@@ -454,7 +454,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                 className="w-8 h-8 flex items-center justify-center rounded-md border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 focus:border-[#0067b8] transition-all disabled:opacity-30 disabled:cursor-not-allowed">
                 <ChevronRight size={14} />
             </button>
-            <span className="text-[11px] font-normal text-gray-400 ml-3 uppercase tracking-wider">
+            <span className="text-xs font-normal text-gray-400 ml-3 uppercase tracking-wider">
                 {filtered.length}名中 {(currentPage - 1) * PAGE_SIZE + 1}–{Math.min(currentPage * PAGE_SIZE, filtered.length)}表示
             </span>
         </div>
@@ -468,7 +468,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
             {/* 1. Header */}
             <header className="h-[44px] bg-white border-b border-gray-300 flex items-center justify-between px-4 z-40 shrink-0">
                 <div className="flex items-center gap-4 flex-1">
-                    <h2 className="text-[15px] font-normal tracking-tight text-gray-950 border-r border-gray-300 pr-4 shrink-0">
+                    <h2 className="text-base font-bold tracking-tight text-gray-950 border-r border-gray-300 pr-4 shrink-0">
                         人材<span className="text-blue-700">管理</span>
                     </h2>
 
@@ -481,7 +481,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             suppressHydrationWarning
-                            className="w-full h-7.5 pl-9 pr-3 bg-gray-50 border border-gray-200 rounded-[6px] text-[13px] font-normal text-gray-900 placeholder:text-gray-500 outline-none focus:border-blue-500 focus:bg-white transition-all shadow-sm"
+                            className="w-full h-8 pl-9 pr-3 bg-gray-50 border border-gray-200 rounded-[6px] text-sm font-normal text-gray-900 placeholder:text-gray-500 outline-none focus:border-blue-500 focus:bg-white transition-all shadow-sm"
                         />
                     </div>
 
@@ -491,7 +491,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                             {/* Entry Date Filter */}
                             <select value={filterEntryDate} onChange={e => setFilterEntryDate(e.target.value)}
                                 suppressHydrationWarning
-                                className="bg-transparent text-[11px] font-normal uppercase text-gray-600 outline-none pr-4 cursor-pointer max-w-[120px]">
+                                className="bg-transparent text-xs font-normal uppercase text-gray-600 outline-none pr-4 cursor-pointer max-w-[120px]">
                                 <option value="all">入国年月日</option>
                                 {entryDateList.map(d => <option key={d} value={d}>{d.replace(/-/g, '/')}</option>)}
                             </select>
@@ -500,7 +500,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                             {/* Visa Status Filter */}
                             <select value={filterVisaStatus} onChange={e => setFilterVisaStatus(e.target.value)}
                                 suppressHydrationWarning
-                                className="bg-transparent text-[11px] font-normal uppercase text-gray-600 outline-none pr-4 cursor-pointer max-w-[100px]">
+                                className="bg-transparent text-xs font-normal uppercase text-gray-600 outline-none pr-4 cursor-pointer max-w-[100px]">
                                 <option value="all">在留資格</option>
                                 {visaStatusList.map(v => (
                                     <option key={v} value={v}>
@@ -513,7 +513,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                             {/* Nationality Filter */}
                             <select value={filterNationality} onChange={e => setFilterNationality(e.target.value)}
                                 suppressHydrationWarning
-                                className="bg-transparent text-[11px] font-normal uppercase text-gray-600 outline-none pr-4 cursor-pointer max-w-[90px]">
+                                className="bg-transparent text-xs font-normal uppercase text-gray-600 outline-none pr-4 cursor-pointer max-w-[90px]">
                                 <option value="all">国籍</option>
                                 {nationalityList.map(n => <option key={n} value={n}>{n}</option>)}
                             </select>
@@ -522,7 +522,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                             {/* Sending Org Filter */}
                             <select value={filterSendingOrg} onChange={e => setFilterSendingOrg(e.target.value)}
                                 suppressHydrationWarning
-                                className="bg-transparent text-[11px] font-normal uppercase text-gray-600 outline-none pr-2 cursor-pointer max-w-[130px]">
+                                className="bg-transparent text-xs font-normal uppercase text-gray-600 outline-none pr-2 cursor-pointer max-w-[130px]">
                                 <option value="all">送出機関</option>
                                 {sendingOrgList.map(o => <option key={o} value={o}>{o}</option>)}
                             </select>
@@ -544,17 +544,17 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                     )}
                     <button
                         onClick={() => setIsBulkImportModalOpen(true)}
-                        className="h-7.5 px-3.5 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 rounded-[6px] flex items-center gap-2 text-[13px] font-normal transition-all active:scale-95 shadow-sm"
+                        className="h-8 px-3.5 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 rounded-[6px] flex items-center gap-2 text-sm font-normal transition-all active:scale-95 shadow-sm"
                     >
-                        <List size={13.5} />
+                        <List size={14} />
                         一括入力
                     </button>
                     <button onClick={() => { setIsRefreshing(true); setTimeout(() => setIsRefreshing(false), 800); }} className={`p-1.5 rounded-[6px] bg-gray-50 text-gray-400 border border-gray-200 transition-all active:scale-95 ${isRefreshing ? 'animate-spin text-blue-600' : 'hover:bg-white hover:text-blue-600'}`}>
                         <RefreshCw size={14} />
                     </button>
                     {(role === 'admin' || role === 'staff') && (
-                        <Link href="/workers/new" className="h-7.5 px-3.5 bg-blue-700 hover:bg-blue-800 text-white rounded-[6px] text-[13px] font-normal hidden md:flex items-center gap-2 active:scale-95 transition-all shadow-md shadow-blue-100">
-                            <Plus size={14} />
+                        <Link href="/workers/new" className="h-8 px-3.5 bg-blue-700 hover:bg-blue-800 text-white rounded-[6px] text-sm font-bold hidden md:flex items-center gap-2 active:scale-95 transition-all shadow-md shadow-blue-100">
+                            <Plus size={16} />
                             <span>新規登録</span>
                         </Link>
                     )}
@@ -570,7 +570,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                         <div className="h-[44px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
                             <div className="flex items-center gap-2">
                                 <Calendar size={18} className="text-gray-400" />
-                                <span className="text-[13px] font-normal uppercase tracking-widest text-gray-900">入国期生</span>
+                                <span className="text-sm font-bold uppercase tracking-widest text-gray-900">入国期生</span>
                             </div>
                         </div>
                         <div className="flex-1 overflow-hidden">
@@ -601,10 +601,10 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                         <div className="h-[44px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
                             <div className="flex items-center gap-2">
                                 <Building2 size={18} className="text-blue-400" />
-                                <span className="text-[13px] font-normal uppercase tracking-widest text-blue-700">企業リスト</span>
+                                <span className="text-sm font-bold uppercase tracking-widest text-blue-700">企業リスト</span>
                             </div>
                             {selectedBatch && (
-                                <span className="text-[11px] font-normal bg-white text-blue-700 px-1.5 py-0.5 rounded-[6px] border border-blue-200 shadow-sm">{filteredCompanies.length}</span>
+                                <span className="text-xs font-bold bg-white text-blue-700 px-1.5 py-0.5 rounded-[6px] border border-blue-200 shadow-sm">{filteredCompanies.length}</span>
                             )}
                         </div>
                         <div className="flex-1 overflow-hidden">
@@ -635,9 +635,9 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                         <div className="h-[44px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
                             <div className="flex items-center gap-2">
                                 <Users size={18} className="text-gray-400" />
-                                <span className="text-[13px] font-normal uppercase tracking-widest text-gray-900">人材リスト</span>
+                                <span className="text-sm font-bold uppercase tracking-widest text-gray-900">人材リスト</span>
                             </div>
-                            <span className="text-[11px] font-normal bg-gray-50 text-gray-900 px-1.5 py-0.5 rounded-[6px] border border-gray-200 shadow-sm">{filtered.length}</span>
+                            <span className="text-xs font-bold bg-gray-50 text-gray-900 px-1.5 py-0.5 rounded-[6px] border border-gray-200 shadow-sm">{filtered.length}</span>
                         </div>
                         {/* Tabs */}
                         <div className="flex border-b border-gray-300 bg-white shrink-0">
@@ -646,7 +646,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                                 const cfg = TAB_CONFIG[key]
                                 return (
                                     <button key={key} onClick={() => setActiveTab(key)}
-                                        className={`flex-1 h-[44px] flex items-center justify-center text-[10px] font-normal uppercase tracking-widest transition-all border-b-2
+                                        className={`flex-1 h-[44px] flex items-center justify-center text-xs font-bold uppercase tracking-widest transition-all border-b-2
                                         ${isActive ? cfg.activeBg : cfg.inactiveText + ' border-transparent'}`}>
                                         {cfg.label}
                                     </button>
@@ -681,10 +681,10 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                         <div className="h-[44px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
                             <div className="flex items-center gap-2">
                                 <User size={18} className="text-gray-400" />
-                                <span className="text-[13px] font-normal uppercase tracking-widest text-gray-900">人材詳細</span>
+                                <span className="text-sm font-bold uppercase tracking-widest text-gray-900">人材詳細</span>
                             </div>
                             {selectedIds.length > 1 && (
-                                <span className="text-[11px] font-normal bg-blue-50 text-blue-700 px-2.5 py-1 rounded-[6px] border border-blue-200 shadow-sm">{selectedIds.length}名一括選択中</span>
+                                <span className="text-xs font-bold bg-blue-50 text-blue-700 px-2.5 py-1 rounded-[6px] border border-blue-200 shadow-sm">{selectedIds.length}名一括選択中</span>
                             )}
                         </div>
                         <div className="flex-1 overflow-hidden">
@@ -717,11 +717,11 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                     <div className="flex-1 min-w-0 flex flex-col overflow-hidden">
                         <div className="h-[44px] px-4 border-b border-gray-300 bg-white flex items-center justify-center gap-3 shrink-0 relative">
                             <div className="flex items-center gap-2 text-slate-800">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" /><path d="M14 2v4a2 2 0 0 0 2 2h4" /></svg>
-                                <span className="text-[13px] font-normal uppercase tracking-widest text-gray-900">関連書類</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" /><path d="M14 2v4a2 2 0 0 0 2 2h4" /></svg>
+                                <span className="text-sm font-bold uppercase tracking-widest text-gray-900">関連書類</span>
                             </div>
                             {selectedIds.length === 1 && (
-                                <span className="absolute right-4 text-[11px] font-normal text-blue-700 bg-blue-50 px-2 py-0.5 rounded-[6px] border border-blue-100 shadow-sm">1名選択</span>
+                                <span className="absolute right-4 text-xs font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-[6px] border border-blue-100 shadow-sm">1名選択</span>
                             )}
                         </div>
                         <div className="flex-1 overflow-hidden">
@@ -748,11 +748,11 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                             <ArrowLeft size={16} />
                         </button>
                     )}
-                    <h1 className="text-[15px] font-normal tracking-tight">
+                    <h1 className="text-base font-bold tracking-tight">
                         {viewState === 'batches' ? '入国期生' : viewState === 'companies' ? '企業' : viewState === 'workers' ? '人材' : '詳細'}
                     </h1>
                     {selectedBatch && viewState !== 'batches' && (
-                        <span className="text-[10px] font-normal bg-amber-100 text-amber-700 px-2 py-0.5 rounded ml-auto">{selectedBatch}</span>
+                        <span className="text-xs font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded ml-auto">{selectedBatch}</span>
                     )}
                 </div>
 
@@ -783,7 +783,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                                     const isActive = activeTab === key
                                     return (
                                         <button key={key} onClick={() => setActiveTab(key)}
-                                            className={`flex-1 h-[52px] flex items-center justify-center text-[10px] font-normal uppercase tracking-widest border-b-2 transition-all
+                                            className={`flex-1 h-[52px] flex items-center justify-center text-xs font-bold uppercase tracking-widest border-b-2 transition-all
                                             ${isActive ? cfg.activeBg : cfg.inactiveText + ' border-transparent'}`}>
                                             {cfg.label}
                                         </button>

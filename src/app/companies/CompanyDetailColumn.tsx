@@ -163,7 +163,7 @@ export default function CompanyDetailColumn({ companies }: CompanyDetailColumnPr
                                 ) : (
                                     <>
                                         <h2 className="text-[16px] font-normal text-gray-900 tracking-tight leading-none truncate uppercase">{c.name_jp || '---'}</h2>
-                                        <span className={`text-[9px] font-normal px-2 py-0.5 rounded-full
+                                        <span className={`text-xs font-bold px-2 py-0.5 rounded-full
                                                 ${(c.active_worker_count || 0) > 0 ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-500'}
                                             `}>
                                             {c.active_worker_count! > 0 ? '受入中' : '未受入'}

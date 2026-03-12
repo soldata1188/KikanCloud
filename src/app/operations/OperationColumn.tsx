@@ -24,26 +24,26 @@ const KENTEI_OPTIONS = ['---', '初級', '基礎級', '専門級', '随時３級
 const SYSTEM_OPTIONS = ['---', '就労認可', '変更届出'];
 
 const InlineField = ({ label, value, type = "text", options = [], onChange }: any) => (
-    <div className="flex items-center gap-3 px-4 py-1 border-b border-slate-200 last:border-0 hover:bg-slate-50/50 transition-all group">
-        <label className="text-[10px] font-normal text-slate-400 uppercase tracking-tighter w-[80px] shrink-0">{label}</label>
+    <div className="flex items-center gap-3 px-4 py-2 border-b border-slate-200 last:border-0 hover:bg-slate-50/50 transition-all group">
+        <label className="text-xs font-bold text-slate-400 uppercase tracking-tighter w-[90px] shrink-0">{label}</label>
         <div className="flex-1 min-w-0">
             {type === "select" ? (
                 <div className="relative">
                     <select
                         value={value || '---'}
                         onChange={(e) => onChange(e.target.value)}
-                        className="w-full appearance-none bg-transparent text-[12px] font-normal text-slate-700 outline-none cursor-pointer pr-5"
+                        className="w-full h-8 appearance-none bg-transparent text-sm font-medium text-slate-700 outline-none cursor-pointer pr-5"
                     >
                         {options.map((opt: string) => <option key={opt} value={opt}>{opt}</option>)}
                     </select>
-                    <ChevronDown size={12} className="absolute right-0 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none group-hover:text-blue-500 transition-colors" />
+                    <ChevronDown size={14} className="absolute right-0 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none group-hover:text-blue-500 transition-colors" />
                 </div>
             ) : (
                 <input
                     type={type}
                     value={value || ''}
                     onChange={(e) => onChange(e.target.value)}
-                    className="w-full bg-transparent text-[12px] font-normal text-slate-700 outline-none border-b border-transparent focus:border-blue-500 placeholder:text-slate-200"
+                    className="w-full h-8 bg-transparent text-sm font-medium text-slate-700 outline-none border-b border-transparent focus:border-blue-500 placeholder:text-slate-200"
                     placeholder="---"
                 />
             )}
@@ -60,15 +60,15 @@ const StatusSelect = ({ value, onChange }: { value: string, onChange: (v: string
 
     return (
         <div className="relative group/status flex-shrink-0">
-            <div className={`flex items-center px-2 py-1 rounded-[4px] border transition-all ${colorClass}`}>
+            <div className={`flex items-center px-3 py-1.5 rounded-[6px] border transition-all ${colorClass}`}>
                 <select
                     value={value}
                     onChange={(e) => onChange(e.target.value)}
-                    className="appearance-none bg-transparent text-[10px] font-normal outline-none cursor-pointer pr-4 color-inherit"
+                    className="appearance-none bg-transparent text-xs font-bold outline-none cursor-pointer pr-4 color-inherit"
                 >
                     {PROGRESS_OPTIONS.map(opt => <option key={opt} value={opt} className="bg-white text-slate-700">{opt}</option>)}
                 </select>
-                <ChevronDown size={10} className="absolute right-1 top-1/2 -translate-y-1/2 opacity-50 pointer-events-none" />
+                <ChevronDown size={12} className="absolute right-2 top-1/2 -translate-y-1/2 opacity-50 pointer-events-none" />
             </div>
         </div>
     );
@@ -145,7 +145,7 @@ export default function OperationColumn({ workers, staff, onUpdate, onBulkUpdate
                 <div className="w-20 h-20 rounded-2xl bg-white border border-slate-100 flex items-center justify-center mb-6 opacity-40">
                     <ClipboardCheck size={32} className="text-slate-400" />
                 </div>
-                <h3 className="text-[13px] font-normal text-slate-400 uppercase tracking-widest leading-loose">
+                <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest leading-loose">
                     対象を<br />選択してください
                 </h3>
             </div>
@@ -180,30 +180,30 @@ export default function OperationColumn({ workers, staff, onUpdate, onBulkUpdate
                         </div>
                         <div className="flex flex-col gap-2">
                             <div className="flex items-center gap-3">
-                                <h1 className="text-[18px] font-normal text-slate-800 tracking-tighter">
+                                <h1 className="text-xl font-bold text-slate-800 tracking-tight">
                                     {isBulkMode ? `${workers.length} 名の労働者を選択中` : worker.name}
                                 </h1>
                                 {!isBulkMode && (
-                                    <span className="px-2 py-0.5 rounded bg-blue-50 text-blue-600 text-[10px] font-normal uppercase tracking-widest border border-blue-100">
+                                    <span className="px-2 py-0.5 rounded bg-blue-50 text-blue-600 text-xs font-bold uppercase tracking-widest border border-blue-100">
                                         {worker.systemType === 'ginou_jisshu' ? '技能実習' : worker.systemType === 'ikusei_shuro' ? '育成就労' : '特定技能'}
                                     </span>
                                 )}
                             </div>
 
-                            <div className="flex items-center gap-5 text-[11px] font-normal text-slate-500">
-                                <div className="flex items-center gap-1.5">
-                                    <Building2 size={13} className="text-slate-300" />
+                            <div className="flex items-center gap-5 text-sm font-medium text-slate-500">
+                                <div className="flex items-center gap-2">
+                                    <Building2 size={15} className="text-slate-300" />
                                     <span>{isBulkMode ? '一괄編集モード' : worker.company}</span>
                                 </div>
                                 {!isBulkMode && (
                                     <>
-                                        <div className="flex items-center gap-1.5">
-                                            <Briefcase size={13} className="text-slate-300" />
+                                        <div className="flex items-center gap-2">
+                                            <Briefcase size={15} className="text-slate-300" />
                                             <span>{worker.occupation}</span>
                                         </div>
-                                        <div className="flex items-center gap-1.5">
-                                            <MapPin size={13} className="text-slate-300" />
-                                            <span className="max-w-[200px] truncate">{worker.address}</span>
+                                        <div className="flex items-center gap-2">
+                                            <MapPin size={15} className="text-slate-300" />
+                                            <span className="max-w-[250px] truncate">{worker.address}</span>
                                         </div>
                                     </>
                                 )}
@@ -212,11 +212,11 @@ export default function OperationColumn({ workers, staff, onUpdate, onBulkUpdate
                     </div>
 
                     <div className="flex items-center gap-4 border-l border-slate-100 pl-6 shrink-0">
-                        <div className="flex flex-col gap-0.5">
-                            <span className="text-[8px] font-normal text-slate-400 tracking-widest uppercase">有効期限 (在留)</span>
-                            <div className="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-[4px] border border-slate-100">
-                                <Calendar size={12} className="text-slate-400" />
-                                <span className={`text-[12px] font-normal ${worker.visaExpiry.includes('あと') ? 'text-rose-600' : 'text-slate-600'}`}>{worker.visaExpiry}</span>
+                        <div className="flex flex-col gap-1">
+                            <span className="text-[10px] font-bold text-slate-400 tracking-widest uppercase">有効期限 (在留)</span>
+                            <div className="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-[6px] border border-slate-100">
+                                <Calendar size={14} className="text-slate-400" />
+                                <span className={`text-sm font-bold ${worker.visaExpiry.includes('あと') ? 'text-rose-600' : 'text-slate-600'}`}>{worker.visaExpiry}</span>
                             </div>
                         </div>
                         {isBulkMode && Object.keys(draftChanges).length > 0 && (
@@ -237,37 +237,37 @@ export default function OperationColumn({ workers, staff, onUpdate, onBulkUpdate
 
                     {/* Top Section: Basic Cert Dates */}
                     <div className="flex divide-x divide-slate-300">
-                        <div className="flex-1 flex items-center gap-5 px-6 py-4 hover:bg-slate-50/30 transition-all">
-                            <div className="flex flex-col gap-1">
-                                <span className="text-[9px] font-normal text-slate-400 uppercase tracking-widest">認定開始日</span>
+                        <div className="flex-1 flex items-center gap-6 px-6 py-5 hover:bg-slate-50/30 transition-all">
+                            <div className="flex flex-col gap-1.5">
+                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">認定開始日</span>
                                 <input
                                     type="date"
                                     value={getCommonValue('direct', 'cert_start_date') || ''}
                                     onChange={(e) => handleFieldChange('direct', 'cert_start_date', e.target.value)}
-                                    className="bg-transparent text-[13px] font-normal text-slate-700 outline-none"
+                                    className="bg-transparent text-sm font-medium text-slate-700 outline-none"
                                 />
                             </div>
-                            <div className="flex flex-col gap-1">
-                                <span className="text-[9px] font-normal text-slate-400 uppercase tracking-widest">認定終了日</span>
+                            <div className="flex flex-col gap-1.5">
+                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">認定終了日</span>
                                 <input
                                     type="date"
                                     value={getCommonValue('direct', 'cert_end_date') || ''}
                                     onChange={(e) => handleFieldChange('direct', 'cert_end_date', e.target.value)}
-                                    className="bg-transparent text-[13px] font-normal text-slate-700 outline-none"
+                                    className="bg-transparent text-sm font-medium text-slate-700 outline-none"
                                 />
                             </div>
                         </div>
-                        <div className="flex-1 bg-slate-50/20 px-6 py-4 flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                                <Activity size={16} className="text-slate-400" />
-                                <span className="text-[11px] font-normal text-slate-700 uppercase tracking-widest">進捗管理概要</span>
+                        <div className="flex-1 bg-slate-50/20 px-6 py-5 flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                                <Activity size={18} className="text-slate-400" />
+                                <span className="text-xs font-bold text-slate-700 uppercase tracking-widest">進捗管理概要</span>
                             </div>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-3">
                                 <div className="flex flex-col items-end">
-                                    <span className="text-[8px] font-normal text-slate-400 uppercase">総合進捗</span>
-                                    <span className="text-[12px] font-normal text-slate-800">75%</span>
+                                    <span className="text-[10px] font-bold text-slate-400 uppercase">総合進捗</span>
+                                    <span className="text-sm font-bold text-slate-800">75%</span>
                                 </div>
-                                <div className="w-16 h-1 bg-slate-100 rounded-full overflow-hidden">
+                                <div className="w-20 h-1.5 bg-slate-100 rounded-full overflow-hidden">
                                     <div className="h-full bg-blue-500 w-[75%]" />
                                 </div>
                             </div>
@@ -279,10 +279,10 @@ export default function OperationColumn({ workers, staff, onUpdate, onBulkUpdate
 
                         {/* Cell: Kikou */}
                         <div className="flex flex-col group">
-                            <div className="px-5 py-2 flex items-center justify-between border-b border-gray-300 bg-white transition-all">
-                                <div className="flex items-center gap-2.5 text-slate-900">
-                                    <ClipboardList size={15} className="text-slate-400" />
-                                    <span className="text-[12px] font-normal uppercase tracking-widest">機構業務</span>
+                            <div className="px-5 py-3 flex items-center justify-between border-b border-gray-300 bg-white transition-all">
+                                <div className="flex items-center gap-3 text-slate-900">
+                                    <ClipboardList size={18} className="text-slate-400" />
+                                    <span className="text-sm font-bold uppercase tracking-widest">機構業務</span>
                                 </div>
                                 <StatusSelect value={getCommonValue('kikou_status', 'progress')} onChange={(v) => handleFieldChange('kikou_status', 'progress', v)} />
                             </div>
@@ -297,10 +297,10 @@ export default function OperationColumn({ workers, staff, onUpdate, onBulkUpdate
 
                         {/* Cell: Nyukan */}
                         <div className="flex flex-col group">
-                            <div className="px-5 py-2 flex items-center justify-between border-b border-gray-300 bg-white transition-all">
-                                <div className="flex items-center gap-2.5 text-slate-900">
-                                    <FileText size={15} className="text-slate-400" />
-                                    <span className="text-[12px] font-normal uppercase tracking-widest">入管業務</span>
+                            <div className="px-5 py-3 flex items-center justify-between border-b border-gray-300 bg-white transition-all">
+                                <div className="flex items-center gap-3 text-slate-900">
+                                    <FileText size={18} className="text-slate-400" />
+                                    <span className="text-sm font-bold uppercase tracking-widest">入管業務</span>
                                 </div>
                                 <StatusSelect value={getCommonValue('nyukan_status', 'progress')} onChange={(v) => handleFieldChange('nyukan_status', 'progress', v)} />
                             </div>
@@ -320,10 +320,10 @@ export default function OperationColumn({ workers, staff, onUpdate, onBulkUpdate
 
                         {/* Cell: Kentei */}
                         <div className="flex flex-col group">
-                            <div className="px-5 py-2 flex items-center justify-between border-b border-gray-300 bg-white transition-all">
-                                <div className="flex items-center gap-2.5 text-slate-900">
-                                    <ShieldCheck size={15} className="text-slate-400" />
-                                    <span className="text-[12px] font-normal uppercase tracking-widest">検定業務</span>
+                            <div className="px-5 py-3 flex items-center justify-between border-b border-gray-300 bg-white transition-all">
+                                <div className="flex items-center gap-3 text-slate-900">
+                                    <ShieldCheck size={18} className="text-slate-400" />
+                                    <span className="text-sm font-bold uppercase tracking-widest">検定業務</span>
                                 </div>
                                 <StatusSelect value={getCommonValue('kentei_status', 'progress')} onChange={(v) => handleFieldChange('kentei_status', 'progress', v)} />
                             </div>
@@ -346,10 +346,10 @@ export default function OperationColumn({ workers, staff, onUpdate, onBulkUpdate
 
                         {/* Cell: System */}
                         <div className="flex flex-col group">
-                            <div className="px-5 py-2 flex items-center justify-between border-b border-gray-300 bg-white transition-all">
-                                <div className="flex items-center gap-2.5 text-slate-900">
-                                    <Building size={15} className="text-slate-400" />
-                                    <span className="text-[12px] font-normal uppercase tracking-widest">既存システム</span>
+                            <div className="px-5 py-3 flex items-center justify-between border-b border-gray-300 bg-white transition-all">
+                                <div className="flex items-center gap-3 text-slate-900">
+                                    <Building size={18} className="text-slate-400" />
+                                    <span className="text-sm font-bold uppercase tracking-widest">既存システム</span>
                                 </div>
                                 <StatusSelect value={getCommonValue('system_status', 'progress') || '未着手'} onChange={(v) => handleFieldChange('system_status', 'progress', v)} />
                             </div>
@@ -365,10 +365,10 @@ export default function OperationColumn({ workers, staff, onUpdate, onBulkUpdate
 
                     {/* Bottom Full Row: Airport Support */}
                     <div className="flex group border-t border-slate-300">
-                        <div className="w-[180px] p-6 flex flex-col items-center justify-center border-r border-gray-300 bg-white shrink-0 transition-all">
-                            <PlaneLanding size={24} className="text-slate-400 mb-3" />
-                            <span className="text-[12px] font-normal text-slate-900 uppercase tracking-widest text-center">送迎・帰国支援</span>
-                            <div className="mt-4 w-full">
+                        <div className="w-[200px] p-6 flex flex-col items-center justify-center border-r border-gray-300 bg-white shrink-0 transition-all">
+                            <PlaneLanding size={32} className="text-slate-400 mb-3" />
+                            <span className="text-sm font-bold text-slate-900 uppercase tracking-widest text-center">送迎・帰国支援</span>
+                            <div className="mt-5 w-full">
                                 <StatusSelect value={getCommonValue('airport_status', 'progress') || '未着手'} onChange={(v) => handleFieldChange('airport_status', 'progress', v)} />
                             </div>
                         </div>
@@ -383,8 +383,8 @@ export default function OperationColumn({ workers, staff, onUpdate, onBulkUpdate
                     <div className="flex flex-col border-t border-slate-300">
                         <div className="px-6 py-4 bg-slate-50/20 border-b border-slate-300 flex items-center justify-between">
                             <div className="flex items-center gap-2.5">
-                                <StickyNote size={15} className="text-slate-400" />
-                                <span className="text-[12px] font-normal text-slate-800 uppercase tracking-widest">備考・特記事項</span>
+                                <StickyNote size={18} className="text-slate-400" />
+                                <span className="text-sm font-bold text-slate-800 uppercase tracking-widest">備考・特記事項</span>
                             </div>
                             <button
                                 onClick={addMemoLine}
@@ -398,7 +398,7 @@ export default function OperationColumn({ workers, staff, onUpdate, onBulkUpdate
                                 <textarea
                                     value={getCommonValue('direct', 'remarks') || ''}
                                     onChange={(e) => handleFieldChange('direct', 'remarks', e.target.value)}
-                                    className="w-full bg-slate-50/50 p-4 rounded-lg border border-slate-100 text-[13px] font-normal text-slate-700 outline-none focus:border-slate-300 min-h-[100px]"
+                                    className="w-full bg-slate-50/50 p-5 rounded-lg border border-slate-100 text-sm font-medium text-slate-700 outline-none focus:border-slate-300 min-h-[120px]"
                                     placeholder="一括上書きメモを入力..."
                                 />
                             ) : (
@@ -410,7 +410,7 @@ export default function OperationColumn({ workers, staff, onUpdate, onBulkUpdate
                                                 type="text"
                                                 value={line}
                                                 onChange={(e) => handleUpdateMemo(index, e.target.value)}
-                                                className="flex-1 bg-transparent text-[13px] font-normal text-slate-700 outline-none placeholder:text-slate-200"
+                                                className="flex-1 bg-transparent text-sm font-medium text-slate-700 outline-none placeholder:text-slate-200"
                                                 placeholder="メモを入力..."
                                             />
                                             <button

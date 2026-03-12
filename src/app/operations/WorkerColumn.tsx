@@ -78,34 +78,34 @@ export default function WorkerColumn({ workers, selectedIds, onSelect }: WorkerC
                                 ${bgCls} ${borderCls}`}
                         >
                             {/* Avatar */}
-                            <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-[10px] font-normal
+                             <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-xs font-bold
                                 ${isSelected ? 'bg-emerald-200/50 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>
-                                {worker.photoUrl
-                                    ? <img src={worker.photoUrl} alt="" className="w-full h-full object-cover rounded-full" />
-                                    : worker.avatar}
+                                 {worker.photoUrl
+                                     ? <img src={worker.photoUrl} alt="" className="w-full h-full object-cover rounded-full" />
+                                     : worker.avatar}
                             </div>
 
                             {/* Info block */}
                             <div className="flex-1 min-w-0 flex flex-col justify-center">
                                 {/* Row 1: Name (Furigana) & Expiry Info */}
                                 <div className="flex items-center justify-between gap-3">
-                                    <div className="flex items-baseline gap-1.5 min-w-0">
-                                        <span className={`text-[13px] font-normal truncate uppercase tracking-tight leading-none
+                                     <div className="flex items-baseline gap-1.5 min-w-0">
+                                        <span className={`text-sm font-bold truncate uppercase tracking-tight leading-none
                                             ${isSelected ? 'text-emerald-900' : 'text-slate-900'}`}>
                                             {worker.name}
                                         </span>
-                                        <span className={`text-[9px] truncate tracking-tight shrink-0
+                                        <span className={`text-xs truncate tracking-tight shrink-0
                                             ${isSelected ? 'text-emerald-600/60' : 'text-slate-400'}`}>
                                             {worker.furigana}
                                         </span>
                                     </div>
-                                    <div className="flex items-center gap-1.5 shrink-0">
-                                        <span className={`text-[9px] font-mono tracking-tighter opacity-70
+                                     <div className="flex items-center gap-1.5 shrink-0">
+                                        <span className={`text-xs font-mono tracking-tighter opacity-70
                                             ${isSelected ? 'text-emerald-700' : 'text-slate-400'}`}>
                                             {worker.visaExpiry}
                                         </span>
                                         {daysLeft !== null && (
-                                            <span className={`text-[9px] font-mono font-normal shrink-0 leading-none px-1 py-0.5 rounded
+                                            <span className={`text-xs font-mono font-bold shrink-0 leading-none px-1 py-0.5 rounded
                                                 ${isSelected
                                                     ? 'bg-emerald-500 text-white shadow-sm'
                                                     : daysLeft <= 30
@@ -120,12 +120,12 @@ export default function WorkerColumn({ workers, selectedIds, onSelect }: WorkerC
                                 </div>
 
                                 {/* Row 2: Company & Full Visa Name */}
-                                <div className="flex items-center justify-between gap-2 mt-1.5">
-                                    <span className={`text-[10px] font-normal truncate leading-none
+                                 <div className="flex items-center justify-between gap-2 mt-1.5">
+                                    <span className={`text-xs font-normal truncate leading-none
                                         ${isSelected ? 'text-emerald-700' : 'text-slate-500'}`}>
                                         {worker.company}
                                     </span>
-                                    <span className={`text-[10px] font-normal shrink-0 tracking-tight leading-none
+                                    <span className={`text-xs font-bold shrink-0 tracking-tight leading-none
                                         ${isSelected ? 'text-emerald-600' : 'text-emerald-600 opacity-90'}`}>
                                         {SYSTEM_LABEL[worker.systemType || ''] || '---'}
                                     </span>
@@ -137,8 +137,8 @@ export default function WorkerColumn({ workers, selectedIds, onSelect }: WorkerC
 
                 {(workers?.length === 0) && (
                     <div className="py-16 text-center">
-                        <User size={32} className="mx-auto text-gray-200 mb-3" />
-                        <p className="text-[12px] font-normal text-gray-300">該当する労働者はいません</p>
+                         <User size={32} className="mx-auto text-gray-200 mb-3" />
+                        <p className="text-xs font-normal text-gray-300">該当する労働者はいません</p>
                     </div>
                 )}
             </div>

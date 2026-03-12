@@ -71,7 +71,7 @@ function EntryBatchColumn({ batches, selectedBatch, onSelect }: EntryBatchColumn
                                     )}
                                 </div>
                                 <div className="flex items-center gap-1.5 shrink-0">
-                                    <span className={`text-[9px] font-mono font-normal px-1 py-0.5 rounded leading-none
+                                    <span className={`text-xs font-bold font-mono px-1 py-0.5 rounded leading-none
                                         ${isSelected ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-500'}`}>
                                         {batch.count}
                                     </span>

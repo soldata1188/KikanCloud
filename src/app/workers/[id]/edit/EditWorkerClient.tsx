@@ -74,9 +74,9 @@ const FormRow = ({ label, required, children, isLast = false }: {
 }) => (
     <div className={`flex flex-col sm:flex-row ${!isLast ? 'border-b border-gray-100' : ''} hover:bg-gray-50/50 transition-colors group`}>
         <div className="w-full sm:w-[160px] lg:w-[180px] px-5 py-3 flex items-start border-b sm:border-b-0 sm:border-r border-gray-100 shrink-0 bg-gray-50/30 group-hover:bg-gray-100/30 transition-colors">
-            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1 flex flex-wrap items-center gap-1">
+            <label className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1 flex flex-wrap items-center gap-1">
                 {label}
-                {required && <span className="text-rose-500 font-black">*</span>}
+                {required && <span className="text-rose-500 font-bold">*</span>}
             </label>
         </div>
         <div className="flex-1 px-5 py-3 flex items-center min-h-[44px]">
@@ -89,9 +89,9 @@ const SectionCard = ({ icon, title, children }: {
     icon: React.ReactNode; title: string; children: React.ReactNode
 }) => (
     <div className="bg-gray-50 border border-gray-200 overflow-hidden rounded-md">
-        <div className="px-5 py-2.5 border-b border-[#005a9e] flex items-center gap-2.5 bg-[#0067b8]">
-            <span className="text-white">{icon}</span>
-            <h3 className="text-[11px] font-black text-white uppercase tracking-widest">{title}</h3>
+        <div className="px-5 py-3 border-b border-[#005a9e] flex items-center gap-2.5 bg-[#0067b8]">
+            <span className="text-white font-bold">{icon}</span>
+            <h3 className="text-base font-bold text-white uppercase tracking-widest">{title}</h3>
         </div>
         <div className="flex flex-col">{children}</div>
     </div>
@@ -246,7 +246,7 @@ export default function EditWorkerClient({ companies, worker }: EditWorkerProps)
         }
     };
 
-    const inputCls = (fieldName?: string) => "w-full bg-transparent focus:bg-gray-50 border border-transparent hover:border-gray-200 rounded-md px-3 py-2 text-[13px] outline-none text-gray-900 font-bold transition-all focus:border-[#0067b8] focus:ring-1 focus:ring-blue-500/10 placeholder:text-gray-300 placeholder:font-normal";
+    const inputCls = (fieldName?: string) => "w-full bg-transparent focus:bg-gray-50 border border-transparent hover:border-gray-200 rounded-md px-3 py-2 text-sm outline-none text-gray-900 font-bold transition-all focus:border-[#0067b8] focus:ring-1 focus:ring-blue-500/10 placeholder:text-gray-300 placeholder:font-normal";
 
     const formatSystemType = (sys: string) => {
         if (sys === 'ikusei_shuro') return '育成就労';
@@ -261,8 +261,8 @@ export default function EditWorkerClient({ companies, worker }: EditWorkerProps)
             {toastError && (
                 <div className="fixed top-4 right-4 z-50 animate-in fade-in slide-in-from-top-3">
                     <div className="flex items-center gap-3 bg-white border border-red-200 px-4 py-3 rounded-2xl text-red-700">
-                        <X className="w-4 h-4 text-red-400 shrink-0 cursor-pointer" onClick={() => setToastError(null)} />
-                        <span className="text-[13px] font-bold">{toastError}</span>
+                        <X className="w-5 h-5 text-red-400 shrink-0 cursor-pointer" onClick={() => setToastError(null)} />
+                        <span className="text-sm font-bold">{toastError}</span>
                     </div>
                 </div>
             )}
@@ -279,11 +279,11 @@ export default function EditWorkerClient({ companies, worker }: EditWorkerProps)
                             </Link>
                             <div className="w-px h-5 bg-gray-200" />
                             <div>
-                                <h2 className="text-[15px] font-bold text-gray-900 leading-tight tracking-tight uppercase">
+                                <h2 className="text-base font-bold text-gray-900 leading-tight tracking-tight uppercase">
                                     {formData.full_name_romaji || '氏名未登録'}
                                 </h2>
                                 <div className="flex items-center gap-1.5 mt-0.5">
-                                    <span className="text-[10px] font-black text-[#0067b8] bg-blue-50 px-2 py-0.5 rounded border border-blue-100 uppercase tracking-widest">
+                                    <span className="text-xs font-bold text-[#0067b8] bg-blue-50 px-2 py-0.5 rounded border border-blue-100 uppercase tracking-widest">
                                         編集モード
                                     </span>
                                 </div>
@@ -291,12 +291,12 @@ export default function EditWorkerClient({ companies, worker }: EditWorkerProps)
                         </div>
                         <div className="flex items-center gap-2">
                             <Link href={`/workers/${worker.id}`}
-                                className="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-gray-200 text-gray-600 text-[11px] font-black uppercase tracking-widest rounded-md hover:bg-gray-50 transition-colors">
+                                className="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-gray-200 text-gray-600 text-xs font-bold uppercase tracking-widest rounded-md hover:bg-gray-50 transition-colors">
                                 キャンセル
                             </Link>
                             <button type="button" onClick={handleSubmit} disabled={isSubmitting}
-                                className="inline-flex items-center gap-1.5 px-6 py-2 bg-[#0067b8] hover:bg-blue-700 text-white text-[11px] font-black uppercase tracking-widest rounded-md transition-all disabled:opacity-50 active:scale-95">
-                                {isSubmitting ? <Loader2 size={12} className="animate-spin" /> : <Save size={12} />}
+                                className="inline-flex items-center gap-1.5 px-6 py-2 bg-[#0067b8] hover:bg-blue-700 text-white text-xs font-bold uppercase tracking-widest rounded-md transition-all disabled:opacity-50 active:scale-95">
+                                {isSubmitting ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
                                 {isSubmitting ? '保存中...' : '変更を保存'}
                             </button>
                         </div>
@@ -319,24 +319,24 @@ export default function EditWorkerClient({ companies, worker }: EditWorkerProps)
                                         )}
                                     </div>
                                     <div className="mt-5 flex flex-col items-center">
-                                        <span className={`px-3 py-1.5 rounded-full text-[10px] font-black border tracking-[0.1em] uppercase ${cfg.bg} ${cfg.text} ${cfg.border}`}>
+                                        <span className={`px-3 py-1.5 rounded-full text-xs font-bold border tracking-[0.1em] uppercase ${cfg.bg} ${cfg.text} ${cfg.border}`}>
                                             {cfg.label}
                                         </span>
                                     </div>
                                 </div>
 
                                 <div className="flex-1 p-10 flex flex-col justify-center bg-gray-50 relative">
-                                    <div className="text-[10px] text-[#0067b8] font-black uppercase tracking-[0.3em] mb-4">人材情報管理記録</div>
-                                    <h3 className="text-[32px] font-black text-gray-900 tracking-tighter leading-none uppercase mb-6">
+                                    <div className="text-xs text-[#0067b8] font-bold uppercase tracking-[0.3em] mb-4">人材情報管理記録</div>
+                                    <h3 className="text-4xl font-bold text-gray-900 tracking-tighter leading-none uppercase mb-8">
                                         {formData.full_name_romaji || '—'}
                                     </h3>
 
                                     <div className="flex flex-wrap gap-4">
-                                        <div className="inline-flex items-center gap-2.5 px-4 py-2 bg-gray-50 text-gray-900 text-[11px] font-black rounded border border-gray-200 uppercase tracking-widest">
-                                            <Briefcase size={12} className="text-[#0067b8]" />
+                                        <div className="inline-flex items-center gap-2.5 px-4 py-2 bg-gray-50 text-gray-900 text-sm font-bold rounded border border-gray-200 uppercase tracking-widest">
+                                            <Briefcase size={14} className="text-[#0067b8]" />
                                             {companies?.find(c => c.id === formData.company_id)?.name_jp || '未配属'}
                                         </div>
-                                        <div className="inline-flex items-center gap-2.5 px-4 py-2 bg-gray-50 text-gray-900 text-[11px] font-black rounded border border-gray-200 uppercase tracking-widest">
+                                        <div className="inline-flex items-center gap-2.5 px-4 py-2 bg-gray-50 text-gray-900 text-sm font-bold rounded border border-gray-200 uppercase tracking-widest">
                                             {formatSystemType(formData.system_type)}
                                         </div>
                                     </div>
@@ -370,8 +370,8 @@ export default function EditWorkerClient({ companies, worker }: EditWorkerProps)
                                                 {[['true', '有'], ['false', '無']].map(([v, l]) => (
                                                     <label key={v} className="flex items-center gap-2 cursor-pointer group">
                                                         <input type="radio" name="has_spouse" value={v} checked={formData.has_spouse === v}
-                                                            onChange={handleInputChange} className="accent-[#0067b8] w-3.5 h-3.5" />
-                                                        <span className="text-[12px] text-gray-600 group-hover:text-gray-900 font-bold tracking-tight">{l}</span>
+                                                            onChange={handleInputChange} className="accent-[#0067b8] w-4 h-4" />
+                                                        <span className="text-sm text-gray-600 group-hover:text-gray-900 font-bold tracking-tight">{l}</span>
                                                     </label>
                                                 ))}
                                             </div>
@@ -399,13 +399,13 @@ export default function EditWorkerClient({ companies, worker }: EditWorkerProps)
                                     </SectionCard>
 
                                     <div className="bg-white border border-gray-200 overflow-hidden rounded-md">
-                                        <div className="px-5 py-2.5 border-b border-[#005a9e] bg-[#0067b8]">
-                                            <h3 className="text-[11px] font-black text-white uppercase tracking-widest">備考・特記事項</h3>
+                                        <div className="px-5 py-3 border-b border-[#005a9e] bg-[#0067b8]">
+                                            <h3 className="text-sm font-bold text-white uppercase tracking-widest">備考・特記事項</h3>
                                         </div>
-                                        <div className="px-5 py-3">
-                                            <textarea name="remarks" value={formData.remarks} onChange={handleInputChange} rows={4}
+                                        <div className="px-5 py-4">
+                                            <textarea name="remarks" value={formData.remarks} onChange={handleInputChange} rows={5}
                                                 placeholder="実習生に関する特記事項やメモ"
-                                                className="w-full bg-transparent focus:bg-gray-50 border border-gray-200 focus:border-[#0067b8] rounded-md px-3 py-2 text-[13px] outline-none text-gray-800 transition-all resize-y min-h-[90px] focus:ring-1 focus:ring-blue-500/20" />
+                                                className="w-full bg-transparent focus:bg-gray-50 border border-gray-200 focus:border-[#0067b8] rounded-md px-3 py-2 text-sm outline-none text-gray-800 transition-all resize-y min-h-[120px] focus:ring-1 focus:ring-blue-500/20" />
                                         </div>
                                     </div>
                                 </div>
@@ -486,21 +486,21 @@ export default function EditWorkerClient({ companies, worker }: EditWorkerProps)
                 <div className="w-[380px] shrink-0 bg-white flex flex-col overflow-hidden border-l border-gray-200">
                     <div className="flex items-center justify-between px-5 h-[57px] border-b border-gray-200 bg-gray-50 shrink-0">
                         <div className="flex items-center gap-2.5">
-                            <div className="p-1.5 bg-[#0067b8] text-white rounded">
-                                <FileBadge2 size={14} />
+                            <div className="p-2 bg-[#0067b8] text-white rounded">
+                                <FileBadge2 size={16} />
                             </div>
-                            <h3 className="text-[12px] font-black text-gray-900 uppercase tracking-widest">ドキュメント保管</h3>
+                            <h3 className="text-sm font-bold text-gray-900 uppercase tracking-widest">ドキュメント保管</h3>
                         </div>
                         {Object.values(files).reduce((a, arr) => a + arr.length, 0) > 0 && (
-                            <span className="text-[10px] font-black text-[#0067b8] bg-blue-50 px-2 py-0.5 rounded border border-blue-100 uppercase tracking-widest">
-                                {Object.values(files).reduce((a, arr) => a + arr.length, 0)} 個のファイル
+                            <span className="text-xs font-bold text-[#0067b8] bg-blue-50 px-2.5 py-1 rounded border border-blue-100 uppercase tracking-widest">
+                                {Object.values(files).reduce((a, arr) => a + arr.length, 0)} 個
                             </span>
                         )}
                     </div>
 
                     <div className="flex-1 overflow-y-auto p-5 space-y-8 no-scrollbar">
-                        <div className="space-y-3">
-                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">新規ドキュメント追加</p>
+                        <div className="space-y-4">
+                            <p className="text-xs font-bold text-gray-400 uppercase tracking-[0.2em]">新規ドキュメント追加</p>
                             <div
                                 onClick={() => mainFileInputRef.current?.click()}
                                 className={`cursor-pointer w-full h-[140px] border-2 border-dashed rounded-md flex flex-col items-center justify-center p-6 transition-all group/upload
@@ -511,23 +511,23 @@ export default function EditWorkerClient({ companies, worker }: EditWorkerProps)
                                 <input type="file" className="hidden" ref={mainFileInputRef} onChange={handleMainFileSelect} />
                                 {stagedFile ? (
                                     <div className="flex flex-col items-center">
-                                        <div className="w-12 h-12 bg-[#0067b8] text-white rounded-md flex items-center justify-center mb-3 group-hover/upload:scale-110 transition-transform">
-                                            <FileText size={24} />
+                                        <div className="w-14 h-14 bg-[#0067b8] text-white rounded-md flex items-center justify-center mb-3 group-hover/upload:scale-110 transition-transform">
+                                            <FileText size={28} />
                                         </div>
-                                        <div className="text-[11px] font-black text-gray-900 text-center truncate w-full px-2 uppercase tracking-tight">{stagedFile.name}</div>
+                                        <div className="text-xs font-bold text-gray-900 text-center truncate w-full px-2 uppercase tracking-tight">{stagedFile.name}</div>
                                     </div>
                                 ) : (
                                     <div className="flex flex-col items-center text-gray-300 group-hover/upload:text-[#0067b8] transition-colors">
-                                        <UploadCloud size={32} className="mb-2" />
-                                        <div className="text-[10px] font-black uppercase tracking-[0.2em]">ドキュメントをアップロード</div>
+                                        <UploadCloud size={40} className="mb-2" />
+                                        <div className="text-xs font-bold uppercase tracking-[0.2em]">ドキュメントをアップロード</div>
                                     </div>
                                 )}
                             </div>
 
                             {stagedFile && (
-                                <div className="p-3 bg-white border border-gray-200 rounded-md animate-in fade-in slide-in-from-top-2">
+                                <div className="p-4 bg-white border border-gray-200 rounded-md animate-in fade-in slide-in-from-top-2">
                                     <select value={stagedTargetDoc} onChange={e => setStagedTargetDoc(e.target.value)}
-                                        className="w-full bg-gray-50 border border-gray-200 focus:border-[#0067b8] rounded-md px-3 py-2 text-[11px] mb-2 font-black outline-none appearance-none cursor-pointer uppercase tracking-tight">
+                                        className="w-full bg-gray-50 border border-gray-200 focus:border-[#0067b8] rounded-md px-3 py-2.5 text-sm mb-3 font-bold mb-2 font-black outline-none appearance-none cursor-pointer uppercase tracking-tight">
                                         <option value="">-- カテゴリー選択 --</option>
                                         {allDocTypes.map(d => (
                                             <option key={d.id} value={d.id}>
@@ -542,25 +542,25 @@ export default function EditWorkerClient({ companies, worker }: EditWorkerProps)
                                     )}
                                     <button type="button" onClick={stageToStorage}
                                         disabled={!stagedTargetDoc || (stagedTargetDoc === 'new_custom' && !newCustomCategory.trim())}
-                                        className="w-full py-2.5 bg-[#0067b8] hover:bg-blue-700 disabled:bg-gray-100 disabled:text-gray-300 text-white text-[11px] font-black rounded-md transition-all uppercase tracking-[0.2em]">
+                                        className="w-full py-3 bg-[#0067b8] hover:bg-blue-700 disabled:bg-gray-100 disabled:text-gray-300 text-white text-xs font-bold rounded-md transition-all uppercase tracking-[0.2em]">
                                         割当と保存
                                     </button>
                                 </div>
                             )}
                         </div>
 
-                        <div className="space-y-3">
-                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">保管済みドキュメント</p>
+                        <div className="space-y-4">
+                            <p className="text-xs font-bold text-gray-400 uppercase tracking-[0.2em]">保管済みドキュメント</p>
                             <div className="space-y-2">
                                 {Object.keys(files).length === 0 && (
-                                    <div className="py-12 flex flex-col items-center justify-center text-center opacity-30 border-2 border-dashed border-gray-200 rounded-md">
-                                        <FileText size={32} className="text-gray-300 mb-2" />
-                                        <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">空</span>
+                                    <div className="py-16 flex flex-col items-center justify-center text-center opacity-30 border-2 border-dashed border-gray-200 rounded-md">
+                                        <FileText size={40} className="text-gray-300 mb-2" />
+                                        <span className="text-xs text-gray-400 font-bold uppercase tracking-widest">空</span>
                                     </div>
                                 )}
                                 {Object.entries(files).map(([docId, arr]) => (
                                     <div key={docId} className="space-y-1">
-                                        <div className="text-[9px] font-black text-[#0067b8] uppercase tracking-widest pl-1 mb-1">
+                                        <div className="text-[11px] font-bold text-[#0067b8] uppercase tracking-widest pl-1 mb-1">
                                             {allDocTypes.find(d => d.id === docId)?.label || docId}
                                         </div>
                                         {arr.map(f => (
@@ -570,8 +570,8 @@ export default function EditWorkerClient({ companies, worker }: EditWorkerProps)
                                                         <FileText size={14} />
                                                     </div>
                                                     <div className="min-w-0">
-                                                        <div className="text-[11px] font-black text-gray-900 truncate uppercase tracking-tight">{f.file.name}</div>
-                                                        <div className="text-[9px] text-gray-400 font-bold">{f.timestamp}</div>
+                                                        <div className="text-sm font-bold text-gray-900 truncate uppercase tracking-tight">{f.file.name}</div>
+                                                        <div className="text-xs text-gray-400 font-bold">{f.timestamp}</div>
                                                     </div>
                                                 </div>
                                                 <button type="button" onClick={() => removeFromStorage(docId, f.id)} className="w-6 h-6 flex items-center justify-center text-gray-300 hover:text-rose-500 hover:bg-rose-50 rounded transition-all">

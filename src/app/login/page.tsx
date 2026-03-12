@@ -42,33 +42,33 @@ export default function LoginPage() {
                         }}>
                         <Hexagon size={24} className="text-white fill-white/10" />
                     </div>
-                    <h1 className="text-2xl font-normal tracking-tighter text-slate-800">
-                        Kikan<span className="text-emerald-600 font-medium">Cloud</span>
+                    <h1 className="text-3xl font-bold tracking-tight text-slate-800">
+                        Kikan<span className="text-emerald-600">Cloud</span>
                     </h1>
-                    <p className="text-[11px] text-slate-500 mt-2 font-medium tracking-tight">
+                    <p className="text-sm text-slate-600 mt-3 font-medium tracking-tight">
                         ソリューション協同組合 内部管理システム
                     </p>
-                    <p className="text-[9px] text-slate-400 mt-1 font-medium uppercase tracking-[0.2em]">Operation Portal</p>
+                    <p className="text-[10px] text-slate-400 mt-2 font-bold uppercase tracking-[0.25em]">Operation Portal</p>
                 </div>
 
                 <div className="px-8 pb-10">
                     {error && (
-                        <div className="mb-6 p-3 bg-rose-50 border border-rose-100 text-rose-600 text-[12px] font-normal rounded-lg flex items-center gap-3 animate-in fade-in duration-300">
-                            <ShieldAlert size={16} className="shrink-0 text-rose-400" />
+                        <div className="mb-6 p-4 bg-rose-50 border border-rose-100 text-rose-600 text-sm font-medium rounded-xl flex items-center gap-3 animate-in fade-in duration-300">
+                            <ShieldAlert size={18} className="shrink-0 text-rose-400" />
                             {error}
                         </div>
                     )}
 
                     <form onSubmit={handleLogin} className="space-y-5">
-                        <div className="space-y-1.5">
-                            <label className="text-[11px] font-medium text-slate-500 uppercase tracking-wider block px-1">ログインID</label>
+                        <div className="space-y-2">
+                            <label className="text-xs font-bold text-slate-500 uppercase tracking-widest block px-1">ログインID</label>
                             <div className="relative group">
-                                <User size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-emerald-500 transition-colors" />
+                                <User size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-emerald-500 transition-colors" />
                                 <input
                                     required
                                     value={loginId}
                                     onChange={(e) => setLoginId(e.target.value)}
-                                    className="w-full h-11 pl-10 pr-4 bg-slate-50/50 border border-slate-200 rounded-xl text-[14px] font-normal outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/5 transition-all outline-none"
+                                    className="w-full h-12 pl-11 pr-4 bg-slate-50/50 border border-slate-200 rounded-xl text-sm font-medium outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/5 transition-all"
                                     placeholder="IDを入力..."
                                     autoCapitalize="none"
                                     autoCorrect="off"
@@ -76,16 +76,16 @@ export default function LoginPage() {
                             </div>
                         </div>
 
-                        <div className="space-y-1.5">
-                            <label className="text-[11px] font-medium text-slate-500 uppercase tracking-wider block px-1">パスワード</label>
+                        <div className="space-y-2">
+                            <label className="text-xs font-bold text-slate-500 uppercase tracking-widest block px-1">パスワード</label>
                             <div className="relative group">
-                                <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-emerald-500 transition-colors" />
+                                <Lock size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-emerald-500 transition-colors" />
                                 <input
                                     required
                                     type="password"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="w-full h-11 pl-10 pr-4 bg-slate-50/50 border border-slate-200 rounded-xl text-[14px] font-normal outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/5 transition-all outline-none"
+                                    className="w-full h-12 pl-11 pr-4 bg-slate-50/50 border border-slate-200 rounded-xl text-sm font-medium outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/5 transition-all"
                                     placeholder="••••••••"
                                 />
                             </div>
@@ -94,14 +94,14 @@ export default function LoginPage() {
                         <button
                             type="submit"
                             disabled={isPending}
-                            className="w-full h-11 bg-[#1e3a5f] text-white font-medium rounded-xl text-[14px] hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2 mt-4 disabled:opacity-50 shadow-lg shadow-slate-200"
+                            className="w-full h-12 bg-[#1e3a5f] text-white font-bold rounded-xl text-base hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2 mt-6 disabled:opacity-50 shadow-lg shadow-slate-200"
                         >
-                            {isPending ? <Loader2 size={18} className="animate-spin" /> : 'ログイン'}
+                            {isPending ? <Loader2 size={20} className="animate-spin" /> : 'ログイン'}
                         </button>
                     </form>
 
-                    <div className="mt-8 pt-6 border-t border-slate-50 text-center">
-                        <p className="text-[10px] text-slate-400 font-normal leading-relaxed tracking-tight">
+                    <div className="mt-8 pt-8 border-t border-slate-50 text-center">
+                        <p className="text-xs text-slate-400 font-medium leading-relaxed tracking-tight">
                             ERP System Internal Access Only<br />
                             © 2026 KikanCloud Security
                         </p>

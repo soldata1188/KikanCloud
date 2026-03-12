@@ -73,21 +73,21 @@ function WorkerListColumn({ workers, selectedIds, onSelect }: WorkerListColumnPr
                             >
                                 {/* セクション 1: アバター & 氏名 (Flexible) */}
                                 <div className="flex-[2] min-w-[170px] flex items-center gap-3.5 overflow-hidden">
-                                    <div className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 text-[11px] font-normal shadow-sm
+                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 text-xs font-normal shadow-sm
                                          ${isSelected ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-500 border border-slate-200'}`}>
                                          {worker.avatar_url
                                              ? <img src={worker.avatar_url} alt="" className="w-full h-full object-cover rounded-full" />
                                              : (worker.full_name_romaji || 'U').charAt(0).toUpperCase()}
                                      </div>
                                      <div className="flex flex-col min-w-0 justify-center">
-                                         <div className="h-5 flex items-center">
-                                             <span className={`text-[14px] font-normal truncate uppercase tracking-tight leading-none
+                                         <div className="min-h-5 flex items-center">
+                                             <span className={`text-base font-medium truncate uppercase tracking-tight leading-none
                                                  ${isSelected ? 'text-emerald-900' : 'text-slate-900'}`}>
                                                  {worker.full_name_romaji || '---'}
                                              </span>
                                          </div>
-                                         <div className="h-4.5 flex items-center">
-                                             <span className={`text-[10px] font-normal truncate tracking-tight leading-none
+                                         <div className="min-h-4.5 flex items-center mt-0.5">
+                                             <span className={`text-xs font-normal truncate tracking-tight leading-none
                                                  ${isSelected ? 'text-emerald-600/70' : 'text-slate-400'}`}>
                                                  {worker.full_name_kana || '---'}
                                              </span>
@@ -96,52 +96,52 @@ function WorkerListColumn({ workers, selectedIds, onSelect }: WorkerListColumnPr
                                  </div>
 
                                 {/* セクション 2: 受入企業 (Flexible) */}
-                                <div className="flex-[1.4] min-w-[120px] flex flex-col justify-center overflow-hidden pr-2">
-                                    <div className="h-5 flex items-center">
-                                        <span className={`text-[12px] font-normal truncate block leading-none
-                                            ${isSelected ? 'text-emerald-700' : 'text-slate-600'}`}>
-                                            {worker.companies?.name_jp ? worker.companies.name_jp.replace(/株式会社|有限会社|（株）|\(株\)/g, '').trim() : '---'}
-                                        </span>
-                                    </div>
-                                    <div className="h-4.5" />
-                                </div>
+                                 <div className="flex-[1.4] min-w-[140px] flex flex-col justify-center overflow-hidden pr-2">
+                                     <div className="min-h-5 flex items-center">
+                                         <span className={`text-sm font-normal truncate block leading-none
+                                             ${isSelected ? 'text-emerald-700' : 'text-slate-600'}`}>
+                                             {worker.companies?.name_jp ? worker.companies.name_jp.replace(/株式会社|有限会社|（株）|\(株\)/g, '').trim() : '---'}
+                                         </span>
+                                     </div>
+                                     <div className="min-h-4.5" />
+                                 </div>
 
                                 {/* セクション 3: 入国日 & 在日期間 (Flexible) */}
-                                <div className="flex-[1.1] min-w-[110px] flex flex-col justify-center gap-0.5 items-end pr-4">
-                                    <div className="h-4 flex items-center overflow-hidden">
-                                        <span className={`text-[12px] font-mono tracking-tighter leading-none text-right
-                                            ${isSelected ? 'text-blue-700 font-normal' : 'text-slate-500'}`}>
-                                            {fmtDate(worker.entry_date)}
-                                        </span>
-                                    </div>
-                                    <div className="h-4 flex items-center overflow-hidden">
-                                        <span className={`text-[11px] font-normal leading-none tracking-tight text-right
-                                            ${isSelected ? 'text-emerald-700' : 'text-slate-500'}`}>
-                                            {fmtInJapanDuration(worker.entry_date)}
-                                        </span>
-                                    </div>
-                                </div>
+                                 <div className="flex-[1.1] min-w-[120px] flex flex-col justify-center gap-1 items-end pr-4">
+                                     <div className="min-h-4 flex items-center overflow-hidden">
+                                         <span className={`text-sm font-mono tracking-tighter leading-none text-right
+                                             ${isSelected ? 'text-blue-700 font-normal' : 'text-slate-500'}`}>
+                                             {fmtDate(worker.entry_date)}
+                                         </span>
+                                     </div>
+                                     <div className="min-h-4 flex items-center overflow-hidden">
+                                         <span className={`text-xs font-normal leading-none tracking-tight text-right
+                                             ${isSelected ? 'text-emerald-700' : 'text-slate-500'}`}>
+                                             {fmtInJapanDuration(worker.entry_date)}
+                                         </span>
+                                     </div>
+                                 </div>
 
                                 {/* セクション 4: 在留資格 (Flexible) */}
-                                <div className="flex-[0.7] min-w-[75px] flex flex-col justify-center overflow-hidden text-center mr-2">
-                                    <div className="h-5 flex items-center justify-center">
-                                        {worker.visa_status && (
-                                            <span className={`inline-block w-full py-0.5 rounded-[4px] text-[10.5px] font-normal uppercase tracking-tighter
-                                                ${isSelected
-                                                    ? 'bg-emerald-100 text-emerald-700'
-                                                    : 'bg-emerald-50 text-emerald-600/70 border border-emerald-100/50'}`}>
-                                                {(() => {
-                                                    const s = worker.visa_status === 'ikusei_shuro' ? '育成就労'
-                                                        : worker.visa_status === 'ginou_jisshu' ? '技能実習'
-                                                            : worker.visa_status === 'tokuteigino' ? '特定技能'
-                                                                : String(worker.visa_status);
-                                                    return s.length > 4 ? s.substring(0, 4) : s;
-                                                })()}
-                                            </span>
-                                        )}
-                                    </div>
-                                    <div className="h-4.5" />
-                                </div>
+                                 <div className="flex-[0.8] min-w-[85px] flex flex-col justify-center overflow-hidden text-center mr-2">
+                                     <div className="min-h-6 flex items-center justify-center">
+                                         {worker.visa_status && (
+                                             <span className={`inline-block w-full py-1 rounded-[4px] text-xs font-normal uppercase tracking-tighter
+                                                 ${isSelected
+                                                     ? 'bg-emerald-100 text-emerald-700'
+                                                     : 'bg-emerald-50 text-emerald-600/70 border border-emerald-100/50'}`}>
+                                                 {(() => {
+                                                     const s = worker.visa_status === 'ikusei_shuro' ? '育成就労'
+                                                         : worker.visa_status === 'ginou_jisshu' ? '技能実習'
+                                                             : worker.visa_status === 'tokuteigino' ? '特定技能'
+                                                                 : String(worker.visa_status);
+                                                     return s.length > 4 ? s.substring(0, 4) : s;
+                                                 })()}
+                                             </span>
+                                         )}
+                                     </div>
+                                     <div className="min-h-4.5" />
+                                 </div>
 
                                 {/* セクション 5: アラート/スペーサー */}
                                 <div className="flex-[0.2] shrink-0" />
@@ -160,33 +160,33 @@ function WorkerListColumn({ workers, selectedIds, onSelect }: WorkerListColumnPr
                                             ? <img src={worker.avatar_url} alt="" className="w-full h-full object-cover rounded-full" />
                                             : (worker.full_name_romaji || 'U').charAt(0).toUpperCase()}
                                     </div>
-                                    <div className="flex-1 min-w-0 flex flex-col justify-center">
-                                        <div className="flex justify-between items-start">
-                                            <span className="text-sm font-normal text-slate-900 uppercase truncate pr-2">
-                                                {worker.full_name_romaji || '---'}
-                                            </span>
-                                        </div>
-                                        <div className="text-[11px] text-slate-400 mb-0.5">{worker.full_name_kana}</div>
-                                        <div className="text-[13px] font-normal text-blue-600 truncate">
-                                            {worker.companies?.name_jp || '---'}
-                                        </div>
-                                    </div>
+                                     <div className="flex-1 min-w-0 flex flex-col justify-center">
+                                         <div className="flex justify-between items-start">
+                                             <span className="text-base font-medium text-slate-900 uppercase truncate pr-2">
+                                                 {worker.full_name_romaji || '---'}
+                                             </span>
+                                         </div>
+                                         <div className="text-xs text-slate-400 mb-1">{worker.full_name_kana}</div>
+                                         <div className="text-sm font-medium text-blue-600 truncate">
+                                             {worker.companies?.name_jp || '---'}
+                                         </div>
+                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-y-2 border-t border-slate-50 pt-3">
-                                    <div className="flex flex-col gap-0.5">
-                                        <span className="text-[9px] text-gray-400 uppercase font-normal tracking-widest">VISA / 育成・実習</span>
-                                        <span className="text-[12px] font-normal text-gray-700">
-                                            {worker.visa_status === 'ikusei_shuro' ? '育成就労' : worker.visa_status === 'ginou_jisshu' ? '技能実習' : worker.visa_status === 'tokuteigino' ? '特定技能' : worker.visa_status || '---'}
-                                        </span>
-                                    </div>
-                                    <div className="flex flex-col gap-0.5">
-                                        <span className="text-[9px] text-gray-400 uppercase font-normal tracking-widest text-right">在日期間 / 入国日</span>
-                                        <span className="text-[12px] font-normal text-gray-700 text-right">
-                                            {fmtInJapanDuration(worker.entry_date)} ({fmtDate(worker.entry_date)})
-                                        </span>
-                                    </div>
-                                </div>
+                                 <div className="grid grid-cols-2 gap-y-3 border-t border-slate-50 pt-4">
+                                     <div className="flex flex-col gap-1">
+                                         <span className="text-[10px] text-gray-400 uppercase font-bold tracking-widest">VISA / 育成・実習</span>
+                                         <span className="text-sm font-medium text-gray-700">
+                                             {worker.visa_status === 'ikusei_shuro' ? '育成就労' : worker.visa_status === 'ginou_jisshu' ? '技能実習' : worker.visa_status === 'tokuteigino' ? '特定技能' : worker.visa_status || '---'}
+                                         </span>
+                                     </div>
+                                     <div className="flex flex-col gap-1">
+                                         <span className="text-[10px] text-gray-400 uppercase font-bold tracking-widest text-right">在日期間 / 入国日</span>
+                                         <span className="text-sm font-medium text-gray-700 text-right">
+                                             {fmtInJapanDuration(worker.entry_date)} ({fmtDate(worker.entry_date)})
+                                         </span>
+                                     </div>
+                                 </div>
                             </button>
                         </div>
                     );

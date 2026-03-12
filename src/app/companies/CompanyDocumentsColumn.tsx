@@ -240,7 +240,7 @@ export default function CompanyDocumentsColumn({ companyId }: CompanyDocumentsCo
                                 <p className="text-[11px] text-blue-800 font-bold truncate pr-3" title={pendingFile.name}>
                                     📄 {pendingFile.name}
                                 </p>
-                                <span className="text-[9px] text-blue-600 font-mono shrink-0">{fmtSize(pendingFile.size)}</span>
+                                <span className="text-xs text-blue-600 font-mono shrink-0">{fmtSize(pendingFile.size)}</span>
                             </div>
                             <div className="flex flex-col gap-2 mt-1">
                                 <input
@@ -328,11 +328,11 @@ export default function CompanyDocumentsColumn({ companyId }: CompanyDocumentsCo
                                                 {doc.file_name}
                                             </p>
                                             <div className="flex flex-wrap items-center gap-1.5 mt-1">
-                                                <span className={`text-[9px] font-black px-1.5 py-0.5 rounded ${cfg.bg} ${cfg.color}`}>
+                                                <span className={`text-xs font-black px-1.5 py-0.5 rounded ${cfg.bg} ${cfg.color}`}>
                                                     {cfg.label}
                                                 </span>
-                                                <span className="text-[9px] text-gray-400 font-mono">{fmtSize(doc.file_size)}</span>
-                                                <span className="text-[9px] text-gray-400">{fmtDate(doc.created_at)}</span>
+                                                <span className="text-xs text-gray-400 font-mono">{fmtSize(doc.file_size)}</span>
+                                                <span className="text-xs text-gray-400">{fmtDate(doc.created_at)}</span>
                                             </div>
                                         </div>
 

@@ -43,9 +43,9 @@ export default function OperationListItem({ worker, onEditMemo }: OperationListI
 
                 {/* Badges */}
                 <div className="absolute top-4 right-4 flex gap-1">
-                    <span className="px-1.5 py-0.5 bg-green-100 text-green-700 text-[10px] font-normal rounded-sm border border-green-200">在籍中</span>
+                    <span className="px-1.5 py-0.5 bg-green-100 text-green-700 text-xs font-bold rounded-sm border border-green-200">在籍中</span>
                     {isWarnExp && (
-                        <span className="px-1.5 py-0.5 bg-red-100 text-red-700 text-[10px] font-normal rounded-sm border border-red-200">
+                        <span className="px-1.5 py-0.5 bg-red-100 text-red-700 text-xs font-bold rounded-sm border border-red-200">
                             期限まで{daysUntilExp}日
                         </span>
                     )}
@@ -57,9 +57,9 @@ export default function OperationListItem({ worker, onEditMemo }: OperationListI
                             {worker.full_name_romaji.charAt(0)}
                         </div>
                         <div>
-                            <div className="text-[10px] text-gray-500 font-normal">{worker.full_name_kana}</div>
+                            <div className="text-xs text-gray-500 font-normal">{worker.full_name_kana}</div>
                             <div className="text-sm font-normal text-gray-900 leading-tight">{worker.full_name_romaji}</div>
-                            <div className="text-[10px] text-[#0067b8] font-normal mt-0.5">{worker.company_name}</div>
+                            <div className="text-xs text-[#0067b8] font-bold mt-0.5">{worker.company_name}</div>
                         </div>
                     </div>
 
@@ -84,7 +84,7 @@ export default function OperationListItem({ worker, onEditMemo }: OperationListI
                 <div className="flex items-center gap-2 mb-3">
                     <i className={`fas ${worker.kikou_status?.progress === '完了' ? 'fa-check-circle text-green-600' : 'fa-clock text-blue-600'}`}></i>
                     <span className="text-xs font-normal text-gray-900">機構業務</span>
-                    <span className={`px-1.5 py-0.5 text-[10px] font-normal rounded border ${worker.kikou_status?.progress === '完了'
+                    <span className={`px-1.5 py-0.5 text-xs font-bold rounded border ${worker.kikou_status?.progress === '完了'
                             ? 'bg-green-100 text-green-700 border-green-200'
                             : 'bg-blue-100 text-blue-700 border-blue-200'
                         }`}>
@@ -105,7 +105,7 @@ export default function OperationListItem({ worker, onEditMemo }: OperationListI
                 <div className="flex items-center gap-2 mb-3">
                     <i className={`fas ${worker.nyukan_status?.progress === '審査中' ? 'fa-spinner fa-spin text-[#0067b8]' : 'fa-check-circle text-green-600'}`}></i>
                     <span className="text-xs font-normal text-gray-900">入管業務</span>
-                    <span className={`px-1.5 py-0.5 text-[10px] font-normal rounded border ${worker.nyukan_status?.progress === '審査中'
+                    <span className={`px-1.5 py-0.5 text-xs font-bold rounded border ${worker.nyukan_status?.progress === '審査中'
                             ? 'bg-blue-100 text-[#0067b8] border-blue-200'
                             : 'bg-green-100 text-green-700 border-green-200'
                         }`}>

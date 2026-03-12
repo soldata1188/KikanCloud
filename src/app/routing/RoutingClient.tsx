@@ -291,7 +291,7 @@ export default function RoutingClient({ initialLocations, filterCompanies, googl
                                     >
                                         {cfg.icon}
                                         {cfg.labelJa}
-                                        <span className={`text-[9px] font-black px-1.5 py-0.5 rounded-md ${on ? 'bg-white/60' : 'bg-slate-100'}`}>
+                                        <span className={`text-xs font-black px-1.5 py-0.5 rounded-md ${on ? 'bg-white/60' : 'bg-slate-100'}`}>
                                             {counts[type]}
                                         </span>
                                     </button>
@@ -383,7 +383,7 @@ export default function RoutingClient({ initialLocations, filterCompanies, googl
                                     <div className={`flex items-center gap-1.5 px-2 py-1.5 rounded-md mx-0.5 mb-0.5 ${cfg.badgeBg}`}>
                                         <span className={cfg.badgeText}>{cfg.icon}</span>
                                         <span className={`text-[10px] font-black uppercase tracking-wider ${cfg.badgeText}`}>{cfg.labelJa}</span>
-                                        <span className={`ml-auto text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-white/70 ${cfg.textColor}`}>{group.length}</span>
+                                        <span className={`ml-auto text-xs font-bold px-1.5 py-0.5 rounded-md bg-white/70 ${cfg.textColor}`}>{group.length}</span>
                                     </div>
                                     {group.map(loc => {
                                         const isActive = activeMarkerId === loc.id
@@ -407,7 +407,7 @@ export default function RoutingClient({ initialLocations, filterCompanies, googl
                                                     <div className={`text-[12px] font-bold truncate ${isActive ? cfg.textColor : 'text-slate-800'}`}>
                                                         {loc.name}
                                                         {loc.badge && (
-                                                            <span className={`ml-1.5 text-[9px] font-black px-1.5 py-0.5 rounded-md
+                                                            <span className={`ml-1.5 text-xs font-black px-1.5 py-0.5 rounded-md
                                                                 ${loc.badge === '対応中'
                                                                     ? 'bg-amber-100 text-amber-600'
                                                                     : loc.badge === '未入国'
@@ -421,7 +421,7 @@ export default function RoutingClient({ initialLocations, filterCompanies, googl
                                                         {loc.address || '住所なし'}
                                                     </div>
                                                     {loc.companyName && loc.type === 'worker' && (
-                                                        <div className={`text-[9px] font-bold mt-0.5 ${isActive ? cfg.textColor : 'text-slate-300'}`}>
+                                                        <div className={`text-xs font-bold mt-0.5 ${isActive ? cfg.textColor : 'text-slate-300'}`}>
                                                             {loc.companyName}
                                                         </div>
                                                     )}
@@ -444,7 +444,7 @@ export default function RoutingClient({ initialLocations, filterCompanies, googl
                                 <div className="flex items-center gap-1.5 px-2 py-1.5 rounded-md mx-0.5 mb-0.5 bg-amber-50">
                                     <AlertTriangle size={11} className="text-amber-500" />
                                     <span className="text-[10px] font-black uppercase tracking-wider text-amber-600">座標未登録</span>
-                                    <span className="ml-auto text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-white/70 text-amber-600">{filteredUnmapped.length}</span>
+                                    <span className="ml-auto text-xs font-bold px-1.5 py-0.5 rounded-md bg-white/70 text-amber-600">{filteredUnmapped.length}</span>
                                 </div>
                                 {filteredUnmapped.map(loc => {
                                     const cfg = LAYER_CONFIG[loc.type]
@@ -462,7 +462,7 @@ export default function RoutingClient({ initialLocations, filterCompanies, googl
                                             <div className="flex-1 min-w-0">
                                                 <div className="text-[12px] font-bold truncate text-slate-600">{loc.name}</div>
                                                 <div className="text-[10px] text-slate-400 truncate mt-0.5">{loc.address || '住所なし'}</div>
-                                                <div className="text-[9px] font-bold text-amber-500 mt-0.5 flex items-center gap-1">
+                                                <div className="text-xs font-bold text-amber-500 mt-0.5 flex items-center gap-1">
                                                     <AlertTriangle size={8} /> 地図未表示（座標未登録）
                                                 </div>
                                             </div>

@@ -41,13 +41,13 @@ function TabAccount({ userProfile }: { userProfile: { id: string; full_name: str
                         className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-md text-sm text-gray-400 cursor-not-allowed font-normal" />
                 </div>
                 <div>
-                    <label className="block text-[10px] font-normal text-gray-500 uppercase tracking-wider mb-1.5">メールアドレス</label>
+                    <label className="block text-xs font-normal text-gray-500 uppercase tracking-wider mb-1.5">メールアドレス</label>
                     <input type="email" value={userProfile?.email || ''} disabled
                         className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-md text-sm text-gray-400 cursor-not-allowed font-normal" />
                 </div>
                 <div>
-                    <label className="block text-[10px] font-normal text-gray-500 uppercase tracking-wider mb-1.5">権限</label>
-                    <div className="inline-flex px-2 py-1 bg-emerald-50 text-emerald-700 text-[10px] font-normal rounded uppercase tracking-widest">
+                    <label className="block text-xs font-normal text-gray-500 uppercase tracking-wider mb-1.5">権限</label>
+                    <div className="inline-flex px-2 py-1 bg-emerald-50 text-emerald-700 text-xs font-bold rounded uppercase tracking-widest">
                         {userProfile?.role || 'staff'}
                     </div>
                 </div>
@@ -75,7 +75,7 @@ function TabNotifications({ emailAlerts, setEmailAlerts, pushAlerts, setPushAler
                     <div key={label} className="flex items-center justify-between p-4 border border-gray-100 rounded-md bg-white">
                         <div>
                             <p className="font-normal text-gray-900 text-sm">{label}</p>
-                            <p className="text-[11px] text-gray-400 mt-0.5">{desc}</p>
+                            <p className="text-xs text-gray-500 mt-0.5">{desc}</p>
                         </div>
                         <button onClick={() => s(!v)}
                             className={`relative inline-flex h-5 w-10 items-center rounded-full transition-colors shrink-0 ${v ? "bg-emerald-600" : "bg-gray-200"}`}>
@@ -124,7 +124,7 @@ function TabAI() {
             <div className="space-y-8 max-w-2xl">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div>
-                        <label className="block text-[10px] font-normal text-gray-500 uppercase tracking-wider mb-2">使用モデル</label>
+                        <label className="block text-xs font-normal text-gray-500 uppercase tracking-wider mb-2">使用モデル</label>
                         <select className="w-full px-3 py-2 bg-white border border-gray-200 rounded-md text-sm outline-none focus:border-emerald-500 transition-colors font-normal">
                             <option>Gemini 1.5 Pro (推奨)</option>
                             <option>Gemini 1.5 Flash (高速)</option>
@@ -132,7 +132,7 @@ function TabAI() {
                         </select>
                     </div>
                     <div>
-                        <label className="block text-[10px] font-normal text-gray-500 uppercase tracking-wider mb-2">出力言語</label>
+                        <label className="block text-xs font-normal text-gray-500 uppercase tracking-wider mb-2">出力言語</label>
                         <select className="w-full px-3 py-2 bg-white border border-gray-200 rounded-md text-sm outline-none focus:border-emerald-500 transition-colors font-normal">
                             <option>日本語 (Default)</option>
                             <option>English</option>
@@ -247,7 +247,7 @@ export default function SettingsPageClient({ currentUser, usersList, companiesLi
                                         <Icon size={14} />
                                         {label}
                                         {id === "accounts" && (
-                                            <span className={`text-[10px] font-normal px-1.5 py-0.5 rounded-full ml-1
+                                            <span className={`text-xs font-bold px-1.5 py-0.5 rounded-full ml-1
                                                 ${orgSubTab === id ? "bg-emerald-50 text-emerald-600" : "bg-gray-100 text-gray-400"}`}>
                                                 {usersList.length}
                                             </span>

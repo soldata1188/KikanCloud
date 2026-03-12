@@ -156,14 +156,14 @@ export default function AuditTimelineBoard({ allCompletedAudits, companies, filt
 
                                                     <div className="flex items-center justify-between gap-2">
                                                         <div className="flex items-center gap-1.5 min-w-0">
-                                                            <span className={`shrink-0 px-1 py-0 rounded-[2px] text-[8px] font-normal uppercase tracking-tighter border ${cfg.bg} ${cfg.color} border-current/10`}>
+                                                            <span className={`shrink-0 px-1 py-0 rounded-[2px] text-xs font-bold uppercase tracking-tighter border ${cfg.bg} ${cfg.color} border-current/10`}>
                                                                 {cfg.label}
                                                             </span>
                                                             <span className="text-[11px] font-normal text-gray-900 truncate">{a.pic_name || '—'}</span>
                                                         </div>
                                                         <div className="flex items-center gap-0.5 text-emerald-500 shrink-0">
                                                             <CheckCircle2 size={9} />
-                                                            <span className="text-[8px] font-normal uppercase tracking-tighter">完了</span>
+                                                            <span className="text-xs font-bold uppercase tracking-tighter">完了</span>
                                                         </div>
                                                     </div>
                                                 </button>

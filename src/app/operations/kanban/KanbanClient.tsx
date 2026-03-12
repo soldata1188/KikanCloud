@@ -128,7 +128,7 @@ export default function KanbanClient({ initialTasks, companies, workers, staff }
                                     className="app-card p-5 hover:shadow-md transition-all group anim-card relative border-none"
                                 >
                                     <div className="flex items-start justify-between gap-3 mb-2">
-                                        <div className={`px-2 py-0.5 rounded border text-[9px] font-black uppercase tracking-widest ${PRIORITY_STYLES[task.priority]}`}>
+                                        <div className={`px-2 py-0.5 rounded border text-xs font-black uppercase tracking-widest ${PRIORITY_STYLES[task.priority]}`}>
                                             {task.priority === 'urgent' && <AlertCircle size={10} className="inline mr-1 -mt-0.5" />}
                                             {task.priority}
                                         </div>
@@ -171,7 +171,7 @@ export default function KanbanClient({ initialTasks, companies, workers, staff }
                                         <div className="flex items-center gap-2">
                                             {task.assigned_user ? (
                                                 <div className="flex items-center gap-2 px-2.5 py-1 bg-gray-50 rounded-lg text-[11px] font-bold text-gray-600 border border-gray-100">
-                                                    <div className="w-4 h-4 rounded-full bg-blue-600 text-white flex items-center justify-center text-[9px]">
+                                                    <div className="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold">
                                                         {task.assigned_user.full_name.charAt(0)}
                                                     </div>
                                                     {task.assigned_user.full_name}

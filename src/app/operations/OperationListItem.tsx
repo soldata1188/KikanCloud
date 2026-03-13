@@ -43,7 +43,7 @@ export default function OperationListItem({ worker, onEditMemo }: OperationListI
 
                 {/* Badges */}
                 <div className="absolute top-4 right-4 flex gap-1">
-                    <span className="px-1.5 py-0.5 bg-green-100 text-green-700 text-xs font-bold rounded-sm border border-green-200">在籍中</span>
+                    <span className="px-1.5 py-0.5 bg-green-100 text-green-700 text-xs font-bold rounded-sm border border-green-200">就業中</span>
                     {isWarnExp && (
                         <span className="px-1.5 py-0.5 bg-red-100 text-red-700 text-xs font-bold rounded-sm border border-red-200">
                             期限まで{daysUntilExp}日

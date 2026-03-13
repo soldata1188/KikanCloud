@@ -542,13 +542,6 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                             </button>
                         </>
                     )}
-                    <button
-                        onClick={() => setIsBulkImportModalOpen(true)}
-                        className="h-8 px-3.5 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 rounded-[6px] flex items-center gap-2 text-sm font-normal transition-all active:scale-95 shadow-sm"
-                    >
-                        <List size={14} />
-                        一括入力
-                    </button>
                     <button onClick={() => { setIsRefreshing(true); setTimeout(() => setIsRefreshing(false), 800); }} className={`p-1.5 rounded-[6px] bg-gray-50 text-gray-400 border border-gray-200 transition-all active:scale-95 ${isRefreshing ? 'animate-spin text-blue-600' : 'hover:bg-white hover:text-blue-600'}`}>
                         <RefreshCw size={14} />
                     </button>

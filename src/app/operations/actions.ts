@@ -16,6 +16,7 @@ export async function getOperationsData() {
         .from('workers')
         .select(`*, companies(name_jp), visas(visa_type, expiration_date)`)
         .eq('is_deleted', false)
+        .in('status', ['working', 'standby', 'waiting'])
         .order('expiration_date', { foreignTable: 'visas', ascending: false })
         .order('created_at', { ascending: false })
 
@@ -85,7 +86,6 @@ export async function updateWorkerStatus(workerId: string, column: string, value
         const statusMap: Record<string, string> = {
             '未入国': 'waiting',
             '対応中': 'standby',
-            '在籍中': 'working',   // legacy alias
             '就業中': 'working',
             '失踪': 'missing',
             '帰国': 'returned',

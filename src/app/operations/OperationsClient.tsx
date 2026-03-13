@@ -81,7 +81,7 @@ export default function OperationsClient({
             company: w.companies?.name_jp || '---',
             companyId: w.company_id,
             visaExpiry: w.zairyu_exp || (w.visas?.[0]?.expiration_date) || w.passport_exp || '---',
-            status: w.status === 'working' ? '就業中' : w.status === 'waiting' ? '配属待ち' : 'その他',
+            status: w.status === 'working' ? '就業中' : w.status === 'standby' ? '対応中' : w.status === 'waiting' ? '未入国' : 'その他',
             avatar: (w.full_name_romaji || 'U').charAt(0),
             photoUrl: w.avatar_url || null,
             nyukan_status: w.nyukan_status || { type: '---', progress: '未着手', assignee: '---' },
@@ -168,13 +168,14 @@ export default function OperationsClient({
         return Array.from(map.entries())
             .map(([label, { count, date, minDays, maxDays }]) => ({ label, count, date, minDays, maxDays }))
             .sort((a, b) => {
+                const na = parseInt(a.label.match(/(\d+)/)?.[1] ?? '0', 10);
+                const nb = parseInt(b.label.match(/(\d+)/)?.[1] ?? '0', 10);
+                if (na !== nb) return nb - na;
+
                 const dateA = a.date || '0000-00-00';
                 const dateB = b.date || '0000-00-00';
                 if (dateA !== dateB) return dateB.localeCompare(dateA);
 
-                const na = parseInt(a.label.match(/(\d+)/)?.[1] ?? '0', 10);
-                const nb = parseInt(b.label.match(/(\d+)/)?.[1] ?? '0', 10);
-                if (na !== nb) return nb - na;
                 return a.label.localeCompare(b.label, 'ja');
             });
     }, [allMappedWorkers]);
@@ -263,7 +264,12 @@ export default function OperationsClient({
 
         return {
             visas: Array.from(visas).sort(),
-            batches: Array.from(batches).sort(),
+            batches: Array.from(batches).sort((a, b) => {
+                const na = parseInt(a.match(/(\d+)/)?.[1] ?? '0', 10);
+                const nb = parseInt(b.match(/(\d+)/)?.[1] ?? '0', 10);
+                if (na !== nb) return nb - na;
+                return a.localeCompare(b, 'ja');
+            }),
             certs: Array.from(certs).sort().reverse()
         };
     }, [allMappedWorkers]);

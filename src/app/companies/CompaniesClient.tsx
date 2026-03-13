@@ -207,13 +207,6 @@ export function CompaniesClient({ companies: initialCompanies, userRole }: Compa
 
                 <div className="flex items-center gap-3">
                     <button
-                        onClick={() => setIsBulkImportModalOpen(true)}
-                        className="h-8 px-3 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 rounded-[6px] text-sm font-normal flex items-center gap-1.5 active:scale-95 transition-all shadow-sm"
-                    >
-                        <List size={14} />
-                        <span>一括入力</span>
-                    </button>
-                    <button
                         onClick={handleRefresh}
                         className={`p-1.5 rounded-[6px] bg-gray-50 text-gray-400 border border-gray-200 transition-all active:scale-95 ${isRefreshing ? 'animate-spin text-blue-600' : 'hover:bg-white hover:text-blue-600'}`}
                     >

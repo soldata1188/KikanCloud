@@ -123,7 +123,7 @@ export default function AuditDetailColumn({ row, onOpenPdfModal }: AuditDetailCo
                             ))
                         ) : (
                             <div className="py-8 text-center text-slate-300 italic text-[11px] font-bold">
-                                在籍中の人材はいません。
+                                就業中の人材はいません。
                             </div>
                         )}
                     </div>

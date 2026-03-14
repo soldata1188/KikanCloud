@@ -13,6 +13,7 @@ interface Worker {
     avatar: string;
     photoUrl: string | null;
     systemType?: string;
+    visaStatus?: string;
     entryBatch?: string;
     cert_end_date?: string;
     nyukan_status?: { progress: string };
@@ -44,6 +45,24 @@ export default function WorkerColumn({ workers, selectedIds, onSelect }: WorkerC
         const months = Math.floor(days / 30);
         const remaining = days % 30;
         return remaining > 0 ? `${months}ヶ月${remaining}日` : `${months}ヶ月`;
+    };
+
+    const abbreviateCompany = (name: string): string => {
+        if (!name) return '---';
+        // Remove common legal entity prefixes / suffixes
+        let s = name
+            .replace(/株式会社/g, '')
+            .replace(/有限会社/g, '')
+            .replace(/合同会社/g, '')
+            .replace(/医療法人/g, '')
+            .replace(/社会福祉法人/g, '')
+            .replace(/学校法人/g, '')
+            .replace(/公益財団法人/g, '')
+            .replace(/一般社団法人/g, '')
+            .replace(/（株）|（有）|（医）/g, '')
+            .trim();
+        // Limit length
+        return s.length > 14 ? s.slice(0, 13) + '…' : s;
     };
 
     const sortedWorkers = useMemo(() => {
@@ -134,11 +153,11 @@ export default function WorkerColumn({ workers, selectedIds, onSelect }: WorkerC
                                 <div className="flex items-center justify-between gap-2 mt-1.5">
                                     <span className={`text-xs font-normal truncate leading-none
                                         ${isSelected ? 'text-emerald-700' : 'text-slate-500'}`}>
-                                        {worker.company}
+                                        {abbreviateCompany(worker.company)}
                                     </span>
                                     <span className={`text-[10px] font-bold shrink-0 tracking-tight leading-none
                                         ${isSelected ? 'text-emerald-600' : 'text-emerald-600 opacity-90'}`}>
-                                        {SYSTEM_LABEL[worker.systemType || ''] || '---'}
+                                        {worker.visaStatus || SYSTEM_LABEL[worker.systemType || ''] || '---'}
                                     </span>
                                 </div>
                             </div>

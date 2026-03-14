@@ -2,6 +2,7 @@
 
 import React, { useState, useTransition, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import {
     Search, Clock, Briefcase, AlertTriangle, ChevronLeft, ChevronRight,
     Building2, Landmark, Calendar, ExternalLink, User, Users,
@@ -76,6 +77,7 @@ const GROUP_COLORS = [
 ]
 
 export default function WorkersListClient({ initialWorkers, role, next90DaysStr }: { initialWorkers: any[], role: string, next90DaysStr: string }) {
+    const router = useRouter()
     const [workers, setWorkers] = useState(initialWorkers)
     const [filtered, setFiltered] = useState(initialWorkers)
     const [selectedBatch, setSelectedBatch] = useState<string | null>(null);
@@ -542,7 +544,18 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                             </button>
                         </>
                     )}
-                    <button onClick={() => { setIsRefreshing(true); setTimeout(() => setIsRefreshing(false), 800); }} className={`p-1.5 rounded-[6px] bg-gray-50 text-gray-400 border border-gray-200 transition-all active:scale-95 ${isRefreshing ? 'animate-spin text-blue-600' : 'hover:bg-white hover:text-blue-600'}`}>
+                    <button
+                        onClick={() => {
+                            setIsRefreshing(true);
+                            router.refresh();
+                            // reset client state to initial
+                            setSearchTerm('');
+                            setSelectedIds([]);
+                            setSelectedCompanyId(null);
+                            setTimeout(() => setIsRefreshing(false), 800);
+                        }}
+                        className={`p-1.5 rounded-[6px] bg-gray-50 text-gray-400 border border-gray-200 transition-all active:scale-95 ${isRefreshing ? 'animate-spin text-blue-600' : 'hover:bg-white hover:text-blue-600'}`}
+                    >
                         <RefreshCw size={14} />
                     </button>
                     {(role === 'admin' || role === 'staff') && (

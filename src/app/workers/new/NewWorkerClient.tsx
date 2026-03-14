@@ -1,6 +1,7 @@
 'use client'
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, UploadCloud, FileText, Loader2, Image as ImageIcon, X, User, Shield, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
@@ -236,12 +237,16 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
 
     const inputClass = INPUT_CLS;
 
-    return (
-        <div className="flex-1 flex flex-col h-full bg-slate-50 relative anim-page">
+    // Portal mount guard (SSR safe)
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => setMounted(true), []);
+
+    const toastPortal = mounted ? createPortal(
+        <>
             {/* ❌ Error Toast */}
             {toastError && (
-                <div className="fixed top-4 right-4 z-50 animate-in fade-in slide-in-from-top-5 duration-300">
-                    <div className="flex items-center gap-3 bg-red-50 border border-red-200 px-5 py-3.5 rounded-[6px] text-red-700 shadow-lg">
+                <div className="fixed top-16 right-4 z-[99999] animate-in fade-in slide-in-from-top-5 duration-300">
+                    <div className="flex items-center gap-3 bg-red-50 border border-red-200 px-5 py-3.5 rounded-[6px] text-red-700 shadow-xl">
                         <X className="w-4 h-4 text-red-500 shrink-0 cursor-pointer" onClick={() => setToastError(null)} />
                         <span className="text-sm font-bold">{toastError}</span>
                     </div>
@@ -249,13 +254,20 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
             )}
             {/* ✅ Success Toast */}
             {toastSuccess && (
-                <div className="fixed top-4 right-4 z-50 animate-in fade-in slide-in-from-top-5 duration-300">
-                    <div className="flex items-center gap-3 bg-emerald-50 border border-emerald-200 px-5 py-3.5 rounded-[6px] text-emerald-700 shadow-lg">
+                <div className="fixed top-16 right-4 z-[99999] animate-in fade-in slide-in-from-top-5 duration-300">
+                    <div className="flex items-center gap-3 bg-emerald-50 border border-emerald-200 px-5 py-3.5 rounded-[6px] text-emerald-700 shadow-xl">
                         <span className="text-lg">&#10003;</span>
                         <span className="text-sm font-bold">{toastSuccess}</span>
                     </div>
                 </div>
             )}
+        </>,
+        document.body
+    ) : null;
+
+    return (
+        <div className="flex-1 flex flex-col h-full bg-slate-50 relative anim-page">
+            {toastPortal}
 
             <div className="flex flex-1 overflow-hidden justify-center bg-slate-50">
                 {/* FORM CONTENT */}

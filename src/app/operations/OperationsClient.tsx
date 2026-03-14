@@ -91,6 +91,7 @@ export default function OperationsClient({
             airport_status: w.airport_status || { progress: '未着手', return_date: '', reentry_date: '', assignee: '---' },
             system_type_content: w.system_type_content || '---',
             systemType: w.system_type,
+            visaStatus: w.visa_status || '',
             occupation: w.industry_field || '---',
             remarks: w.remarks || '',
             address: w.address || '---',

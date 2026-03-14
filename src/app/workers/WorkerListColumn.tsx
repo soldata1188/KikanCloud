@@ -17,7 +17,7 @@ interface Worker {
     passport_exp?: string;
     insurance_exp?: string;
     nationality?: string;
-    address?: string;
+    japan_residence?: string;
     industry_field?: string;
 }
 
@@ -155,10 +155,10 @@ function WorkerListColumn({ workers, selectedIds, onSelect }: WorkerListColumnPr
                                                     ? worker.companies.name_jp.replace(/株式会社|有限会社|（株）|\(株\)/g, '').trim()
                                                     : '---'}
                                             </span>
-                                            {worker.address && (
+                                            {worker.japan_residence && (
                                                 <span className={`text-[10px] font-normal truncate block leading-none mt-1.5
                                                     ${isSelected ? 'text-[#0067b8]/50' : 'text-slate-400'}`}>
-                                                    {worker.address}
+                                                    {worker.japan_residence}
                                                 </span>
                                             )}
                                         </div>

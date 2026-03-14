@@ -74,16 +74,8 @@ function WorkerListColumn({ workers, selectedIds, onSelect }: WorkerListColumnPr
         return sorted;
     }, [workers]);
 
-    if (workers.length === 0) {
-        return (
-            <div className="py-20 text-center bg-white lg:bg-transparent rounded-lg">
-                <User size={32} className="mx-auto text-gray-200 mb-2" />
-                <p className="text-[13px] font-normal text-gray-300">該当する人材はいません</p>
-            </div>
-        );
-    }
-
     // ─── Pre-compute global index per worker ─────────────────────────────────
+    // Must be before early return to satisfy Rules of Hooks
     const globalIndexMap = React.useMemo(() => {
         const map = new Map<string, number>();
         let counter = 1;
@@ -92,6 +84,15 @@ function WorkerListColumn({ workers, selectedIds, onSelect }: WorkerListColumnPr
         });
         return map;
     }, [grouped]);
+
+    if (workers.length === 0) {
+        return (
+            <div className="py-20 text-center bg-white lg:bg-transparent rounded-lg">
+                <User size={32} className="mx-auto text-gray-200 mb-2" />
+                <p className="text-[13px] font-normal text-gray-300">該当する人材はいません</p>
+            </div>
+        );
+    }
 
     return (
         <div className="w-full h-full flex flex-col bg-white lg:bg-transparent overflow-hidden">

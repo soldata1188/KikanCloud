@@ -285,7 +285,7 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
                             <div className="bg-white rounded border border-slate-200 overflow-hidden">
                                 <SectionHeader icon={<User size={13} />} label="個人・雇用・住所" color="bg-[#0067b8] text-white" />
                                 <FormRow label={<span>氏名(ローマ字)<span className="text-[10px] text-red-600 ml-1">必須</span></span>}>
-                                    <div className="flex-1 flex flex-col w-full">
+                                    <div className="w-full flex flex-col">
                                         <input name="full_name_romaji" value={formData.full_name_romaji} onChange={handleInputChange} className={`${inputClass} ${errors.full_name_romaji ? 'border-red-500 bg-red-50' : ''}`} placeholder="例: NGUYEN VAN A" />
                                         {errors.full_name_romaji && <span className="text-[11px] text-red-500 mt-1 ml-1">{errors.full_name_romaji}</span>}
                                     </div>
@@ -294,7 +294,7 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
                                     <input name="full_name_kana" value={formData.full_name_kana} onChange={handleInputChange} className={inputClass} placeholder="例: グエン ヴァン ア" />
                                 </FormRow>
                                 <FormRow label={<span>生年月日<span className="text-[10px] text-red-600 ml-1">必須</span></span>}>
-                                    <div className="flex-1 flex flex-col w-full">
+                                    <div className="w-full flex flex-col">
                                         <input name="dob" type="date" value={formData.dob} onChange={handleInputChange} className={`${inputClass} ${errors.dob ? 'border-red-500 bg-red-50' : ''}`} />
                                         {errors.dob && <span className="text-[11px] text-red-500 mt-1 ml-1">{errors.dob}</span>}
                                     </div>

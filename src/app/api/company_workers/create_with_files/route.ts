@@ -63,7 +63,24 @@ export async function POST(req: NextRequest) {
             .select()
             .single();
 
-        if (workerErr) throw workerErr;
+        if (workerErr) {
+            console.error('[create_worker] DB Error:', JSON.stringify(workerErr));
+            // Unique constraint violation → duplicate worker
+            if (workerErr.code === '23505') {
+                return NextResponse.json({
+                    error: '同じ氏名・生年月日の人材がすでに登録されています。'
+                }, { status: 409 });
+            }
+            // Not null violations
+            if (workerErr.code === '23502') {
+                return NextResponse.json({
+                    error: `必須項目が入力されていません: ${workerErr.message}`
+                }, { status: 400 });
+            }
+            return NextResponse.json({
+                error: workerErr.message || 'データベースエラーが発生しました。'
+            }, { status: 500 });
+        }
 
         const workerId = newWorker.id;
 
@@ -75,7 +92,6 @@ export async function POST(req: NextRequest) {
                 const isAvatar = docType === 'avatar';
                 const bucketName = isAvatar ? 'avatars' : 'worker_documents';
 
-                // Keep original filename but ensure it's safe
                 const safeName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, '');
                 const filePath = `${tenant_id}/${workerId}/${docType}_${Date.now()}_${safeName}`;
 
@@ -83,12 +99,9 @@ export async function POST(req: NextRequest) {
 
                 if (!uploadError) {
                     const { data: pubUrl } = supabase.storage.from(bucketName).getPublicUrl(filePath);
-
                     if (isAvatar) {
-                        // Update worker avatar
                         await supabase.from('workers').update({ avatar_url: pubUrl.publicUrl }).eq('id', workerId);
                     }
-                    // Upload failed silently — non-critical, worker data is saved
                 }
             }
         }
@@ -96,6 +109,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ success: true, workerId }, { status: 200 });
 
     } catch (error: unknown) {
+        console.error('[create_worker] Unexpected error:', error);
         const msg = error instanceof Error ? error.message : 'Internal Server Error'
         return NextResponse.json({ error: msg }, { status: 500 })
     }

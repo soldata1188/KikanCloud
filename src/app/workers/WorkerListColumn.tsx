@@ -153,6 +153,12 @@ function WorkerListColumn({ workers, selectedIds, onSelect }: WorkerListColumnPr
                                                     ? worker.companies.name_jp.replace(/株式会社|有限会社|（株）|\(株\)/g, '').trim()
                                                     : '---'}
                                             </span>
+                                            {worker.entry_batch && (
+                                                <span className={`text-[10px] font-bold truncate block leading-none mt-1.5 uppercase tracking-wider
+                                                    ${isSelected ? 'text-[#0067b8]/50' : 'text-slate-400'}`}>
+                                                    {worker.entry_batch}
+                                                </span>
+                                            )}
                                         </div>
 
                                         {/* Section 3: 入国日 & 在日期間 */}
@@ -194,6 +200,11 @@ function WorkerListColumn({ workers, selectedIds, onSelect }: WorkerListColumnPr
                                                 <div className="text-sm font-medium text-[#0067b8] truncate">
                                                     {worker.companies?.name_jp || '---'}
                                                 </div>
+                                                {worker.entry_batch && (
+                                                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">
+                                                        {worker.entry_batch}
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
 

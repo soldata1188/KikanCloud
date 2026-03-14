@@ -13,35 +13,38 @@ interface EntryBatchColumnProps {
     batches: EntryBatchItem[];
     selectedBatch: string | null;
     onSelect: (batch: string | null) => void;
+    hideAll?: boolean;
 }
 
-function EntryBatchColumn({ batches, selectedBatch, onSelect }: EntryBatchColumnProps) {
+function EntryBatchColumn({ batches, selectedBatch, onSelect, hideAll = false }: EntryBatchColumnProps) {
     const total = React.useMemo(() => batches.reduce((sum, b) => sum + b.count, 0), [batches]);
 
     return (
         <div className="w-full h-full flex flex-col bg-white overflow-hidden">
             <div className="flex-1 overflow-y-auto thin-scrollbar">
                 {/* ALL button */}
-                <button
-                    onClick={() => onSelect(null)}
-                    className={`w-full text-left px-3 py-2.5 border-b border-gray-100 transition-colors duration-150 flex items-center justify-between
-                        ${selectedBatch === null
-                            ? 'bg-emerald-50 border-l-[3px] border-emerald-500'
-                            : 'hover:bg-emerald-50/40 border-l-[3px] border-transparent'}`}
-                >
-                    <div className="flex items-center gap-2.5">
-                        <div className={`w-7 h-7 rounded-md flex items-center justify-center shrink-0
-                            ${selectedBatch === null ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-400'}`}>
-                            <CalendarDays size={14} />
+                {!hideAll && (
+                    <button
+                        onClick={() => onSelect(null)}
+                        className={`w-full text-left px-3 py-2.5 border-b border-gray-100 transition-colors duration-150 flex items-center justify-between
+                            ${selectedBatch === null
+                                ? 'bg-emerald-50 border-l-[3px] border-emerald-500'
+                                : 'hover:bg-emerald-50/40 border-l-[3px] border-transparent'}`}
+                    >
+                        <div className="flex items-center gap-2.5">
+                            <div className={`w-7 h-7 rounded-md flex items-center justify-center shrink-0
+                                ${selectedBatch === null ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-400'}`}>
+                                <CalendarDays size={14} />
+                            </div>
+                            <span className={`text-[13px] font-normal uppercase tracking-wide
+                                ${selectedBatch === null ? 'text-emerald-900' : 'text-slate-900'}`}>すべて</span>
                         </div>
-                        <span className={`text-[13px] font-normal uppercase tracking-wide
-                            ${selectedBatch === null ? 'text-emerald-900' : 'text-slate-900'}`}>すべて</span>
-                    </div>
-                    <span className={`text-[9px] font-mono font-normal px-1 py-0.5 rounded leading-none
-                        ${selectedBatch === null ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-500'}`}>
-                        {total}
-                    </span>
-                </button>
+                        <span className={`text-[9px] font-mono font-normal px-1 py-0.5 rounded leading-none
+                            ${selectedBatch === null ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-500'}`}>
+                            {total}
+                        </span>
+                    </button>
+                )}
 
                 {/* Batch items */}
                 <div className="mt-0">

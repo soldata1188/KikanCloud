@@ -140,7 +140,7 @@ export default function OperationsClient({
             if (ed !== 0) return ed;
             return (a.name || '').localeCompare(b.name || '', 'ja');
         });
-    }, [allMappedWorkers, searchTerm, visaFilter, batchFilter, certFilter, selectedCompanyId, selectedBatch]);
+    }, [allMappedWorkers, searchTerm, visaFilter, batchFilter, certFilter, selectedCompanyId, selectedBatch, workerStatusFilter]);
 
     // Derived Batch List
     const batchItems = useMemo(() => {
@@ -187,6 +187,8 @@ export default function OperationsClient({
                 return a.label.localeCompare(b.label, 'ja');
             });
     }, [allMappedWorkers]);
+
+    const totalBatchCount = useMemo(() => batchItems.reduce((sum, b) => sum + b.count, 0), [batchItems]);
 
     // Derived Companies (Smart Filter: hide companies if they don't match searching workers OR selected batch)
     const filteredCompanies = useMemo(() => {
@@ -510,14 +512,41 @@ export default function OperationsClient({
                             </div>
                             <span className="text-xs font-bold bg-white text-slate-500 px-1.5 py-0.5 rounded-[6px] border border-gray-200 shadow-sm">{batchItems.length}</span>
                         </div>
+                        
+                        {/* Filter Bar Aligned */}
+                        <div className="px-2 py-1.5 border-b border-gray-200 bg-gray-50 flex items-center gap-1 shrink-0">
+                            <button
+                                onClick={() => handleSelectBatch(null)}
+                                className={`flex-1 px-3 py-1.5 rounded-[6px] text-[11px] font-bold uppercase tracking-tight transition-all flex items-center justify-between
+                                    ${selectedBatch === null
+                                        ? 'bg-emerald-600 text-white shadow-sm'
+                                        : 'bg-white text-emerald-600 border border-emerald-100 hover:bg-emerald-50'}`}
+                            >
+                                <div className="flex items-center gap-2">
+                                    <Calendar size={13} strokeWidth={2.5} />
+                                    <span>すべて</span>
+                                </div>
+                                <span className={`text-[10px] font-mono font-bold px-1 py-0.5 rounded leading-none ${selectedBatch === null ? 'bg-white/20 text-white' : 'bg-emerald-50 text-emerald-600'}`}>
+                                    {totalBatchCount}
+                                </span>
+                            </button>
+                        </div>
+
                         <div className="flex-1 overflow-hidden">
                             <EntryBatchColumn
                                 batches={batchItems}
                                 selectedBatch={selectedBatch}
                                 onSelect={handleSelectBatch}
+                                hideAll={true}
                             />
                         </div>
                     </div>
+
+                    {/* Resize handle */}
+                    <div
+                        className="w-1 bg-transparent hover:bg-blue-400/30 cursor-col-resize shrink-0 transition-colors z-10"
+                        onMouseDown={(e) => startResize('company', e.clientX)}
+                    />
 
                     {/* Column 0: Companies */}
                     <div className="flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-300" style={{ width: companyWidth }}>
@@ -528,11 +557,32 @@ export default function OperationsClient({
                             </div>
                             <span className="text-xs font-bold bg-white text-slate-500 px-1.5 py-0.5 rounded-[6px] border border-gray-200 shadow-sm">{filteredCompanies.length}</span>
                         </div>
+
+                        {/* Filter Bar Aligned */}
+                        <div className="px-2 py-1.5 border-b border-gray-200 bg-gray-50 flex items-center gap-1 shrink-0">
+                            <button
+                                onClick={() => handleSelectCompany(null)}
+                                className={`flex-1 px-3 py-1.5 rounded-[6px] text-[11px] font-bold uppercase tracking-tight transition-all flex items-center justify-between
+                                    ${selectedCompanyId === null
+                                        ? 'bg-emerald-600 text-white shadow-sm'
+                                        : 'bg-white text-emerald-600 border border-emerald-100 hover:bg-emerald-50'}`}
+                            >
+                                <div className="flex items-center gap-2">
+                                    <Building2 size={13} strokeWidth={2.5} />
+                                    <span>すべて表示</span>
+                                </div>
+                                <span className={`text-[10px] font-mono font-bold px-1 py-0.5 rounded leading-none ${selectedCompanyId === null ? 'bg-white/20 text-white' : 'bg-emerald-50 text-emerald-600'}`}>
+                                    {filteredCompanies.length}
+                                </span>
+                            </button>
+                        </div>
+
                         <div className="flex-1 overflow-hidden">
                             <CompanyColumn
                                 companies={filteredCompanies}
                                 selectedId={selectedCompanyId}
                                 onSelect={handleSelectCompany}
+                                hideAll={true}
                             />
                         </div>
                     </div>

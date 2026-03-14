@@ -301,10 +301,10 @@ export default function ProfileDetailColumn({ workers, onUpdate, onBulkUpdate, b
                                 { label: '制度区分', field: 'system_type', type: 'select', options: [['', '変更なし'], ['ginou_jisshu', '技能実習'], ['ikusei_shuro', '育成就労'], ['tokuteigino', '特定技能']] },
                                 { label: '職種区分', field: 'industry_field', type: 'text', placeholder: '例: 建設' },
                                 { label: '日本語レベル', field: 'japanese_level', type: 'text', placeholder: '例: N3' },
-                                { label: '送出機関', field: 'sending_org', type: 'text', placeholder: '例: ABC Company' },
+                                { label: '送出機関', field: 'sending_org', type: 'select', options: [['', '変更なし'], ['HTC', 'HTC'], ['VINASEM', 'VINASEM'], ['MPK', 'MPK'], ['LPK IWA KYO', 'LPK IWA KYO'], ['UNO', 'UNO'], ['S.K.T.C', 'S.K.T.C'], ['KOBE HUMAN', 'KOBE HUMAN']] },
                                 { label: '入国期生', field: 'entry_batch', type: 'text', placeholder: '例: 2024-01' },
                                 { label: '入国日', field: 'entry_date', type: 'date', placeholder: '' },
-                                { label: '在留資格', field: 'visa_status', type: 'text', placeholder: '例: 育成就労' },
+                                { label: '在留資格', field: 'visa_status', type: 'select', options: [['', '変更なし'], ['実習生1号', '実習生1号'], ['実習生2号', '実習生2号'], ['実習生3号', '実習生3号'], ['特定1号', '特定1号'], ['特定2号', '特定2号'], ['特定活動', '特定活動'], ['育成就労', '育成就労']] },
                                 { label: '在留期限', field: 'zairyu_exp', type: 'date', placeholder: '' },
                                 { label: '認定開始日', field: 'cert_start_date', type: 'date', placeholder: '' },
                                 { label: '認定終了日', field: 'cert_end_date', type: 'date', placeholder: '' },
@@ -480,7 +480,15 @@ export default function ProfileDetailColumn({ workers, onUpdate, onBulkUpdate, b
                             {renderField("国籍", "nationality")}
                             {renderField("出身地", "birthplace")}
                             {renderField("配偶者", "has_spouse", "select", { true: '有', false: '無' })}
-                            {renderField("送出機関", "sending_org")}
+                            {renderField("送出機関", "sending_org", "select", {
+                                'HTC': 'HTC',
+                                'VINASEM': 'VINASEM',
+                                'MPK': 'MPK',
+                                'LPK IWA KYO': 'LPK IWA KYO',
+                                'UNO': 'UNO',
+                                'S.K.T.C': 'S.K.T.C',
+                                'KOBE HUMAN': 'KOBE HUMAN',
+                            })}
                             {renderField("社宅住所", "japan_residence")}
                         </div>
                     </section>
@@ -521,7 +529,16 @@ export default function ProfileDetailColumn({ workers, onUpdate, onBulkUpdate, b
                                     />
                                 );
                             })()}
-                            {renderField("在留資格", "visa_status")}
+                            {renderField("在留資格", "visa_status", "select", {
+                                '実習生1号': '実習生1号',
+                                '実習生2号': '実習生2号',
+                                '実習生3号': '実習生3号',
+                                '特定1号': '特定1号',
+                                '特定2号': '特定2号',
+                                '特定活動': '特定活動',
+                                '育成就労': '育成就労',
+                            })}
+
                             {renderExpiryField("在留期限", "zairyu_exp")}
                         </div>
                     </section>

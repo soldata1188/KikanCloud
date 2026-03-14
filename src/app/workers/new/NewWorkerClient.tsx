@@ -334,7 +334,16 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
                                     </select>
                                 </FormRow>
                                 <FormRow label="送出機関">
-                                    <input name="sending_org" value={formData.sending_org} onChange={handleInputChange} className={inputClass} placeholder="例: VINAJAPAN JSC" />
+                                    <select name="sending_org" value={formData.sending_org} onChange={handleInputChange} className={inputClass}>
+                                        <option value="">選択してください</option>
+                                        <option value="HTC">HTC</option>
+                                        <option value="VINASEM">VINASEM</option>
+                                        <option value="MPK">MPK</option>
+                                        <option value="LPK IWA KYO">LPK IWA KYO</option>
+                                        <option value="UNO">UNO</option>
+                                        <option value="S.K.T.C">S.K.T.C</option>
+                                        <option value="KOBE HUMAN">KOBE HUMAN</option>
+                                    </select>
                                 </FormRow>
                                 <FormRow label="配属先企業">
                                     <select name="company_id" value={formData.company_id} onChange={handleInputChange} className={inputClass}>

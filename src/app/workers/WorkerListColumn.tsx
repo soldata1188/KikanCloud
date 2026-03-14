@@ -17,6 +17,8 @@ interface Worker {
     passport_exp?: string;
     insurance_exp?: string;
     nationality?: string;
+    address?: string;
+    industry_field?: string;
 }
 
 interface WorkerListColumnProps {
@@ -126,7 +128,7 @@ function WorkerListColumn({ workers, selectedIds, onSelect }: WorkerListColumnPr
                                         <span className="text-[10px] font-mono text-gray-300 shrink-0 w-[20px] text-center select-none">{rowNum}</span>
 
                                         {/* Section 1: Avatar & Name */}
-                                        <div className="flex-[2] min-w-[170px] flex items-center gap-3.5 overflow-hidden">
+                                        <div className="flex-[2] min-w-[180px] flex items-center gap-3.5 overflow-hidden">
                                             <div className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 text-xs font-normal
                                                 ${isSelected ? 'bg-[#0067b8] text-white' : 'bg-slate-100 text-slate-500 border border-slate-200'}`}>
                                                 {worker.avatar_url
@@ -138,23 +140,37 @@ function WorkerListColumn({ workers, selectedIds, onSelect }: WorkerListColumnPr
                                                     ${isSelected ? 'text-[#0067b8]' : 'text-slate-900'}`}>
                                                     {worker.full_name_romaji || '---'}
                                                 </span>
-                                                <span className={`text-xs font-normal truncate tracking-tight leading-none mt-0.5
+                                                <span className={`text-xs font-normal truncate tracking-tight leading-none mt-1
                                                     ${isSelected ? 'text-[#0067b8]/60' : 'text-slate-400'}`}>
                                                     {worker.full_name_kana || '---'}
                                                 </span>
                                             </div>
                                         </div>
 
-                                        {/* Section 2: 受入企業 */}
-                                        <div className="flex-[1.4] min-w-[140px] flex flex-col justify-center overflow-hidden pr-2">
+                                        {/* Section 2: 受入企業 & 社宅住所 */}
+                                        <div className="flex-[1.8] min-w-[160px] flex flex-col justify-center overflow-hidden pr-2">
                                             <span className={`text-sm font-normal truncate block leading-none
                                                 ${isSelected ? 'text-[#0067b8]/80' : 'text-slate-600'}`}>
                                                 {worker.companies?.name_jp
                                                     ? worker.companies.name_jp.replace(/株式会社|有限会社|（株）|\(株\)/g, '').trim()
                                                     : '---'}
                                             </span>
+                                            {worker.address && (
+                                                <span className={`text-[10px] font-normal truncate block leading-none mt-1.5
+                                                    ${isSelected ? 'text-[#0067b8]/50' : 'text-slate-400'}`}>
+                                                    {worker.address}
+                                                </span>
+                                            )}
+                                        </div>
+
+                                        {/* Section 2.5: 職種区分 & 入国期生 (New Column) */}
+                                        <div className="flex-[1.2] min-w-[100px] flex flex-col justify-center overflow-hidden pr-2">
+                                            <span className={`text-[11px] font-bold truncate block leading-none
+                                                ${isSelected ? 'text-[#0067b8]/80' : 'text-slate-600'}`}>
+                                                {worker.industry_field || '---'}
+                                            </span>
                                             {worker.entry_batch && (
-                                                <span className={`text-[10px] font-bold truncate block leading-none mt-1.5 uppercase tracking-wider
+                                                <span className={`text-[10px] font-black truncate block leading-none mt-1.5 uppercase tracking-wider
                                                     ${isSelected ? 'text-[#0067b8]/50' : 'text-slate-400'}`}>
                                                     {worker.entry_batch}
                                                 </span>
@@ -162,7 +178,7 @@ function WorkerListColumn({ workers, selectedIds, onSelect }: WorkerListColumnPr
                                         </div>
 
                                         {/* Section 3: 入国日 & 在日期間 */}
-                                        <div className="flex-[1.1] min-w-[120px] flex flex-col justify-center gap-0.5 items-end pr-4">
+                                        <div className="flex-[1.2] min-w-[130px] flex flex-col justify-center gap-0.5 items-end pr-2 ml-auto">
                                             <span className={`text-sm font-mono tracking-tighter leading-none text-right
                                                 ${isSelected ? 'text-[#0067b8]' : 'text-slate-500'}`}>
                                                 {fmtDate(worker.entry_date)}

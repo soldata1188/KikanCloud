@@ -136,7 +136,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
     // Column widths (resizable) - Balanced for Option B
     const [batchWidth, setBatchWidth] = useState(165);
     const [companyWidth, setCompanyWidth] = useState(240);
-    const [workerWidth, setWorkerWidth] = useState(510);
+    const [workerWidth, setWorkerWidth] = useState(650);
     const [profileWidth, setProfileWidth] = useState(480);
     const isResizing = useRef(false);
 

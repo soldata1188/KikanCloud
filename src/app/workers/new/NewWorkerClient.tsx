@@ -58,8 +58,8 @@ const DOC_TYPES = [
 ];
 
 const FormRow = ({ label, children, isLast = false }: { label: React.ReactNode, children: React.ReactNode, isLast?: boolean }) => (
-    <div className={`flex justify-between items-center px-5 py-2.5 border-b border-gray-50 bg-white ${isLast ? 'border-0' : ''}`}>
-        <span className="text-[11px] font-bold text-gray-400 shrink-0 min-w-[100px]">{label}</span>
+    <div className={`flex items-center px-5 py-3 border-b border-gray-50 bg-white ${isLast ? 'border-0' : ''}`}>
+        <span className="text-[12px] font-bold text-gray-400 shrink-0 w-[130px] uppercase tracking-tighter">{label}</span>
         <div className="flex-1 flex w-full">
             {children}
         </div>
@@ -68,9 +68,9 @@ const FormRow = ({ label, children, isLast = false }: { label: React.ReactNode, 
 
 function SectionHeader({ icon, label, color }: { icon: React.ReactNode; label: string; color: string }) {
     return (
-        <div className={`flex items-center gap-2 px-5 py-2.5 border-b ${color}`}>
+        <div className={`flex items-center gap-2 px-5 py-3 border-b ${color}`}>
             <span className="opacity-60">{icon}</span>
-            <span className="text-[10px] font-black uppercase tracking-[0.18em]">{label}</span>
+            <span className="text-[11px] font-black uppercase tracking-[0.18em]">{label}</span>
         </div>
     );
 }
@@ -188,6 +188,7 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
         }
 
         setIsSubmitting(true);
+        console.log("Submitting worker data...");
         try {
             const formPayload = new FormData();
             Object.entries(formData).forEach(([key, val]) => {
@@ -205,27 +206,34 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
                 body: formPayload
             });
 
-            if (!res.ok) {
-                const errorData = await res.json().catch(() => ({ error: 'サーバー通信エラー' }));
-                throw new Error(errorData.error || "保存システムエラーが発生いたしました。");
-            }
+            // Read JSON only once
+            const result = await res.json().catch(() => ({ error: 'サーバーから応答がありません。' }));
+            console.log("API Response:", result);
 
-            const result = await res.json();
-            if (result.success && result.workerId) {
-                router.push(`/workers/${result.workerId}`);
-            } else {
+            if (!res.ok || !result.success) {
                 throw new Error(result.error || "保存システムエラーが発生いたしました。");
             }
+
+            // Success case
+            console.log("Success! Redirecting to:", `/workers/${result.workerId}`);
+            setToastError("登録が完了しました。詳細ページへ移動します...");
+            
+            // Refresh and Push
+            router.refresh();
+            router.push(`/workers/${result.workerId}`);
+            
+            // In case router.push is slow, don't reset submitting yet 
+            // to prevent double-clicks during transition.
         } catch (error: unknown) {
             console.error("Submit error:", error);
             const msg = error instanceof Error ? error.message : '保存システムエラーが発生いたしました。'
             setToastError(`保存に失敗いたしました: ${msg}`);
             setTimeout(() => setToastError(null), 5000);
-            setIsSubmitting(false); // Đảm bảo reset trạng thái loading nếu có lỗi
+            setIsSubmitting(false); // Reset loading only on failure
         }
     };
 
-    const inputClass = "flex-1 h-7 w-full px-2 bg-white border border-slate-200 rounded text-[12px] font-bold text-gray-800 outline-none focus:border-[#0067b8]";
+    const inputClass = "flex-1 h-10 w-full px-3 bg-white border border-slate-200 rounded-lg text-base font-medium text-gray-800 outline-none focus:border-[#0067b8] transition-all shadow-sm";
 
     return (
         <div className="flex-1 flex flex-col h-full bg-slate-50 relative anim-page">
@@ -274,7 +282,7 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
                                 <FormRow label={<span>氏名(ローマ字)<span className="text-[10px] text-red-600 ml-1">必須</span></span>}>
                                     <div className="flex-1 flex flex-col">
                                         <input name="full_name_romaji" value={formData.full_name_romaji} onChange={handleInputChange} className={`${inputClass} ${errors.full_name_romaji ? 'border-red-500 bg-red-50' : ''}`} placeholder="例: NGUYEN VAN A" />
-                                        {errors.full_name_romaji && <span className="text-[10px] text-red-500 mt-0.5 ml-1">{errors.full_name_romaji}</span>}
+                                        {errors.full_name_romaji && <span className="text-[11px] text-red-500 mt-1 ml-1">{errors.full_name_romaji}</span>}
                                     </div>
                                 </FormRow>
                                 <FormRow label="氏名（カナ）">
@@ -283,7 +291,7 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
                                 <FormRow label={<span>生年月日<span className="text-[10px] text-red-600 ml-1">必須</span></span>}>
                                     <div className="flex-1 flex flex-col">
                                         <input name="dob" type="date" value={formData.dob} onChange={handleInputChange} className={`${inputClass} ${errors.dob ? 'border-red-500 bg-red-50' : ''}`} />
-                                        {errors.dob && <span className="text-[10px] text-red-500 mt-0.5 ml-1">{errors.dob}</span>}
+                                        {errors.dob && <span className="text-[11px] text-red-500 mt-1 ml-1">{errors.dob}</span>}
                                     </div>
                                 </FormRow>
                                 <FormRow label="性別">
@@ -391,7 +399,7 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
                                     name="remarks"
                                     value={formData.remarks}
                                     onChange={handleInputChange}
-                                    className="w-full min-h-[80px] p-3 border border-slate-200 bg-white rounded text-[12px] outline-none focus:border-[#0067b8] font-medium text-gray-800"
+                                    className="w-full min-h-[120px] p-4 border border-slate-200 bg-white rounded-lg text-base outline-none focus:border-[#0067b8] font-medium text-gray-800 transition-all shadow-sm"
                                     placeholder="実習生に関する特記事項やメモ"
                                 />
                             </div>

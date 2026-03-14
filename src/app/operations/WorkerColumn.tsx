@@ -137,9 +137,9 @@ export default function WorkerColumn({ workers, selectedIds, onSelect }: WorkerC
                                                 ${isSelected
                                                     ? 'bg-emerald-500 text-white shadow-sm'
                                                     : daysLeft <= 0
-                                                        ? 'bg-red-600 text-white animate-pulse'
+                                                        ? 'bg-red-600 text-white'
                                                         : daysLeft <= 30
-                                                            ? 'bg-red-500 text-white animate-pulse'
+                                                            ? 'bg-red-500 text-white'
                                                             : daysLeft <= 90
                                                                 ? 'bg-amber-100 text-amber-700'
                                                                 : 'bg-slate-100 text-slate-500'}`}>

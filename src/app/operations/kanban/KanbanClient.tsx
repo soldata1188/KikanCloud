@@ -37,7 +37,7 @@ const PRIORITY_STYLES: Record<string, string> = {
     low: 'bg-gray-50 text-gray-500 border-gray-100',
     medium: 'bg-blue-50 text-blue-600 border-blue-100',
     high: 'bg-amber-50 text-amber-700 border-amber-200',
-    urgent: 'bg-red-50 text-red-700 border-red-200 animate-pulse'
+    urgent: 'bg-red-50 text-red-700 border-red-200'
 };
 
 export default function KanbanClient({ initialTasks, companies, workers, staff }: KanbanClientProps) {
@@ -196,7 +196,7 @@ export default function KanbanClient({ initialTasks, companies, workers, staff }
                                     </div>
 
                                     {task.task_type.startsWith('auto_') && (
-                                        <div className="absolute top-2 right-2 w-1.5 h-1.5 bg-[#0067b8] rounded-full animate-pulse shadow-sm shadow-[#0067b8]/50" title="自動生成タスク" />
+                                        <div className="absolute top-2 right-2 w-1.5 h-1.5 bg-[#0067b8] rounded-full shadow-sm shadow-[#0067b8]/50" title="自動生成タスク" />
                                     )}
                                 </div>
                             ))}

@@ -142,7 +142,7 @@ export default function AuditDetailColumn({ row, onOpenPdfModal }: AuditDetailCo
                     </p>
                     <div className="flex items-center justify-between pt-4 border-t border-white/5">
                         <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)] animate-pulse" />
+                            <div className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]" />
                             <span className="text-[10px] font-black uppercase tracking-widest text-white/40">Monitoring Active</span>
                         </div>
                     </div>

@@ -123,7 +123,7 @@ function Row({ label, value, valueClass }: { label: string; value: React.ReactNo
 function ExpiryRow({ label, value }: { label: string; value?: string | null }) {
     const n = daysLeft(value);
     const badge = n !== null && n <= 90 ? (
-        <span className={`ml-2 text-xs font-bold px-1 py-0.5 rounded ${n <= 30 ? 'bg-rose-500 text-white animate-pulse' : 'bg-amber-100 text-amber-700'}`}>
+        <span className={`ml-2 text-xs font-bold px-1 py-0.5 rounded ${n <= 30 ? 'bg-rose-500 text-white' : 'bg-amber-100 text-amber-700'}`}>
             {n <= 0 ? '期限切れ' : `${n}日`}
         </span>
     ) : null;

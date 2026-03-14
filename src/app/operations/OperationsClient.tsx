@@ -40,10 +40,11 @@ export default function OperationsClient({
     const [visaFilter, setVisaFilter] = useState('all');
     const [batchFilter, setBatchFilter] = useState('all');
     const [certFilter, setCertFilter] = useState('all');
+    const [workerStatusFilter, setWorkerStatusFilter] = useState('working');
 
     // Column widths (resizable)
     const [companyWidth, setCompanyWidth] = useState(280);
-    const [workerWidth, setWorkerWidth] = useState(420);
+    const [workerWidth, setWorkerWidth] = useState(520);
     const isResizing = useRef(false);
 
     const startResize = useCallback((col: 'company' | 'worker', startX: number) => {
@@ -93,8 +94,9 @@ export default function OperationsClient({
             systemType: w.system_type,
             visaStatus: w.visa_status || '',
             occupation: w.industry_field || '---',
+            rawStatus: w.status,
             remarks: w.remarks || '',
-            address: w.address || '---',
+            address: w.japan_residence || '---',
             cert_start_date: w.cert_start_date,
             cert_end_date: w.cert_end_date,
             entryBatch: w.entry_batch || '---',
@@ -127,6 +129,11 @@ export default function OperationsClient({
         // 2. Filter by Company Column context
         if (selectedCompanyId) {
             list = list.filter(w => w.companyId === selectedCompanyId);
+        }
+
+        // Apply Status Tab Filter
+        if (workerStatusFilter !== 'all') {
+            list = list.filter(w => w.rawStatus === workerStatusFilter);
         }
         return list.sort((a, b) => {
             const ed = (b.entryDate || '0000-00-00').localeCompare(a.entryDate || '0000-00-00');
@@ -553,6 +560,28 @@ export default function OperationsClient({
                             </div>
                             <span className="text-xs font-bold bg-white text-slate-500 px-1.5 py-0.5 rounded-[6px] border border-gray-200 shadow-sm">{filteredWorkers.length}</span>
                         </div>
+
+                        {/* Status Tabs Filter */}
+                        <div className="px-2 py-1.5 border-b border-gray-200 bg-gray-50 flex items-center gap-1 shrink-0">
+                            {[
+                                { id: 'all', label: 'すべて' },
+                                { id: 'working', label: '就業中' },
+                                { id: 'standby', label: '対応中' },
+                                { id: 'waiting', label: '未入国' },
+                            ].map((tab) => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setWorkerStatusFilter(tab.id)}
+                                    className={`flex-1 px-1.5 py-1.5 rounded-[6px] text-[11px] font-bold uppercase tracking-tight transition-all
+                                        ${workerStatusFilter === tab.id
+                                            ? 'bg-blue-600 text-white shadow-sm'
+                                            : 'bg-white text-gray-500 border border-gray-200 hover:bg-gray-100 hover:text-gray-700'}`}
+                                >
+                                    {tab.label}
+                                </button>
+                            ))}
+                        </div>
+
                         <div className="flex-1 overflow-hidden">
                             <WorkerColumn
                                 workers={filteredWorkers}
@@ -647,38 +676,59 @@ export default function OperationsClient({
                         </div>
                     )}
                     {viewState === 'workers' && (
-                        <div className="absolute inset-0 overflow-y-auto p-4 space-y-4">
-                            {filteredWorkers.map(w => (
-                                <OperationListItem
-                                    key={w.id}
-                                    worker={{
-                                        id: w.id,
-                                        full_name_romaji: w.name,
-                                        full_name_kana: w.furigana,
-                                        company_name: w.company,
-                                        visa_status: w.systemType === 'ginou_jisshu' ? '技能実習' : w.systemType === 'ikusei_shuro' ? '育成就労' : '特定技能',
-                                        zairyu_exp: w.visaExpiry,
-                                        entry_date: w.entryDate,
-                                        address: w.address,
-                                        kikou_status: {
-                                            progress: w.kikou_status?.progress || '未着手',
-                                            type: w.kikou_status?.type || '---',
-                                            application_date: w.kikou_status?.application_date || '---',
-                                            assignee: w.kikou_status?.assignee || '---'
-                                        },
-                                        nyukan_status: {
-                                            progress: w.nyukan_status?.progress || '未着手',
-                                            application_date: w.nyukan_status?.application_date || '---',
-                                            receipt_number: w.nyukan_status?.receipt_number || '---'
-                                        },
-                                        remarks: w.remarks
-                                    }}
-                                    onEditMemo={(id) => {
-                                        setSelectedWorkerIds([id]);
-                                        setViewState('operations');
-                                    }}
-                                />
-                            ))}
+                        <div className="absolute inset-0 flex flex-col">
+                            <div className="px-4 py-2 bg-gray-50 border-b border-gray-100 flex items-center gap-1 shrink-0">
+                                {[
+                                    { id: 'all', label: 'すべて' },
+                                    { id: 'working', label: '就業中' },
+                                    { id: 'standby', label: '対応中' },
+                                    { id: 'waiting', label: '未入国' },
+                                ].map((tab) => (
+                                    <button
+                                        key={tab.id}
+                                        onClick={() => setWorkerStatusFilter(tab.id)}
+                                        className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all
+                                            ${workerStatusFilter === tab.id
+                                                ? 'bg-blue-600 text-white shadow-sm'
+                                                : 'bg-white text-gray-500 border border-gray-100'}`}
+                                    >
+                                        {tab.label}
+                                    </button>
+                                ))}
+                            </div>
+                            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                                {filteredWorkers.map(w => (
+                                    <OperationListItem
+                                        key={w.id}
+                                        worker={{
+                                            id: w.id,
+                                            full_name_romaji: w.name,
+                                            full_name_kana: w.furigana,
+                                            company_name: w.company,
+                                            visa_status: w.systemType === 'ginou_jisshu' ? '技能実習' : w.systemType === 'ikusei_shuro' ? '育成就労' : '特定技能',
+                                            zairyu_exp: w.visaExpiry,
+                                            entry_date: w.entryDate,
+                                            address: w.address,
+                                            kikou_status: {
+                                                progress: w.kikou_status?.progress || '未着手',
+                                                type: w.kikou_status?.type || '---',
+                                                application_date: w.kikou_status?.application_date || '---',
+                                                assignee: w.kikou_status?.assignee || '---'
+                                            },
+                                            nyukan_status: {
+                                                progress: w.nyukan_status?.progress || '未着手',
+                                                application_date: w.nyukan_status?.application_date || '---',
+                                                receipt_number: w.nyukan_status?.receipt_number || '---'
+                                            },
+                                            remarks: w.remarks
+                                        }}
+                                        onEditMemo={(id) => {
+                                            setSelectedWorkerIds([id]);
+                                            setViewState('operations');
+                                        }}
+                                    />
+                                ))}
+                            </div>
                         </div>
                     )}
                     {viewState === 'operations' && (

@@ -84,6 +84,7 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
     const [newCustomCategory, setNewCustomCategory] = useState<string>('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [toastError, setToastError] = useState<string | null>(null);
+    const [toastSuccess, setToastSuccess] = useState<string | null>(null);
     const [errors, setErrors] = useState<Record<string, string>>({});
 
     // Document Kanban States
@@ -188,7 +189,6 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
         }
 
         setIsSubmitting(true);
-        console.log("Submitting worker data...");
         try {
             const formPayload = new FormData();
             Object.entries(formData).forEach(([key, val]) => {
@@ -208,41 +208,46 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
 
             // Read JSON only once
             const result = await res.json().catch(() => ({ error: 'サーバーから応答がありません。' }));
-            console.log("API Response:", result);
 
             if (!res.ok || !result.success) {
                 throw new Error(result.error || "保存システムエラーが発生いたしました。");
             }
 
-            // Success case
-            console.log("Success! Redirecting to:", `/workers/${result.workerId}`);
-            setToastError("登録が完了しました。詳細ページへ移動します...");
-            
-            // Refresh and Push
+            // ✅ Success: show green toast then redirect to /workers
+            setToastSuccess("登録が完了しました。人材一覧へ戻ります...");
             router.refresh();
-            router.push(`/workers/${result.workerId}`);
-            
-            // In case router.push is slow, don't reset submitting yet 
-            // to prevent double-clicks during transition.
+            setTimeout(() => {
+                router.push('/workers');
+            }, 800);
+
         } catch (error: unknown) {
             console.error("Submit error:", error);
             const msg = error instanceof Error ? error.message : '保存システムエラーが発生いたしました。'
             setToastError(`保存に失敗いたしました: ${msg}`);
             setTimeout(() => setToastError(null), 5000);
-            setIsSubmitting(false); // Reset loading only on failure
+            setIsSubmitting(false);
         }
     };
 
-    const inputClass = "flex-1 h-10 w-full px-3 bg-white border border-slate-200 rounded-lg text-base font-medium text-gray-800 outline-none focus:border-[#0067b8] transition-all shadow-sm";
+    const inputClass = "flex-1 h-10 w-full px-3 bg-white border border-slate-200 rounded-md text-base font-medium text-gray-800 outline-none focus:border-[#0067b8] transition-colors";
 
     return (
         <div className="flex-1 flex flex-col h-full bg-slate-50 relative anim-page">
-            {/* Red Toast Output */}
+            {/* ❌ Error Toast */}
             {toastError && (
                 <div className="fixed top-4 right-4 z-50 animate-in fade-in slide-in-from-top-5 duration-300">
-                    <div className="flex items-center gap-3 bg-red-50/95 backdrop-blur border border-red-200 px-5 py-3.5 rounded-2xl text-red-700">
-                        <X className="w-5 h-5 text-red-500 shrink-0 cursor-pointer hover:bg-red-100 rounded-full" onClick={() => setToastError(null)} />
-                        <span className="text-sm font-bold tracking-wide">{toastError}</span>
+                    <div className="flex items-center gap-3 bg-red-50 border border-red-200 px-5 py-3.5 rounded-[6px] text-red-700 shadow-lg">
+                        <X className="w-4 h-4 text-red-500 shrink-0 cursor-pointer" onClick={() => setToastError(null)} />
+                        <span className="text-sm font-bold">{toastError}</span>
+                    </div>
+                </div>
+            )}
+            {/* ✅ Success Toast */}
+            {toastSuccess && (
+                <div className="fixed top-4 right-4 z-50 animate-in fade-in slide-in-from-top-5 duration-300">
+                    <div className="flex items-center gap-3 bg-emerald-50 border border-emerald-200 px-5 py-3.5 rounded-[6px] text-emerald-700 shadow-lg">
+                        <span className="text-lg">&#10003;</span>
+                        <span className="text-sm font-bold">{toastSuccess}</span>
                     </div>
                 </div>
             )}
@@ -280,7 +285,7 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
                             <div className="bg-white rounded border border-slate-200 overflow-hidden">
                                 <SectionHeader icon={<User size={13} />} label="個人・雇用・住所" color="bg-[#0067b8] text-white" />
                                 <FormRow label={<span>氏名(ローマ字)<span className="text-[10px] text-red-600 ml-1">必須</span></span>}>
-                                    <div className="flex-1 flex flex-col">
+                                    <div className="flex-1 flex flex-col w-full">
                                         <input name="full_name_romaji" value={formData.full_name_romaji} onChange={handleInputChange} className={`${inputClass} ${errors.full_name_romaji ? 'border-red-500 bg-red-50' : ''}`} placeholder="例: NGUYEN VAN A" />
                                         {errors.full_name_romaji && <span className="text-[11px] text-red-500 mt-1 ml-1">{errors.full_name_romaji}</span>}
                                     </div>
@@ -289,7 +294,7 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
                                     <input name="full_name_kana" value={formData.full_name_kana} onChange={handleInputChange} className={inputClass} placeholder="例: グエン ヴァン ア" />
                                 </FormRow>
                                 <FormRow label={<span>生年月日<span className="text-[10px] text-red-600 ml-1">必須</span></span>}>
-                                    <div className="flex-1 flex flex-col">
+                                    <div className="flex-1 flex flex-col w-full">
                                         <input name="dob" type="date" value={formData.dob} onChange={handleInputChange} className={`${inputClass} ${errors.dob ? 'border-red-500 bg-red-50' : ''}`} />
                                         {errors.dob && <span className="text-[11px] text-red-500 mt-1 ml-1">{errors.dob}</span>}
                                     </div>
@@ -399,7 +404,7 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
                                     name="remarks"
                                     value={formData.remarks}
                                     onChange={handleInputChange}
-                                    className="w-full min-h-[120px] p-4 border border-slate-200 bg-white rounded-lg text-base outline-none focus:border-[#0067b8] font-medium text-gray-800 transition-all shadow-sm"
+                                    className="w-full min-h-[120px] p-4 border border-slate-200 bg-white rounded-md text-base outline-none focus:border-[#0067b8] font-medium text-gray-800 transition-colors"
                                     placeholder="実習生に関する特記事項やメモ"
                                 />
                             </div>

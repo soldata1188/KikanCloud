@@ -546,7 +546,10 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                         <RefreshCw size={14} />
                     </button>
                     {(role === 'admin' || role === 'staff') && (
-                        <Link href="/workers/new" className="h-8 px-3.5 bg-blue-700 hover:bg-blue-800 text-white rounded-[6px] text-sm font-bold hidden md:flex items-center gap-2 active:scale-95 transition-all shadow-md shadow-blue-100">
+                        <Link 
+                            href="/workers/new" 
+                            className="h-8 px-3.5 bg-blue-700 hover:bg-blue-800 text-white rounded-[6px] text-sm font-bold flex items-center gap-2 active:scale-95 transition-all shadow-md shadow-blue-100 shrink-0"
+                        >
                             <Plus size={16} />
                             <span>新規登録</span>
                         </Link>

@@ -108,9 +108,9 @@ function SectionHeader({ icon, label, color }: { icon: React.ReactNode; label: s
 
 function Row({ label, value, valueClass }: { label: string; value: React.ReactNode; valueClass?: string }) {
     return (
-        <div className="flex justify-between items-center px-4 py-1 border-b border-gray-50 last:border-0 hover:bg-emerald-50/10 transition-colors">
-            <span className="text-[10px] font-normal text-gray-400 shrink-0 min-w-[90px] uppercase tracking-tighter">{label}</span>
-            <span className={`text-[12px] font-normal text-right ${valueClass || 'text-gray-800'}`}>{value || '---'}</span>
+        <div className="flex items-center px-4 py-1.5 border-b border-gray-50 last:border-0 hover:bg-emerald-50/10 transition-colors">
+            <span className="text-[10px] font-normal text-gray-400 shrink-0 w-[130px] uppercase tracking-tighter">{label}</span>
+            <span className={`text-[12px] font-normal flex-1 ${valueClass || 'text-gray-800'}`}>{value || '---'}</span>
         </div>
     );
 }
@@ -123,9 +123,9 @@ function ExpiryRow({ label, value }: { label: string; value?: string | null }) {
         </span>
     ) : null;
     return (
-        <div className="flex justify-between items-center px-4 py-1 border-b border-gray-50 last:border-0 hover:bg-emerald-50/10 transition-colors">
-            <span className="text-[10px] font-normal text-gray-400 shrink-0 min-w-[90px] uppercase tracking-tighter">{label}</span>
-            <span className={`text-[12px] font-mono ${expiryColor(value)} flex items-center font-normal`}>
+        <div className="flex items-center px-4 py-1.5 border-b border-gray-50 last:border-0 hover:bg-emerald-50/10 transition-colors">
+            <span className="text-[10px] font-normal text-gray-400 shrink-0 w-[130px] uppercase tracking-tighter">{label}</span>
+            <span className={`text-[12px] font-mono ${expiryColor(value)} flex-1 flex items-center font-normal`}>
                 {fmt(value)}{badge}
             </span>
         </div>
@@ -217,8 +217,8 @@ export default function ProfileDetailColumn({ workers, onUpdate, onBulkUpdate, b
             return <Row label={label} value={displayVal} />;
         }
         return (
-            <div className="flex justify-between items-center px-4 py-1 border-b border-gray-50 last:border-0 bg-white">
-                <span className="text-[10px] font-normal text-gray-400 shrink-0 min-w-[90px] uppercase tracking-tighter">{label}</span>
+            <div className="flex items-center px-4 py-1 border-b border-gray-50 last:border-0 bg-white">
+                <span className="text-[10px] font-normal text-gray-400 shrink-0 w-[130px] uppercase tracking-tighter">{label}</span>
                 {type === 'select' ? (
                     <select
                         value={String(val)}
@@ -250,13 +250,13 @@ export default function ProfileDetailColumn({ workers, onUpdate, onBulkUpdate, b
         const val = isEditing ? (editForm[field] as string || '') : (worker?.[field] as string || '');
         if (!isEditing) return <ExpiryRow label={label} value={val} />;
         return (
-            <div className="flex justify-between items-center px-3 py-2 border-b border-gray-50 last:border-0 bg-white">
-                <span className="text-[10px] font-normal text-gray-400 shrink-0 min-w-[80px]">{label}</span>
+            <div className="flex items-center px-4 py-1 border-b border-gray-50 last:border-0 bg-white">
+                <span className="text-[10px] font-normal text-gray-400 shrink-0 w-[130px] uppercase tracking-tighter">{label}</span>
                 <input
                     type="date"
                     value={val}
                     onChange={e => setEditForm(prev => ({ ...prev, [field]: e.target.value }))}
-                    className="flex-1 h-7 px-2 bg-white border border-gray-200 rounded text-[12px] font-normal text-gray-800 outline-none focus:border-emerald-500"
+                    className="flex-1 h-7 px-2 bg-gray-50 border border-gray-200 rounded text-[12px] font-normal text-gray-800 outline-none focus:border-emerald-500 transition-all"
                 />
             </div>
         );

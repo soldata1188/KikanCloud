@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { ArrowLeft, UploadCloud, FileText, Loader2, Image as ImageIcon, X, User, Shield, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
 
@@ -76,12 +77,14 @@ function SectionHeader({ icon, label, color }: { icon: React.ReactNode; label: s
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function NewWorkerClient({ companies }: { companies: any[] }) {
+    const router = useRouter();
     const [formData, setFormData] = useState<WorkerData>(initialWorkerData);
     const [files, setFiles] = useState<Record<string, { id: string, file: File, timestamp: string }[]>>({});
     const [customDocTypes, setCustomDocTypes] = useState<{ id: string, label: string }[]>([]);
     const [newCustomCategory, setNewCustomCategory] = useState<string>('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [toastError, setToastError] = useState<string | null>(null);
+    const [errors, setErrors] = useState<Record<string, string>>({});
 
     // Document Kanban States
     const [stagedFile, setStagedFile] = useState<File | null>(null);
@@ -167,8 +170,23 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
         }));
     };
 
+    const validate = () => {
+        const newErrors: Record<string, string> = {};
+        if (!formData.full_name_romaji.trim()) newErrors.full_name_romaji = '氏名(ローマ字)は必須です';
+        if (!formData.dob) newErrors.dob = '生年月日は必須です';
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        
+        if (!validate()) {
+            setToastError("入力内容に不備があります。赤字の項目を確認してください。");
+            setTimeout(() => setToastError(null), 3000);
+            return;
+        }
+
         setIsSubmitting(true);
         try {
             const formPayload = new FormData();
@@ -187,22 +205,27 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
                 body: formPayload
             });
 
+            if (!res.ok) {
+                const errorData = await res.json().catch(() => ({ error: 'サーバー通信エラー' }));
+                throw new Error(errorData.error || "保存システムエラーが発生いたしました。");
+            }
+
             const result = await res.json();
-            if (result.success) {
-                window.location.href = `/workers/${result.workerId}`;
+            if (result.success && result.workerId) {
+                router.push(`/workers/${result.workerId}`);
             } else {
                 throw new Error(result.error || "保存システムエラーが発生いたしました。");
             }
         } catch (error: unknown) {
+            console.error("Submit error:", error);
             const msg = error instanceof Error ? error.message : '保存システムエラーが発生いたしました。'
             setToastError(`保存に失敗いたしました: ${msg}`);
             setTimeout(() => setToastError(null), 5000);
-        } finally {
-            setIsSubmitting(false);
+            setIsSubmitting(false); // Đảm bảo reset trạng thái loading nếu có lỗi
         }
     };
 
-    const inputClass = "flex-1 h-7 w-full px-2 bg-white border border-indigo-200 rounded text-[12px] font-bold text-gray-800 outline-none focus:border-indigo-500";
+    const inputClass = "flex-1 h-7 w-full px-2 bg-white border border-slate-200 rounded text-[12px] font-bold text-gray-800 outline-none focus:border-[#0067b8]";
 
     return (
         <div className="flex-1 flex flex-col h-full bg-slate-50 relative anim-page">
@@ -221,7 +244,7 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
                 <div className="w-full max-w-[900px] h-full overflow-y-auto p-4 md:p-6 no-scrollbar pb-24 bg-white">
                     <div className="flex justify-between items-center mb-4">
                         <div className="flex items-center gap-2">
-                            <span className="text-[12px] font-black px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">NEW WORKER</span>
+                            <span className="text-[12px] font-black px-2 py-0.5 rounded bg-slate-100 text-slate-600">NEW WORKER</span>
                             <span className="text-[14px] font-black text-gray-900 tracking-tight">人材新規登録</span>
                         </div>
                         <div className="flex flex-col md:flex-row gap-2">
@@ -235,7 +258,7 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
                                 type="button"
                                 onClick={handleSubmit}
                                 disabled={isSubmitting}
-                                className="w-full md:w-auto h-8 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md text-[11px] font-bold transition-all flex items-center justify-center gap-1.5 disabled:opacity-50"
+                                className="w-full md:w-auto h-8 px-5 bg-[#0067b8] hover:bg-[#005a9e] text-white rounded-md text-[11px] font-bold transition-all flex items-center justify-center gap-1.5 disabled:opacity-50 shadow-sm"
                             >
                                 {isSubmitting && <Loader2 size={13} className="animate-spin" />}
                                 {isSubmitting ? '登録中...' : '登録完了'}
@@ -247,15 +270,21 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
                         {/* --- Left Column --- */}
                         <div className="flex flex-col gap-2">
                             <div className="bg-white rounded border border-slate-200 overflow-hidden">
-                                <SectionHeader icon={<User size={13} />} label="個人・雇用・住所" color="bg-blue-600 text-white" />
+                                <SectionHeader icon={<User size={13} />} label="個人・雇用・住所" color="bg-[#0067b8] text-white" />
                                 <FormRow label={<span>氏名(ローマ字)<span className="text-[10px] text-red-600 ml-1">必須</span></span>}>
-                                    <input name="full_name_romaji" value={formData.full_name_romaji} onChange={handleInputChange} className={inputClass} placeholder="例: NGUYEN VAN A" />
+                                    <div className="flex-1 flex flex-col">
+                                        <input name="full_name_romaji" value={formData.full_name_romaji} onChange={handleInputChange} className={`${inputClass} ${errors.full_name_romaji ? 'border-red-500 bg-red-50' : ''}`} placeholder="例: NGUYEN VAN A" />
+                                        {errors.full_name_romaji && <span className="text-[10px] text-red-500 mt-0.5 ml-1">{errors.full_name_romaji}</span>}
+                                    </div>
                                 </FormRow>
                                 <FormRow label="氏名（カナ）">
                                     <input name="full_name_kana" value={formData.full_name_kana} onChange={handleInputChange} className={inputClass} placeholder="例: グエン ヴァン ア" />
                                 </FormRow>
-                                <FormRow label="生年月日">
-                                    <input name="dob" type="date" value={formData.dob} onChange={handleInputChange} className={inputClass} />
+                                <FormRow label={<span>生年月日<span className="text-[10px] text-red-600 ml-1">必須</span></span>}>
+                                    <div className="flex-1 flex flex-col">
+                                        <input name="dob" type="date" value={formData.dob} onChange={handleInputChange} className={`${inputClass} ${errors.dob ? 'border-red-500 bg-red-50' : ''}`} />
+                                        {errors.dob && <span className="text-[10px] text-red-500 mt-0.5 ml-1">{errors.dob}</span>}
+                                    </div>
                                 </FormRow>
                                 <FormRow label="性別">
                                     <select name="gender" value={formData.gender} onChange={handleInputChange} className={inputClass}>
@@ -314,7 +343,7 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
 
                         <div className="flex flex-col gap-2">
                             <div className="bg-white rounded border border-slate-200 overflow-hidden">
-                                <SectionHeader icon={<Shield size={13} />} label="入国・在留・書類" color="bg-blue-600 text-white" />
+                                <SectionHeader icon={<Shield size={13} />} label="入国・在留・書類" color="bg-[#0067b8] text-white" />
                                 <FormRow label="制度区分">
                                     <select name="system_type" value={formData.system_type} onChange={handleInputChange} className={inputClass}>
                                         <option value="ikusei_shuro">育成就労</option>
@@ -362,7 +391,7 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
                                     name="remarks"
                                     value={formData.remarks}
                                     onChange={handleInputChange}
-                                    className="w-full min-h-[80px] p-3 border border-indigo-200 bg-white rounded text-[12px] outline-none focus:border-indigo-500 font-medium text-gray-800"
+                                    className="w-full min-h-[80px] p-3 border border-slate-200 bg-white rounded text-[12px] outline-none focus:border-[#0067b8] font-medium text-gray-800"
                                     placeholder="実習生に関する特記事項やメモ"
                                 />
                             </div>

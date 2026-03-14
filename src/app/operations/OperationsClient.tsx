@@ -100,7 +100,8 @@ export default function OperationsClient({
             cert_start_date: w.cert_start_date,
             cert_end_date: w.cert_end_date,
             entryBatch: w.entry_batch || '---',
-            entryDate: w.entry_date || '0000-00-00'
+            entryDate: w.entry_date || '0000-00-00',
+            expirationDate: w.zairyu_exp || w.visas?.[0]?.expiration_date || '9999-12-31'
         }));
     }, [workers]);
 
@@ -136,9 +137,14 @@ export default function OperationsClient({
             list = list.filter(w => w.rawStatus === workerStatusFilter);
         }
         return list.sort((a, b) => {
-            const ed = (b.entryDate || '0000-00-00').localeCompare(a.entryDate || '0000-00-00');
-            if (ed !== 0) return ed;
-            return (a.name || '').localeCompare(b.name || '', 'ja');
+            // Priority 1: Visa Expiration Date (Earliest first)
+            const dateA = a.expirationDate || '9999-12-31';
+            const dateB = b.expirationDate || '9999-12-31';
+            const dateCompare = dateA.localeCompare(dateB);
+            if (dateCompare !== 0) return dateCompare;
+
+            // Priority 2: Company Name (Alphabetical)
+            return (a.company || '').localeCompare(b.company || '', 'ja');
         });
     }, [allMappedWorkers, searchTerm, visaFilter, batchFilter, certFilter, selectedCompanyId, selectedBatch, workerStatusFilter]);
 

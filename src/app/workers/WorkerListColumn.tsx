@@ -26,7 +26,7 @@ interface WorkerListColumnProps {
 }
 
 // ─── Visa status display order & labels ────────────────────────────────────
-const VISA_ORDER = ['実習生1号', '実習生2号', '実習生3号', '育成就労', '特定1号', '特定2号', '特定活動', '技能実習', '特定技能'];
+const VISA_ORDER = ['実習生1号', '実習生2号', '実習生3号', '特定活動', '育成就労', '特定1号', '特定2号', '技能実習', '特定技能'];
 const VISA_LABEL_MAP: Record<string, string> = {
     'ikusei_shuro': '育成就労',
     'ginou_jisshu': '技能実習',

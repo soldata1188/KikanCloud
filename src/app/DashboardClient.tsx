@@ -49,7 +49,7 @@ export default function DashboardClient({ userName, dashboardData }: { userName:
                         <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
                             <div className="flex items-center gap-2">
                                 <Sparkles className="text-emerald-600" size={18} />
-                                <h2 className="text-base font-normal text-gray-800 uppercase tracking-wide">クイックアクセス</h2>
+                                <h2 className="text-base font-bold text-gray-900 uppercase tracking-wide">クイックアクセス</h2>
                             </div>
                             <button className="text-gray-400 hover:text-gray-600"><MoreHorizontal size={18} /></button>
                         </div>
@@ -71,7 +71,7 @@ export default function DashboardClient({ userName, dashboardData }: { userName:
                                     <div className={`w-14 h-14 rounded-2xl bg-white text-emerald-600 flex items-center justify-center transition-all duration-300 group-hover:scale-110 shadow-sm border border-gray-100 group-hover:border-emerald-200`}>
                                         {item.icon}
                                     </div>
-                                    <span className="text-[12px] font-normal text-gray-700 leading-tight uppercase tracking-tight">
+                                    <span className="text-[12px] font-bold text-gray-950 leading-tight uppercase tracking-tight">
                                         {item.name}
                                     </span>
                                 </Link>
@@ -82,7 +82,7 @@ export default function DashboardClient({ userName, dashboardData }: { userName:
                     {/* Secondary Actions Section */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="app-card p-6 space-y-4 hover:shadow-md transition-shadow group border-l-4 border-l-orange-500">
-                            <h3 className="text-base font-normal text-gray-800 uppercase tracking-tight">今月の巡回報告</h3>
+                            <h3 className="text-base font-bold text-gray-900 uppercase tracking-tight">今月の巡回報告</h3>
                             <p className="text-sm text-gray-500 leading-relaxed font-normal">
                                 未提出の定期訪問報告書が <span className="text-orange-600 font-normal underline">4件</span> あります。
                             </p>
@@ -93,7 +93,7 @@ export default function DashboardClient({ userName, dashboardData }: { userName:
                         </div>
 
                         <div className="app-card p-6 space-y-4 hover:shadow-md transition-shadow group border-l-4 border-l-emerald-600">
-                            <h3 className="text-base font-normal text-gray-800 uppercase tracking-tight">特定技能求人</h3>
+                            <h3 className="text-base font-bold text-gray-900 uppercase tracking-tight">特定技能求人</h3>
                             <p className="text-sm text-gray-500 leading-relaxed font-normal">
                                 新しい特定技能求人依頼が届いています。内容を確認してください。
                             </p>
@@ -110,7 +110,7 @@ export default function DashboardClient({ userName, dashboardData }: { userName:
                     <section className="app-card overflow-hidden">
                         <div className="px-6 py-5 border-b border-gray-100 flex items-center gap-2">
                             <Activity className="text-gray-400" size={18} />
-                            <h2 className="text-base font-normal text-gray-800">最近の活動</h2>
+                            <h2 className="text-base font-bold text-gray-900">最近の活動</h2>
                         </div>
 
                         <div className="divide-y divide-gray-50">
@@ -140,23 +140,6 @@ export default function DashboardClient({ userName, dashboardData }: { userName:
                         </Link>
                     </section>
 
-                    {/* Security/Info Info Card */}
-                    <section className="app-card p-6 bg-gradient-to-br from-emerald-600 to-emerald-700 text-white border-0 shadow-lg shadow-emerald-200/50">
-                        <div className="space-y-4">
-                            <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
-                                <ShieldCheck size={28} className="text-white" />
-                            </div>
-                            <div>
-                                <h3 className="text-lg font-normal mb-1 uppercase tracking-tight">システムセキュリティ</h3>
-                                <p className="text-sm text-emerald-50 leading-relaxed font-normal opacity-90">
-                                    データの安全性を高めるため、二要素認証（2FA）の設定を推奨しています。
-                                </p>
-                            </div>
-                            <Link href="/settings" className="inline-block py-2.5 px-6 bg-white text-emerald-600 rounded-xl text-xs font-normal shadow-sm active:scale-95 transition-all uppercase tracking-widest">
-                                設定を開く
-                            </Link>
-                        </div>
-                    </section>
                 </div>
             </div>
         </div>

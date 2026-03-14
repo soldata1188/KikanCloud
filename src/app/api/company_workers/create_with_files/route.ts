@@ -19,20 +19,23 @@ export async function POST(req: NextRequest) {
         // 1. Insert Worker Data
         const getStr = (key: string) => (formData.get(key) as string) || null;
 
+        const full_name_romaji = getStr('full_name_romaji') || '';
+        const full_name_kana   = getStr('full_name_kana') || full_name_romaji; // fallback to romaji if kana is empty
+
         const workerData: Record<string, unknown> = {
             tenant_id,
-            full_name_romaji: getStr('full_name_romaji'),
-            full_name_kana: getStr('full_name_kana'),
+            full_name_romaji,
+            full_name_kana,
             dob: getStr('dob') || '2000-01-01',
             gender: getStr('gender'),
             blood_type: getStr('blood_type'),
-            nationality: getStr('nationality'),
+            nationality: getStr('nationality') || 'ベトナム',
             address: getStr('address'),
             company_id: getStr('company_id') || null,
             industry_field: getStr('industry_field'),
             sending_org: getStr('sending_org'),
-            system_type: getStr('system_type'),
-            status: getStr('status'),
+            system_type: getStr('system_type') || 'ikusei_shuro',
+            status: getStr('status') || 'waiting',
             entry_batch: getStr('entry_batch'),
             entry_date: getStr('entry_date'),
             insurance_exp: getStr('insurance_exp'),

@@ -38,6 +38,14 @@ export default function WorkerColumn({ workers, selectedIds, onSelect }: WorkerC
         return Math.ceil((new Date(dateStr).getTime() - Date.now()) / 86400000);
     };
 
+    const formatDaysLeft = (days: number): string => {
+        if (days <= 0) return '期限切';
+        if (days <= 30) return `${days}日`;
+        const months = Math.floor(days / 30);
+        const remaining = days % 30;
+        return remaining > 0 ? `${months}ヶ月${remaining}日` : `${months}ヶ月`;
+    };
+
     const sortedWorkers = useMemo(() => {
         return [...(workers || [])].sort((a, b) => {
             if (!a.visaExpiry || a.visaExpiry === '---') return 1;
@@ -106,15 +114,17 @@ export default function WorkerColumn({ workers, selectedIds, onSelect }: WorkerC
                                             {worker.visaExpiry}
                                         </span>
                                         {daysLeft !== null && (
-                                            <span className={`text-xs font-mono font-bold shrink-0 leading-none px-1 py-0.5 rounded
+                                            <span className={`text-[10px] font-mono font-bold shrink-0 leading-none px-1 py-0.5 rounded
                                                 ${isSelected
                                                     ? 'bg-emerald-500 text-white shadow-sm'
-                                                    : daysLeft <= 30
-                                                        ? 'bg-red-500 text-white animate-pulse'
-                                                        : daysLeft <= 90
-                                                            ? 'bg-amber-100 text-amber-700'
-                                                            : 'bg-slate-100 text-slate-500'}`}>
-                                                {daysLeft <= 0 ? 'Exp' : `${daysLeft}d`}
+                                                    : daysLeft <= 0
+                                                        ? 'bg-red-600 text-white animate-pulse'
+                                                        : daysLeft <= 30
+                                                            ? 'bg-red-500 text-white animate-pulse'
+                                                            : daysLeft <= 90
+                                                                ? 'bg-amber-100 text-amber-700'
+                                                                : 'bg-slate-100 text-slate-500'}`}>
+                                                {formatDaysLeft(daysLeft)}
                                             </span>
                                         )}
                                     </div>
@@ -126,7 +136,7 @@ export default function WorkerColumn({ workers, selectedIds, onSelect }: WorkerC
                                         ${isSelected ? 'text-emerald-700' : 'text-slate-500'}`}>
                                         {worker.company}
                                     </span>
-                                    <span className={`text-xs font-bold shrink-0 tracking-tight leading-none
+                                    <span className={`text-[10px] font-bold shrink-0 tracking-tight leading-none
                                         ${isSelected ? 'text-emerald-600' : 'text-emerald-600 opacity-90'}`}>
                                         {SYSTEM_LABEL[worker.systemType || ''] || '---'}
                                     </span>

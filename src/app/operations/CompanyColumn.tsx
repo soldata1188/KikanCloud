@@ -42,7 +42,7 @@ function CompanyColumn({ companies, selectedId, onSelect }: CompanyColumnProps) 
                         <button
                             key={company.id}
                             onClick={() => onSelect(company.id)}
-                            className={`w-full text-left pr-3 pl-1.5 py-2.5 border-b border-b-gray-200 border-l-[3px] transition-colors duration-150 flex items-center justify-between group
+                            className={`w-full text-left pr-3 pl-1.5 py-2.5 border-l-[3px] transition-colors duration-150 flex items-center justify-between group
                                 ${selectedId === company.id
                                     ? 'bg-emerald-50 border-l-emerald-500'
                                     : 'hover:bg-emerald-50/40 border-l-transparent'}`}

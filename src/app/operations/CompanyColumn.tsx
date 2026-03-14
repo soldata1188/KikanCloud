@@ -38,16 +38,17 @@ function CompanyColumn({ companies, selectedId, onSelect }: CompanyColumnProps) 
                 </button>
 
                 <div className="mt-0">
-                    {companies.map(company => (
+                    {companies.map((company, idx) => (
                         <button
                             key={company.id}
                             onClick={() => onSelect(company.id)}
-                            className={`w-full text-left px-3 py-2.5 border-b border-gray-100 transition-colors duration-150 flex items-center justify-between group
+                            className={`w-full text-left pr-3 pl-1.5 py-2.5 border-b border-b-gray-200 border-l-[3px] transition-colors duration-150 flex items-center justify-between group
                                 ${selectedId === company.id
-                                    ? 'bg-emerald-50 border-l-[3px] border-emerald-500'
-                                    : 'hover:bg-emerald-50/40 border-l-[3px] border-transparent'}`}
+                                    ? 'bg-emerald-50 border-l-emerald-500'
+                                    : 'hover:bg-emerald-50/40 border-l-transparent'}`}
                         >
-                            <div className="flex items-center min-w-0 flex-1">
+                            <div className="flex items-center min-w-0 flex-1 gap-2">
+                                <span className="text-[10px] font-mono text-gray-300 shrink-0 w-[20px] text-center select-none">{idx + 1}</span>
                                 <span className={`text-[13px] font-normal truncate uppercase text-left tracking-wide
                                     ${selectedId === company.id ? 'text-emerald-900' : 'text-slate-900'}`}>
                                     {company.name_jp}

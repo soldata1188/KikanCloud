@@ -57,10 +57,15 @@ const DOC_TYPES = [
     { id: 'ccus', label: 'CCUSカード' }
 ];
 
+// ─── Design System Components ───────────────────────────────────────────────
+const LABEL_CLS = "text-[11px] font-semibold text-gray-400 shrink-0 w-[130px] uppercase tracking-tight";
+// Note: NO flex-1 here — w-full works correctly in block context (FormRow inner is min-w-0 not flex)
+const INPUT_CLS = "w-full h-10 px-3 bg-white border border-slate-200 rounded-md text-sm font-medium text-gray-800 outline-none focus:border-[#0067b8] transition-colors";
+
 const FormRow = ({ label, children, isLast = false }: { label: React.ReactNode, children: React.ReactNode, isLast?: boolean }) => (
-    <div className={`flex items-center px-5 py-3 border-b border-gray-50 bg-white ${isLast ? 'border-0' : ''}`}>
-        <span className="text-[12px] font-bold text-gray-400 shrink-0 w-[130px] uppercase tracking-tighter">{label}</span>
-        <div className="flex-1 flex w-full">
+    <div className={`flex items-center px-5 py-2 border-b border-gray-50 bg-white ${isLast ? 'border-0' : ''}`}>
+        <span className={LABEL_CLS}>{label}</span>
+        <div className="flex-1 min-w-0">
             {children}
         </div>
     </div>
@@ -68,9 +73,9 @@ const FormRow = ({ label, children, isLast = false }: { label: React.ReactNode, 
 
 function SectionHeader({ icon, label, color }: { icon: React.ReactNode; label: string; color: string }) {
     return (
-        <div className={`flex items-center gap-2 px-5 py-3 border-b ${color}`}>
-            <span className="opacity-60">{icon}</span>
-            <span className="text-[11px] font-black uppercase tracking-[0.18em]">{label}</span>
+        <div className={`flex items-center gap-2 px-5 py-2.5 border-b ${color}`}>
+            <span className="opacity-70">{icon}</span>
+            <span className="text-[10px] font-black uppercase tracking-[0.2em]">{label}</span>
         </div>
     );
 }
@@ -229,7 +234,7 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
         }
     };
 
-    const inputClass = "flex-1 h-10 w-full px-3 bg-white border border-slate-200 rounded-md text-base font-medium text-gray-800 outline-none focus:border-[#0067b8] transition-colors";
+    const inputClass = INPUT_CLS;
 
     return (
         <div className="flex-1 flex flex-col h-full bg-slate-50 relative anim-page">
@@ -255,15 +260,15 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
             <div className="flex flex-1 overflow-hidden justify-center bg-slate-50">
                 {/* FORM CONTENT */}
                 <div className="w-full max-w-[900px] h-full overflow-y-auto p-4 md:p-6 no-scrollbar pb-24 bg-white">
-                    <div className="flex justify-between items-center mb-4">
-                        <div className="flex items-center gap-2">
-                            <span className="text-[12px] font-black px-2 py-0.5 rounded bg-slate-100 text-slate-600">NEW WORKER</span>
-                            <span className="text-[14px] font-black text-gray-900 tracking-tight">人材新規登録</span>
+                    <div className="flex justify-between items-center mb-5 pb-4 border-b border-gray-100">
+                        <div className="flex items-center gap-2.5">
+                            <span className="text-[10px] font-black px-2.5 py-1 rounded-md bg-slate-100 text-slate-500 uppercase tracking-widest">NEW WORKER</span>
+                            <span className="text-[15px] font-black text-gray-900 tracking-tight">人材新規登録</span>
                         </div>
-                        <div className="flex flex-col md:flex-row gap-2">
+                        <div className="flex items-center gap-2">
                             <Link
                                 href="/workers"
-                                className="w-full md:w-auto h-8 px-4 bg-white border border-gray-200 hover:bg-gray-50 text-gray-500 rounded-md text-[11px] font-bold transition-all flex items-center justify-center"
+                                className="h-9 px-4 bg-white border border-gray-200 hover:bg-gray-50 text-gray-500 rounded-md text-[12px] font-semibold transition-all flex items-center justify-center"
                             >
                                 キャンセル
                             </Link>
@@ -271,33 +276,32 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
                                 type="button"
                                 onClick={handleSubmit}
                                 disabled={isSubmitting}
-                                className="w-full md:w-auto h-8 px-5 bg-[#0067b8] hover:bg-[#005a9e] text-white rounded-md text-[11px] font-bold transition-all flex items-center justify-center gap-1.5 disabled:opacity-50 shadow-sm"
+                                className="h-9 px-5 bg-[#0067b8] hover:bg-[#005a9e] text-white rounded-md text-[12px] font-bold transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                             >
                                 {isSubmitting && <Loader2 size={13} className="animate-spin" />}
                                 {isSubmitting ? '登録中...' : '登録完了'}
                             </button>
                         </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-4 w-full">
+                    <div className="grid grid-cols-2 gap-4 w-full items-start">
 
                         {/* --- Left Column --- */}
-                        <div className="flex flex-col gap-2">
-                            <div className="bg-white rounded border border-slate-200 overflow-hidden">
+                        <div className="flex flex-col">
+                            <div className="bg-white rounded-md border border-slate-200 overflow-hidden">
                                 <SectionHeader icon={<User size={13} />} label="個人・雇用・住所" color="bg-[#0067b8] text-white" />
-                                <FormRow label={<span>氏名(ローマ字)<span className="text-[10px] text-red-600 ml-1">必須</span></span>}>
-                                    <div className="w-full flex flex-col">
-                                        <input name="full_name_romaji" value={formData.full_name_romaji} onChange={handleInputChange} className={`${inputClass} ${errors.full_name_romaji ? 'border-red-500 bg-red-50' : ''}`} placeholder="例: NGUYEN VAN A" />
-                                        {errors.full_name_romaji && <span className="text-[11px] text-red-500 mt-1 ml-1">{errors.full_name_romaji}</span>}
-                                    </div>
+                                <FormRow label={<span>氏名(ローマ字)<span className="text-[10px] text-red-500 ml-1">必須</span></span>}>
+                                    <input name="full_name_romaji" value={formData.full_name_romaji} onChange={handleInputChange}
+                                        className={`${inputClass} ${errors.full_name_romaji ? 'border-red-500 bg-red-50' : ''}`}
+                                        placeholder="例: NGUYEN VAN A" />
+                                    {errors.full_name_romaji && <p className="text-[11px] text-red-500 mt-0.5">{errors.full_name_romaji}</p>}
                                 </FormRow>
                                 <FormRow label="氏名（カナ）">
                                     <input name="full_name_kana" value={formData.full_name_kana} onChange={handleInputChange} className={inputClass} placeholder="例: グエン ヴァン ア" />
                                 </FormRow>
-                                <FormRow label={<span>生年月日<span className="text-[10px] text-red-600 ml-1">必須</span></span>}>
-                                    <div className="w-full flex flex-col">
-                                        <input name="dob" type="date" value={formData.dob} onChange={handleInputChange} className={`${inputClass} ${errors.dob ? 'border-red-500 bg-red-50' : ''}`} />
-                                        {errors.dob && <span className="text-[11px] text-red-500 mt-1 ml-1">{errors.dob}</span>}
-                                    </div>
+                                <FormRow label={<span>生年月日<span className="text-[10px] text-red-500 ml-1">必須</span></span>}>
+                                    <input name="dob" type="date" value={formData.dob} onChange={handleInputChange}
+                                        className={`${inputClass} ${errors.dob ? 'border-red-500 bg-red-50' : ''}`} />
+                                    {errors.dob && <p className="text-[11px] text-red-500 mt-0.5">{errors.dob}</p>}
                                 </FormRow>
                                 <FormRow label="性別">
                                     <select name="gender" value={formData.gender} onChange={handleInputChange} className={inputClass}>
@@ -374,8 +378,18 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
                                     <input name="entry_date" type="date" value={formData.entry_date} onChange={handleInputChange} className={inputClass} />
                                 </FormRow>
                                 <FormRow label="在留資格">
-                                    <input name="visa_status" value={formData.visa_status} onChange={handleInputChange} className={inputClass} placeholder="例: 技能実習第1号イ" />
+                                    <select name="visa_status" value={formData.visa_status} onChange={handleInputChange} className={inputClass}>
+                                        <option value="">選択してください</option>
+                                        <option value="実習生1号">実習生1号</option>
+                                        <option value="実習生2号">実習生2号</option>
+                                        <option value="実習生3号">実習生3号</option>
+                                        <option value="特定1号">特定1号</option>
+                                        <option value="特定2号">特定2号</option>
+                                        <option value="特定活動">特定活動</option>
+                                        <option value="育成就労">育成就労</option>
+                                    </select>
                                 </FormRow>
+
                                 <FormRow label="在留期限">
                                     <input name="zairyu_exp" type="date" value={formData.zairyu_exp} onChange={handleInputChange} className={inputClass} />
                                 </FormRow>
@@ -397,14 +411,14 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
                             </div>
                         </div>
 
-                        <div className="bg-white rounded border border-slate-200 overflow-hidden col-span-2">
-                            <SectionHeader icon={<MessageSquare size={13} />} label="備考" color="bg-slate-50 text-slate-500" />
-                            <div className="p-2 bg-white">
+                        <div className="bg-white rounded-md border border-slate-200 overflow-hidden col-span-2">
+                            <SectionHeader icon={<MessageSquare size={12} />} label="備考" color="bg-slate-50 text-slate-500" />
+                            <div className="p-4 bg-white">
                                 <textarea
                                     name="remarks"
                                     value={formData.remarks}
                                     onChange={handleInputChange}
-                                    className="w-full min-h-[120px] p-4 border border-slate-200 bg-white rounded-md text-base outline-none focus:border-[#0067b8] font-medium text-gray-800 transition-colors"
+                                    className="w-full min-h-[100px] p-3 border border-slate-200 bg-white rounded-md text-sm outline-none focus:border-[#0067b8] font-medium text-gray-800 transition-colors"
                                     placeholder="実習生に関する特記事項やメモ"
                                 />
                             </div>

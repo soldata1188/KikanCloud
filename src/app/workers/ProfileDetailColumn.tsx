@@ -96,21 +96,26 @@ function expiryColor(d?: string | null) {
     return 'text-gray-800';
 }
 
-// ── Sub-components ────────────────────────────────────────
-function SectionHeader({ icon, label, color }: { icon: React.ReactNode; label: string; color: string }) {
+// ── Design System Tokens ───────────────────────────────────────────────
+const LABEL_CLS = "text-[11px] font-semibold text-gray-400 shrink-0 w-[130px] uppercase tracking-tight";
+const VALUE_CLS = "text-[13px] font-normal flex-1";
+const INPUT_EDIT_CLS = "flex-1 h-8 px-2 bg-gray-50 border border-gray-200 rounded-md text-[13px] font-normal text-gray-800 outline-none focus:border-[#0067b8] transition-colors";
+
+// ── Sub-components ────────────────────────────────────────────────
+function SectionHeader({ icon, label }: { icon: React.ReactNode; label: string }) {
     return (
-        <div className={`flex items-center gap-2 px-3 py-1.5 border-b ${color.includes('blue') ? color.replace('blue', 'emerald') : color}`}>
-            <span className="opacity-70 scale-95">{icon}</span>
-            <span className="text-[10px] font-normal uppercase tracking-[0.1em] text-emerald-800">{label}</span>
+        <div className="flex items-center gap-2 px-4 py-2 border-b border-gray-100 bg-slate-50">
+            <span className="text-[#0067b8] opacity-70">{icon}</span>
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#0067b8]">{label}</span>
         </div>
     );
 }
 
 function Row({ label, value, valueClass }: { label: string; value: React.ReactNode; valueClass?: string }) {
     return (
-        <div className="flex items-center px-4 py-1.5 border-b border-gray-50 last:border-0 hover:bg-emerald-50/10 transition-colors">
-            <span className="text-[10px] font-normal text-gray-400 shrink-0 w-[130px] uppercase tracking-tighter">{label}</span>
-            <span className={`text-[12px] font-normal flex-1 ${valueClass || 'text-gray-800'}`}>{value || '---'}</span>
+        <div className="flex items-center px-4 py-1.5 border-b border-gray-50 last:border-0 hover:bg-blue-50/10 transition-colors">
+            <span className={LABEL_CLS}>{label}</span>
+            <span className={`${VALUE_CLS} ${valueClass || 'text-gray-800'}`}>{value || '---'}</span>
         </div>
     );
 }
@@ -118,14 +123,14 @@ function Row({ label, value, valueClass }: { label: string; value: React.ReactNo
 function ExpiryRow({ label, value }: { label: string; value?: string | null }) {
     const n = daysLeft(value);
     const badge = n !== null && n <= 90 ? (
-        <span className={`ml-2 text-xs font-bold px-1 py-0.5 rounded shadow-sm ${n <= 30 ? 'bg-rose-500 text-white animate-pulse' : 'bg-amber-100 text-amber-700'}`}>
+        <span className={`ml-2 text-xs font-bold px-1 py-0.5 rounded ${n <= 30 ? 'bg-rose-500 text-white animate-pulse' : 'bg-amber-100 text-amber-700'}`}>
             {n <= 0 ? '期限切れ' : `${n}日`}
         </span>
     ) : null;
     return (
-        <div className="flex items-center px-4 py-1.5 border-b border-gray-50 last:border-0 hover:bg-emerald-50/10 transition-colors">
-            <span className="text-[10px] font-normal text-gray-400 shrink-0 w-[130px] uppercase tracking-tighter">{label}</span>
-            <span className={`text-[12px] font-mono ${expiryColor(value)} flex-1 flex items-center font-normal`}>
+        <div className="flex items-center px-4 py-1.5 border-b border-gray-50 last:border-0 hover:bg-blue-50/10 transition-colors">
+            <span className={LABEL_CLS}>{label}</span>
+            <span className={`text-[13px] font-mono ${expiryColor(value)} flex-1 flex items-center`}>
                 {fmt(value)}{badge}
             </span>
         </div>
@@ -217,13 +222,13 @@ export default function ProfileDetailColumn({ workers, onUpdate, onBulkUpdate, b
             return <Row label={label} value={displayVal} />;
         }
         return (
-            <div className="flex items-center px-4 py-1 border-b border-gray-50 last:border-0 bg-white">
-                <span className="text-[10px] font-normal text-gray-400 shrink-0 w-[130px] uppercase tracking-tighter">{label}</span>
+            <div className="flex items-center px-4 py-1.5 border-b border-gray-50 last:border-0 bg-white">
+                <span className={LABEL_CLS}>{label}</span>
                 {type === 'select' ? (
                     <select
                         value={String(val)}
                         onChange={e => setEditForm(prev => ({ ...prev, [field]: e.target.value === 'true' ? true : e.target.value === 'false' ? false : e.target.value }))}
-                        className="flex-1 h-7 px-2 bg-gray-50 border border-gray-200 rounded text-[12px] font-normal text-gray-800 outline-none focus:border-emerald-500 transition-all"
+                        className={INPUT_EDIT_CLS}
                     >
                         <option value="">---</option>
                         {Object.entries(options).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
@@ -232,14 +237,14 @@ export default function ProfileDetailColumn({ workers, onUpdate, onBulkUpdate, b
                     <textarea
                         value={String(val)}
                         onChange={e => setEditForm(prev => ({ ...prev, [field]: e.target.value }))}
-                        className="flex-1 min-h-[60px] p-2 bg-gray-50 border border-gray-200 rounded text-[12px] font-normal text-gray-800 outline-none focus:border-emerald-500 transition-all"
+                        className="flex-1 min-h-[60px] p-2 bg-gray-50 border border-gray-200 rounded-md text-[13px] font-normal text-gray-800 outline-none focus:border-[#0067b8] transition-colors"
                     />
                 ) : (
                     <input
                         type={type}
                         value={String(val)}
                         onChange={e => setEditForm(prev => ({ ...prev, [field]: e.target.value }))}
-                        className="flex-1 h-7 px-2 bg-gray-50 border border-gray-200 rounded text-[12px] font-normal text-gray-800 outline-none focus:border-emerald-500 transition-all"
+                        className={INPUT_EDIT_CLS}
                     />
                 )}
             </div>
@@ -250,13 +255,13 @@ export default function ProfileDetailColumn({ workers, onUpdate, onBulkUpdate, b
         const val = isEditing ? (editForm[field] as string || '') : (worker?.[field] as string || '');
         if (!isEditing) return <ExpiryRow label={label} value={val} />;
         return (
-            <div className="flex items-center px-4 py-1 border-b border-gray-50 last:border-0 bg-white">
-                <span className="text-[10px] font-normal text-gray-400 shrink-0 w-[130px] uppercase tracking-tighter">{label}</span>
+            <div className="flex items-center px-4 py-1.5 border-b border-gray-50 last:border-0 bg-white">
+                <span className={LABEL_CLS}>{label}</span>
                 <input
                     type="date"
                     value={val}
                     onChange={e => setEditForm(prev => ({ ...prev, [field]: e.target.value }))}
-                    className="flex-1 h-7 px-2 bg-gray-50 border border-gray-200 rounded text-[12px] font-normal text-gray-800 outline-none focus:border-emerald-500 transition-all"
+                    className={INPUT_EDIT_CLS}
                 />
             </div>
         );
@@ -467,7 +472,7 @@ export default function ProfileDetailColumn({ workers, onUpdate, onBulkUpdate, b
 
                     {/* 1. 基本情報 */}
                     <section className="space-y-1">
-                        <SectionHeader icon={<User size={14} className="text-emerald-600" />} label="プロフィール・住所" color="text-emerald-900 mb-2 border-b-0" />
+                        <SectionHeader icon={<User size={14} />} label="プロフィール・住所" />
                         <div className="space-y-0 text-gray-800">
                             {renderField("生年月日", "dob", "date")}
                             {renderField("性別", "gender", "select", { male: '男性', female: '女性', other: 'その他' })}
@@ -482,7 +487,7 @@ export default function ProfileDetailColumn({ workers, onUpdate, onBulkUpdate, b
 
                     {/* 2. 契約・雇用情報 */}
                     <section className="space-y-1">
-                        <SectionHeader icon={<Briefcase size={14} className="text-emerald-600" />} label="契約・雇用情報" color="text-emerald-900 mb-2 border-b-0" />
+                        <SectionHeader icon={<Briefcase size={14} />} label="契約・雇用情報" />
                         <div className="space-y-0 text-gray-800">
                             {renderField("受入企業", "company_id", "select", companies.reduce((acc, c) => ({ ...acc, [c.id]: c.name_jp }), {}))}
                             {renderField("制度区分", "system_type", "select", { ginou_jisshu: '技能実習', ikusei_shuro: '育成就労', tokuteigino: '特定技能' })}
@@ -493,24 +498,36 @@ export default function ProfileDetailColumn({ workers, onUpdate, onBulkUpdate, b
 
                     {/* 3. 入国・在留管理 */}
                     <section className="space-y-1">
-                        <SectionHeader icon={<Globe size={14} className="text-emerald-600" />} label="入国・在留管理" color="text-emerald-900 mb-2 border-b-0" />
+                        <SectionHeader icon={<Globe size={14} />} label="入国・在留管理" />
                         <div className="space-y-0 text-gray-800">
                             {renderField("入国期生", "entry_batch")}
                             {renderField("入国日", "entry_date", "date")}
-                            {!isEditing && worker.entry_date && (
-                                <Row
-                                    label="在日期間"
-                                    value={`${Math.floor((Date.now() - new Date(worker.entry_date).getTime()) / 86400000)}日`}
-                                    valueClass="text-emerald-700 font-mono font-normal"
-                                />
-                            )}
+                            {!isEditing && worker.entry_date && (() => {
+                                const entry = new Date(worker.entry_date);
+                                const today = new Date();
+                                let years = today.getFullYear() - entry.getFullYear();
+                                let months = today.getMonth() - entry.getMonth();
+                                if (months < 0) { years--; months += 12; }
+                                const label = years > 0 && months > 0
+                                    ? `${years}年${months}ヶ月`
+                                    : years > 0
+                                        ? `${years}年`
+                                        : `${months}ヶ月`;
+                                return (
+                                    <Row
+                                        label="在日期間"
+                                        value={label}
+                                        valueClass="text-emerald-700 font-mono font-normal"
+                                    />
+                                );
+                            })()}
                             {renderField("在留資格", "visa_status")}
                             {renderExpiryField("在留期限", "zairyu_exp")}
                         </div>
                     </section>
 
                     <section>
-                        <SectionHeader icon={<CreditCard size={14} className="text-emerald-600" />} label="重要書類・認定" color="text-emerald-900 border-b-0" />
+                        <SectionHeader icon={<CreditCard size={14} />} label="重要書類・認定" />
                         <div className="space-y-0 text-gray-800">
                             {renderField("パスポート番号", "passport_no")}
                             {renderExpiryField("パスポート期限", "passport_exp")}
@@ -522,21 +539,21 @@ export default function ProfileDetailColumn({ workers, onUpdate, onBulkUpdate, b
 
                     {/* 6. 備考 */}
                     <section className="space-y-1">
-                        <SectionHeader icon={<MessageSquare size={14} className="text-emerald-600" />} label="備考・フィードバック" color="text-emerald-900 mb-2 border-b-0" />
+                        <SectionHeader icon={<MessageSquare size={14} />} label="備考・フィードバック" />
                         <div className="mt-2 min-h-[100px]">
                             {isEditing ? (
                                 <textarea
                                     value={editForm.remarks || ''}
                                     onChange={e => setEditForm({ ...editForm, remarks: e.target.value })}
-                                    className="w-full min-h-[120px] p-4 bg-slate-50 border border-gray-100 rounded-xl text-[12px] font-normal outline-none focus:border-emerald-500 transition-all text-gray-700"
+                                    className="w-full min-h-[120px] p-4 bg-slate-50 border border-gray-100 rounded-lg text-sm font-normal outline-none focus:border-[#0067b8] transition-all text-gray-700"
                                     placeholder="備考・メモを入力..."
                                 />
                             ) : worker.remarks ? (
-                                <div className="p-4 bg-slate-50/50 rounded-xl border border-gray-50">
-                                    <p className="text-[12px] text-gray-700 leading-relaxed whitespace-pre-wrap">{worker.remarks}</p>
+                                <div className="p-4 bg-slate-50/50 rounded-lg border border-gray-50">
+                                    <p className="text-[13px] text-gray-700 leading-relaxed whitespace-pre-wrap">{worker.remarks}</p>
                                 </div>
                             ) : (
-                                <p className="text-[11px] text-gray-300 italic px-1">備考なし</p>
+                                <p className="text-[12px] text-gray-300 italic px-1">備考なし</p>
                             )}
                         </div>
                     </section>

@@ -34,12 +34,16 @@ interface CompanyDetailColumnProps {
     companies: Company[];
 }
 
-// ── Sub-components ────────────────────────────────────────
+// ── Sub-components ────────────────────────────────────────────────
+const LABEL_CLS = "text-[11px] font-semibold text-gray-400 shrink-0 w-[130px] uppercase tracking-tight";
+const VALUE_CLS = "text-[13px] font-normal flex-1";
+const INPUT_EDIT_CLS = "flex-1 h-8 px-2 bg-gray-50 border border-gray-200 rounded-md text-[13px] font-normal text-gray-800 outline-none focus:border-[#0067b8] transition-colors";
+
 function SectionHeader({ icon, label }: { icon: React.ReactNode; label: string }) {
     return (
-        <div className="flex items-center gap-2 px-3 py-1.5 border-b border-gray-100">
-            <span className="text-emerald-600 opacity-60 scale-95">{icon}</span>
-            <span className="text-[10px] font-normal uppercase tracking-[0.1em] text-emerald-900">{label}</span>
+        <div className="flex items-center gap-2 px-4 py-2 border-b border-gray-100 bg-slate-50">
+            <span className="text-[#0067b8] opacity-70">{icon}</span>
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#0067b8]">{label}</span>
         </div>
     );
 }
@@ -58,24 +62,24 @@ interface RowProps {
 function Row({ label, name, value, isEditing, onChange, type = 'text', placeholder, valueClass }: RowProps) {
     if (isEditing) {
         return (
-            <div className="flex justify-between items-center px-4 py-1 border-b border-gray-50 bg-white">
-                <span className="text-[10px] font-normal text-gray-400 shrink-0 min-w-[90px] uppercase tracking-tighter">{label}</span>
+            <div className="flex items-center px-4 py-1.5 border-b border-gray-50 bg-white">
+                <span className={LABEL_CLS}>{label}</span>
                 <input
                     name={name}
                     type={type}
                     value={value || ''}
                     onChange={onChange}
                     placeholder={placeholder}
-                    className="flex-1 h-7 px-2 bg-white border border-gray-200 rounded text-[12px] font-normal text-gray-800 outline-none focus:border-emerald-500 transition-colors"
+                    className={INPUT_EDIT_CLS}
                 />
             </div>
         );
     }
 
     return (
-        <div className="flex justify-between items-center px-4 py-1 border-b border-gray-50 last:border-0 hover:bg-emerald-50/10 transition-colors">
-            <span className="text-[10px] font-normal text-gray-400 shrink-0 min-w-[90px] uppercase tracking-tighter">{label}</span>
-            <span className={`text-[12px] font-normal text-right break-all ${valueClass || 'text-gray-800'}`}>{value || '---'}</span>
+        <div className="flex items-center px-4 py-1.5 border-b border-gray-50 last:border-0 hover:bg-blue-50/10 transition-colors">
+            <span className={LABEL_CLS}>{label}</span>
+            <span className={`${VALUE_CLS} ${valueClass || 'text-gray-800'}`}>{value || '---'}</span>
         </div>
     );
 }
@@ -259,21 +263,21 @@ export default function CompanyDetailColumn({ companies }: CompanyDetailColumnPr
                     {/* 3. 備考 */}
                     <section className="space-y-1">
                         <SectionHeader icon={<AlignLeft size={14} />} label="備考・メモ" />
-                        <div className="mt-2 min-h-[100px]">
+                        <div className="mt-2 min-h-[80px]">
                             {isEditing ? (
                                 <textarea
                                     name="remarks"
                                     value={editData.remarks || ''}
                                     onChange={handleInputChange}
-                                    className="w-full min-h-[100px] p-4 bg-slate-50 border border-gray-100 rounded-xl text-[12px] font-normal outline-none focus:border-emerald-500 transition-all text-gray-700"
+                                    className="w-full min-h-[100px] p-4 bg-slate-50 border border-gray-100 rounded-lg text-sm font-normal outline-none focus:border-[#0067b8] transition-all text-gray-700"
                                     placeholder="備考・メモを入力..."
                                 />
                             ) : c.remarks ? (
-                                <div className="p-4 bg-slate-50/50 rounded-xl border border-gray-50">
-                                    <p className="text-[12px] text-gray-700 leading-relaxed whitespace-pre-wrap">{c.remarks}</p>
+                                <div className="p-4 bg-slate-50/50 rounded-lg border border-gray-50">
+                                    <p className="text-[13px] text-gray-700 leading-relaxed whitespace-pre-wrap">{c.remarks}</p>
                                 </div>
                             ) : (
-                                <p className="text-[11px] text-gray-300 italic px-1">備考なし</p>
+                                <p className="text-[12px] text-gray-300 italic px-1">備考なし</p>
                             )}
                         </div>
                     </section>

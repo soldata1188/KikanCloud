@@ -33,24 +33,24 @@ export default function CompanyListColumn({ companies, selectedIds, onSelect }: 
     return (
         <div className="w-full h-full flex flex-col bg-white lg:bg-transparent overflow-hidden">
             <div className="flex-1 overflow-y-auto thin-scrollbar lg:bg-white p-2 lg:p-0 space-y-2 lg:space-y-0">
-                {companies.map(company => {
+                {companies.map((company, idx) => {
                     const isSelected = selectedIds.includes(company.id);
+                    const rowNum = idx + 1;
                     return (
                         <div key={company.id} className="relative group">
                             {/* Desktop List Layout (Hidden on Mobile) */}
                             <button
                                 onClick={(e) => onSelect(company.id, e)}
-                                className={`hidden lg:flex w-full text-left px-4 py-3 border-b border-gray-100 transition-all duration-150 items-center gap-4
+                                className={`hidden lg:flex w-full text-left pr-4 pl-1.5 py-3 border-b border-b-gray-200 border-l-[4px] transition-all duration-150 items-center gap-3
                                     ${isSelected
-                                        ? 'bg-emerald-50/60 border-l-[4px] border-emerald-500 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]'
-                                        : 'hover:bg-slate-50 border-l-[4px] border-transparent'}`}
+                                        ? 'bg-emerald-50/60 border-l-emerald-500 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]'
+                                        : 'hover:bg-slate-50 border-l-transparent'}`}
                             >
-                                {/* Section 1: Icon & Name (Flex-1) */}
-                                <div className="flex-1 shrink-0 flex items-center gap-3 overflow-hidden">
-                                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 text-[11px] font-normal shadow-sm
-                                        ${isSelected ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-500 border border-slate-200'}`}>
-                                        <Building2 size={14} />
-                                    </div>
+                                {/* Row Number */}
+                                <span className="text-[10px] font-mono text-gray-300 shrink-0 w-[20px] text-center select-none">{rowNum}</span>
+
+                                {/* Section 1: Name (Flex-1) */}
+                                <div className="flex-1 shrink-0 flex items-center overflow-hidden">
                                      <div className="flex flex-col min-w-0 justify-center">
                                          <div className="min-h-5 flex items-center">
                                              <span className={`text-base font-medium truncate uppercase tracking-tight leading-none

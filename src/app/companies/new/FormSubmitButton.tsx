@@ -9,10 +9,10 @@ export function FormSubmitButton() {
         <button
             type="submit"
             disabled={pending}
-            className="px-6 py-2.5 text-white text-sm bg-[#24b47e] hover:bg-[#1e9a6a] font-bold rounded-none transition-colors disabled:opacity-50 flex items-center gap-2"
+            className="h-9 px-5 bg-[#0067b8] hover:bg-[#005a9e] text-white rounded-md text-[12px] font-bold transition-colors flex items-center gap-2 disabled:opacity-50"
         >
-            {pending && <Loader2 size={16} className="animate-spin" />}
-            {pending ? '保存中...' : '保存'}
+            {pending && <Loader2 size={13} className="animate-spin" />}
+            {pending ? '保存中...' : '登録完了'}
         </button>
     )
 }

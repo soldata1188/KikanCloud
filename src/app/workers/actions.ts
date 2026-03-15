@@ -122,21 +122,37 @@ export async function deleteWorker(formData: FormData) {
 }
 
 export type ImportWorkerPayload = {
-    company_name?: string;
-    full_name_romaji?: string;
-    dob?: string;
-    gender?: string;
-    has_spouse?: boolean | null;
-    nationality?: string;
-    birthplace?: string;
-    entry_date?: string;
+    company_name?: string | null;
+    full_name_romaji?: string | null;
+    full_name_kana?: string | null;
+    dob?: string | null;
+    gender?: string | null;
+    has_spouse?: boolean | string | null;
+    nationality?: string | null;
+    birthplace?: string | null;
+    entry_date?: string | null;
+    entry_batch?: string | null;
+    visa_status?: string | null;
+    zairyu_no?: string | null;
     zairyu_exp?: string | null;
-    visa_status?: string;
-    industry_field?: string;
     passport_no?: string | null;
     passport_exp?: string | null;
+    industry_field?: string | null;
+    system_type?: string | null;
+    status?: string | null;
+    japanese_level?: string | null;
+    blood_type?: string | null;
+    cert_no?: string | null;
+    cert_start_date?: string | null;
+    cert_end_date?: string | null;
+    insurance_exp?: string | null;
+    sending_org?: string | null;
     address?: string | null;
     japan_residence?: string | null;
+    remarks?: string | null;
+    kentei_status?: string | null;
+    kikou_status?: string | null;
+    nyukan_status?: string | null;
 };
 
 export async function importWorkers(workersData: ImportWorkerPayload[]): Promise<{ success: boolean; count?: number; newCompanies?: number; error?: string }> {
@@ -208,17 +224,22 @@ export async function importWorkers(workersData: ImportWorkerPayload[]): Promise
             const companyName = w.company_name ? String(w.company_name).trim() : ''
             const companyId = companyName ? (companyMap.get(companyName) || null) : null
 
+            const hasSpouse = typeof w.has_spouse === 'boolean' ? w.has_spouse :
+                (String(w.has_spouse || '').includes('有') || String(w.has_spouse || '').includes('既') || String(w.has_spouse || '').toLowerCase() === 'true')
+
             return {
                 tenant_id: userData?.tenant_id,
                 company_id: companyId,
                 full_name_romaji: w.full_name_romaji ? String(w.full_name_romaji).toUpperCase().trim() : 'UNKNOWN',
-                full_name_kana: '-',
+                full_name_kana: w.full_name_kana ? String(w.full_name_kana).trim() : '-',
                 dob: parseDate(w.dob) || '2000-01-01',
                 gender: mapGender(w.gender),
-                has_spouse: !!w.has_spouse,
+                has_spouse: hasSpouse,
                 nationality: mapNationality(w.nationality),
                 birthplace: w.birthplace ? String(w.birthplace).trim() : null,
                 entry_date: parseDate(w.entry_date),
+                entry_batch: w.entry_batch ? String(w.entry_batch).trim() : null,
+                zairyu_no: w.zairyu_no ? String(w.zairyu_no).trim() : null,
                 zairyu_exp: parseDate(w.zairyu_exp),
                 residence_card_exp_date: parseDate(w.zairyu_exp),
                 visa_status: w.visa_status ? String(w.visa_status).trim() : 'ikusei_shuro',
@@ -226,10 +247,21 @@ export async function importWorkers(workersData: ImportWorkerPayload[]): Promise
                 passport_no: w.passport_no ? String(w.passport_no).trim() : null,
                 passport_exp: parseDate(w.passport_exp),
                 passport_exp_date: parseDate(w.passport_exp),
-                address: w.birthplace ? String(w.birthplace).trim() : (w.japan_residence ? String(w.japan_residence).trim() : null),
+                system_type: w.system_type ? String(w.system_type).trim() : 'ikusei_shuro',
+                status: w.status ? String(w.status).trim() : 'working',
+                japanese_level: w.japanese_level ? String(w.japanese_level).trim() : null,
+                blood_type: w.blood_type ? String(w.blood_type).trim() : null,
+                cert_no: w.cert_no ? String(w.cert_no).trim() : null,
+                cert_start_date: parseDate(w.cert_start_date),
+                cert_end_date: parseDate(w.cert_end_date),
+                insurance_exp: parseDate(w.insurance_exp),
+                sending_org: w.sending_org ? String(w.sending_org).trim() : null,
+                address: w.address ? String(w.address).trim() : (w.japan_residence ? String(w.japan_residence).trim() : null),
                 japan_residence: w.japan_residence ? String(w.japan_residence).trim() : null,
-                status: 'working',
-                system_type: 'ikusei_shuro'
+                remarks: w.remarks ? String(w.remarks).trim() : null,
+                kentei_status: w.kentei_status ? String(w.kentei_status).trim() : null,
+                kikou_status: w.kikou_status ? String(w.kikou_status).trim() : null,
+                nyukan_status: w.nyukan_status ? String(w.nyukan_status).trim() : null,
             }
         })
 

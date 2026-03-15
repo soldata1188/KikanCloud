@@ -6,39 +6,61 @@ import type { ImportWorkerPayload } from '@/app/workers/actions'
 import { useRouter } from 'next/navigation'
 import Papa from 'papaparse'
 
+// 21列 — ユーザー指定の順序
 const WORKER_COLUMNS = [
-    { key: 'company_name',    label: '受入企業名',           required: true  },
-    { key: 'full_name_romaji',label: '氏名(英字)',            required: true  },
-    { key: 'full_name_kana',  label: '氏名(カナ)',            required: false },
-    { key: 'dob',             label: '生年月日',              required: false },
-    { key: 'gender',          label: '性別',                  required: false },
-    { key: 'has_spouse',      label: '既婚',                  required: false },
-    { key: 'nationality',     label: '国籍',                  required: false },
-    { key: 'birthplace',      label: '出生地',                required: false },
-    { key: 'entry_date',      label: '入国日',                required: false },
-    { key: 'entry_batch',     label: '入国バッチ',            required: false },
-    { key: 'visa_status',     label: '在留資格',              required: false },
-    { key: 'zairyu_no',       label: '在留番号',              required: false },
-    { key: 'zairyu_exp',      label: '在留期限',              required: false },
-    { key: 'passport_no',     label: 'パスポート番号',        required: false },
-    { key: 'passport_exp',    label: 'パスポート期限',        required: false },
-    { key: 'industry_field',  label: '職種',                  required: false },
-    { key: 'system_type',     label: '制度',                  required: false },
-    { key: 'status',          label: 'ステータス',            required: false },
-    { key: 'japanese_level',  label: '日本語レベル',          required: false },
-    { key: 'blood_type',      label: '血液型',                required: false },
-    { key: 'cert_no',         label: '認定番号',              required: false },
-    { key: 'cert_start_date', label: '認定開始日',            required: false },
-    { key: 'cert_end_date',   label: '認定終了日',            required: false },
-    { key: 'insurance_exp',   label: '社会保険期限',          required: false },
-    { key: 'sending_org',     label: '送り出し機関',          required: false },
-    { key: 'address',         label: '現住所',                required: false },
-    { key: 'japan_residence', label: '社宅住所',              required: false },
-    { key: 'remarks',         label: '備考',                  required: false },
-    { key: 'kentei_status',   label: '検定ステータス',        required: false },
-    { key: 'kikou_status',    label: '機構ステータス',        required: false },
-    { key: 'nyukan_status',   label: '入管ステータス',        required: false },
+    { key: 'company_name',    label: '受入企業名',   required: true  },
+    { key: 'full_name_kana',  label: '氏名(カナ)',   required: false },
+    { key: 'dob',             label: '生年月日',     required: false },
+    { key: 'gender',          label: '性別',         required: false },
+    { key: 'blood_type',      label: '血液型',       required: false },
+    { key: 'nationality',     label: '国籍',         required: false },
+    { key: 'birthplace',      label: '出生地',       required: false },
+    { key: 'sending_org',     label: '送出機関',     required: false },
+    { key: 'status',          label: 'ステータス',   required: false },
+    { key: 'japan_residence', label: '社宅住所',     required: false },
+    { key: 'system_type',     label: '制度区分',     required: false },
+    { key: 'industry_field',  label: '職種',         required: false },
+    { key: 'entry_batch',     label: '入国期生',     required: false },
+    { key: 'entry_date',      label: '入国日',       required: false },
+    { key: 'visa_status',     label: '在留資格',     required: false },
+    { key: 'zairyu_exp',      label: '在留期限',     required: false },
+    { key: 'passport_no',     label: 'パスポート番号', required: false },
+    { key: 'passport_exp',    label: 'パスポート期限', required: false },
+    { key: 'cert_start_date', label: '認定開始日',   required: false },
+    { key: 'cert_end_date',   label: '認定終了日',   required: false },
+    { key: 'insurance_exp',   label: '保険期限',     required: false },
 ]
+
+// BOM付きUTF-8でCSVを生成してダウンロード（Excelで文字化けしない）
+function downloadTemplate() {
+    const headers = WORKER_COLUMNS.map(c => c.label).join(',')
+    const sample1 = [
+        'ABC工業株式会社', 'グエン ヴァン エー', '1998-05-20', '男', 'A',
+        'ベトナム', 'HANOI', 'ABC送り出し機関', 'working', '東京都新宿区1-2-3',
+        'ikusei_shuro', '製造・溶接', '2024-04', '2024-04-01',
+        '特定技能', '2027-03-31', 'B1234567', '2029-05-19',
+        '2024-04-01', '2027-03-31', '2027-03-31',
+    ].join(',')
+    const sample2 = [
+        'XYZ建設', 'チャン ティ ビー', '2000-08-15', '女', 'O',
+        'ベトナム', 'HO CHI MINH', 'XYZ送り出し', 'working', '大阪府大阪市北区1-1',
+        'tokutei_gino', '建設・とび', '2023-09', '2023-09-10',
+        '技能実習2号', '2026-09-09', 'C9876543', '2030-08-14',
+        '2023-09-10', '2026-09-09', '2026-09-09',
+    ].join(',')
+
+    // \uFEFF = UTF-8 BOM — Excelが日本語を正しく読み込む
+    const csv = '\uFEFF' + [headers, sample1, sample2].join('\n')
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = '外国人材_インポート雛形.csv'
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+}
 
 export function BulkImportModal({
     onClose,
@@ -66,13 +88,14 @@ export function BulkImportModal({
                 skipEmptyLines: true,
                 complete: (results) => {
                     const sample = (results.data as any[]).slice(0, 3).map((r: any) =>
-                        Object.values(r)[1] as string || ''
+                        String(r['受入企業名'] || Object.values(r)[0] || '')
                     )
                     setPreview({ count: results.data.length, sample })
                 }
             })
         }
-        reader.readAsText(f)
+        // BOM付きファイルも正しく読む
+        reader.readAsText(f, 'UTF-8')
     }
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -88,38 +111,31 @@ export function BulkImportModal({
                 complete: async (results) => {
                     const data: ImportWorkerPayload[] = (results.data as any[]).map((row: any) => {
                         const g = (label: string) => String(row[label] || '').trim()
+                        const kana = g('氏名(カナ)')
                         return {
                             company_name:     g('受入企業名'),
-                            full_name_romaji: g('氏名(英字)'),
-                            full_name_kana:   g('氏名(カナ)'),
-                            dob:              g('生年月日'),
-                            gender:           g('性別'),
-                            has_spouse:       g('既婚').includes('有') || g('既婚').includes('既'),
-                            nationality:      g('国籍'),
-                            birthplace:       g('出生地'),
-                            entry_date:       g('入国日'),
-                            entry_batch:      g('入国バッチ'),
-                            visa_status:      g('在留資格'),
-                            zairyu_no:        g('在留番号') || null,
+                            // 氏名(英字)がない場合はカナをフォールバックとして使用
+                            full_name_romaji: kana || null,
+                            full_name_kana:   kana || null,
+                            dob:              g('生年月日') || null,
+                            gender:           g('性別') || null,
+                            blood_type:       g('血液型') || null,
+                            nationality:      g('国籍') || null,
+                            birthplace:       g('出生地') || null,
+                            sending_org:      g('送出機関') || null,
+                            status:           g('ステータス') || null,
+                            japan_residence:  g('社宅住所') || null,
+                            system_type:      g('制度区分') || null,
+                            industry_field:   g('職種') || null,
+                            entry_batch:      g('入国期生') || null,
+                            entry_date:       g('入国日') || null,
+                            visa_status:      g('在留資格') || null,
                             zairyu_exp:       g('在留期限') || null,
                             passport_no:      g('パスポート番号') || null,
                             passport_exp:     g('パスポート期限') || null,
-                            industry_field:   g('職種'),
-                            system_type:      g('制度'),
-                            status:           g('ステータス'),
-                            japanese_level:   g('日本語レベル') || null,
-                            blood_type:       g('血液型') || null,
-                            cert_no:          g('認定番号') || null,
                             cert_start_date:  g('認定開始日') || null,
                             cert_end_date:    g('認定終了日') || null,
-                            insurance_exp:    g('社会保険期限') || null,
-                            sending_org:      g('送り出し機関') || null,
-                            address:          g('現住所') || null,
-                            japan_residence:  g('社宅住所') || null,
-                            remarks:          g('備考') || null,
-                            kentei_status:    g('検定ステータス') || null,
-                            kikou_status:     g('機構ステータス') || null,
-                            nyukan_status:    g('入管ステータス') || null,
+                            insurance_exp:    g('保険期限') || null,
                         }
                     })
                     startTransition(async () => {
@@ -139,7 +155,7 @@ export function BulkImportModal({
                 error: (err: any) => setError(`CSV解析エラー: ${err.message}`)
             })
         }
-        reader.readAsText(file)
+        reader.readAsText(file, 'UTF-8')
     }
 
     return (
@@ -149,7 +165,7 @@ export function BulkImportModal({
                 <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50">
                     <div className="flex items-center gap-3">
                         <Upload size={18} className="text-gray-600" />
-                        <h3 className="font-black text-[15px] text-gray-900 uppercase tracking-wider">外国人材 一括CSV入力</h3>
+                        <h3 className="font-black text-[15px] text-gray-900">外国人材 一括CSV入力</h3>
                     </div>
                     <button onClick={onClose} className="p-2 hover:bg-gray-200 rounded-lg transition-colors text-gray-400 hover:text-gray-700">
                         <X size={20} />
@@ -157,30 +173,32 @@ export function BulkImportModal({
                 </div>
 
                 <div className="p-6 space-y-5 max-h-[80vh] overflow-y-auto">
-                    {/* Template download + column list */}
+                    {/* テンプレート説明 */}
                     <div className="bg-blue-50 border border-blue-100 rounded-lg p-4">
                         <div className="flex items-center justify-between mb-3">
-                            <h4 className="text-[12px] font-black text-blue-800 uppercase tracking-widest flex items-center gap-2">
+                            <h4 className="text-[12px] font-black text-blue-800 flex items-center gap-2">
                                 <FileText size={13} /> CSVテンプレート（全{WORKER_COLUMNS.length}列）
                             </h4>
-                            <a
-                                href="/templates/worker_import_template.csv"
-                                download
+                            <button
+                                type="button"
+                                onClick={downloadTemplate}
                                 className="flex items-center gap-1.5 text-[11px] font-black text-white bg-blue-600 px-3 py-1.5 rounded-md hover:bg-blue-700 transition-colors"
                             >
                                 <Download size={11} /> 雛形ダウンロード
-                            </a>
+                            </button>
                         </div>
-                        <div className="grid grid-cols-3 gap-x-4 gap-y-0.5">
+                        <div className="grid grid-cols-3 gap-x-4 gap-y-1">
                             {WORKER_COLUMNS.map((col, i) => (
                                 <div key={col.key} className="flex items-center gap-1.5 text-[10px]">
-                                    <span className="text-blue-300 font-mono w-4 text-right">{i + 1}</span>
+                                    <span className="text-blue-300 font-mono w-4 shrink-0 text-right">{i + 1}</span>
                                     <span className={col.required ? 'font-black text-blue-900' : 'text-blue-700'}>{col.label}</span>
-                                    {col.required && <span className="text-red-500 text-[8px]">*</span>}
+                                    {col.required && <span className="text-red-500 text-[8px] shrink-0">必須</span>}
                                 </div>
                             ))}
                         </div>
-                        <p className="text-[10px] text-blue-600 mt-2">* 必須。日付形式: YYYY-MM-DD。1行目はヘッダー行。</p>
+                        <p className="text-[10px] text-blue-500 mt-3">
+                            日付形式: <span className="font-mono">YYYY-MM-DD</span>　・　1行目はヘッダー行　・　BOM付きUTF-8またはShift-JIS対応
+                        </p>
                     </div>
 
                     {error && (
@@ -194,7 +212,7 @@ export function BulkImportModal({
                         <div className="flex items-center gap-2 p-3 bg-emerald-50 border border-emerald-100 rounded-lg">
                             <CheckCircle2 size={15} className="text-emerald-600 shrink-0" />
                             <p className="text-[12px] font-semibold text-emerald-700">
-                                {preview.count}件検出 — サンプル: {preview.sample.filter(Boolean).join(', ')}
+                                {preview.count}件を検出 — {preview.sample.filter(Boolean).join('、')}
                             </p>
                         </div>
                     )}
@@ -213,7 +231,7 @@ export function BulkImportModal({
                             <p className="text-[13px] font-black text-gray-700">
                                 {file ? file.name : 'CSVファイルを選択またはドラッグ'}
                             </p>
-                            <p className="text-[10px] font-bold text-gray-400 mt-1 uppercase tracking-wider">CSV Only • UTF-8推奨</p>
+                            <p className="text-[10px] font-bold text-gray-400 mt-1">CSV形式　UTF-8 / Shift-JIS対応</p>
                         </label>
 
                         <div className="flex gap-3">

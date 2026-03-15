@@ -230,7 +230,9 @@ export async function importWorkers(workersData: ImportWorkerPayload[]): Promise
             return {
                 tenant_id: userData?.tenant_id,
                 company_id: companyId,
-                full_name_romaji: w.full_name_romaji ? String(w.full_name_romaji).toUpperCase().trim() : 'UNKNOWN',
+                full_name_romaji: w.full_name_romaji
+                    ? String(w.full_name_romaji).toUpperCase().trim()
+                    : (w.full_name_kana ? String(w.full_name_kana).trim() : 'UNKNOWN'),
                 full_name_kana: w.full_name_kana ? String(w.full_name_kana).trim() : '-',
                 dob: parseDate(w.dob) || '2000-01-01',
                 gender: mapGender(w.gender),

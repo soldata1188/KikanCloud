@@ -3,6 +3,7 @@ import { useState, useCallback, useEffect } from 'react'
 import { APIProvider, Map, AdvancedMarker, useMap } from '@vis.gl/react-google-maps'
 import { MapPin as MapPinIcon, Building2, User, Search, X, Navigation, AlertTriangle, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
+import { companyInitials } from '@/lib/utils/companyName'
 
 // ── Types ────────────────────────────────────────────────────────
 export type LocationType = 'company' | 'worker'
@@ -42,11 +43,8 @@ function partitionLocations(locs: RawLocation[]): { mappable: MappableLocation[]
     return { mappable, unmapped }
 }
 
-const CORP_WORDS = /^(株式会社|有限会社|合同会社|合資会社|合名会社|一般社団法人|一般財団法人|特定非営利活動法人|社会福祉法人|医療法人|NPO法人|㈱|㈲)\s*|\s*(株式会社|有限会社|合同会社|合資会社|合名会社|㈱|㈲)$/g
-
 function initials(name: string): string {
-    const simplified = name.replace(CORP_WORDS, '').trim()
-    return (simplified || name).slice(0, 2)
+    return companyInitials(name, 2)
 }
 
 // ── Map Panner ───────────────────────────────────────────────────

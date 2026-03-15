@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Building2 } from 'lucide-react';
+import { companyInitials } from '@/lib/utils/companyName';
 
 interface Company {
     id: string;
@@ -35,7 +36,7 @@ export default function CompanyListColumn({ companies, selectedIds, onSelect }: 
             <div className="flex-1 overflow-y-auto thin-scrollbar">
                 {companies.map((company) => {
                     const isSelected = selectedIds.includes(company.id);
-                    const initial = (company.name_jp || '?').charAt(0);
+                    const initial = companyInitials(company.name_jp);
                     const hasWorkers = (company.active_worker_count || 0) > 0;
 
                     return (

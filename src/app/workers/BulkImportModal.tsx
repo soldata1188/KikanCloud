@@ -6,11 +6,12 @@ import type { ImportWorkerPayload } from '@/app/workers/actions'
 import { useRouter } from 'next/navigation'
 import Papa from 'papaparse'
 
-// 21列 — ユーザー指定の順序
+// 22列 — ユーザー指定の順序
 const WORKER_COLUMNS = [
-    { key: 'company_name',    label: '受入企業名',   required: true  },
-    { key: 'full_name_kana',  label: '氏名(カナ)',   required: false },
-    { key: 'dob',             label: '生年月日',     required: false },
+    { key: 'company_name',    label: '受入企業名',     required: true  },
+    { key: 'full_name_romaji',label: '氏名(ローマ字)', required: false },
+    { key: 'full_name_kana',  label: '氏名(カナ)',     required: false },
+    { key: 'dob',             label: '生年月日',       required: false },
     { key: 'gender',          label: '性別',         required: false },
     { key: 'blood_type',      label: '血液型',       required: false },
     { key: 'nationality',     label: '国籍',         required: false },
@@ -35,14 +36,14 @@ const WORKER_COLUMNS = [
 function downloadTemplate() {
     const headers = WORKER_COLUMNS.map(c => c.label).join(',')
     const sample1 = [
-        'ABC工業株式会社', 'グエン ヴァン エー', '1998-05-20', '男', 'A',
+        'ABC工業株式会社', 'NGUYEN VAN A', 'グエン ヴァン エー', '1998-05-20', '男', 'A',
         'ベトナム', 'HANOI', 'ABC送り出し機関', 'working', '東京都新宿区1-2-3',
         'ikusei_shuro', '製造・溶接', '2024-04', '2024-04-01',
         '特定技能', '2027-03-31', 'B1234567', '2029-05-19',
         '2024-04-01', '2027-03-31', '2027-03-31',
     ].join(',')
     const sample2 = [
-        'XYZ建設', 'チャン ティ ビー', '2000-08-15', '女', 'O',
+        'XYZ建設', 'TRAN THI B', 'チャン ティ ビー', '2000-08-15', '女', 'O',
         'ベトナム', 'HO CHI MINH', 'XYZ送り出し', 'working', '大阪府大阪市北区1-1',
         'tokutei_gino', '建設・とび', '2023-09', '2023-09-10',
         '技能実習2号', '2026-09-09', 'C9876543', '2030-08-14',
@@ -111,11 +112,11 @@ export function BulkImportModal({
                 complete: async (results) => {
                     const data: ImportWorkerPayload[] = (results.data as any[]).map((row: any) => {
                         const g = (label: string) => String(row[label] || '').trim()
-                        const kana = g('氏名(カナ)')
+                        const romaji = g('氏名(ローマ字)')
+                        const kana   = g('氏名(カナ)')
                         return {
                             company_name:     g('受入企業名'),
-                            // 氏名(英字)がない場合はカナをフォールバックとして使用
-                            full_name_romaji: kana || null,
+                            full_name_romaji: romaji || kana || null,
                             full_name_kana:   kana || null,
                             dob:              g('生年月日') || null,
                             gender:           g('性別') || null,

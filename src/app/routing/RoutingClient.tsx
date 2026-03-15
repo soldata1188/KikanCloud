@@ -348,14 +348,6 @@ export default function RoutingClient({ initialLocations, filterCompanies, googl
                             </div>
                         </div>
 
-                        {/* Stats badges */}
-                        {alertCount > 0 && (
-                            <div className="flex gap-[6px] mb-[10px]">
-                                <span className="flex items-center gap-[5px] px-[10px] py-1 rounded-[20px] text-[11px] font-medium bg-[#fee2e2] text-[#dc2626] border border-[#dc2626]">
-                                    <AlertTriangle size={11} /> 期限警告 {alertCount}
-                                </span>
-                            </div>
-                        )}
 
                         {geocodeDone && (
                             <div className="bg-[#dcfce7] border border-[#16a34a] rounded-[8px] px-3 py-2 flex items-center gap-2 mb-[10px] text-[11px] text-[#16a34a] font-medium">

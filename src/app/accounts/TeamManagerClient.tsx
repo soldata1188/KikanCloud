@@ -218,8 +218,26 @@ export default function TeamManagerClient({
                             <button onClick={() => setIsCreateOpen(false)}><X size={16} /></button>
                         </div>
                         <form onSubmit={handleCreate} className="p-6 space-y-4">
-                            {/* ... (internal form fields updated similarly with rounded-md and blue theme) ... */}
-                            {/* Shortened for brevity in thought, but applied in replacement */}
+                            {createMsg.text && (
+                                <div className={`p-3 text-xs font-normal rounded-md border ${createMsg.type === 'error' ? 'bg-rose-50 text-rose-700 border-rose-100' : 'bg-emerald-50 text-emerald-700 border-emerald-100'}`}>
+                                    <div>{createMsg.text}</div>
+                                    {createMsg.type === 'success' && createMsg.loginId && (
+                                        <div className="mt-2 space-y-1">
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-emerald-600">ログインID:</span>
+                                                <span className="font-mono">{createMsg.loginId}</span>
+                                                <CopyButton text={createMsg.loginId} />
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-emerald-600">パスワード:</span>
+                                                <span className="font-mono">{createMsg.password}</span>
+                                                <CopyButton text={createMsg.password!} />
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                            <input type="hidden" name="role" value={selectedRole} />
                             <div>
                                 <label className="block text-[10px] font-normal text-gray-400 uppercase mb-1 tracking-wider">権限</label>
                                 <div className="grid grid-cols-2 gap-2">
@@ -240,7 +258,7 @@ export default function TeamManagerClient({
                             <div>
                                 <label className="block text-[10px] font-normal text-gray-400 uppercase mb-1 tracking-wider">初期パスワード</label>
                                 <div className="flex gap-2">
-                                    <input value={createPw} onChange={e => setCreatePw(e.target.value)} required className="flex-1 h-10 px-3 bg-gray-50 border border-gray-200 rounded-md text-sm font-mono outline-none focus:border-[#0067b8] font-normal" />
+                                    <input name="password" value={createPw} onChange={e => setCreatePw(e.target.value)} required className="flex-1 h-10 px-3 bg-gray-50 border border-gray-200 rounded-md text-sm font-mono outline-none focus:border-[#0067b8] font-normal" />
                                     <button type="button" onClick={() => setCreatePw(genPassword())} className="px-3 bg-gray-100 border border-gray-200 rounded-md text-xs font-normal"><RefreshCw size={14} /></button>
                                 </div>
                             </div>

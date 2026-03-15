@@ -19,6 +19,8 @@ interface OperationListItemProps {
     onEditMemo?: (id: string) => void;
 }
 
+const fmtDate = (d?: string) => d && d !== '---' ? d.replace(/-/g, '/') : (d || '---')
+
 export default function OperationListItem({ worker, onEditMemo }: OperationListItemProps) {
     // Calculate duration in Japan
     const entryDate = new Date(worker.entry_date);
@@ -64,8 +66,8 @@ export default function OperationListItem({ worker, onEditMemo }: OperationListI
                     {/* Grid data 2A: Full info, 1 cột trên Mobile, 2 cột trên Desktop */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-y-2 text-[11px]">
                         <div><span className="text-gray-400">資格:</span> <span className="font-normal text-[#0067b8]">{worker.visa_status}</span></div>
-                        <div><span className="text-gray-400">期限:</span> <span className={`font-normal ${isWarnExp ? 'text-red-600' : 'text-gray-700'}`}>{worker.zairyu_exp}</span></div>
-                        <div><span className="text-gray-400">入国:</span> <span className="font-normal text-gray-700">{worker.entry_date}</span></div>
+                        <div><span className="text-gray-400">期限:</span> <span className={`font-normal ${isWarnExp ? 'text-red-600' : 'text-gray-700'}`}>{fmtDate(worker.zairyu_exp)}</span></div>
+                        <div><span className="text-gray-400">入国:</span> <span className="font-normal text-gray-700">{fmtDate(worker.entry_date)}</span></div>
                         <div><span className="text-gray-400">経過:</span> <span className="font-normal text-gray-900">{years}年 {months}ヶ月</span></div>
                         <div className="col-span-1 md:col-span-2 flex items-start gap-1 mt-1 text-gray-500">
                             <i className="fas fa-map-marker-alt mt-0.5 text-gray-400"></i>
@@ -88,7 +90,7 @@ export default function OperationListItem({ worker, onEditMemo }: OperationListI
                 </div>
                 <div className="space-y-1.5 text-[11px]">
                     <div className="flex justify-between"><span className="text-gray-400">申請内容:</span> <span className="font-normal text-gray-800">{worker.kikou_status?.type || '---'}</span></div>
-                    <div className="flex justify-between"><span className="text-gray-400">申請日:</span> <span className="font-normal text-gray-700">{worker.kikou_status?.application_date || '---'}</span></div>
+                    <div className="flex justify-between"><span className="text-gray-400">申請日:</span> <span className="font-normal text-gray-700">{fmtDate(worker.kikou_status?.application_date)}</span></div>
                     <div className="flex justify-between"><span className="text-gray-400">担当者:</span> <span className="font-normal text-gray-700">{worker.kikou_status?.assignee || '---'}</span></div>
                 </div>
             </div>
@@ -108,7 +110,7 @@ export default function OperationListItem({ worker, onEditMemo }: OperationListI
                     </span>
                 </div>
                 <div className="space-y-1.5 text-[11px]">
-                    <div className="flex justify-between"><span className="text-gray-400">申請日:</span> <span className="font-normal text-[#0067b8]">{worker.nyukan_status?.application_date || '---'}</span></div>
+                    <div className="flex justify-between"><span className="text-gray-400">申請日:</span> <span className="font-normal text-[#0067b8]">{fmtDate(worker.nyukan_status?.application_date)}</span></div>
                     <div className="flex justify-between"><span className="text-gray-400">受理番号:</span> <span className="font-normal text-gray-700">{worker.nyukan_status?.receipt_number || '---'}</span></div>
                 </div>
             </div>

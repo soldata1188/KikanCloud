@@ -241,7 +241,7 @@ export default function OperationColumn({ workers, staff, onUpdate, onBulkUpdate
                             <div className="flex flex-col items-end gap-1">
                                 <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">在留期限</span>
                                 <div className="flex items-center gap-1.5">
-                                    <span className="text-xs font-bold text-slate-600">{worker.visaExpiry}</span>
+                                    <span className="text-xs font-bold text-slate-600">{worker.visaExpiry?.replace(/-/g, '/')}</span>
                                     {visaBadge && (
                                         <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${visaBadge.cls}`}>
                                             {visaBadge.label}

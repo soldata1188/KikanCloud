@@ -158,7 +158,7 @@ export default function KanbanClient({ initialTasks, companies, workers, staff }
                                         {task.due_date && (
                                             <div className="flex items-center gap-2 text-[11px] font-bold text-white bg-blue-600 px-2 py-1 rounded inline-flex shadow-sm shadow-blue-200">
                                                 <Calendar size={12} />
-                                                <span>期日: {new Date(task.due_date).toLocaleDateString()}</span>
+                                                <span>期日: {task.due_date.replace(/-/g, '/')}</span>
                                             </div>
                                         )}
                                     </div>

@@ -150,7 +150,7 @@ export default function ShienLogClient({ initialLogs, companies, workers }: Shie
                                             </div>
                                             <div className="text-center md:mt-2">
                                                 <div className="text-[16px] font-bold text-gray-900 mb-1">
-                                                    {log.support_date}
+                                                    {log.support_date?.replace(/-/g, '/')}
                                                 </div>
                                                 <span className="badge badge-primary">{TYPE_LABELS[log.support_type]}</span>
                                             </div>

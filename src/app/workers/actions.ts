@@ -249,8 +249,20 @@ export async function importWorkers(workersData: ImportWorkerPayload[]): Promise
                 passport_no: w.passport_no ? String(w.passport_no).trim() : null,
                 passport_exp: parseDate(w.passport_exp),
                 passport_exp_date: parseDate(w.passport_exp),
-                system_type: w.system_type ? String(w.system_type).trim() : 'ikusei_shuro',
-                status: w.status ? String(w.status).trim() : 'working',
+                system_type: (() => {
+                    const v = String(w.system_type || '').trim().toLowerCase()
+                    if (v === 'ginou_jisshu' || v === '技能実習') return 'ginou_jisshu'
+                    if (v === 'tokuteigino' || v === 'tokutei_gino' || v === '特定技能') return 'tokuteigino'
+                    return 'ikusei_shuro' // default: 育成就労
+                })(),
+                status: (() => {
+                    const v = String(w.status || '').trim().toLowerCase()
+                    if (v === 'waiting' || v === '未入国') return 'waiting'
+                    if (v === 'missing' || v === '失踪') return 'missing'
+                    if (v === 'returned' || v === '帰国') return 'returned'
+                    if (v === 'standby' || v === '対応中') return 'standby'
+                    return 'working' // default: 就業中
+                })(),
                 japanese_level: w.japanese_level ? String(w.japanese_level).trim() : null,
                 blood_type: w.blood_type ? String(w.blood_type).trim() : null,
                 cert_no: w.cert_no ? String(w.cert_no).trim() : null,

@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
-import { RefreshCw, Search, Building2, Plus, Briefcase, FileText, ArrowLeft, Users } from 'lucide-react';
+import { RefreshCw, Search, Building2, Plus, Briefcase, FileText, ArrowLeft, Users, Upload } from 'lucide-react';
 import { BulkImportModal } from './BulkImportModal';
 
 import IndustryColumn from './IndustryColumn';
@@ -176,10 +176,19 @@ export function CompaniesClient({ companies: initialCompanies, userRole }: Compa
                         <RefreshCw size={14} />
                     </button>
                     {(userRole === 'admin' || userRole === 'staff') && (
-                        <Link href="/companies/new" className="btn btn-sm btn-primary">
-                            <Plus size={14} />
-                            新規登録
-                        </Link>
+                        <>
+                            <button
+                                onClick={() => setIsBulkImportModalOpen(true)}
+                                className="btn btn-sm shrink-0 bg-emerald-600 text-white hover:bg-emerald-700 border-emerald-600"
+                            >
+                                <Upload size={14} />
+                                一括CSV入力
+                            </button>
+                            <Link href="/companies/new" className="btn btn-sm btn-primary">
+                                <Plus size={14} />
+                                新規登録
+                            </Link>
+                        </>
                     )}
                 </div>
             </header>

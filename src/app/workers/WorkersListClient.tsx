@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import {
     Search, Clock, AlertTriangle, ChevronLeft, ChevronRight,
     Building2, Calendar, User, Users,
-    CheckCircle2, Plus, Trash2, RefreshCw, ArrowLeft
+    CheckCircle2, Plus, Trash2, RefreshCw, ArrowLeft, Upload
 } from 'lucide-react'
 import { bulkDeleteWorkers } from '@/app/actions/operations'
 import { updateWorkerStatus } from '@/app/operations/actions'
@@ -535,10 +535,19 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                         <RefreshCw size={14} />
                     </button>
                     {(role === 'admin' || role === 'staff') && (
-                        <Link href="/workers/new" className="btn btn-sm btn-primary shrink-0">
-                            <Plus size={15} />
-                            新規登録
-                        </Link>
+                        <>
+                            <button
+                                onClick={() => setIsBulkImportModalOpen(true)}
+                                className="btn btn-sm shrink-0 bg-emerald-600 text-white hover:bg-emerald-700 border-emerald-600"
+                            >
+                                <Upload size={14} />
+                                一括CSV入力
+                            </button>
+                            <Link href="/workers/new" className="btn btn-sm btn-primary shrink-0">
+                                <Plus size={15} />
+                                新規登録
+                            </Link>
+                        </>
                     )}
                 </div>
             </header>

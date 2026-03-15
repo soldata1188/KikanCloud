@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { RefreshCw, Search, Building2, Plus, Briefcase, FileText, ArrowLeft, Users } from 'lucide-react';
 import { BulkImportModal } from './BulkImportModal';
@@ -31,37 +31,6 @@ export function CompaniesClient({ companies: initialCompanies, userRole }: Compa
     const [mobileTab, setMobileTab] = useState(1); // 0=業種 1=企業 2=詳細 3=書類
     const [isBulkImportModalOpen, setIsBulkImportModalOpen] = useState(false);
 
-    // Column widths (resizable)
-    const [industryWidth, setIndustryWidth] = useState(150);
-    const [listWidth, setListWidth] = useState(320);
-    const [detailWidth, setDetailWidth] = useState(440);
-    const [workerListWidth, setWorkerListWidth] = useState(400);
-    const isResizing = useRef(false);
-
-    const startResize = useCallback((col: 'industry' | 'list' | 'detail' | 'workerList', startX: number) => {
-        isResizing.current = true;
-        const startWidth = col === 'industry' ? industryWidth : col === 'list' ? listWidth : col === 'detail' ? detailWidth : workerListWidth;
-        const setter = col === 'industry' ? setIndustryWidth : col === 'list' ? setListWidth : col === 'detail' ? setDetailWidth : setWorkerListWidth;
-        const min = col === 'industry' ? 100 : col === 'list' ? 200 : col === 'detail' ? 350 : 300;
-        const max = col === 'industry' ? 300 : col === 'list' ? 700 : col === 'detail' ? 1000 : 800;
-
-        const onMouseMove = (e: MouseEvent) => {
-            if (!isResizing.current) return;
-            const delta = e.clientX - startX;
-            setter(Math.min(max, Math.max(min, startWidth + delta)));
-        };
-        const onMouseUp = () => {
-            isResizing.current = false;
-            window.removeEventListener('mousemove', onMouseMove);
-            window.removeEventListener('mouseup', onMouseUp);
-            document.body.style.cursor = '';
-            document.body.style.userSelect = '';
-        };
-        document.body.style.cursor = 'col-resize';
-        document.body.style.userSelect = 'none';
-        window.addEventListener('mousemove', onMouseMove);
-        window.addEventListener('mouseup', onMouseUp);
-    }, [industryWidth, listWidth, detailWidth]);
 
     // ── Data Processing ──
     const mappedCompanies = useMemo(() => {
@@ -220,7 +189,7 @@ export function CompaniesClient({ companies: initialCompanies, userRole }: Compa
                 {/* ── DESKTOP LAYOUT ── */}
                 <div className="hidden lg:flex flex-1 items-stretch border-t border-gray-200 overflow-hidden bg-white">
                     {/* Column 0: Industry */}
-                    <div className="flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-200" style={{ width: industryWidth }}>
+                    <div className="flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-200 w-[150px]">
                         <div className="h-[44px] px-3 border-b border-gray-200 bg-white flex items-center gap-2 shrink-0">
                             <div className="flex items-center gap-2 shrink-0">
                                 <Briefcase size={18} className="text-gray-400" />
@@ -244,22 +213,8 @@ export function CompaniesClient({ companies: initialCompanies, userRole }: Compa
                         </div>
                     </div>
 
-                    {/* Resize Handle: Industry | List */}
-                    <div
-                        className="relative self-stretch flex-shrink-0 w-[1px] bg-gray-200 group/resize hover:bg-blue-300 transition-colors cursor-col-resize z-10"
-                        onMouseDown={(e) => startResize('industry', e.clientX)}
-                    >
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover/resize:opacity-100 transition-opacity pointer-events-none">
-                            <div className="flex flex-col gap-[3px] py-2 px-1">
-                                {[...Array(5)].map((_, i) => (
-                                    <div key={i} className="w-[3px] h-[3px] rounded-full bg-blue-400" />
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-
                     {/* Column 1: Company List */}
-                    <div className="flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-200" style={{ width: listWidth }}>
+                    <div className="flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-200 w-[320px]">
                         <div className="h-[44px] px-3 border-b border-gray-200 bg-white flex items-center gap-2 shrink-0">
                             <div className="flex items-center gap-2 shrink-0">
                                 <Building2 size={18} className="text-emerald-400" />
@@ -280,41 +235,13 @@ export function CompaniesClient({ companies: initialCompanies, userRole }: Compa
                         </div>
                     </div>
 
-                    {/* Resize Handle: List | Detail */}
-                    <div
-                        className="relative self-stretch flex-shrink-0 w-[1px] bg-gray-200 group/resize hover:bg-blue-300 transition-colors cursor-col-resize z-10"
-                        onMouseDown={(e) => startResize('list', e.clientX)}
-                    >
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover/resize:opacity-100 transition-opacity pointer-events-none">
-                            <div className="flex flex-col gap-[3px] py-2 px-1">
-                                {[...Array(5)].map((_, i) => (
-                                    <div key={i} className="w-[3px] h-[3px] rounded-full bg-blue-400" />
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-
                     {/* Column 2: Detail */}
-                    <div className="flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-200 bg-white" style={{ width: detailWidth }}>
+                    <div className="flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-200 bg-white w-[440px]">
                         <CompanyDetailColumn companies={selectedCompany ? [selectedCompany] : []} />
                     </div>
 
-                    {/* Resize Handle: Detail | Worker List */}
-                    <div
-                        className="relative self-stretch flex-shrink-0 w-[1px] bg-gray-200 group/resize hover:bg-blue-300 transition-colors cursor-col-resize z-10"
-                        onMouseDown={(e) => startResize('detail', e.clientX)}
-                    >
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover/resize:opacity-100 transition-opacity pointer-events-none">
-                            <div className="flex flex-col gap-[3px] py-2 px-1">
-                                {[...Array(5)].map((_, i) => (
-                                    <div key={i} className="w-[3px] h-[3px] rounded-full bg-blue-400" />
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-
                     {/* Column 2.5: Worker List */}
-                    <div className="flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-200 bg-white" style={{ width: workerListWidth }}>
+                    <div className="flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-200 bg-white w-[400px]">
                         <div className="h-[44px] px-4 border-b border-gray-200 bg-white flex items-center justify-between shrink-0">
                             <div className="flex items-center gap-2">
                                 <Users size={18} className="text-gray-400" />
@@ -370,20 +297,6 @@ export function CompaniesClient({ companies: initialCompanies, userRole }: Compa
                                     <p className="text-xs font-bold">該当者なし</p>
                                 </div>
                             )}
-                        </div>
-                    </div>
-
-                    {/* Resize Handle: Worker List | Documents */}
-                    <div
-                        className="relative self-stretch flex-shrink-0 w-[1px] bg-gray-200 group/resize hover:bg-blue-300 transition-colors cursor-col-resize z-10"
-                        onMouseDown={(e) => startResize('workerList', e.clientX)}
-                    >
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover/resize:opacity-100 transition-opacity pointer-events-none">
-                            <div className="flex flex-col gap-[3px] py-2 px-1">
-                                {[...Array(5)].map((_, i) => (
-                                    <div key={i} className="w-[3px] h-[3px] rounded-full bg-blue-400" />
-                                ))}
-                            </div>
                         </div>
                     </div>
 

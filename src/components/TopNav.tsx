@@ -43,12 +43,12 @@ export function TopNav({ title, role }: { title?: string; role?: string }) {
                 </svg>
             </button>
             {/* ── Logo sát lề trái ─────────────────────────────────────── */}
-            <Link href="/" className="flex flex-col leading-none shrink-0 select-none pl-0 md:pl-5">
+            <Link href="/" className="flex items-baseline gap-2 leading-none shrink-0 select-none pl-0 md:pl-5">
                 <span className="text-lg font-bold text-white tracking-tight" style={{ fontFamily: 'var(--font-en)' }}>
-                    KikanCloud
+                    Solution
                 </span>
-                <span className="text-[10px] font-normal text-white/80 tracking-[0.12em] mt-0.5 hidden sm:block" style={{ fontFamily: 'var(--font-jp)' }}>
-                    基幹管理システム
+                <span className="text-[11px] font-normal text-white/70 tracking-[0.1em]" style={{ fontFamily: 'var(--font-en)' }}>
+                    Cooperative
                 </span>
             </Link>
 
@@ -59,9 +59,9 @@ export function TopNav({ title, role }: { title?: string; role?: string }) {
                 </div>
                 <Link
                     href="/chat"
-                    className="hidden sm:inline-flex items-center gap-2 h-9 pl-3 pr-4 rounded-full bg-white/20 hover:bg-white/30 text-white text-[13px] font-medium transition-colors"
+                    className="hidden sm:inline-flex items-center gap-2 h-7 pl-3 pr-4 rounded-full bg-white/20 hover:bg-white/30 text-white text-[12px] font-medium transition-colors"
                 >
-                    <BrainCircuit size={16} className="text-white shrink-0" />
+                    <BrainCircuit size={14} className="text-white shrink-0" />
                     AI概要
                 </Link>
 
@@ -69,7 +69,7 @@ export function TopNav({ title, role }: { title?: string; role?: string }) {
                     <button
                         type="button"
                         onClick={() => setDropdownOpen((v) => !v)}
-                        className="w-10 h-10 rounded-full bg-white/25 hover:bg-white/35 flex items-center justify-center font-bold text-white text-sm select-none transition-colors border border-white/20"
+                        className="w-8 h-8 rounded-full bg-white/25 hover:bg-white/35 flex items-center justify-center font-bold text-white text-[13px] select-none transition-colors border border-white/20"
                         aria-expanded={dropdownOpen}
                     >
                         {initial}

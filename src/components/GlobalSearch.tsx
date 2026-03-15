@@ -43,7 +43,7 @@ export function GlobalSearch({ variant = 'dark' }: { variant?: 'light' | 'dark' 
         <>
             <div onClick={() => setIsOpen(true)} className="relative hidden md:block group cursor-pointer w-full max-w-[280px]">
                 <div
-                    className={`relative w-full h-9 rounded-[32px] flex items-center border transition-all ${isLight
+                    className={`relative w-full h-7 rounded-[32px] flex items-center border transition-all ${isLight
                         ? 'bg-gray-100 border-gray-200 group-hover:bg-gray-200'
                         : 'bg-white/20 border-white/20 group-hover:bg-white/30 group-hover:border-white/30'
                     }`}

@@ -41,7 +41,7 @@ export function CompaniesClient({ companies: initialCompanies, userRole }: Compa
                 ...c,
                 employee_count: allWorkers.length,
                 active_worker_count: activeWorkers.length,
-                industry: c.industry_type || c.industry || '未分類',
+                industry: c.industry || '未分類',
             };
         });
     }, [companies]);

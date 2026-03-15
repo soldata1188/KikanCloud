@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
             zairyu_no: getStr('zairyu_no'),
             zairyu_exp: getStr('zairyu_exp'),
             passport_no: getStr('passport_no'),
-            passport_exp: getStr('passport_exp'),
+            passport_exp_date: getStr('passport_exp'),
             cert_no: getStr('cert_no'),
             cert_start_date: getStr('cert_start_date'),
             cert_end_date: getStr('cert_end_date'),

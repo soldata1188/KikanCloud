@@ -11,7 +11,6 @@ interface Company {
     name_romaji?: string;
     status?: string | null;
     corporate_number?: string;
-    acceptance_notification_number?: string;
     representative?: string;
     representative_romaji?: string;
     manager_name?: string;
@@ -279,7 +278,6 @@ export default function CompanyDetailColumn({ companies }: CompanyDetailColumnPr
                             <Row label="フリガナ" name="name_kana" value={isEditing ? editData.name_kana : c.name_kana} isEditing={isEditing} onChange={handleInputChange} />
                             <Row label="ローマ字" name="name_romaji" value={isEditing ? editData.name_romaji : c.name_romaji} isEditing={isEditing} onChange={handleInputChange} valueClass="font-normal uppercase tracking-wide" />
                             <Row label="法人番号(13桁)" name="corporate_number" value={isEditing ? editData.corporate_number : c.corporate_number} isEditing={isEditing} onChange={handleInputChange} valueClass="font-mono text-gray-600" />
-                            <Row label="受理届出番号" name="acceptance_notification_number" value={isEditing ? editData.acceptance_notification_number : c.acceptance_notification_number} isEditing={isEditing} onChange={handleInputChange} valueClass="font-mono text-gray-600" />
                             <Row label="所在地（住所）" name="address" value={isEditing ? editData.address : c.address} isEditing={isEditing} onChange={handleInputChange} />
                             <Row label="電話番号" name="phone" value={isEditing ? editData.phone : c.phone} isEditing={isEditing} onChange={handleInputChange} valueClass="font-mono text-gray-600" />
                             <Row label="メールアドレス" name="email" value={isEditing ? editData.email : c.email} isEditing={isEditing} onChange={handleInputChange} />

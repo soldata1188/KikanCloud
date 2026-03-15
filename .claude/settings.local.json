@@ -17,7 +17,12 @@
       "Bash(ls:*)",
       "Bash(git:*)",
       "Bash(npx next:*)",
-      "Bash(Remove-Item -Recurse -Force \"C:\\\\ARATABIZ\\\\kikan-saas\\\\.next\" 2>/dev/null; echo \"cleared\")"
+      "Bash(Remove-Item -Recurse -Force \"C:\\\\ARATABIZ\\\\kikan-saas\\\\.next\" 2>/dev/null; echo \"cleared\")",
+      "Bash(npx supabase:*)",
+      "Bash(node:*)",
+      "Read(//c/Users/solut/AppData/Roaming/supabase/**)",
+      "Read(//c/Users/solut/.supabase/**)",
+      "Read(//c/Users/solut/AppData/Roaming/**)"
     ]
   }
 }

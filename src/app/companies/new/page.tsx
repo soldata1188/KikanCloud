@@ -81,9 +81,6 @@ export default async function NewCompanyPage() {
                                     <FormRow label="法人番号(13桁)">
                                         <input name="corporate_number" type="text" maxLength={13} placeholder="例：1234567890123" className={`${INPUT_CLS} font-mono`} />
                                     </FormRow>
-                                    <FormRow label="支援機関番号">
-                                        <input name="registration_number" type="text" placeholder="例：20登-000001" className={`${INPUT_CLS} font-mono`} />
-                                    </FormRow>
                                     <FormRow label="郵便番号">
                                         <input name="postal_code" type="text" placeholder="例：160-0022" className={`${INPUT_CLS} font-mono`} />
                                     </FormRow>

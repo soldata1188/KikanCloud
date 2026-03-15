@@ -73,7 +73,6 @@ export default function EditCompanyClient({ company }: { company: any }) {
         tech_advisor: company.tech_advisor || '',
         labor_insurance_number: company.labor_insurance_number || '',
         employment_insurance_number: company.employment_insurance_number || '',
-        acceptance_notification_number: company.acceptance_notification_number || '',
         acceptance_notification_date: company.acceptance_notification_date || '',
         general_supervision_fee: company.general_supervision_fee?.toString() || '',
         category_3_supervision_fee: company.category_3_supervision_fee?.toString() || '',
@@ -275,9 +274,6 @@ export default function EditCompanyClient({ company }: { company: any }) {
                             </FormRow>
                             <FormRow label="雇用保険番号">
                                 <input name="employment_insurance_number" value={form.employment_insurance_number} onChange={handleChange} className={inputCls + ' font-mono'} placeholder="例：1234-567890-1" />
-                            </FormRow>
-                            <FormRow label="受理届出番号">
-                                <input name="acceptance_notification_number" value={form.acceptance_notification_number} onChange={handleChange} className={inputCls + ' font-mono'} placeholder="例：2023-12345" />
                             </FormRow>
                             <FormRow label="受理届出日">
                                 <input name="acceptance_notification_date" value={form.acceptance_notification_date} onChange={handleChange} type="date" className={inputCls} />

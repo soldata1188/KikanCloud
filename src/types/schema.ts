@@ -26,7 +26,6 @@ export interface Company {
     employee_count?: number;
     labor_insurance_number?: string;
     employment_insurance_number?: string;
-    acceptance_notification_number?: string;
     acceptance_notification_date?: string;
     general_supervision_fee?: number;
     category_3_supervision_fee?: number;

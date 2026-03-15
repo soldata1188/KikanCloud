@@ -29,6 +29,6 @@ INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_typ
 VALUES ('company_docs', 'company_docs', false, 104857600, '{image/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv}')
 ON CONFLICT (id) DO UPDATE SET public = false;
 
-CREATE POLICY "company_docs_select" ON storage.objects FOR SELECT USING (bucket_id = 'company_docs' AND storage.foldername(name)[1] IN (SELECT id::text FROM public.companies WHERE tenant_id = public.get_auth_tenant_id()));
-CREATE POLICY "company_docs_insert" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'company_docs' AND storage.foldername(name)[1] IN (SELECT id::text FROM public.companies WHERE tenant_id = public.get_auth_tenant_id()));
-CREATE POLICY "company_docs_delete" ON storage.objects FOR DELETE USING (bucket_id = 'company_docs' AND storage.foldername(name)[1] IN (SELECT id::text FROM public.companies WHERE tenant_id = public.get_auth_tenant_id()));
+CREATE POLICY "company_docs_select" ON storage.objects FOR SELECT USING (bucket_id = 'company_docs' AND (storage.foldername(name))[1] IN (SELECT id::text FROM public.companies WHERE tenant_id = public.get_auth_tenant_id()));
+CREATE POLICY "company_docs_insert" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'company_docs' AND (storage.foldername(name))[1] IN (SELECT id::text FROM public.companies WHERE tenant_id = public.get_auth_tenant_id()));
+CREATE POLICY "company_docs_delete" ON storage.objects FOR DELETE USING (bucket_id = 'company_docs' AND (storage.foldername(name))[1] IN (SELECT id::text FROM public.companies WHERE tenant_id = public.get_auth_tenant_id()));

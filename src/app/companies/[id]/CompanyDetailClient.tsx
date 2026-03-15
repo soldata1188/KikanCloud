@@ -239,7 +239,6 @@ export default function CompanyDetailClient({ company, documents }: { company: a
                             <SectionCard icon={<Briefcase size={14} />} title="登録番号・費用">
                                 <DataRow label="労働保険番号" value={company.labor_insurance_number ? <span className="font-mono text-[12px]">{company.labor_insurance_number}</span> : null} />
                                 <DataRow label="雇用保険番号" value={company.employment_insurance_number ? <span className="font-mono text-[12px]">{company.employment_insurance_number}</span> : null} />
-                                <DataRow label="受理届出番号" value={company.acceptance_notification_number ? <span className="font-mono text-[12px]">{company.acceptance_notification_number}</span> : null} />
                                 <DataRow label="受理届出日" value={company.acceptance_notification_date ? <span className="font-mono">{company.acceptance_notification_date}</span> : null} />
                                 <DataRow label="一般監理費" value={company.general_supervision_fee ? `${company.general_supervision_fee.toLocaleString()} 円` : undefined} />
                                 <DataRow label="3号監理費" value={company.category_3_supervision_fee ? `${company.category_3_supervision_fee.toLocaleString()} 円` : undefined} />

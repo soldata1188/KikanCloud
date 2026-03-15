@@ -13,7 +13,6 @@ import {
     Settings,
     MessageSquare,
     User,
-    Menu,
 } from "lucide-react";
 
 function GraduationIcon({ size = 16, className = '' }: { size?: number; className?: string }) {
@@ -168,47 +167,6 @@ export function SidebarClient({ active, userRole, userProfile }: SidebarClientPr
                 {sidebarContent}
             </aside>
 
-            {/* Mobile bottom bar — 5 fixed items */}
-            <nav
-                role="navigation"
-                aria-label="モバイルナビゲーション"
-                className="fixed bottom-0 left-0 right-0 z-[100] md:hidden bg-white border-t border-[var(--color-border)]"
-                style={{ paddingBottom: "max(env(safe-area-inset-bottom), 0px)" }}
-            >
-                <div className="flex items-center h-[56px]">
-                    {([
-                        { id: "dashboard",  href: "/",           Icon: LayoutDashboard, label: "ホーム"    },
-                        { id: "workers",    href: "/workers",    Icon: Users,           label: "外国人材"  },
-                        { id: "operations", href: "/operations", Icon: ClipboardList,   label: "業務管理"  },
-                        { id: "chat",       href: "/chat",       Icon: MessageSquare,   label: "AIチャット"},
-                    ] as const).map(({ id, href, Icon, label }) => {
-                        const isActive = active === id;
-                        return (
-                            <Link
-                                key={id}
-                                href={href}
-                                aria-label={label}
-                                aria-current={isActive ? 'page' : undefined}
-                                className="flex-1 flex flex-col items-center justify-center gap-0.5 py-1 text-[10px] font-medium transition-colors"
-                                style={{ color: isActive ? 'var(--brand-primary)' : 'var(--color-text-muted)' }}
-                            >
-                                <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
-                                {label}
-                            </Link>
-                        );
-                    })}
-                    {/* メニュー — opens full sidebar */}
-                    <button
-                        aria-label="メニュー"
-                        onClick={() => setMobileMenuOpen(true)}
-                        className="flex-1 flex flex-col items-center justify-center gap-0.5 py-1 text-[10px] font-medium transition-colors"
-                        style={{ color: 'var(--color-text-muted)' }}
-                    >
-                        <Menu size={20} strokeWidth={2} />
-                        メニュー
-                    </button>
-                </div>
-            </nav>
         </>
     );
 }

@@ -2,9 +2,10 @@
 
 import React, { useState, useMemo, useEffect, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import {
     Search, RefreshCw, Plus, FileDown,
-    X, CalendarPlus, CheckCircle2, CalendarCheck, Clock, Save, ArrowLeft
+    X, CalendarPlus, CheckCircle2, CalendarCheck, Clock, Save, ArrowLeft, History
 } from 'lucide-react';
 
 import AuditStatusColumn from './AuditStatusColumn';
@@ -273,6 +274,10 @@ export function AuditsClient({ matrixData, filterMonth, userRole, companies = []
                     </div>
                 </div>
                 <div className="flex items-center gap-3">
+                    <Link href="/audits/history"
+                        className="h-7 px-3 bg-white border border-gray-300 text-gray-950 hover:border-blue-600 hover:text-blue-700 rounded-lg text-[12px] font-normal flex items-center gap-1.5 active:scale-95 transition-all shadow-sm">
+                        <History size={13} /><span>履歴管理</span>
+                    </Link>
                     <button
                         onClick={() => setShowPdfModal(true)}
                         className="h-7 px-3 bg-white border border-gray-300 text-gray-950 hover:border-blue-600 hover:text-blue-700 rounded-lg text-[12px] font-normal flex items-center gap-1.5 active:scale-95 transition-all shadow-sm"

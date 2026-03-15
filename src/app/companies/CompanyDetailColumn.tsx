@@ -1,8 +1,8 @@
 'use client'
 
 import React, { useState, useEffect } from 'react';
-import { Building2, Edit, Briefcase, AlignLeft, Save, Loader2 } from 'lucide-react';
-import { updateCompany } from './actions';
+import { Building2, Edit, Briefcase, AlignLeft, Save, Loader2, Trash2, AlertTriangle } from 'lucide-react';
+import { updateCompany, deleteCompany } from './actions';
 
 interface Company {
     id: string;
@@ -88,6 +88,8 @@ export default function CompanyDetailColumn({ companies }: CompanyDetailColumnPr
     const [isEditing, setIsEditing] = useState(false);
     const [editData, setEditData] = useState<Partial<Company>>({});
     const [isSaving, setIsSaving] = useState(false);
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     const c = companies[0];
 
@@ -122,6 +124,19 @@ export default function CompanyDetailColumn({ companies }: CompanyDetailColumnPr
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         setEditData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    };
+
+    const handleDelete = async () => {
+        setIsDeleting(true);
+        try {
+            const formData = new FormData();
+            formData.set('id', c.id);
+            await deleteCompany(formData);
+        } catch (error: any) {
+            alert(error?.message || '削除に失敗しました。');
+            setIsDeleting(false);
+            setShowDeleteConfirm(false);
+        }
     };
 
     const handleSave = async () => {
@@ -190,10 +205,19 @@ export default function CompanyDetailColumn({ companies }: CompanyDetailColumnPr
 
                     <div className="shrink-0 ml-4 flex gap-2">
                         {!isEditing ? (
-                            <button onClick={() => { setIsEditing(true); setEditData(c); }} className="btn btn-sm btn-secondary">
-                                <Edit size={13} />
-                                編集する
-                            </button>
+                            <div className="flex flex-col gap-1.5">
+                                <button onClick={() => { setIsEditing(true); setEditData(c); }} className="btn btn-sm btn-secondary">
+                                    <Edit size={13} />
+                                    編集する
+                                </button>
+                                {(c.active_worker_count ?? 0) === 0 && (
+                                    <button onClick={() => setShowDeleteConfirm(true)}
+                                        className="btn btn-sm flex items-center gap-1.5 text-red-500 border border-red-200 hover:bg-red-50 rounded-md px-2 py-1 text-[12px] transition-colors">
+                                        <Trash2 size={12} />
+                                        削除
+                                    </button>
+                                )}
+                            </div>
                         ) : (
                             <div className="flex flex-col gap-1.5">
                                 <button onClick={handleSave} disabled={isSaving} className="btn btn-sm btn-success">
@@ -206,6 +230,40 @@ export default function CompanyDetailColumn({ companies }: CompanyDetailColumnPr
                             </div>
                         )}
                     </div>
+
+                    {/* Delete confirm modal */}
+                    {showDeleteConfirm && (
+                        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/30 backdrop-blur-sm"
+                            onClick={e => { if (e.target === e.currentTarget) setShowDeleteConfirm(false) }}>
+                            <div className="bg-white rounded-xl w-[320px] shadow-xl border border-gray-200 overflow-hidden">
+                                <div className="px-5 py-4 border-b border-gray-100 flex items-center gap-3">
+                                    <div className="w-9 h-9 rounded-full bg-red-50 flex items-center justify-center shrink-0">
+                                        <AlertTriangle size={18} className="text-red-500" />
+                                    </div>
+                                    <div>
+                                        <p className="text-[14px] font-semibold text-gray-900">企業を削除しますか？</p>
+                                        <p className="text-[11px] text-gray-400 mt-0.5">この操作は取り消せません</p>
+                                    </div>
+                                </div>
+                                <div className="px-5 py-3">
+                                    <p className="text-[13px] text-gray-600">
+                                        <span className="font-semibold text-gray-900">{c.name_jp}</span> を完全に削除します。
+                                    </p>
+                                </div>
+                                <div className="px-5 py-3 flex gap-2 border-t border-gray-100">
+                                    <button onClick={() => setShowDeleteConfirm(false)} disabled={isDeleting}
+                                        className="flex-1 h-9 rounded-lg border border-gray-200 text-[13px] text-gray-500 hover:bg-gray-50 transition-colors disabled:opacity-50">
+                                        キャンセル
+                                    </button>
+                                    <button onClick={handleDelete} disabled={isDeleting}
+                                        className="flex-1 h-9 rounded-lg bg-red-500 text-white text-[13px] font-medium hover:bg-red-600 transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50">
+                                        {isDeleting ? <Loader2 size={13} className="animate-spin" /> : <Trash2 size={13} />}
+                                        削除する
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
 

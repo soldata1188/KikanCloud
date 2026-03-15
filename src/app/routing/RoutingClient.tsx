@@ -1,7 +1,7 @@
 'use client'
 import { useState, useCallback, useEffect } from 'react'
 import { APIProvider, Map, AdvancedMarker, useMap } from '@vis.gl/react-google-maps'
-import { MapPin as MapPinIcon, Building2, User, Search, X, Navigation, AlertTriangle, ExternalLink } from 'lucide-react'
+import { MapPin as MapPinIcon, Building2, User, Search, X, Navigation, AlertTriangle, ExternalLink, LocateFixed } from 'lucide-react'
 import Link from 'next/link'
 import { companyInitials } from '@/lib/utils/companyName'
 
@@ -237,16 +237,19 @@ export default function RoutingClient({ initialLocations, filterCompanies, googl
     const alertCount = locations.filter(l => l.type === 'worker' && l.daysUntilExpiry != null && l.daysUntilExpiry <= 60).length
     const unmappedCount = unmapped.length
 
-    // Sort helpers
-    const urgencyScore = (loc: RawLocation) => {
-        if (loc.daysUntilExpiry == null) return 999
-        if (loc.daysUntilExpiry <= 30) return loc.daysUntilExpiry          // most urgent first
-        if (loc.daysUntilExpiry <= 60) return loc.daysUntilExpiry + 100
-        return 999
-    }
-
-    const sortedMappable = [...filteredMappable].sort((a, b) => urgencyScore(a) - urgencyScore(b))
-    const sortedUnmapped = [...filteredUnmapped]
+    // Sort: companies by あいうえお、workers by a,b,c
+    const mappableCompanies = filteredMappable
+        .filter(l => l.type === 'company')
+        .sort((a, b) => a.name.localeCompare(b.name, 'ja'))
+    const mappableWorkers = filteredMappable
+        .filter(l => l.type === 'worker')
+        .sort((a, b) => a.name.localeCompare(b.name, 'en'))
+    const unmappedCompanies = filteredUnmapped
+        .filter(l => l.type === 'company')
+        .sort((a, b) => a.name.localeCompare(b.name, 'ja'))
+    const unmappedWorkers = filteredUnmapped
+        .filter(l => l.type === 'worker')
+        .sort((a, b) => a.name.localeCompare(b.name, 'en'))
 
     // Geocode handler
     const handleGeocode = async () => {
@@ -365,9 +368,9 @@ export default function RoutingClient({ initialLocations, filterCompanies, googl
                                 <div className="text-[11px] text-[#d97706] flex-1 leading-[1.5]">
                                     {unmappedCount}件 座標未登録。AIで住所から自動変換できます
                                 </div>
-                                <button onClick={() => setShowGeocodeModal(true)}
-                                    className="h-[24px] px-[10px] rounded-[6px] bg-[#d97706] text-white text-[10px] font-medium whitespace-nowrap shrink-0 hover:bg-[#b45309] transition-colors">
-                                    一括変換
+                                <button onClick={() => setShowGeocodeModal(true)} title="一括変換"
+                                    className="w-[24px] h-[24px] rounded-[6px] bg-[#d97706] text-white flex items-center justify-center shrink-0 hover:bg-[#b45309] transition-colors">
+                                    <LocateFixed size={13} />
                                 </button>
                             </div>
                         )}
@@ -401,53 +404,70 @@ export default function RoutingClient({ initialLocations, filterCompanies, googl
                     {/* Panel List */}
                     <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
 
-                        {/* Group 1: 地図表示済み */}
-                        {sortedMappable.length > 0 && (
+                        {/* Group 1: 地図表示済み — 企業 (あいうえお順) */}
+                        {mappableCompanies.length > 0 && (
                             <div>
                                 <div className="px-[14px] py-2 flex items-center justify-between sticky top-0 bg-white z-[1] border-b border-[#f1f5f9]">
                                     <div className="flex items-center gap-[5px] text-[10px] font-bold text-[#94a3b8] uppercase tracking-[.3px]">
-                                        <span className="w-2 h-2 rounded-full bg-[#16a34a] inline-block shrink-0" />
-                                        地図表示済み
+                                        <Building2 size={10} className="text-[#d97706]" />
+                                        受入企業
                                     </div>
-                                    <span className="text-[10px] text-[#94a3b8]">{sortedMappable.length}件</span>
+                                    <span className="text-[10px] text-[#94a3b8]">{mappableCompanies.length}件</span>
                                 </div>
-                                {sortedMappable.map(loc => {
+                                {mappableCompanies.map(loc => {
                                     const isActive = activeMarkerId === loc.id
-                                    const days = loc.daysUntilExpiry
-                                    const isUrgent = days != null && days <= 30
-                                    const isWarn = days != null && days > 30 && days <= 60
-                                    const isCompany = loc.type === 'company'
                                     return (
-                                        <button
-                                            key={loc.id}
-                                            onClick={() => flyTo(loc)}
-                                            className={`w-full flex items-center gap-[10px] px-[14px] py-[9px] border-b border-[#f1f5f9] transition-all text-left cursor-pointer ${isActive ? 'bg-[#e6f1fb] border-l-[3px] border-l-[#0067b8]' : 'hover:bg-[#f8fafc]'}`}
-                                        >
-                                            {/* Marker avatar */}
-                                            <div className={`w-[28px] h-[28px] rounded-[8px] flex items-center justify-center shrink-0 text-[11px] font-bold ${isUrgent ? 'bg-[#fee2e2] text-[#dc2626]' : isCompany ? 'bg-[#fef3c7] text-[#d97706]' : 'bg-[#e6f1fb] text-[#0067b8]'}`}>
+                                        <button key={loc.id} onClick={() => flyTo(loc)}
+                                            className={`w-full flex items-center gap-[10px] px-[14px] py-[9px] border-b border-[#f1f5f9] transition-all text-left cursor-pointer ${isActive ? 'bg-[#e6f1fb] border-l-[3px] border-l-[#0067b8]' : 'hover:bg-[#f8fafc]'}`}>
+                                            <div className="w-[28px] h-[28px] rounded-[8px] flex items-center justify-center shrink-0 text-[11px] font-bold bg-[#fef3c7] text-[#d97706]">
                                                 {initials(loc.name)}
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <div className="text-[12px] font-medium text-[#0f172a] truncate">{loc.name}</div>
-                                                <div className="text-[11px] text-[#94a3b8] truncate mt-[1px]">
-                                                    {!isCompany && loc.companyName ? loc.companyName : (loc.address || '住所なし')}
-                                                </div>
+                                                <div className="text-[11px] text-[#94a3b8] truncate mt-[1px]">{loc.address || '住所なし'}</div>
+                                            </div>
+                                            {loc.workerCount != null && loc.workerCount > 0 && (
+                                                <span className="text-[9px] px-[6px] py-[2px] rounded-[8px] font-semibold bg-[#dcfce7] text-[#16a34a] whitespace-nowrap shrink-0">
+                                                    {loc.workerCount}名
+                                                </span>
+                                            )}
+                                        </button>
+                                    )
+                                })}
+                            </div>
+                        )}
+
+                        {/* Group 2: 地図表示済み — 対象者 (a,b,c順) */}
+                        {mappableWorkers.length > 0 && (
+                            <div>
+                                <div className="px-[14px] py-2 flex items-center justify-between sticky top-0 bg-white z-[1] border-b border-[#f1f5f9]">
+                                    <div className="flex items-center gap-[5px] text-[10px] font-bold text-[#94a3b8] uppercase tracking-[.3px]">
+                                        <User size={10} className="text-[#0067b8]" />
+                                        対象者
+                                    </div>
+                                    <span className="text-[10px] text-[#94a3b8]">{mappableWorkers.length}件</span>
+                                </div>
+                                {mappableWorkers.map(loc => {
+                                    const isActive = activeMarkerId === loc.id
+                                    const days = loc.daysUntilExpiry
+                                    const isUrgent = days != null && days <= 30
+                                    const isWarn = days != null && days > 30 && days <= 60
+                                    return (
+                                        <button key={loc.id} onClick={() => flyTo(loc)}
+                                            className={`w-full flex items-center gap-[10px] px-[14px] py-[9px] border-b border-[#f1f5f9] transition-all text-left cursor-pointer ${isActive ? 'bg-[#e6f1fb] border-l-[3px] border-l-[#0067b8]' : 'hover:bg-[#f8fafc]'}`}>
+                                            <div className={`w-[28px] h-[28px] rounded-[8px] flex items-center justify-center shrink-0 text-[11px] font-bold ${isUrgent ? 'bg-[#fee2e2] text-[#dc2626]' : 'bg-[#e6f1fb] text-[#0067b8]'}`}>
+                                                {initials(loc.name)}
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <div className="text-[12px] font-medium text-[#0f172a] truncate">{loc.name}</div>
+                                                <div className="text-[11px] text-[#94a3b8] truncate mt-[1px]">{loc.companyName || '住所なし'}</div>
                                             </div>
                                             <div className="flex flex-col items-end gap-[3px] shrink-0 ml-1">
-                                                {isCompany && loc.workerCount != null && loc.workerCount > 0 && (
-                                                    <span className="text-[9px] px-[6px] py-[2px] rounded-[8px] font-semibold bg-[#dcfce7] text-[#16a34a] whitespace-nowrap">
-                                                        {loc.workerCount}名在籍
-                                                    </span>
-                                                )}
                                                 {isUrgent && days != null && (
-                                                    <span className="text-[9px] px-[6px] py-[2px] rounded-[8px] font-semibold bg-[#fee2e2] text-[#dc2626] whitespace-nowrap">
-                                                        {days}日後期限
-                                                    </span>
+                                                    <span className="text-[9px] px-[6px] py-[2px] rounded-[8px] font-semibold bg-[#fee2e2] text-[#dc2626] whitespace-nowrap">{days}日後期限</span>
                                                 )}
                                                 {isWarn && days != null && (
-                                                    <span className="text-[9px] px-[6px] py-[2px] rounded-[8px] font-semibold bg-[#fef3c7] text-[#d97706] whitespace-nowrap">
-                                                        {days}日後期限
-                                                    </span>
+                                                    <span className="text-[9px] px-[6px] py-[2px] rounded-[8px] font-semibold bg-[#fef3c7] text-[#d97706] whitespace-nowrap">{days}日後期限</span>
                                                 )}
                                             </div>
                                         </button>
@@ -456,47 +476,75 @@ export default function RoutingClient({ initialLocations, filterCompanies, googl
                             </div>
                         )}
 
-                        {/* Group 2: 座標未登録 */}
-                        {sortedUnmapped.length > 0 && (
+                        {/* Group 3: 座標未登録 — 企業 */}
+                        {unmappedCompanies.length > 0 && (
                             <div>
                                 <div className="px-[14px] py-2 flex items-center justify-between sticky top-0 bg-white z-[1] border-b border-[#f1f5f9]">
                                     <div className="flex items-center gap-[5px] text-[10px] font-bold text-[#94a3b8] uppercase tracking-[.3px]">
                                         <span className="w-2 h-2 rounded-full bg-[#d97706] inline-block shrink-0" />
-                                        座標未登録
+                                        未登録企業
                                     </div>
-                                    <button onClick={() => setShowGeocodeModal(true)}
-                                        className="text-[10px] text-[#0067b8] hover:underline cursor-pointer">
-                                        {sortedUnmapped.length}件 一括変換
-                                    </button>
+                                    <div className="flex items-center gap-1.5">
+                                        <span className="text-[10px] text-[#94a3b8]">{unmappedCompanies.length}件</span>
+                                        <button onClick={() => setShowGeocodeModal(true)} title="一括変換"
+                                            className="w-[20px] h-[20px] rounded-[5px] bg-[#e6f1fb] text-[#0067b8] flex items-center justify-center hover:bg-[#0067b8] hover:text-white transition-colors">
+                                            <LocateFixed size={11} />
+                                        </button>
+                                    </div>
                                 </div>
-                                {sortedUnmapped.map(loc => {
-                                    const isCompany = loc.type === 'company'
-                                    return (
-                                        <div
-                                            key={loc.id}
-                                            className="flex items-center gap-[10px] px-[14px] py-[9px] border-b border-[#f1f5f9] hover:bg-[#f8fafc] transition-all"
-                                        >
-                                            {/* No-geo marker */}
-                                            <div className={`w-[28px] h-[28px] rounded-[8px] flex items-center justify-center shrink-0 text-[11px] font-bold bg-[#f1f5f9] text-[#94a3b8]`}>
-                                                {initials(loc.name)}
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <div className="text-[12px] font-medium text-[#0f172a] truncate">{loc.name}</div>
-                                                <div className="text-[11px] text-[#94a3b8] truncate mt-[1px]">
-                                                    {!isCompany && loc.companyName ? loc.companyName : (loc.address || '住所なし')}
-                                                </div>
-                                            </div>
-                                            <button onClick={() => setShowGeocodeModal(true)}
-                                                className="text-[10px] text-[#d97706] whitespace-nowrap hover:underline shrink-0">
-                                                座標登録 →
-                                            </button>
+                                {unmappedCompanies.map(loc => (
+                                    <div key={loc.id} className="flex items-center gap-[10px] px-[14px] py-[9px] border-b border-[#f1f5f9] hover:bg-[#f8fafc] transition-all">
+                                        <div className="w-[28px] h-[28px] rounded-[8px] flex items-center justify-center shrink-0 text-[11px] font-bold bg-[#f1f5f9] text-[#94a3b8]">
+                                            {initials(loc.name)}
                                         </div>
-                                    )
-                                })}
+                                        <div className="flex-1 min-w-0">
+                                            <div className="text-[12px] font-medium text-[#0f172a] truncate">{loc.name}</div>
+                                            <div className="text-[11px] text-[#94a3b8] truncate mt-[1px]">{loc.address || '住所なし'}</div>
+                                        </div>
+                                        <button onClick={() => setShowGeocodeModal(true)} title="座標登録"
+                                            className="w-[20px] h-[20px] rounded-[5px] bg-[#fef3c7] text-[#d97706] flex items-center justify-center hover:bg-[#d97706] hover:text-white transition-colors shrink-0">
+                                            <LocateFixed size={11} />
+                                        </button>
+                                    </div>
+                                ))}
                             </div>
                         )}
 
-                        {filteredMappable.length === 0 && filteredUnmapped.length === 0 && (
+                        {/* Group 4: 座標未登録 — 対象者 */}
+                        {unmappedWorkers.length > 0 && (
+                            <div>
+                                <div className="px-[14px] py-2 flex items-center justify-between sticky top-0 bg-white z-[1] border-b border-[#f1f5f9]">
+                                    <div className="flex items-center gap-[5px] text-[10px] font-bold text-[#94a3b8] uppercase tracking-[.3px]">
+                                        <span className="w-2 h-2 rounded-full bg-[#d97706] inline-block shrink-0" />
+                                        未登録対象者
+                                    </div>
+                                    <div className="flex items-center gap-1.5">
+                                        <span className="text-[10px] text-[#94a3b8]">{unmappedWorkers.length}件</span>
+                                        <button onClick={() => setShowGeocodeModal(true)} title="一括変換"
+                                            className="w-[20px] h-[20px] rounded-[5px] bg-[#e6f1fb] text-[#0067b8] flex items-center justify-center hover:bg-[#0067b8] hover:text-white transition-colors">
+                                            <LocateFixed size={11} />
+                                        </button>
+                                    </div>
+                                </div>
+                                {unmappedWorkers.map(loc => (
+                                    <div key={loc.id} className="flex items-center gap-[10px] px-[14px] py-[9px] border-b border-[#f1f5f9] hover:bg-[#f8fafc] transition-all">
+                                        <div className="w-[28px] h-[28px] rounded-[8px] flex items-center justify-center shrink-0 text-[11px] font-bold bg-[#f1f5f9] text-[#94a3b8]">
+                                            {initials(loc.name)}
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <div className="text-[12px] font-medium text-[#0f172a] truncate">{loc.name}</div>
+                                            <div className="text-[11px] text-[#94a3b8] truncate mt-[1px]">{loc.companyName || '住所なし'}</div>
+                                        </div>
+                                        <button onClick={() => setShowGeocodeModal(true)} title="座標登録"
+                                            className="w-[20px] h-[20px] rounded-[5px] bg-[#fef3c7] text-[#d97706] flex items-center justify-center hover:bg-[#d97706] hover:text-white transition-colors shrink-0">
+                                            <LocateFixed size={11} />
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                        {mappableCompanies.length === 0 && mappableWorkers.length === 0 && unmappedCompanies.length === 0 && unmappedWorkers.length === 0 && (
                             <div className="flex flex-col items-center justify-center h-40 text-[#94a3b8]">
                                 <Search size={24} className="mb-2" />
                                 <p className="text-[11px]">該当する場所がありません</p>

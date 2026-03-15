@@ -27,12 +27,12 @@ export default async function RoutingPage() {
         .select('id, name_jp, address, latitude, longitude')
         .eq('is_deleted', false)
 
-    // ── Workers (with visa expiry) ─────────────────────────────────
+    // ── Workers: 就業中・対応中 only ──────────────────────────────────
     const { data: workers } = await supabase
         .from('workers')
         .select('id, full_name_romaji, full_name_kana, address, japan_residence, latitude, longitude, company_id, status, zairyu_exp')
         .eq('is_deleted', false)
-        .in('status', ['working', 'standby', 'waiting'])
+        .in('status', ['working', 'standby'])
 
     // Build lookup maps
     const companyMap: Record<string, string> = {}
@@ -44,8 +44,8 @@ export default async function RoutingPage() {
         if (w.company_id) workerCountMap[w.company_id] = (workerCountMap[w.company_id] ?? 0) + 1
     })
 
-    // ── Build company locations ────────────────────────────────────
-    const companyLocations: RawLocation[] = (companies || []).map(c => ({
+    // ── Build company locations: 受入中 (has active workers) only ────
+    const companyLocations: RawLocation[] = (companies || []).filter(c => (workerCountMap[c.id] ?? 0) > 0).map(c => ({
         id: c.id,
         name: c.name_jp ?? '名前なし',
         type: 'company' as const,
@@ -70,7 +70,7 @@ export default async function RoutingPage() {
             longitude: w.longitude ?? null,
             companyId: w.company_id ?? '',
             companyName: companyMap[w.company_id ?? ''] ?? '企業不明',
-            badge: w.status === 'standby' ? '対応中' : w.status === 'waiting' ? '未入国' : '就業中',
+            badge: w.status === 'standby' ? '対応中' : '就業中',
             daysUntilExpiry: days,
         }
     })

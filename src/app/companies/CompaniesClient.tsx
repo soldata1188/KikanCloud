@@ -21,7 +21,6 @@ export function CompaniesClient({ companies: initialCompanies, userRole }: Compa
 
     // Filter states
     const [searchTerm, setSearchTerm] = useState('');
-    const [activeTab, setActiveTab] = useState<'all' | 'active' | 'inactive'>('active');
 
     // Selection states
     const [selectedIndustry, setSelectedIndustry] = useState<string | null>(null);
@@ -29,11 +28,12 @@ export function CompaniesClient({ companies: initialCompanies, userRole }: Compa
 
     // Mobile view state
     const [mobileView, setMobileView] = useState<'industry' | 'list' | 'detail' | 'docs'>('list');
+    const [mobileTab, setMobileTab] = useState(1); // 0=業種 1=企業 2=詳細 3=書類
     const [isBulkImportModalOpen, setIsBulkImportModalOpen] = useState(false);
 
     // Column widths (resizable)
     const [industryWidth, setIndustryWidth] = useState(150);
-    const [listWidth, setListWidth] = useState(420);
+    const [listWidth, setListWidth] = useState(320);
     const [detailWidth, setDetailWidth] = useState(440);
     const [workerListWidth, setWorkerListWidth] = useState(400);
     const isResizing = useRef(false);
@@ -108,13 +108,6 @@ export function CompaniesClient({ companies: initialCompanies, userRole }: Compa
             result = result.filter(c => (c.industry || '未分類') === selectedIndustry);
         }
 
-        // Tab filter
-        if (activeTab === 'active') {
-            result = result.filter(c => c.active_worker_count > 0);
-        } else if (activeTab === 'inactive') {
-            result = result.filter(c => c.active_worker_count === 0);
-        }
-
         const cleanName = (name: string) => {
             return name.replace(/株式会社|有限会社|合同会社|（株）|\(株\)|（有）|\(有\)|（同）|\(同\)/g, '').trim();
         };
@@ -124,7 +117,7 @@ export function CompaniesClient({ companies: initialCompanies, userRole }: Compa
             const nameB = cleanName(b.name_jp || '');
             return nameA.localeCompare(nameB, 'ja');
         });
-    }, [mappedCompanies, searchTerm, selectedIndustry, activeTab]);
+    }, [mappedCompanies, searchTerm, selectedIndustry]);
 
     // Auto-select first company when list changes
     useEffect(() => {
@@ -136,7 +129,7 @@ export function CompaniesClient({ companies: initialCompanies, userRole }: Compa
             setSelectedCompanyId(null);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [filteredCompanies.length, selectedIndustry, activeTab, searchTerm]);
+    }, [filteredCompanies.length, selectedIndustry, searchTerm]);
 
     const selectedCompany = useMemo(() => {
         return mappedCompanies.find(c => c.id === selectedCompanyId) || null;
@@ -171,6 +164,7 @@ export function CompaniesClient({ companies: initialCompanies, userRole }: Compa
     const handleSelectCompany = (id: string, event?: React.MouseEvent) => {
         setSelectedCompanyId(id);
         if (mobileView === 'list') setMobileView('detail');
+        setMobileTab(2); // auto-switch to 詳細 tab on mobile
     };
 
     const handleBack = () => {
@@ -271,23 +265,7 @@ export function CompaniesClient({ companies: initialCompanies, userRole }: Compa
                                 <Building2 size={18} className="text-emerald-400" />
                                 <span className="text-sm font-bold uppercase tracking-widest text-emerald-700">企業リスト</span>
                             </div>
-                            <div className="flex items-center gap-1 flex-1">
-                                {([
-                                    { key: 'active', label: '受入中', count: mappedCompanies.filter(c => c.active_worker_count > 0).length },
-                                    { key: 'inactive', label: '未受入', count: mappedCompanies.filter(c => c.active_worker_count === 0).length },
-                                    { key: 'all', label: 'すべて', count: mappedCompanies.length },
-                                ] as const).map(({ key, label, count }) => (
-                                    <button key={key} onClick={() => setActiveTab(key)}
-                                        className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-tight transition-all
-                                        ${activeTab === key ? 'bg-[#0067b8] text-white shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>
-                                        {label}
-                                        <span className={`text-[9px] rounded-full px-1 py-0.5 leading-none font-normal
-                                            ${activeTab === key ? 'bg-white/25 text-white' : 'bg-gray-100 text-gray-500'}`}>
-                                            {count}
-                                        </span>
-                                    </button>
-                                ))}
-                            </div>
+                            <div className="flex-1" />
                             <span className="text-xs font-bold bg-gray-50 px-1.5 py-0.5 rounded-lg text-slate-600 border border-gray-200 shadow-sm shrink-0">
                                 {filteredCompanies.length}
                             </span>
@@ -423,82 +401,63 @@ export function CompaniesClient({ companies: initialCompanies, userRole }: Compa
                     </div>
                 </div>
 
-                {/* ── MOBILE LAYOUT (Drill-down) ── */}
-                <div className="lg:hidden flex-1 flex flex-col bg-gray-100 pb-20 overflow-hidden">
-                    {/* Headers Mobile */}
-                    <div className="bg-white border-b border-gray-100 px-4 py-3 flex items-center gap-3 sticky top-0 z-20">
-                        {mobileView !== 'industry' && (
-                            <button
-                                onClick={handleBack}
-                                className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-50 text-gray-600"
-                            >
-                                <ArrowLeft size={16} />
-                            </button>
-                        )}
-                        <h1 className="text-base font-bold tracking-tight uppercase">
-                            {mobileView === 'industry' ? '業種別リスト' : mobileView === 'list' ? (selectedIndustry || 'すべて') : mobileView === 'detail' ? '企業詳細' : '書類管理'}
-                        </h1>
-                        {mobileView === 'industry' && (
-                            <button onClick={handleRefresh} className="ml-auto p-2 text-gray-400">
-                                <RefreshCw size={16} className={isRefreshing ? 'animate-spin' : ''} />
-                            </button>
-                        )}
-                        {mobileView === 'detail' && (
-                            <button
-                                onClick={() => setMobileView('docs')}
-                                className="ml-auto px-3 py-1.5 text-xs font-bold bg-blue-50 text-blue-600 rounded flex items-center gap-1.5"
-                            >
-                                書類 <FileText size={14} />
-                            </button>
-                        )}
+                {/* ── MOBILE LAYOUT (Tab Navigation) ── */}
+                <div className="lg:hidden flex-1 flex flex-col overflow-hidden bg-white">
+                    {/* Mobile Tab Bar */}
+                    <div className="flex border-b border-[var(--color-border)] bg-white flex-shrink-0">
+                        {['業種', '企業', '詳細', '書類'].map((tab, i) => (
+                            <button key={i}
+                                className={`flex-1 py-2.5 text-xs font-medium transition-colors
+                                    ${mobileTab === i
+                                        ? 'text-[var(--brand-primary)] border-b-2 border-[var(--brand-primary)]'
+                                        : 'text-[var(--color-text-muted)]'}`}
+                                onClick={() => setMobileTab(i)}
+                            >{tab}</button>
+                        ))}
                     </div>
-
                     <div className="flex-1 overflow-hidden relative">
-                        {mobileView === 'industry' && (
+                        {mobileTab === 0 && (
                             <div className="absolute inset-0 bg-white overflow-y-auto">
                                 <IndustryColumn
                                     industries={industries}
                                     selectedIndustry={selectedIndustry}
-                                    onSelect={handleSelectIndustry}
+                                    onSelect={(ind) => { handleSelectIndustry(ind); setMobileTab(1); }}
                                 />
                             </div>
                         )}
-                        {(mobileView === 'list' || (mobileView === 'industry' && selectedIndustry)) && (
-                            <div className="absolute inset-0 bg-white flex flex-col">
-                                <div className="px-3 py-2 border-b border-gray-100 bg-white flex items-center gap-1 flex-shrink-0">
-                                    {([
-                                        { key: 'active', label: '受入中', count: mappedCompanies.filter(c => c.active_worker_count > 0).length },
-                                        { key: 'inactive', label: '未受入', count: mappedCompanies.filter(c => c.active_worker_count === 0).length },
-                                        { key: 'all', label: 'すべて', count: mappedCompanies.length },
-                                    ] as const).map(({ key, label, count }) => (
-                                        <button key={key} onClick={() => setActiveTab(key)}
-                                            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-bold transition-all
-                                            ${activeTab === key ? 'bg-[#0067b8] text-white' : 'text-gray-400 hover:text-gray-600'}`}>
-                                            {label}
-                                            <span className={`text-[10px] rounded-full px-1 py-0.5 leading-none font-normal
-                                                ${activeTab === key ? 'bg-white/25 text-white' : 'bg-gray-100 text-gray-500'}`}>
-                                                {count}
-                                            </span>
-                                        </button>
-                                    ))}
-                                </div>
-                                <div className="flex-1 overflow-hidden">
-                                    <CompanyListColumn
-                                        companies={filteredCompanies}
-                                        selectedIds={selectedCompanyId ? [selectedCompanyId as string] : []}
-                                        onSelect={handleSelectCompany}
-                                    />
-                                </div>
+                        {mobileTab === 1 && (
+                            <div className="absolute inset-0 bg-white">
+                                <CompanyListColumn
+                                    companies={filteredCompanies}
+                                    selectedIds={selectedCompanyId ? [selectedCompanyId as string] : []}
+                                    onSelect={handleSelectCompany}
+                                />
                             </div>
                         )}
-                        {mobileView === 'detail' && selectedCompany && (
+                        {mobileTab === 2 && (
                             <div className="absolute inset-0 bg-white flex flex-col overflow-y-auto">
-                                <CompanyDetailColumn companies={[selectedCompany]} />
+                                {selectedCompany ? (
+                                    <CompanyDetailColumn companies={[selectedCompany]} />
+                                ) : (
+                                    <div className="flex flex-col items-center justify-center h-full gap-2 p-8"
+                                        style={{ color: 'var(--color-text-muted)' }}>
+                                        <Building2 size={32} opacity={0.3} />
+                                        <span className="text-sm">企業を選択してください</span>
+                                    </div>
+                                )}
                             </div>
                         )}
-                        {mobileView === 'docs' && selectedCompanyId && (
+                        {mobileTab === 3 && (
                             <div className="absolute inset-0 bg-white flex flex-col overflow-y-auto">
-                                <CompanyDocumentsColumn companyId={selectedCompanyId} />
+                                {selectedCompanyId ? (
+                                    <CompanyDocumentsColumn companyId={selectedCompanyId} />
+                                ) : (
+                                    <div className="flex flex-col items-center justify-center h-full gap-2 p-8"
+                                        style={{ color: 'var(--color-text-muted)' }}>
+                                        <FileText size={32} opacity={0.3} />
+                                        <span className="text-sm">企業を選択してください</span>
+                                    </div>
+                                )}
                             </div>
                         )}
                     </div>

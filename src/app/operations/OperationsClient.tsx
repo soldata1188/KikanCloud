@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useMemo, useRef, useCallback } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { RefreshCw, ArrowLeft, Search, Building2, Users2, Settings2, Calendar } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import CompanyColumn from './CompanyColumn';
@@ -33,6 +33,7 @@ export default function OperationsClient({
     const [lastSelectedId, setLastSelectedId] = useState<string | null>(null);
     const [viewState, setViewState] = useState<'batches' | 'companies' | 'workers' | 'operations'>('batches');
     const [isRefreshing, setIsRefreshing] = useState(false);
+    const [mobileTab, setMobileTab] = useState(0); // 0=企業 1=労働者 2=業務
 
     // Global Filters
     const [searchTerm, setSearchTerm] = useState('');
@@ -43,36 +44,6 @@ export default function OperationsClient({
 
     // Debounce timer refs for DB writes
     const dbWriteTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
-
-    // Column widths (resizable)
-    const [companyWidth, setCompanyWidth] = useState(280);
-    const [workerWidth, setWorkerWidth] = useState(520);
-    const isResizing = useRef(false);
-
-    const startResize = useCallback((col: 'company' | 'worker', startX: number) => {
-        isResizing.current = true;
-        const startWidth = col === 'company' ? companyWidth : workerWidth;
-        const setter = col === 'company' ? setCompanyWidth : setWorkerWidth;
-        const min = col === 'company' ? 180 : 200;
-        const max = col === 'company' ? 500 : 700;
-
-        const onMouseMove = (e: MouseEvent) => {
-            if (!isResizing.current) return;
-            const delta = e.clientX - startX;
-            setter(Math.min(max, Math.max(min, startWidth + delta)));
-        };
-        const onMouseUp = () => {
-            isResizing.current = false;
-            window.removeEventListener('mousemove', onMouseMove);
-            window.removeEventListener('mouseup', onMouseUp);
-            document.body.style.cursor = '';
-            document.body.style.userSelect = '';
-        };
-        document.body.style.cursor = 'col-resize';
-        document.body.style.userSelect = 'none';
-        window.addEventListener('mousemove', onMouseMove);
-        window.addEventListener('mouseup', onMouseUp);
-    }, [companyWidth, workerWidth]);
 
     // --- Derived Data ---
     // --- Derived Data (Workers) ---
@@ -435,9 +406,6 @@ export default function OperationsClient({
             {/* 1. Unified Global Header */}
             <header className="h-[44px] bg-white border-b border-gray-200 flex items-center justify-between px-4 z-40 shrink-0">
                 <div className="flex items-center gap-4 flex-1">
-                    <h2 className="text-base font-bold tracking-tight text-gray-950 border-r border-gray-300 pr-4 shrink-0">
-                        業務<span className="text-blue-700 font-bold">管理</span>
-                    </h2>
 
                     {/* Global Search */}
                     <div className="relative w-[180px] group">
@@ -503,8 +471,8 @@ export default function OperationsClient({
             {/* Desktop: Seamless Unified Block Layout */}
             <div className="hidden lg:flex flex-1 items-stretch overflow-x-auto thin-scrollbar border-t border-gray-200 bg-white">
 
-                    {/* Column -1: Entry Batches (Fixed 180px) */}
-                    <div className="w-[180px] flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-200">
+                    {/* Column -1: Entry Batches */}
+                    <div className="w-[160px] flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-200">
                         <div className="h-[44px] px-3 border-b border-gray-200 bg-white flex items-center gap-2 shrink-0">
                             <div className="flex items-center gap-2 shrink-0">
                                 <Calendar size={18} className="text-gray-400" />
@@ -528,22 +496,8 @@ export default function OperationsClient({
                         </div>
                     </div>
 
-                    {/* Resize Handle: Batch | Company */}
-                    <div
-                        className="relative self-stretch flex-shrink-0 w-[1px] bg-gray-200 group/resize hover:bg-blue-300 transition-colors cursor-col-resize z-10"
-                        onMouseDown={(e) => startResize('company', e.clientX)}
-                    >
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover/resize:opacity-100 transition-opacity pointer-events-none">
-                            <div className="flex flex-col gap-[3px] py-2 px-1">
-                                {[...Array(5)].map((_, i) => (
-                                    <div key={i} className="w-[3px] h-[3px] rounded-full bg-blue-400" />
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-
                     {/* Column 0: Companies */}
-                    <div className="flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-200" style={{ width: companyWidth }}>
+                    <div className="w-[320px] flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-200">
                         <div className="h-[44px] px-3 border-b border-gray-200 bg-white flex items-center gap-2 shrink-0">
                             <div className="flex items-center gap-2 shrink-0">
                                 <Building2 size={18} className="text-blue-400" />
@@ -569,22 +523,8 @@ export default function OperationsClient({
                         </div>
                     </div>
 
-                    {/* Resize Handle: Company | Worker */}
-                    <div
-                        className="relative flex-shrink-0 w-[1px] bg-gray-200 group/resize hover:bg-blue-300 transition-colors cursor-col-resize z-10"
-                        onMouseDown={(e) => startResize('company', e.clientX)}
-                    >
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover/resize:opacity-100 transition-opacity">
-                            <div className="flex flex-col gap-[3px] py-2 px-1">
-                                {[...Array(5)].map((_, i) => (
-                                    <div key={i} className="w-[3px] h-[3px] rounded-full bg-blue-400" />
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-
                     {/* Column 1: Workers */}
-                    <div className="flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-200" style={{ width: workerWidth }}>
+                    <div className="w-[460px] flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-200">
                         <div className="h-[44px] px-3 border-b border-gray-200 bg-white flex items-center gap-3 shrink-0">
                             <div className="flex items-center gap-2 text-slate-900 shrink-0">
                                 <Users2 size={18} className="text-slate-400" />
@@ -621,21 +561,7 @@ export default function OperationsClient({
                         </div>
                     </div>
 
-                    {/* Resize Handle: Worker | Operations */}
-                    <div
-                        className="relative flex-shrink-0 w-[1px] bg-gray-200 group/resize hover:bg-blue-300 transition-colors cursor-col-resize"
-                        onMouseDown={(e) => startResize('worker', e.clientX)}
-                    >
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover/resize:opacity-100 transition-opacity">
-                            <div className="flex flex-col gap-[3px] py-2 px-1">
-                                {[...Array(5)].map((_, i) => (
-                                    <div key={i} className="w-[3px] h-[3px] rounded-full bg-blue-400" />
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="flex-1 flex flex-col overflow-hidden min-w-[400px]">
+                    <div className="flex-1 flex flex-col overflow-hidden min-w-[380px]">
                         <div className="h-[44px] px-4 border-b border-gray-200 bg-white flex items-center justify-between shrink-0">
                             <div className="flex items-center gap-2 text-slate-900">
                                 <Settings2 size={18} className="text-slate-400" />
@@ -657,110 +583,40 @@ export default function OperationsClient({
 
             </div>
 
-            {/* Mobile: Drill-down */}
+            {/* Mobile: Tab Navigation */}
             <div className="flex lg:hidden flex-1 flex-col overflow-hidden bg-white">
-                <div className="bg-white border-b border-gray-100 px-4 py-3 flex items-center justify-between sticky top-0 z-20">
-                    <div className="flex items-center gap-3">
-                        {viewState !== 'batches' && (
-                            <button
-                                onClick={() => {
-                                    if (viewState === 'operations') setViewState('workers');
-                                    else if (viewState === 'workers') setViewState('companies');
-                                    else if (viewState === 'companies') setViewState('batches');
-                                }}
-                                className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-50 text-gray-600 active:bg-gray-100"
-                            >
-                                <ArrowLeft size={18} />
-                            </button>
-                        )}
-                        <h1 className="text-base font-bold tracking-tight uppercase">
-                            {viewState === 'batches' ? '入国期生' : viewState === 'companies' ? '企業選択' : viewState === 'workers' ? '労働者選択' : '業務内容'}
-                        </h1>
-                    </div>
-                    <button
-                        onClick={handleRefresh}
-                        className={`p-2 text-gray-400 hover:text-blue-600 transition-all ${isRefreshing ? 'animate-spin text-blue-600' : ''}`}
-                    >
-                        <RefreshCw size={18} />
-                    </button>
+                {/* Mobile Tab Bar */}
+                <div className="flex border-b border-[var(--color-border)] bg-white flex-shrink-0">
+                    {['企業', '労働者', '業務'].map((tab, i) => (
+                        <button key={i}
+                            className={`flex-1 py-2.5 text-xs font-medium transition-colors
+                                ${mobileTab === i
+                                    ? 'text-[var(--brand-primary)] border-b-2 border-[var(--brand-primary)]'
+                                    : 'text-[var(--color-text-muted)]'}`}
+                            onClick={() => setMobileTab(i)}
+                        >{tab}</button>
+                    ))}
                 </div>
-
                 <div className="flex-1 overflow-hidden relative">
-                    {viewState === 'batches' && (
-                        <div className="absolute inset-0">
-                            <EntryBatchColumn
-                                batches={batchItems}
-                                selectedBatch={selectedBatch}
-                                onSelect={handleSelectBatch}
-                            />
-                        </div>
-                    )}
-                    {viewState === 'companies' && (
+                    {mobileTab === 0 && (
                         <div className="absolute inset-0">
                             <CompanyColumn
                                 companies={filteredCompanies}
                                 selectedId={selectedCompanyId}
-                                onSelect={handleSelectCompany}
+                                onSelect={(id) => { handleSelectCompany(id); setMobileTab(1); }}
                             />
                         </div>
                     )}
-                    {viewState === 'workers' && (
-                        <div className="absolute inset-0 flex flex-col">
-                            <div className="px-4 py-2 bg-gray-50 border-b border-gray-100 flex items-center gap-1 shrink-0">
-                                {[
-                                    { id: 'all', label: 'すべて' },
-                                    { id: 'working', label: '就業中' },
-                                    { id: 'standby', label: '対応中' },
-                                    { id: 'waiting', label: '未入国' },
-                                ].map((tab) => (
-                                    <button
-                                        key={tab.id}
-                                        onClick={() => setWorkerStatusFilter(tab.id)}
-                                        className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all
-                                            ${workerStatusFilter === tab.id
-                                                ? 'bg-blue-600 text-white shadow-sm'
-                                                : 'bg-white text-gray-500 border border-gray-100'}`}
-                                    >
-                                        {tab.label}
-                                    </button>
-                                ))}
-                            </div>
-                            <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                                {filteredWorkers.map(w => (
-                                    <OperationListItem
-                                        key={w.id}
-                                        worker={{
-                                            id: w.id,
-                                            full_name_romaji: w.name,
-                                            full_name_kana: w.furigana,
-                                            company_name: w.company,
-                                            visa_status: w.systemType === 'ginou_jisshu' ? '技能実習' : w.systemType === 'ikusei_shuro' ? '育成就労' : '特定技能',
-                                            zairyu_exp: w.visaExpiry,
-                                            entry_date: w.entryDate,
-                                            address: w.address,
-                                            kikou_status: {
-                                                progress: w.kikou_status?.progress || '未着手',
-                                                type: w.kikou_status?.type || '---',
-                                                application_date: w.kikou_status?.application_date || '---',
-                                                assignee: w.kikou_status?.assignee || '---'
-                                            },
-                                            nyukan_status: {
-                                                progress: w.nyukan_status?.progress || '未着手',
-                                                application_date: w.nyukan_status?.application_date || '---',
-                                                receipt_number: w.nyukan_status?.receipt_number || '---'
-                                            },
-                                            remarks: w.remarks
-                                        }}
-                                        onEditMemo={(id) => {
-                                            setSelectedWorkerIds([id]);
-                                            setViewState('operations');
-                                        }}
-                                    />
-                                ))}
-                            </div>
+                    {mobileTab === 1 && (
+                        <div className="absolute inset-0">
+                            <WorkerColumn
+                                workers={filteredWorkers}
+                                selectedIds={selectedWorkerIds}
+                                onSelect={(id, e) => { handleSelectWorker(id, e); setMobileTab(2); }}
+                            />
                         </div>
                     )}
-                    {viewState === 'operations' && (
+                    {mobileTab === 2 && (
                         <div className="absolute inset-0">
                             <OperationColumn
                                 workers={selectedWorkers}

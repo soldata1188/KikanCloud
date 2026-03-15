@@ -51,8 +51,8 @@ function PdfSettingsModal({ filterMonth, matrixData, onClose }: { filterMonth: s
         onClose();
     };
     return (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[200] flex items-center justify-center p-4">
-            <div className="bg-white rounded-xl w-full max-w-md overflow-hidden border border-gray-200 flex flex-col">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[200] flex items-end md:items-center justify-center p-0 md:p-4">
+            <div className="bg-white rounded-t-2xl md:rounded-xl w-full md:max-w-md max-h-[90vh] overflow-y-auto border border-gray-200 flex flex-col">
                 <div className="flex items-center justify-between px-6 py-5 bg-gray-50/50 border-b border-gray-100">
                     <div className="flex items-center gap-3">
                         <FileDown size={20} className="text-blue-600" />
@@ -109,8 +109,8 @@ function AddScheduleModal({ companies, defaultPicName, defaultCompanyId, default
         });
     };
     return (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[200] flex items-center justify-center p-4">
-            <div className="bg-white rounded-xl w-full max-w-lg overflow-hidden border border-gray-200">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[200] flex items-end md:items-center justify-center p-0 md:p-4">
+            <div className="bg-white rounded-t-2xl md:rounded-xl w-full md:max-w-lg max-h-[90vh] overflow-y-auto border border-gray-200">
                 <div className="flex items-center justify-between px-6 py-5 bg-gray-50 border-b border-gray-100">
                     <div className="flex items-center gap-3">
                         <CalendarPlus size={20} className="text-blue-600" />

@@ -6,6 +6,8 @@ import { TopNav } from '@/components/TopNav'
 
 import { CompaniesClient } from './CompaniesClient'
 
+export const metadata = { title: '受入企業管理' }
+
 export const dynamic = 'force-dynamic';
 
 export default async function CompaniesPage() {

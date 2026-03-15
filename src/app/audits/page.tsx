@@ -5,6 +5,8 @@ import { TopNav } from '@/components/TopNav'
 import { AuditsClient } from './AuditsClient'
 import { redirect } from 'next/navigation'
 
+export const metadata = { title: '監査・訪問' }
+
 export const dynamic = 'force-dynamic';
 
 export default async function AuditsPage({ searchParams }: { searchParams: Promise<{ [key: string]: string | undefined }> }) {

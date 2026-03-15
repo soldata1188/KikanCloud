@@ -30,8 +30,20 @@ export function TopNav({ title, role }: { title?: string; role?: string }) {
                 style={{ height: 'var(--header-height)', background: 'var(--brand-primary)' }}
             >
                 <div className="flex items-center justify-between w-full min-w-0 gap-4 h-full">
+            {/* ── Hamburger (mobile only) ───────────────────────────────── */}
+            <button
+                className="md:hidden p-2 -ml-1 ml-2 rounded-lg hover:bg-white/15 text-white transition-colors shrink-0"
+                onClick={() => window.dispatchEvent(new CustomEvent('toggle-sidebar'))}
+                aria-label="メニューを開く"
+            >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <line x1="3" y1="6" x2="21" y2="6"/>
+                    <line x1="3" y1="12" x2="21" y2="12"/>
+                    <line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
             {/* ── Logo sát lề trái ─────────────────────────────────────── */}
-            <Link href="/" className="flex flex-col leading-none shrink-0 select-none pl-4 md:pl-5">
+            <Link href="/" className="flex flex-col leading-none shrink-0 select-none pl-0 md:pl-5">
                 <span className="text-lg font-bold text-white tracking-tight" style={{ fontFamily: 'var(--font-en)' }}>
                     KikanCloud
                 </span>
@@ -42,12 +54,12 @@ export function TopNav({ title, role }: { title?: string; role?: string }) {
 
             {/* ── Phải: Hộp tìm kiếm sát nút AI概要 + Avatar ───────────────── */}
             <div className="flex-1 flex items-center justify-end gap-2 min-w-0 pr-3 md:pr-4">
-                <div className="w-full max-w-[260px]">
+                <div className="hidden md:flex w-full max-w-[260px]">
                     <GlobalSearch variant="dark" />
                 </div>
                 <Link
                     href="/chat"
-                    className="hidden sm:inline-flex items-center gap-2 h-9 pl-3 pr-4 rounded-[32px] bg-white/20 hover:bg-white/30 text-white text-[13px] font-medium transition-colors"
+                    className="hidden sm:inline-flex items-center gap-2 h-9 pl-3 pr-4 rounded-full bg-white/20 hover:bg-white/30 text-white text-[13px] font-medium transition-colors"
                 >
                     <BrainCircuit size={16} className="text-white shrink-0" />
                     AI概要

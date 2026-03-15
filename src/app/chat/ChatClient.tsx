@@ -1,6 +1,7 @@
 'use client'
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { Sparkles, ArrowUp, User, MessageSquare, Trash2, Search, Plus } from 'lucide-react'
+import { Sparkles, ArrowUp, User, MessageSquare, Trash2, Search, Plus, History, X } from 'lucide-react'
+import { useMediaQuery } from '@/hooks/useMediaQuery'
 
 type Message = {
     id: string
@@ -54,21 +55,21 @@ type DataCardData = { title: string; rows: DataCardRow[] }
 const BADGE_CLASSES: Record<string, string> = {
     red:   'bg-red-100 text-red-600',
     amber: 'bg-amber-100 text-amber-600',
-    blue:  'bg-[#e6f1fb] text-[#0067b8]',
+    blue:  'bg-[var(--brand-primary-light)] text-[var(--brand-primary)]',
     green: 'bg-green-100 text-green-600',
 }
 
 function DataCard({ data }: { data: DataCardData }) {
     return (
-        <div className="bg-[#f8fafc] border border-[#e2e8f0] rounded-[8px] px-3 py-[10px] mt-[10px]">
-            <div className="text-[10px] font-semibold text-[#94a3b8] uppercase tracking-[.3px] mb-2">{data.title}</div>
+        <div className="bg-[var(--input-bg)] border border-[var(--color-border)] rounded-[var(--radius-md)] px-3 py-[10px] mt-[10px]">
+            <div className="text-[10px] font-semibold text-[var(--color-text-muted)] uppercase tracking-[.3px] mb-2">{data.title}</div>
             {data.rows.map((row, i) => (
-                <div key={i} className={`flex items-center justify-between py-[5px] text-[12px] text-[#0f172a] ${i < data.rows.length - 1 ? 'border-b border-[#f1f5f9]' : ''}`}>
+                <div key={i} className={`flex items-center justify-between py-[5px] text-[12px] text-[var(--color-text-primary)] ${i < data.rows.length - 1 ? 'border-b border-[var(--color-border-subtle)]' : ''}`}>
                     <div className="flex flex-col">
                         <span>{row.name}</span>
-                        {row.sub && <span className="text-[10px] text-[#94a3b8] mt-[1px]">{row.sub}</span>}
+                        {row.sub && <span className="text-[10px] text-[var(--color-text-muted)] mt-[1px]">{row.sub}</span>}
                     </div>
-                    <span className={`text-[10px] px-2 py-[2px] rounded-[10px] font-semibold whitespace-nowrap ml-3 ${BADGE_CLASSES[row.urgency] ?? BADGE_CLASSES.blue}`}>
+                    <span className={`text-[10px] px-2 py-[2px] rounded-[var(--radius-pill)] font-semibold whitespace-nowrap ml-3 ${BADGE_CLASSES[row.urgency] ?? BADGE_CLASSES.blue}`}>
                         {row.badge}
                     </span>
                 </div>
@@ -113,10 +114,10 @@ function renderMessageContent(content: string) {
 
 const TypingIndicator = () => (
     <div className="flex items-start gap-[10px]">
-        <div className="w-[34px] h-[34px] rounded-[10px] bg-gradient-to-br from-[#0067b8] to-[#004a8c] flex items-center justify-center shrink-0 shadow-[0_2px_6px_rgba(0,103,184,.25)]">
+        <div className="w-[34px] h-[34px] rounded-[var(--radius-lg)] bg-gradient-to-br from-[var(--brand-primary)] to-[var(--brand-primary-dark)] flex items-center justify-center shrink-0 shadow-[0_2px_6px_rgba(0,103,184,.25)]">
             <Sparkles size={14} className="text-white" />
         </div>
-        <div className="bg-white border border-gray-200 px-4 py-3 flex items-center gap-1 shadow-[0_1px_3px_rgba(0,0,0,.08)]"
+        <div className="bg-white border border-[var(--color-border)] px-4 py-3 flex items-center gap-1 shadow-[var(--shadow-sm)]"
             style={{ borderRadius: '2px 12px 12px 12px' }}>
             <div className="w-[6px] h-[6px] bg-gray-400 rounded-full" style={{ animation: 'bounce .9s infinite' }}></div>
             <div className="w-[6px] h-[6px] bg-gray-400 rounded-full" style={{ animation: 'bounce .9s .15s infinite' }}></div>
@@ -138,6 +139,8 @@ export default function ChatClient({ workerCount, companyCount }: ChatClientProp
     const [sessions, setSessions] = useState<ChatSession[]>([])
     const [currentSessionId, setCurrentSessionId] = useState<string | null>(null)
     const [isClient, setIsClient] = useState(false)
+    const [showHistory, setShowHistory] = useState(false)
+    const isMobile = useMediaQuery('(max-width: 768px)')
 
     const messagesEndRef = useRef<HTMLDivElement>(null)
 
@@ -311,33 +314,52 @@ export default function ChatClient({ workerCount, companyCount }: ChatClientProp
 
     return (
         <main className="flex-1 flex overflow-hidden">
+            {/* Mobile backdrop */}
+            {isMobile && showHistory && (
+                <div className="fixed inset-0 bg-black/40 z-[199]" onClick={() => setShowHistory(false)} />
+            )}
+
             {/* ── Chat History Panel (260px) ── */}
-            <div className="w-[260px] bg-white border-r border-[#e2e8f0] flex flex-col shrink-0">
+            <div className={`bg-white border-r border-[var(--color-border)] flex flex-col shrink-0 ${
+                isMobile
+                    ? `fixed left-0 top-0 bottom-0 w-[280px] z-[200] transition-transform duration-300 ${showHistory ? 'translate-x-0' : '-translate-x-full'}`
+                    : 'w-[260px]'
+            }`}>
 
                 {/* Panel Header */}
-                <div className="px-[14px] py-3 border-b border-[#e2e8f0] flex items-center justify-between shrink-0">
-                    <div className="flex items-center gap-[6px] text-[13px] font-semibold text-[#0f172a]">
+                <div className="px-[14px] py-3 border-b border-[var(--color-border)] flex items-center justify-between shrink-0">
+                    <div className="flex items-center gap-[6px] text-[13px] font-semibold text-[var(--color-text-primary)]">
                         <MessageSquare size={14} strokeWidth={2} />
                         チャット履歴
                     </div>
-                    <button
-                        onClick={createNewSession}
-                        title="新しいチャット"
-                        className="w-[28px] h-[28px] rounded-[8px] bg-[#0067b8] hover:bg-[#004a8c] flex items-center justify-center shrink-0 transition-all hover:scale-105"
-                    >
-                        <Plus size={14} strokeWidth={2.5} className="text-white" />
-                    </button>
+                    <div className="flex items-center gap-1">
+                        <button
+                            onClick={createNewSession}
+                            title="新しいチャット"
+                            className="w-[28px] h-[28px] rounded-[var(--radius-md)] bg-[var(--brand-primary)] hover:bg-[var(--brand-primary-dark)] flex items-center justify-center shrink-0 transition-all hover:scale-105"
+                        >
+                            <Plus size={14} strokeWidth={2.5} className="text-white" />
+                        </button>
+                        {isMobile && (
+                            <button
+                                onClick={() => setShowHistory(false)}
+                                className="w-[28px] h-[28px] rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white flex items-center justify-center shrink-0"
+                            >
+                                <X size={14} className="text-[var(--color-text-muted)]" />
+                            </button>
+                        )}
+                    </div>
                 </div>
 
                 {/* Quick Prompts */}
-                <div className="px-3 py-[10px] border-b border-[#e2e8f0] shrink-0">
-                    <div className="text-[10px] font-semibold text-[#94a3b8] tracking-[.4px] mb-[6px]">よく使う質問</div>
+                <div className="px-3 py-[10px] border-b border-[var(--color-border)] shrink-0">
+                    <div className="text-[10px] font-semibold text-[var(--color-text-muted)] tracking-[.4px] mb-[6px]">よく使う質問</div>
                     <div className="flex flex-col gap-1">
                         {QUICK_PROMPTS.map(p => (
                             <button
                                 key={p}
                                 onClick={() => handleSend(p)}
-                                className="px-[10px] py-[6px] rounded-[8px] bg-[#f8fafc] border border-[#e2e8f0] text-[11px] text-[#475569] text-left leading-[1.4] transition-all hover:bg-[#e6f1fb] hover:border-[#0067b8] hover:text-[#0067b8]"
+                                className="px-[10px] py-[6px] rounded-[var(--radius-md)] bg-[var(--input-bg)] border border-[var(--color-border)] text-[11px] text-[var(--color-text-secondary)] text-left leading-[1.4] transition-all hover:bg-[var(--brand-primary-light)] hover:border-[var(--brand-primary)] hover:text-[var(--brand-primary)]"
                             >
                                 {p}
                             </button>
@@ -346,15 +368,15 @@ export default function ChatClient({ workerCount, companyCount }: ChatClientProp
                 </div>
 
                 {/* Search */}
-                <div className="px-3 py-2 border-b border-[#e2e8f0] shrink-0">
+                <div className="px-3 py-2 border-b border-[var(--color-border)] shrink-0">
                     <div className="relative">
-                        <Search size={12} className="absolute left-[9px] top-[10px] text-[#94a3b8]" />
+                        <Search size={12} className="absolute left-[9px] top-[10px] text-[var(--color-text-muted)]" />
                         <input
                             type="text"
                             placeholder="チャットを検索..."
                             value={searchQuery}
                             onChange={e => setSearchQuery(e.target.value)}
-                            className="w-full h-[32px] border border-[#e2e8f0] rounded-[8px] pl-[30px] pr-[10px] text-[12px] text-[#0f172a] bg-[#f8fafc] outline-none focus:border-[#0067b8] focus:bg-white transition-all"
+                            className="w-full h-[32px] border border-[var(--color-border)] rounded-[var(--radius-md)] pl-[30px] pr-[10px] text-[12px] text-[var(--color-text-primary)] bg-[var(--input-bg)] outline-none focus:border-[var(--brand-primary)] focus:bg-white transition-all"
                         />
                     </div>
                 </div>
@@ -362,11 +384,11 @@ export default function ChatClient({ workerCount, companyCount }: ChatClientProp
                 {/* History List */}
                 <div className="flex-1 overflow-y-auto px-2 py-2">
                     {groupedSessions.length === 0 && (
-                        <p className="text-center text-[11px] text-[#94a3b8] mt-6">履歴が見つかりません</p>
+                        <p className="text-center text-[11px] text-[var(--color-text-muted)] mt-6">履歴が見つかりません</p>
                     )}
                     {groupedSessions.map(group => (
                         <div key={group.label}>
-                            <div className="text-[10px] font-semibold text-[#94a3b8] px-[6px] py-2 tracking-[.3px]">
+                            <div className="text-[10px] font-semibold text-[var(--color-text-muted)] px-[6px] py-2 tracking-[.3px]">
                                 {group.label}
                             </div>
                             {group.sessions.map(session => {
@@ -376,26 +398,26 @@ export default function ChatClient({ workerCount, companyCount }: ChatClientProp
                                     <div
                                         key={session.id}
                                         onClick={() => setCurrentSessionId(session.id)}
-                                        className={`relative px-[10px] py-2 rounded-[8px] cursor-pointer transition-all mb-0.5 group ${isActive ? 'bg-[#e6f1fb]' : 'hover:bg-[#f8fafc]'}`}
+                                        className={`relative px-[10px] py-2 rounded-[var(--radius-md)] cursor-pointer transition-all mb-0.5 group ${isActive ? 'bg-[var(--brand-primary-light)]' : 'hover:bg-[var(--input-bg)]'}`}
                                     >
                                         <div className="flex items-center justify-between mb-0.5">
-                                            <span className={`text-[12px] font-medium truncate flex-1 ${isActive ? 'text-[#0067b8]' : 'text-[#0f172a]'}`}>
+                                            <span className={`text-[12px] font-medium truncate flex-1 ${isActive ? 'text-[var(--brand-primary)]' : 'text-[var(--color-text-primary)]'}`}>
                                                 {session.title}
                                             </span>
-                                            <span className="text-[9px] px-[6px] py-[1px] rounded-[8px] bg-[#e6f1fb] text-[#0067b8] font-semibold shrink-0 ml-1">
+                                            <span className="text-[9px] px-[6px] py-[1px] rounded-[var(--radius-md)] bg-[var(--brand-primary-light)] text-[var(--brand-primary)] font-semibold shrink-0 ml-1">
                                                 AI
                                             </span>
                                         </div>
-                                        <div className="text-[11px] text-[#94a3b8] truncate pr-4">
+                                        <div className="text-[11px] text-[var(--color-text-muted)] truncate pr-4">
                                             {lastMsg?.content.replace(/\n/g, ' ')}
                                         </div>
-                                        <div className="text-[10px] text-[#94a3b8] mt-0.5">
+                                        <div className="text-[10px] text-[var(--color-text-muted)] mt-0.5">
                                             {formatTime(session.updatedAt)}
                                         </div>
                                         {/* Delete button */}
                                         <button
                                             onClick={e => deleteSession(e, session.id)}
-                                            className="absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5 rounded-[4px] hidden group-hover:flex items-center justify-center text-[#94a3b8] hover:bg-red-100 hover:text-red-500 transition-all"
+                                            className="absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5 rounded-[4px] hidden group-hover:flex items-center justify-center text-[var(--color-text-muted)] hover:bg-red-100 hover:text-red-500 transition-all"
                                         >
                                             <Trash2 size={11} />
                                         </button>
@@ -407,34 +429,41 @@ export default function ChatClient({ workerCount, companyCount }: ChatClientProp
                 </div>
 
                 {/* Footer note */}
-                <div className="px-3 py-2 border-t border-[#e2e8f0] shrink-0">
-                    <p className="text-[10px] text-[#94a3b8] text-center">※ 履歴は30日間保存されます</p>
+                <div className="px-3 py-2 border-t border-[var(--color-border)] shrink-0">
+                    <p className="text-[10px] text-[var(--color-text-muted)] text-center">※ 履歴は30日間保存されます</p>
                 </div>
             </div>
 
             {/* ── Chat Main (flex-1) ── */}
             <div className="flex-1 flex flex-col bg-white relative overflow-hidden">
                 {/* Chat Header */}
-                <div className="h-[56px] bg-white border-b border-[#e2e8f0] px-5 flex items-center justify-between shrink-0 shadow-[0_1px_0_#e2e8f0]">
+                <div className="h-[44px] bg-white border-b border-[var(--color-border)] px-5 flex items-center justify-between shrink-0 shadow-[0_1px_0_var(--color-border)]">
                     <div className="flex items-center gap-3">
-                        <div className="w-[38px] h-[38px] rounded-[10px] bg-gradient-to-br from-[#0067b8] to-[#004a8c] flex items-center justify-center shrink-0 shadow-[0_2px_8px_rgba(0,103,184,.3)]">
+                        <div className="w-[38px] h-[38px] rounded-[var(--radius-lg)] bg-gradient-to-br from-[var(--brand-primary)] to-[var(--brand-primary-dark)] flex items-center justify-center shrink-0 shadow-[0_2px_8px_rgba(0,103,184,.3)]">
                             <Sparkles size={17} className="text-white" />
                         </div>
                         <div>
-                            <div className="text-[14px] font-semibold text-[#0f172a]">KikanCloud AI アシスタント</div>
-                            <div className="flex items-center gap-[5px] text-[11px] text-[#16a34a]">
-                                <span className="w-[6px] h-[6px] rounded-full bg-[#16a34a] shrink-0" style={{ animation: 'pulse 2s infinite' }} />
+                            <div className="text-[14px] font-semibold text-[var(--color-text-primary)]">KikanCloud AI アシスタント</div>
+                            <div className="flex items-center gap-[5px] text-[11px] text-[var(--color-success)]">
+                                <span className="w-[6px] h-[6px] rounded-full bg-[var(--color-success)] shrink-0" style={{ animation: 'pulse 2s infinite' }} />
                                 オンライン · Gemini 2.5 Flash
                             </div>
                         </div>
                     </div>
                     <div className="flex items-center gap-[6px]">
-                        <button className="h-[30px] px-[10px] rounded-[8px] border border-[#e2e8f0] bg-white text-[11px] text-[#475569] flex items-center gap-1 transition-all hover:border-[#0067b8] hover:text-[#0067b8] hover:bg-[#e6f1fb]">
+                        <button
+                            onClick={() => setShowHistory(true)}
+                            className="md:hidden h-[30px] px-[10px] rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white text-[11px] text-[var(--color-text-secondary)] flex items-center gap-1 transition-all hover:border-[var(--brand-primary)] hover:text-[var(--brand-primary)] hover:bg-[var(--brand-primary-light)]"
+                        >
+                            <History size={12} />
+                            履歴
+                        </button>
+                        <button className="hidden md:flex h-[30px] px-[10px] rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white text-[11px] text-[var(--color-text-secondary)] items-center gap-1 transition-all hover:border-[var(--brand-primary)] hover:text-[var(--brand-primary)] hover:bg-[var(--brand-primary-light)]">
                             エクスポート
                         </button>
                         <button
                             onClick={clearCurrentChat}
-                            className="h-[30px] px-[10px] rounded-[8px] border border-[#e2e8f0] bg-white text-[11px] text-[#475569] flex items-center gap-1 transition-all hover:border-red-400 hover:text-red-500 hover:bg-red-50"
+                            className="h-[30px] px-[10px] rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white text-[11px] text-[var(--color-text-secondary)] flex items-center gap-1 transition-all hover:border-red-400 hover:text-red-500 hover:bg-red-50"
                         >
                             <Trash2 size={11} />
                             クリア
@@ -443,14 +472,14 @@ export default function ChatClient({ workerCount, companyCount }: ChatClientProp
                 </div>
 
                 {/* Context Bar */}
-                <div className="bg-[#e6f1fb] border-b border-[#bfdbfe] px-5 py-[7px] flex items-center gap-2 shrink-0 flex-wrap">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#0067b8" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                    <span className="text-[11px] text-[#0067b8] font-medium whitespace-nowrap">AIコンテキスト：</span>
+                <div className="bg-[var(--brand-primary-light)] border-b border-[#bfdbfe] px-5 py-[7px] flex items-center gap-2 shrink-0 flex-wrap">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--brand-primary)" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    <span className="text-[11px] text-[var(--brand-primary)] font-medium whitespace-nowrap">AIコンテキスト：</span>
                     <div className="flex gap-[5px] flex-wrap">
-                        <span className="bg-[#0067b8] text-white border border-[#0067b8] rounded-[20px] px-[10px] py-[2px] text-[11px]">👥 {workerCount}名の労働者</span>
-                        <span className="bg-[#0067b8] text-white border border-[#0067b8] rounded-[20px] px-[10px] py-[2px] text-[11px]">🏢 {companyCount}社の企業</span>
-                        <span className="bg-white text-[#0067b8] border border-[#bfdbfe] rounded-[20px] px-[10px] py-[2px] text-[11px] cursor-pointer transition-all hover:bg-[#0067b8] hover:text-white hover:border-[#0067b8]">📋 監査データ</span>
-                        <span className="bg-white text-[#0067b8] border border-[#bfdbfe] rounded-[20px] px-[10px] py-[2px] text-[11px] cursor-pointer transition-all hover:bg-[#0067b8] hover:text-white hover:border-[#0067b8]">📄 書類情報</span>
+                        <span className="bg-[var(--brand-primary)] text-white border border-[var(--brand-primary)] rounded-[var(--radius-pill)] px-[10px] py-[2px] text-[11px]">👥 {workerCount}名の労働者</span>
+                        <span className="bg-[var(--brand-primary)] text-white border border-[var(--brand-primary)] rounded-[var(--radius-pill)] px-[10px] py-[2px] text-[11px]">🏢 {companyCount}社の企業</span>
+                        <span className="bg-white text-[var(--brand-primary)] border border-[#bfdbfe] rounded-[var(--radius-pill)] px-[10px] py-[2px] text-[11px] cursor-pointer transition-all hover:bg-[var(--brand-primary)] hover:text-white hover:border-[var(--brand-primary)]">📋 監査データ</span>
+                        <span className="bg-white text-[var(--brand-primary)] border border-[#bfdbfe] rounded-[var(--radius-pill)] px-[10px] py-[2px] text-[11px] cursor-pointer transition-all hover:bg-[var(--brand-primary)] hover:text-white hover:border-[var(--brand-primary)]">📄 書類情報</span>
                     </div>
                 </div>
 
@@ -463,9 +492,9 @@ export default function ChatClient({ workerCount, companyCount }: ChatClientProp
                             style={{ animation: 'fadeUp .25s ease' }}
                         >
                             {/* Avatar */}
-                            <div className={`w-[34px] h-[34px] rounded-[10px] shrink-0 flex items-center justify-center text-[12px] font-semibold ${msg.role === 'ai'
-                                ? 'bg-gradient-to-br from-[#0067b8] to-[#004a8c] text-white shadow-[0_2px_6px_rgba(0,103,184,.25)]'
-                                : 'bg-[#f1f5f9] text-[#475569]'
+                            <div className={`w-[34px] h-[34px] rounded-[var(--radius-lg)] shrink-0 flex items-center justify-center text-[12px] font-semibold ${msg.role === 'ai'
+                                ? 'bg-gradient-to-br from-[var(--brand-primary)] to-[var(--brand-primary-dark)] text-white shadow-[0_2px_6px_rgba(0,103,184,.25)]'
+                                : 'bg-[var(--color-border-subtle)] text-[var(--color-text-secondary)]'
                             }`}>
                                 {msg.role === 'ai' ? <Sparkles size={14} className="text-white" /> : <User size={14} />}
                             </div>
@@ -473,14 +502,14 @@ export default function ChatClient({ workerCount, companyCount }: ChatClientProp
                             <div className="max-w-[68%]">
                                 <div
                                     className={`px-[15px] py-3 text-[13px] leading-[1.75] whitespace-pre-wrap ${msg.role === 'ai'
-                                        ? 'bg-white border border-[#e2e8f0] text-[#0f172a] shadow-[0_1px_3px_rgba(0,0,0,.08)]'
-                                        : 'bg-[#0067b8] text-white'
+                                        ? 'bg-white border border-[var(--color-border)] text-[var(--color-text-primary)] shadow-[var(--shadow-sm)]'
+                                        : 'bg-[var(--brand-primary)] text-white'
                                     }`}
                                     style={{ borderRadius: msg.role === 'ai' ? '2px 12px 12px 12px' : '12px 2px 12px 12px' }}
                                 >
                                     {msg.role === 'ai' ? renderMessageContent(msg.content) : msg.content}
                                 </div>
-                                <div className={`text-[10px] text-[#94a3b8] mt-[5px] ${msg.role === 'user' ? 'text-right' : ''}`}>
+                                <div className={`text-[10px] text-[var(--color-text-muted)] mt-[5px] ${msg.role === 'user' ? 'text-right' : ''}`}>
                                     {formatTime(msg.id === 'welcome' ? Date.now() : parseInt(msg.id) || Date.now())}
                                 </div>
                             </div>
@@ -491,12 +520,12 @@ export default function ChatClient({ workerCount, companyCount }: ChatClientProp
                 </div>
 
                 {/* Input Area */}
-                <div className="px-5 pt-[14px] pb-4 bg-white border-t border-[#e2e8f0] shrink-0">
-                    <div className="bg-[#f8fafc] border-[1.5px] border-[#e2e8f0] rounded-[12px] px-[14px] py-[10px] transition-all focus-within:border-[#0067b8] focus-within:bg-white focus-within:shadow-[0_0_0_3px_rgba(0,103,184,.08)]">
+                <div className="px-5 pt-[14px] pb-4 bg-white border-t border-[var(--color-border)] shrink-0">
+                    <div className="bg-[var(--input-bg)] border-[1.5px] border-[var(--color-border)] rounded-[var(--radius-xl)] px-[14px] py-[10px] transition-all focus-within:border-[var(--brand-primary)] focus-within:bg-white focus-within:shadow-[0_0_0_3px_var(--brand-primary-ring)]">
                         {/* Tool buttons */}
                         <div className="flex items-center gap-[6px] mb-2 flex-wrap">
                             {['📎 ファイル添付', '🔍 データ検索', '📊 レポート生成'].map(label => (
-                                <button key={label} className="h-[24px] px-2 rounded-[6px] border border-[#e2e8f0] bg-white text-[11px] text-[#475569] flex items-center gap-[3px] transition-all shadow-[0_1px_3px_rgba(0,0,0,.08)] hover:border-[#0067b8] hover:text-[#0067b8] hover:bg-[#e6f1fb]">
+                                <button key={label} className="h-[24px] px-2 rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-white text-[11px] text-[var(--color-text-secondary)] flex items-center gap-[3px] transition-all shadow-[var(--shadow-sm)] hover:border-[var(--brand-primary)] hover:text-[var(--brand-primary)] hover:bg-[var(--brand-primary-light)]">
                                     {label}
                                 </button>
                             ))}
@@ -509,23 +538,23 @@ export default function ChatClient({ workerCount, companyCount }: ChatClientProp
                                 onKeyDown={handleKeyDown}
                                 disabled={isTyping}
                                 placeholder="AIにメッセージを送信... (Enterで送信, Shift+Enterで改行)"
-                                className="flex-1 border-none bg-transparent text-[13px] text-[#0f172a] resize-none outline-none disabled:opacity-50 placeholder:text-[#94a3b8] leading-[1.65]"
+                                className="flex-1 border-none bg-transparent text-[13px] text-[var(--color-text-primary)] resize-none outline-none disabled:opacity-50 placeholder:text-[var(--color-text-muted)] leading-[1.65]"
                                 style={{ minHeight: '22px', maxHeight: '140px' }}
                                 rows={1}
                             />
                             <button
                                 onClick={() => handleSend()}
                                 disabled={!inputValue.trim() || isTyping}
-                                className={`w-[36px] h-[36px] rounded-[10px] flex items-center justify-center shrink-0 transition-all ${inputValue.trim() && !isTyping
-                                    ? 'bg-[#0067b8] hover:bg-[#004a8c] shadow-[0_2px_6px_rgba(0,103,184,.3)] hover:scale-[1.08] hover:shadow-[0_4px_12px_rgba(0,103,184,.4)]'
-                                    : 'bg-[#e2e8f0] cursor-not-allowed'
+                                className={`w-[36px] h-[36px] rounded-[var(--radius-lg)] flex items-center justify-center shrink-0 transition-all ${inputValue.trim() && !isTyping
+                                    ? 'bg-[var(--brand-primary)] hover:bg-[var(--brand-primary-dark)] shadow-[0_2px_6px_rgba(0,103,184,.3)] hover:scale-[1.08] hover:shadow-[0_4px_12px_rgba(0,103,184,.4)]'
+                                    : 'bg-[var(--color-border)] cursor-not-allowed'
                                 }`}
                             >
-                                <ArrowUp size={16} strokeWidth={2.5} className={inputValue.trim() && !isTyping ? 'text-white' : 'text-[#94a3b8]'} />
+                                <ArrowUp size={16} strokeWidth={2.5} className={inputValue.trim() && !isTyping ? 'text-white' : 'text-[var(--color-text-muted)]'} />
                             </button>
                         </div>
                     </div>
-                    <p className="text-[10px] text-[#94a3b8] text-center mt-2">
+                    <p className="text-[10px] text-[var(--color-text-muted)] text-center mt-2">
                         Enterで送信 · Shift+Enterで改行 · AIの回答は参考情報です
                     </p>
                 </div>

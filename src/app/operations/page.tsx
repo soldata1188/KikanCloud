@@ -6,6 +6,8 @@ import { TopNav } from '@/components/TopNav'
 import OperationsClient from './OperationsClient'
 import { getOperationsData } from './actions'
 
+export const metadata = { title: '業務管理' }
+
 export const dynamic = 'force-dynamic';
 
 export default async function OperationsPage() {

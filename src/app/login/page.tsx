@@ -68,7 +68,7 @@ export default function LoginPage() {
                                     required
                                     value={loginId}
                                     onChange={(e) => setLoginId(e.target.value)}
-                                    className="w-full h-12 pl-11 pr-4 bg-slate-50/50 border border-slate-200 rounded-xl text-sm font-medium outline-none focus:border-[#0067b8] focus:bg-white focus:ring-2 focus:ring-[#0067b8]/10 transition-all"
+                                    className="w-full h-12 pl-11 pr-4 bg-slate-50/50 border border-slate-200 rounded-xl text-sm font-medium outline-none focus:border-[var(--brand-primary)] focus:bg-white focus:ring-2 focus:ring-[var(--brand-primary-ring)] transition-all"
                                     placeholder="IDを入力..."
                                     autoCapitalize="none"
                                     autoCorrect="off"
@@ -85,7 +85,7 @@ export default function LoginPage() {
                                     type="password"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="w-full h-12 pl-11 pr-4 bg-slate-50/50 border border-slate-200 rounded-xl text-sm font-medium outline-none focus:border-[#0067b8] focus:bg-white focus:ring-2 focus:ring-[#0067b8]/10 transition-all"
+                                    className="w-full h-12 pl-11 pr-4 bg-slate-50/50 border border-slate-200 rounded-xl text-sm font-medium outline-none focus:border-[var(--brand-primary)] focus:bg-white focus:ring-2 focus:ring-[var(--brand-primary-ring)] transition-all"
                                     placeholder="••••••••"
                                 />
                             </div>
@@ -94,7 +94,7 @@ export default function LoginPage() {
                         <button
                             type="submit"
                             disabled={isPending}
-                            className="w-full h-12 bg-[#0067b8] text-white font-bold rounded-xl text-base hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2 mt-6 disabled:opacity-50 shadow-lg shadow-slate-200"
+                            className="w-full h-12 bg-[var(--brand-primary)] text-white font-bold rounded-xl text-base hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2 mt-6 disabled:opacity-50 shadow-lg shadow-slate-200"
                         >
                             {isPending ? <Loader2 size={20} className="animate-spin" /> : 'ログイン'}
                         </button>

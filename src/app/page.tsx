@@ -71,7 +71,7 @@ export default async function DashboardPage() {
             supabase.from('workers').select('id', { count: 'exact', head: true }).eq('tenant_id', tenantId).eq('is_deleted', false),
             supabase.from('companies').select('id', { count: 'exact', head: true }).eq('tenant_id', tenantId).eq('is_deleted', false),
             supabase.from('workers')
-                .select('id, full_name_romaji, nationality, status, residence_card_exp_date, passport_exp_date, industry_field, updated_at, companies(id, name_jp)')
+                .select('id, full_name_romaji, nationality, status, visa_status, residence_card_exp_date, passport_exp_date, industry_field, updated_at, companies(id, name_jp)')
                 .eq('tenant_id', tenantId).eq('is_deleted', false),
             // Audits not yet completed this month
             supabase.from('audits')
@@ -115,6 +115,17 @@ export default async function DashboardPage() {
         const nationalities = Object.entries(natCounts)
             .map(([name, count]) => ({ name, count, percentage: Math.round((count / (totalWorkers || 1)) * 100) }))
             .sort((a, b) => b.count - a.count).slice(0, 4)
+
+        // ── Visa status types (在留資格) ──────────────────────────────────────
+        const visaCounts: Record<string, number> = {}
+        workers.forEach(w => {
+            const v = (w.visa_status as string | null)?.trim() || '未登録'
+            visaCounts[v] = (visaCounts[v] || 0) + 1
+        })
+        const visaTypes = Object.entries(visaCounts)
+            .map(([name, count]) => ({ name, count, percentage: Math.round((count / (totalWorkers || 1)) * 100) }))
+            .sort((a, b) => b.count - a.count)
+            .slice(0, 6)
 
         // ── Industries ────────────────────────────────────────────────────────
         const indCounts: Record<string, number> = {}
@@ -291,6 +302,7 @@ export default async function DashboardPage() {
         const dashboardData = {
             stats: { totalWorkers, totalCompanies, enteringWorkers, missingWorkers },
             nationalities,
+            visaTypes,
             industries,
             groupedAlerts,
             alertsCount: groupedAlerts.length,

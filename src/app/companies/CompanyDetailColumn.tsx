@@ -43,7 +43,7 @@ function SectionHeader({ icon, label }: { icon: React.ReactNode; label: string }
     return (
         <div className="flex items-center gap-2 px-4 py-2 border-b border-gray-100 bg-slate-50">
             <span className="text-[#0067b8] opacity-70">{icon}</span>
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#0067b8]">{label}</span>
+            <span className="text-[13px] font-black uppercase tracking-[0.2em] text-[#0067b8]">{label}</span>
         </div>
     );
 }

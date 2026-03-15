@@ -85,6 +85,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
     const [selectedIds, setSelectedIds] = useState<string[]>([])
     const [lastSelectedId, setLastSelectedId] = useState<string | null>(null);
     const [viewState, setViewState] = useState<'batches' | 'companies' | 'workers' | 'profile'>('batches');
+    const [mobileTab, setMobileTab] = useState(2); // 0=期生 1=企業 2=労働者 3=詳細
     const [isPending, startTransition] = useTransition()
     const [activeTab, setActiveTab] = useState('active')
     const [layout, setLayout] = useState<'list' | 'grid'>('list')
@@ -433,6 +434,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
             setLastSelectedId(id);
         }
         setViewState('profile');
+        setMobileTab(3); // auto-switch to 詳細 tab on mobile
     }, [filtered, lastSelectedId, selectedIds, setSelectedIds, setLastSelectedId, setViewState]);
 
     const countByTab = useCallback((key: string) => {
@@ -763,86 +765,66 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
             </div>
 
             {/* 3. Mobile: Drill-down (4 steps) */}
-            <div className="flex lg:hidden flex-1 flex-col overflow-hidden bg-gray-100">
-                <div className="bg-white border-b border-gray-100 px-4 py-3 flex items-center gap-3 sticky top-0 z-20">
-                    {viewState !== 'batches' && (
-                        <button
-                            onClick={() => {
-                                if (viewState === 'profile') setViewState('workers');
-                                else if (viewState === 'workers') setViewState('companies');
-                                else setViewState('batches');
-                            }}
-                            className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-600"
-                        >
-                            <ArrowLeft size={16} />
-                        </button>
-                    )}
-                    <h1 className="text-base font-bold tracking-tight">
-                        {viewState === 'batches' ? '入国期生' : viewState === 'companies' ? '企業' : viewState === 'workers' ? '人材' : '詳細'}
-                    </h1>
-                    {selectedBatch && viewState !== 'batches' && (
-                        <span className="text-xs font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded ml-auto">{selectedBatch}</span>
-                    )}
+            {/* Mobile: Tab Navigation */}
+            <div className="flex lg:hidden flex-1 flex-col overflow-hidden bg-white">
+                {/* Mobile Tab Bar */}
+                <div className="flex border-b border-[var(--color-border)] bg-white flex-shrink-0">
+                    {['期生', '企業', '労働者', '詳細'].map((tab, i) => (
+                        <button key={i}
+                            className={`flex-1 py-2.5 text-xs font-medium transition-colors
+                                ${mobileTab === i
+                                    ? 'text-[var(--brand-primary)] border-b-2 border-[var(--brand-primary)]'
+                                    : 'text-[var(--color-text-muted)]'}`}
+                            onClick={() => setMobileTab(i)}
+                        >{tab}</button>
+                    ))}
                 </div>
-
                 <div className="flex-1 overflow-hidden relative">
-                    {viewState === 'batches' && (
+                    {mobileTab === 0 && (
                         <div className="absolute inset-0 bg-white">
                             <EntryBatchColumn
                                 batches={batchItems}
                                 selectedBatch={selectedBatch}
-                                onSelect={handleSelectBatch}
+                                onSelect={(b) => { handleSelectBatch(b); setMobileTab(1); }}
                             />
                         </div>
                     )}
-                    {viewState === 'companies' && (
+                    {mobileTab === 1 && (
                         <div className="absolute inset-0 bg-white">
                             <CompanyColumn
                                 companies={filteredCompanies}
                                 selectedId={selectedCompanyId}
-                                onSelect={handleSelectCompany}
+                                onSelect={(id) => { handleSelectCompany(id); setMobileTab(2); }}
                             />
                         </div>
                     )}
-                    {viewState === 'workers' && (
-                        <div className="absolute inset-0 flex flex-col bg-white">
-                            <div className="flex items-center gap-1 px-2 border-b border-gray-100 shrink-0 h-[52px]">
-                                {TAB_KEYS.map((key) => {
-                                    const cfg = TAB_CONFIG[key]
-                                    const isActive = activeTab === key
-                                    const count = key === 'all' ? workers.length : countByTab(key)
-                                    return (
-                                        <button key={key} onClick={() => setActiveTab(key)}
-                                            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-bold transition-all
-                                            ${isActive ? 'bg-[#0067b8] text-white' : 'text-gray-400 hover:text-gray-600'}`}>
-                                            {cfg.label}
-                                            <span className={`text-[10px] rounded-full px-1 py-0.5 leading-none font-normal
-                                                ${isActive ? 'bg-white/25 text-white' : 'bg-gray-100 text-gray-500'}`}>
-                                                {count}
-                                            </span>
-                                        </button>
-                                    )
-                                })}
-                            </div>
-                            <div className="flex-1 overflow-hidden">
-                                <WorkerListColumn
-                                    workers={filtered}
-                                    selectedIds={selectedIds}
-                                    onSelect={handleSelectWorker}
-                                />
-                            </div>
+                    {mobileTab === 2 && (
+                        <div className="absolute inset-0 bg-white">
+                            <WorkerListColumn
+                                workers={filtered}
+                                selectedIds={selectedIds}
+                                onSelect={handleSelectWorker}
+                            />
                         </div>
                     )}
-                    {viewState === 'profile' && (
+                    {mobileTab === 3 && (
                         <div className="absolute inset-0">
-                            <ProfileDetailColumn
-                                workers={selectedWorkers}
-                                batchForm={batchForm}
-                                setBatchForm={setBatchForm}
-                                onUpdate={handleChange}
-                                onBulkUpdate={applyBatch}
-                                companies={uniqueCompanies}
-                            />
+                            {selectedIds.length > 0 ? (
+                                <ProfileDetailColumn
+                                    workers={selectedWorkers}
+                                    batchForm={batchForm}
+                                    setBatchForm={setBatchForm}
+                                    onUpdate={handleChange}
+                                    onBulkUpdate={applyBatch}
+                                    companies={uniqueCompanies}
+                                />
+                            ) : (
+                                <div className="flex flex-col items-center justify-center h-full gap-2 p-8"
+                                    style={{ color: 'var(--color-text-muted)' }}>
+                                    <User size={32} opacity={0.3} />
+                                    <span className="text-sm">労働者を選択してください</span>
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>

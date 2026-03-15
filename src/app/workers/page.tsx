@@ -6,6 +6,8 @@ import { TopNav } from '@/components/TopNav'
 
 import WorkersListClient from './WorkersListClient'
 
+export const metadata = { title: '外国人材管理' }
+
 export const dynamic = 'force-dynamic';
 
 export default async function WorkersPage() {

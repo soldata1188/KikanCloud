@@ -167,7 +167,7 @@ export default function DashboardClient({ userName, dashboardData }: { userName:
     };
 
     return (
-        <div className="w-full h-full pb-20 overflow-y-auto thin-scrollbar bg-[#f8fafc]">
+        <div className="w-full h-full pb-20 overflow-y-auto thin-scrollbar bg-[var(--input-bg)]">
             <div className="max-w-[1400px] mx-auto px-6 pt-6 space-y-6">
 
                 {/* ─── Page header: ダッシュボード + 日付 ───────────────────────── */}
@@ -177,11 +177,11 @@ export default function DashboardClient({ userName, dashboardData }: { userName:
                 </div>
 
                 {/* ─── AI Morning Briefing ──────────────────────────────────────── */}
-                <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#0067b8] via-[#0052a3] to-[#003d8f] text-white shadow-lg shadow-[#0067b8]/20">
+                <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[var(--brand-primary)] via-[var(--brand-primary-dark)] to-[#003d8f] text-white shadow-lg shadow-[var(--brand-primary)]/20">
                     <div className="pointer-events-none absolute -top-12 -right-12 w-56 h-56 rounded-full bg-white/5" />
                     <div className="pointer-events-none absolute -bottom-8 -left-8 w-40 h-40 rounded-full bg-white/5" />
 
-                    <div className="relative px-6 py-5">
+                    <div className="relative px-4 py-3 md:px-6 md:py-5">
                         <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center gap-2">
                                 <div className="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center">
@@ -288,8 +288,8 @@ export default function DashboardClient({ userName, dashboardData }: { userName:
                             label: '受入企業',
                             value: dashboardData?.stats?.totalCompanies ?? 0,
                             sub: '社',
-                            color: 'text-[#0067b8]',
-                            border: 'border-l-[#0067b8]',
+                            color: 'text-[var(--brand-primary)]',
+                            border: 'border-l-[var(--brand-primary)]',
                             bg: 'bg-blue-50/30',
                             href: '/companies',
                         },
@@ -554,7 +554,7 @@ export default function DashboardClient({ userName, dashboardData }: { userName:
                                                                     <span className="text-[11px] font-bold text-gray-700 font-mono">{m.passport}</span>
                                                                 </div>
                                                                 <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                                                                    <div className="h-full bg-[#0067b8]/60 rounded-full transition-all duration-500"
+                                                                    <div className="h-full bg-[var(--brand-primary)]/60 rounded-full transition-all duration-500"
                                                                         style={{ width: `${passportPct}%` }} />
                                                                 </div>
                                                             </div>
@@ -708,7 +708,7 @@ export default function DashboardClient({ userName, dashboardData }: { userName:
                     <div className="p-5 grid grid-cols-3 sm:grid-cols-6 gap-3">
                         {[
                             { id: "operations", name: "業務管理", href: "/operations", icon: <ClipboardList size={20} />, color: "text-emerald-600", hover: "group-hover:bg-emerald-100" },
-                            { id: "workers", name: "外国人材", href: "/workers", icon: <Users size={20} />, color: "text-[#0067b8]", hover: "group-hover:bg-blue-100" },
+                            { id: "workers", name: "外国人材", href: "/workers", icon: <Users size={20} />, color: "text-[var(--brand-primary)]", hover: "group-hover:bg-blue-100" },
                             { id: "companies", name: "受入企業", href: "/companies", icon: <Building2 size={20} />, color: "text-violet-600", hover: "group-hover:bg-violet-100" },
                             { id: "audits", name: "監査・訪問", href: "/audits", icon: <ShieldCheck size={20} />, color: "text-amber-600", hover: "group-hover:bg-amber-100" },
                             { id: "routing", name: "マップ", href: "/routing", icon: <Map size={20} />, color: "text-teal-600", hover: "group-hover:bg-teal-100" },
@@ -725,39 +725,8 @@ export default function DashboardClient({ userName, dashboardData }: { userName:
                     </div>
                 </section>
 
-                {/* ─── Bottom info: Secondary cards + Sub-stats + Nationality ──────── */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-5 pb-4">
-
-                    {/* Card 1: 巡回報告 */}
-                    <div className="app-card p-5 space-y-3 hover:shadow-md transition-shadow group border-l-4 border-l-orange-400">
-                        <h3 className="text-[11px] font-black text-gray-700 uppercase tracking-[0.15em]">今月の巡回報告</h3>
-                        <p className="text-sm text-gray-500 leading-relaxed font-normal">
-                            {(dashboardData?.pendingAuditsCount ?? 0) > 0 ? (
-                                <>未完了の監査・訪問報告が{' '}<span className="text-orange-600 font-bold">{dashboardData.pendingAuditsCount}件</span>あります。</>
-                            ) : '今月の監査・訪問の状況を確認してください。'}
-                        </p>
-                        <Link href="/audits" className="inline-flex items-center gap-1.5 text-sm font-normal text-emerald-600 hover:text-emerald-700">
-                            報告書を確認する <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
-                        </Link>
-                    </div>
-
-                    {/* Card 2: その他ステータス */}
-                    <div className="app-card p-5 space-y-4">
-                        <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.18em]">その他のステータス</h3>
-                        <div className="space-y-3">
-                            {[
-                                { label: '入国待ち・手続中', value: dashboardData?.stats?.enteringWorkers ?? 0, color: 'text-amber-600', border: 'border-l-amber-400' },
-                                { label: '失踪・帰国済', value: dashboardData?.stats?.missingWorkers ?? 0, color: 'text-red-400', border: 'border-l-red-300' },
-                            ].map(({ label, value, color, border }) => (
-                                <div key={label} className={`flex items-center justify-between pl-3 border-l-[3px] ${border}`}>
-                                    <span className="text-[11px] text-gray-500 font-normal">{label}</span>
-                                    <span className={`text-xl font-bold font-mono ${color}`}>{value}</span>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Card 3: 国籍別 */}
+                {/* ─── Bottom info: Nationality + Visa types ──────── */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pb-4">
                     {dashboardData?.nationalities?.length > 0 && (
                         <div className="app-card p-5 space-y-3">
                             <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.18em]">国籍別</h3>
@@ -770,6 +739,25 @@ export default function DashboardClient({ userName, dashboardData }: { userName:
                                         </div>
                                         <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
                                             <div className="h-full bg-emerald-400 rounded-full transition-all duration-500" style={{ width: `${percentage}%` }} />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {dashboardData?.visaTypes?.length > 0 && (
+                        <div className="app-card p-5 space-y-3">
+                            <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.18em]">在留資格別</h3>
+                            <div className="space-y-2.5">
+                                {dashboardData.visaTypes.map(({ name, count, percentage }: any) => (
+                                    <div key={name}>
+                                        <div className="flex justify-between items-center mb-1">
+                                            <span className="text-[11px] text-gray-600 font-normal truncate pr-2">{name}</span>
+                                            <span className="text-[11px] font-bold font-mono text-gray-600 shrink-0">{count}<span className="font-normal text-gray-400 ml-0.5">名</span></span>
+                                        </div>
+                                        <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                                            <div className="h-full bg-[var(--brand-primary)] rounded-full transition-all duration-500" style={{ width: `${percentage}%` }} />
                                         </div>
                                     </div>
                                 ))}

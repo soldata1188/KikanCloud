@@ -5,6 +5,8 @@ import { TopNav } from '@/components/TopNav'
 import RoutingClient from './RoutingClient'
 import type { RawLocation } from './RoutingClient'
 
+export const metadata = { title: '位置情報マップ' }
+
 export const dynamic = 'force-dynamic';
 
 function daysFromNow(dateStr: string | null | undefined): number | null {

@@ -5,10 +5,9 @@ import {
     MapPin, Building2, Building,
     ClipboardList, FileText, ShieldCheck,
     CheckCircle2, Briefcase,
-    Loader2, ChevronDown, ClipboardCheck, PlaneLanding,
-    StickyNote, Plus, Trash2, Clock, MessageSquare, Phone, Monitor, Users
+    Loader2, ChevronDown, ClipboardCheck,
+    StickyNote, Plus, Trash2
 } from 'lucide-react';
-import { getWorkerTasksAndLogs } from './actions';
 
 interface OperationColumnProps {
     workers: any[];
@@ -24,23 +23,6 @@ const WINDOW_OPTIONS = ['---', '窓口', 'ONLINE'];
 const KENTEI_OPTIONS = ['---', '初級', '基礎級', '専門級', '随時３級'];
 const SYSTEM_OPTIONS = ['---', '就労認可', '変更届出'];
 
-const PRIORITY_COLOR: Record<string, string> = {
-    urgent: 'bg-red-50 text-red-600 border-red-200',
-    high: 'bg-amber-50 text-amber-600 border-amber-200',
-    medium: 'bg-blue-50 text-blue-600 border-blue-100',
-    low: 'bg-gray-50 text-gray-500 border-gray-100',
-};
-const TASK_STATUS_COLOR: Record<string, string> = {
-    done: 'text-emerald-500',
-    in_progress: 'text-blue-500',
-    todo: 'text-gray-300',
-};
-const LOG_ICON: Record<string, React.ElementType> = {
-    visit: Users, phone: Phone, online: Monitor, other: MessageSquare,
-};
-const LOG_LABEL: Record<string, string> = {
-    visit: '訪問', phone: '電話', online: 'オンライン', other: 'その他',
-};
 
 function getVisaBadge(visaExpiry: string) {
     if (!visaExpiry || visaExpiry === '---') return null;
@@ -108,10 +90,10 @@ const SectionBlock = ({ icon: Icon, title, status, onStatusChange, children }: {
     children: React.ReactNode;
 }) => (
     <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
-        <div className="px-5 py-3 flex items-center justify-between border-b border-slate-100 bg-slate-50/40">
+        <div className="px-5 py-3 flex items-center justify-between border-b border-[#005a9e] bg-[#0067b8]">
             <div className="flex items-center gap-2.5">
-                <Icon size={15} className="text-slate-400" />
-                <span className="text-[11px] font-bold text-slate-600 uppercase tracking-widest">{title}</span>
+                <Icon size={15} className="text-white/80" />
+                <span className="text-[13px] font-bold text-white uppercase tracking-widest">{title}</span>
             </div>
             <StatusBadge value={status} onChange={onStatusChange} />
         </div>
@@ -123,26 +105,8 @@ export default function OperationColumn({ workers, staff, onUpdate, onBulkUpdate
     const [memoLines, setMemoLines] = useState<string[]>(['']);
     const [draftChanges, setDraftChanges] = useState<Record<string, string>>({});
     const [isSaving, setIsSaving] = useState(false);
-    const [tasks, setTasks] = useState<any[]>([]);
-    const [shienLogs, setShienLogs] = useState<any[]>([]);
-    const [isLoadingActivity, setIsLoadingActivity] = useState(false);
-
     const isBulkMode = workers.length > 1;
     const worker = workers[0];
-
-    // Load tasks/logs for single worker
-    useEffect(() => {
-        if (isBulkMode || !worker?.id) {
-            setTasks([]);
-            setShienLogs([]);
-            return;
-        }
-        setIsLoadingActivity(true);
-        getWorkerTasksAndLogs(worker.id)
-            .then(({ tasks: t, logs: l }) => { setTasks(t); setShienLogs(l); })
-            .catch(() => { })
-            .finally(() => setIsLoadingActivity(false));
-    }, [worker?.id, isBulkMode]);
 
     useEffect(() => {
         if (!isBulkMode && worker?.id) {
@@ -223,7 +187,6 @@ export default function OperationColumn({ workers, staff, onUpdate, onBulkUpdate
         getV('nyukan_status', 'progress'),
         getV('kentei_status', 'progress'),
         getV('system_status', 'progress'),
-        getV('airport_status', 'progress'),
     ].map(s => s || '未着手');
     const completedCount = progressStatuses.filter(s => s === '完了').length;
     const progressPct = Math.round((completedCount / progressStatuses.length) * 100);
@@ -387,28 +350,17 @@ export default function OperationColumn({ workers, staff, onUpdate, onBulkUpdate
                     <InlineField label="担当者" value={getV('system_status', 'assignee')} type="select" options={STAFF_OPTIONS} onChange={(v: any) => handleFieldChange('system_status', 'assignee', v)} />
                 </SectionBlock>
 
-                {/* 5. 送迎・帰国支援 */}
-                <SectionBlock
-                    icon={PlaneLanding} title="送迎・帰国支援"
-                    status={getV('airport_status', 'progress') || '未着手'}
-                    onStatusChange={(v) => handleFieldChange('airport_status', 'progress', v)}
-                >
-                    <InlineField label="帰国日" value={getV('airport_status', 'return_date')} type="date" onChange={(v: any) => handleFieldChange('airport_status', 'return_date', v)} />
-                    <InlineField label="再入国日" value={getV('airport_status', 'reentry_date')} type="date" onChange={(v: any) => handleFieldChange('airport_status', 'reentry_date', v)} />
-                    <InlineField label="業務担当者" value={getV('airport_status', 'assignee')} type="select" options={STAFF_OPTIONS} onChange={(v: any) => handleFieldChange('airport_status', 'assignee', v)} />
-                </SectionBlock>
-
-                {/* 6. 備考・特記事項 */}
+{/* 6. 備考・特記事項 */}
                 <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
-                    <div className="px-5 py-3 flex items-center justify-between border-b border-slate-100 bg-slate-50/40">
+                    <div className="px-5 py-3 flex items-center justify-between border-b border-[#005a9e] bg-[#0067b8]">
                         <div className="flex items-center gap-2.5">
-                            <StickyNote size={15} className="text-slate-400" />
-                            <span className="text-[11px] font-bold text-slate-600 uppercase tracking-widest">備考・特記事項</span>
+                            <StickyNote size={15} className="text-white/80" />
+                            <span className="text-[13px] font-bold text-white uppercase tracking-widest">備考・特記事項</span>
                         </div>
                         {!isBulkMode && (
                             <button
                                 onClick={addMemoLine}
-                                className="w-7 h-7 flex items-center justify-center rounded-full bg-slate-100 text-slate-400 hover:bg-slate-700 hover:text-white transition-all active:scale-90"
+                                className="w-7 h-7 flex items-center justify-center rounded-full bg-white/20 text-white hover:bg-white/30 transition-all active:scale-90"
                             >
                                 <Plus size={13} />
                             </button>
@@ -447,61 +399,6 @@ export default function OperationColumn({ workers, staff, onUpdate, onBulkUpdate
                     </div>
                 </div>
 
-                {/* 7. タスク・支援記録 (single worker only) */}
-                {!isBulkMode && (
-                    <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
-                        <div className="px-5 py-3 border-b border-slate-100 bg-slate-50/40 flex items-center gap-2.5">
-                            <CheckCircle2 size={15} className="text-slate-400" />
-                            <span className="text-[11px] font-bold text-slate-600 uppercase tracking-widest">タスク・支援記録</span>
-                            {isLoadingActivity && <Loader2 size={11} className="animate-spin text-slate-300 ml-1" />}
-                        </div>
-
-                        {isLoadingActivity ? (
-                            <div className="flex items-center justify-center py-8">
-                                <Loader2 size={18} className="animate-spin text-slate-300" />
-                            </div>
-                        ) : (
-                            <div className="divide-y divide-slate-100">
-                                {/* Tasks */}
-                                {tasks.length > 0 ? tasks.map(task => (
-                                    <div key={task.id} className="flex items-start gap-3 px-5 py-3 hover:bg-slate-50/50 transition-colors">
-                                        <CheckCircle2 size={13} className={`mt-0.5 shrink-0 ${TASK_STATUS_COLOR[task.status] || 'text-gray-300'}`} />
-                                        <div className="flex-1 min-w-0">
-                                            <p className="text-xs font-bold text-slate-700 truncate">{task.title}</p>
-                                            {task.due_date && (
-                                                <p className="text-[10px] text-slate-400 flex items-center gap-1 mt-0.5">
-                                                    <Clock size={9} />期日: {task.due_date}
-                                                </p>
-                                            )}
-                                        </div>
-                                        <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded border shrink-0 ${PRIORITY_COLOR[task.priority] || 'bg-gray-50 text-gray-500 border-gray-100'}`}>
-                                            {task.priority?.toUpperCase()}
-                                        </span>
-                                    </div>
-                                )) : (
-                                    <p className="text-[11px] text-slate-300 text-center py-5 italic">タスクなし</p>
-                                )}
-
-                                {/* ShienLogs (latest 3) */}
-                                {shienLogs.length > 0 && shienLogs.slice(0, 3).map(log => {
-                                    const Icon = LOG_ICON[log.support_type] || MessageSquare;
-                                    return (
-                                        <div key={log.id} className="flex items-start gap-3 px-5 py-3 bg-slate-50/30 hover:bg-slate-50 transition-colors">
-                                            <Icon size={13} className="text-slate-400 shrink-0 mt-0.5" />
-                                            <div className="flex-1 min-w-0">
-                                                <div className="flex items-center gap-2 mb-1">
-                                                    <span className="text-[9px] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-100">{LOG_LABEL[log.support_type]}</span>
-                                                    <span className="text-[10px] text-slate-400">{log.support_date}</span>
-                                                </div>
-                                                <p className="text-[11px] text-slate-600 line-clamp-2 leading-relaxed">{log.content}</p>
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        )}
-                    </div>
-                )}
 
                 <div className="h-8 shrink-0" />
             </div>

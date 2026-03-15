@@ -1,7 +1,7 @@
 'use client'
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { APIProvider, Map, AdvancedMarker, useMap } from '@vis.gl/react-google-maps'
-import { MapPin as MapPinIcon, Building2, User, Search, X, Navigation, AlertTriangle, ExternalLink, LocateFixed } from 'lucide-react'
+import { MapPin as MapPinIcon, Building2, User, Search, X, AlertTriangle, ExternalLink, LocateFixed, ChevronUp, List } from 'lucide-react'
 import Link from 'next/link'
 import { companyInitials } from '@/lib/utils/companyName'
 
@@ -206,11 +206,14 @@ export default function RoutingClient({ initialLocations, filterCompanies, googl
     const [activeMarkerId, setActiveMarkerId] = useState<string | null>(null)
     const [panTarget, setPanTarget] = useState<{ lat: number; lng: number } | null>(null)
 
+    const [sheetState, setSheetState] = useState<'peek' | 'half' | 'full'>('peek')
+
     // Geocode modal state
     const [showGeocodeModal, setShowGeocodeModal] = useState(false)
     const [isGeocoding, setIsGeocoding] = useState(false)
     const [geocodeProgress, setGeocodeProgress] = useState<{ done: number; total: number } | null>(null)
     const [geocodeDone, setGeocodeDone] = useState(false)
+    const hasGeocodedRef = useRef(false) // prevent duplicate API calls
 
     const defaultCenter = mappable.length > 0
         ? { lat: mappable[0].latitude, lng: mappable[0].longitude }
@@ -230,10 +233,7 @@ export default function RoutingClient({ initialLocations, filterCompanies, googl
         !q || l.name.toLowerCase().includes(q) || (l.address ?? '').toLowerCase().includes(q)
     )
 
-    // Counts
-    const companyCount = locations.filter(l => l.type === 'company').length
-    const workerCount = locations.filter(l => l.type === 'worker').length
-    // Alert = workers (not companies) with expiry within 60 days
+    // Alert = workers with expiry within 60 days
     const alertCount = locations.filter(l => l.type === 'worker' && l.daysUntilExpiry != null && l.daysUntilExpiry <= 60).length
     const unmappedCount = unmapped.length
 
@@ -251,9 +251,11 @@ export default function RoutingClient({ initialLocations, filterCompanies, googl
         .filter(l => l.type === 'worker')
         .sort((a, b) => a.name.localeCompare(b.name, 'en'))
 
-    // Geocode handler
+    // Geocode handler — guarded to run only once per session
     const handleGeocode = async () => {
         if (!googleMapsKey) { alert('Google Maps API keyが設定されていません'); return }
+        if (hasGeocodedRef.current || isGeocoding) return
+        hasGeocodedRef.current = true
         const targets = unmapped.filter(l => l.address)
         if (targets.length === 0) { setShowGeocodeModal(false); return }
 
@@ -331,7 +333,7 @@ export default function RoutingClient({ initialLocations, filterCompanies, googl
             <div className="flex h-full overflow-hidden">
 
                 {/* ══ LEFT PANEL (340px) ══ */}
-                <div className="w-[340px] bg-white border-r border-[#e2e8f0] flex flex-col shrink-0 z-10">
+                <div className="hidden md:flex w-[340px] bg-white border-r border-[#e2e8f0] flex-col shrink-0 z-10">
 
                     {/* Panel Header */}
                     <div className="px-[14px] py-3 border-b border-[#e2e8f0] shrink-0">
@@ -347,33 +349,14 @@ export default function RoutingClient({ initialLocations, filterCompanies, googl
                         </div>
 
                         {/* Stats badges */}
-                        <div className="flex gap-[6px] mb-[10px] flex-wrap">
-                            <span className="flex items-center gap-[5px] px-[10px] py-1 rounded-[20px] text-[11px] font-medium bg-[#fef3c7] text-[#d97706] border border-[#d97706]">
-                                <Building2 size={11} /> 受入企業 {companyCount}
-                            </span>
-                            <span className="flex items-center gap-[5px] px-[10px] py-1 rounded-[20px] text-[11px] font-medium bg-[#e6f1fb] text-[#0067b8] border border-[#0067b8]">
-                                <User size={11} /> 対象者 {workerCount}
-                            </span>
-                            {alertCount > 0 && (
+                        {alertCount > 0 && (
+                            <div className="flex gap-[6px] mb-[10px]">
                                 <span className="flex items-center gap-[5px] px-[10px] py-1 rounded-[20px] text-[11px] font-medium bg-[#fee2e2] text-[#dc2626] border border-[#dc2626]">
                                     <AlertTriangle size={11} /> 期限警告 {alertCount}
                                 </span>
-                            )}
-                        </div>
-
-                        {/* Geocode alert bar */}
-                        {unmappedCount > 0 && !geocodeDone && (
-                            <div className="bg-[#fef3c7] border border-[#d97706] rounded-[8px] px-3 py-2 flex items-start gap-2 mb-[10px]">
-                                <AlertTriangle size={14} className="text-[#d97706] shrink-0 mt-[1px]" />
-                                <div className="text-[11px] text-[#d97706] flex-1 leading-[1.5]">
-                                    {unmappedCount}件 座標未登録。AIで住所から自動変換できます
-                                </div>
-                                <button onClick={() => setShowGeocodeModal(true)} title="一括変換"
-                                    className="w-[24px] h-[24px] rounded-[6px] bg-[#d97706] text-white flex items-center justify-center shrink-0 hover:bg-[#b45309] transition-colors">
-                                    <LocateFixed size={13} />
-                                </button>
                             </div>
                         )}
+
                         {geocodeDone && (
                             <div className="bg-[#dcfce7] border border-[#16a34a] rounded-[8px] px-3 py-2 flex items-center gap-2 mb-[10px] text-[11px] text-[#16a34a] font-medium">
                                 ✓ 座標変換が完了しました
@@ -677,6 +660,76 @@ export default function RoutingClient({ initialLocations, filterCompanies, googl
                     {/* Attribution */}
                     <div className="absolute bottom-[6px] right-2 text-[10px] text-[#64748b] z-[100] pointer-events-none">
                         地図データ ©2026 Google
+                    </div>
+
+                    {/* ══ MOBILE BOTTOM SHEET ══ */}
+                    <div className={`md:hidden absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl shadow-[0_-4px_24px_rgba(0,0,0,.12)] z-[150] transition-transform duration-300 ${
+                        sheetState === 'peek' ? 'translate-y-[calc(100%-56px)]'
+                        : sheetState === 'half' ? 'translate-y-[50%]'
+                        : 'translate-y-0'
+                    }`} style={{ maxHeight: '80vh' }}>
+                        {/* Drag handle */}
+                        <div
+                            className="flex flex-col items-center pt-3 pb-2 cursor-pointer"
+                            onClick={() => setSheetState(s => s === 'peek' ? 'half' : s === 'half' ? 'full' : 'peek')}
+                        >
+                            <div className="w-10 h-1 rounded-full bg-gray-300 mb-2" />
+                            <div className="flex items-center justify-between w-full px-4">
+                                <div className="flex items-center gap-2 text-[13px] font-semibold text-[#0f172a]">
+                                    <List size={14} className="text-[#0067b8]" />
+                                    場所リスト
+                                    <span className="text-[11px] font-normal text-[#94a3b8]">{mappableCompanies.length}社・{mappableWorkers.length}名</span>
+                                </div>
+                                <ChevronUp size={16} className={`text-[#94a3b8] transition-transform ${sheetState === 'full' ? 'rotate-180' : ''}`} />
+                            </div>
+                        </div>
+                        {/* Sheet content */}
+                        <div className="overflow-y-auto px-3 pb-4" style={{ maxHeight: 'calc(80vh - 56px)' }}>
+                            {alertCount > 0 && (
+                                <div className="mb-3 p-3 rounded-xl bg-red-50 border border-red-200 flex items-center gap-2">
+                                    <AlertTriangle size={14} className="text-red-500 shrink-0" />
+                                    <span className="text-[12px] text-red-600 font-medium">在留期限が近い労働者が{alertCount}名います</span>
+                                </div>
+                            )}
+                            {/* Companies */}
+                            {mappableCompanies.length > 0 && (
+                                <div className="mb-3">
+                                    <div className="text-[10px] font-semibold text-[#94a3b8] tracking-[.4px] mb-1 px-1">受入企業 ({mappableCompanies.length})</div>
+                                    <div className="flex flex-col gap-1">
+                                        {mappableCompanies.map(loc => (
+                                            <button key={loc.id} onClick={() => flyTo(loc)}
+                                                className={`w-full text-left px-3 py-2 rounded-xl border transition-all text-[13px] ${activeMarkerId === loc.id ? 'bg-[#e6f1fb] border-[#0067b8] text-[#0067b8]' : 'bg-white border-[#e2e8f0] text-[#0f172a] hover:bg-[#f8fafc]'}`}>
+                                                <div className="flex items-center gap-2">
+                                                    <Building2 size={13} className="shrink-0" />
+                                                    <span className="truncate">{loc.name}</span>
+                                                </div>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                            {/* Workers */}
+                            {mappableWorkers.length > 0 && (
+                                <div>
+                                    <div className="text-[10px] font-semibold text-[#94a3b8] tracking-[.4px] mb-1 px-1">労働者 ({mappableWorkers.length})</div>
+                                    <div className="flex flex-col gap-1">
+                                        {mappableWorkers.map(loc => {
+                                            const isAlert = loc.daysUntilExpiry != null && loc.daysUntilExpiry <= 60
+                                            return (
+                                                <button key={loc.id} onClick={() => flyTo(loc)}
+                                                    className={`w-full text-left px-3 py-2 rounded-xl border transition-all text-[13px] ${activeMarkerId === loc.id ? 'bg-[#e6f1fb] border-[#0067b8]' : 'bg-white border-[#e2e8f0] hover:bg-[#f8fafc]'}`}>
+                                                    <div className="flex items-center gap-2">
+                                                        <User size={13} className={`shrink-0 ${isAlert ? 'text-red-500' : 'text-[#475569]'}`} />
+                                                        <span className={`truncate ${isAlert ? 'text-red-600' : 'text-[#0f172a]'}`}>{loc.name}</span>
+                                                        {isAlert && <span className="ml-auto text-[10px] bg-red-100 text-red-500 px-1.5 py-0.5 rounded-full shrink-0">期限注意</span>}
+                                                    </div>
+                                                </button>
+                                            )
+                                        })}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>

@@ -104,12 +104,26 @@ export async function updateOperationData(workerId: string, column: 'kentei_stat
     const supabase = await createClient()
 
     const updates: Record<string, unknown> = { updated_at: new Date().toISOString() }
-    updates[column] = data
+
+    // For kentei_status: sync ○/× symbols → gakka/jitsugi text fields for kentei page compatibility
+    if (column === 'kentei_status' && data !== null && typeof data === 'object') {
+        const d = { ...(data as Record<string, unknown>) }
+        if (typeof d.exam_result_written === 'string') {
+            d.gakka_result = d.exam_result_written === '○' ? '合格' : d.exam_result_written === '×' ? '不合格' : '未受験'
+        }
+        if (typeof d.exam_result_practical === 'string') {
+            d.jitsugi_result = d.exam_result_practical === '○' ? '合格' : d.exam_result_practical === '×' ? '不合格' : '未受験'
+        }
+        updates[column] = d
+    } else {
+        updates[column] = data
+    }
 
     const { error } = await supabase.from('workers').update(updates).eq('id', workerId)
     if (error) throw new Error('更新に失敗しました。(Failed to update operation): ' + error.message)
 
     revalidatePath('/operations')
+    revalidatePath('/kentei')
     return { success: true }
 }
 

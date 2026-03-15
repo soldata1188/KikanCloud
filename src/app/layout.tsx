@@ -11,8 +11,18 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-    title: "KikanCloud | 外国人材・受入企業管理クラウド",
-    description: "監理団体・登録支援機関向けの次世代クラウド管理システム",
+    title: {
+        default: "KikanCloud | 外国人材・受入企業管理クラウド",
+        template: "%s | KikanCloud",
+    },
+    description: "監理団体・登録支援機関向けの次世代クラウド管理システム。外国人材・受入企業・業務・監査をワンストップで管理。",
+    openGraph: {
+        title: "KikanCloud | 外国人材・受入企業管理クラウド",
+        description: "監理団体・登録支援機関向けの次世代クラウド管理システム",
+        locale: "ja_JP",
+        type: "website",
+    },
+    robots: { index: false, follow: false }, // 社内システムのためインデックス不要
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

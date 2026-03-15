@@ -103,11 +103,12 @@ function WorkerListColumn({ workers, selectedIds, onSelect }: WorkerListColumnPr
                 {grouped.map(({ label, workers: groupWorkers }) => (
                     <div key={label}>
                         {/* ── Group Header ── */}
-                        <div className="flex items-center gap-2 px-4 py-1.5 bg-gray-50 border-b border-t border-gray-100 sticky top-0 z-10">
-                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">{label}</span>
-                            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-gray-200 text-gray-600">
-                                {groupWorkers.length}
+                        <div className="flex items-center gap-2 px-4 py-2 sticky top-0 z-10 bg-white">
+                            <span className="text-xs font-bold uppercase tracking-widest text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded shrink-0">
+                                {label}
                             </span>
+                            <div className="flex-1 h-px bg-emerald-100" />
+                            <span className="text-xs font-normal text-emerald-600/50 shrink-0">{groupWorkers.length}</span>
                         </div>
 
                         {/* ── Worker Rows ── */}

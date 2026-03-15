@@ -1,7 +1,8 @@
 'use client'
 import { useState, useCallback, useEffect } from 'react'
-import { APIProvider, Map, AdvancedMarker, InfoWindow, useMap } from '@vis.gl/react-google-maps'
-import { MapPin as MapPinIcon, Building2, User, Search, X, Navigation, AlertTriangle } from 'lucide-react'
+import { APIProvider, Map, AdvancedMarker, useMap } from '@vis.gl/react-google-maps'
+import { MapPin as MapPinIcon, Building2, User, Search, X, Navigation, AlertTriangle, ExternalLink } from 'lucide-react'
+import Link from 'next/link'
 
 // ── Types ────────────────────────────────────────────────────────
 export type LocationType = 'company' | 'worker'
@@ -41,8 +42,11 @@ function partitionLocations(locs: RawLocation[]): { mappable: MappableLocation[]
     return { mappable, unmapped }
 }
 
+const CORP_WORDS = /^(株式会社|有限会社|合同会社|合資会社|合名会社|一般社団法人|一般財団法人|特定非営利活動法人|社会福祉法人|医療法人|NPO法人|㈱|㈲)\s*|\s*(株式会社|有限会社|合同会社|合資会社|合名会社|㈱|㈲)$/g
+
 function initials(name: string): string {
-    return name.trim().slice(0, 2).toUpperCase()
+    const simplified = name.replace(CORP_WORDS, '').trim()
+    return (simplified || name).slice(0, 2)
 }
 
 // ── Map Panner ───────────────────────────────────────────────────
@@ -531,44 +535,68 @@ export default function RoutingClient({ initialLocations, filterCompanies, googl
                             )
                         })}
 
-                        {/* Info window */}
-                        {activeMarkerId && (() => {
-                            const loc = filteredMappable.find(l => l.id === activeMarkerId)
-                            if (!loc) return null
-                            const isAlert = loc.daysUntilExpiry != null && loc.daysUntilExpiry <= 60
-                            const pinColor = isAlert ? '#dc2626' : loc.type === 'company' ? '#d97706' : '#0067b8'
-                            return (
-                                <InfoWindow
-                                    position={{ lat: loc.latitude, lng: loc.longitude }}
-                                    onCloseClick={() => { setActiveMarkerId(null); setPanTarget(null) }}
-                                    headerDisabled
-                                >
-                                    <div className="p-[12px] min-w-[200px]">
-                                        <div className="text-[13px] font-semibold text-[#0f172a] mb-1">{loc.name}</div>
-                                        <div className="text-[11px] text-[#64748b] leading-[1.4] mb-2">{loc.address || '住所なし'}</div>
-                                        {loc.type === 'company' && loc.workerCount != null && (
-                                            <div className="flex items-center gap-[6px] text-[11px] text-[#64748b] mb-1">
-                                                <User size={11} /> 在籍労働者 {loc.workerCount}名
-                                            </div>
-                                        )}
-                                        {isAlert && loc.daysUntilExpiry != null && (
-                                            <div className="flex items-center gap-[6px] text-[11px] text-[#dc2626] mb-1">
-                                                <AlertTriangle size={11} /> ビザ期限 {loc.daysUntilExpiry}日後
-                                            </div>
-                                        )}
-                                        <div className="flex gap-[5px] mt-2">
-                                            <a
-                                                href={`/${loc.type === 'company' ? 'companies' : 'workers'}/${loc.id}`}
-                                                className="flex-1 h-[26px] rounded-[6px] bg-[#f1f5f9] text-[#475569] text-[11px] font-medium flex items-center justify-center hover:bg-[#e2e8f0] transition-colors"
-                                            >
-                                                詳細を見る
-                                            </a>
-                                        </div>
-                                    </div>
-                                </InfoWindow>
-                            )
-                        })()}
                     </Map>
+
+                    {/* Custom popup overlay — replaces InfoWindow (avoids getRootNode bug) */}
+                    {activeMarkerId && (() => {
+                        const loc = filteredMappable.find(l => l.id === activeMarkerId)
+                        if (!loc) return null
+                        const days = loc.daysUntilExpiry
+                        const isUrgent = days != null && days <= 30
+                        const isWarn = days != null && days > 30 && days <= 60
+                        const isCompany = loc.type === 'company'
+                        const detailHref = isCompany ? `/companies/${loc.id}` : `/workers/${loc.id}`
+                        return (
+                            <div className="absolute top-3 left-1/2 -translate-x-1/2 z-[200] w-[280px] bg-white rounded-[10px] shadow-[0_4px_20px_rgba(0,0,0,.2)] border border-[#e2e8f0] overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+                                {/* Header */}
+                                <div className={`px-[14px] py-[10px] flex items-center justify-between border-b border-[#f1f5f9] ${isCompany ? 'bg-[#fef3c7]' : isUrgent ? 'bg-[#fee2e2]' : 'bg-[#e6f1fb]'}`}>
+                                    <div className="flex items-center gap-2 min-w-0">
+                                        <div className={`w-[24px] h-[24px] rounded-[6px] flex items-center justify-center shrink-0 ${isCompany ? 'bg-[#d97706] text-white' : isUrgent ? 'bg-[#dc2626] text-white' : 'bg-[#0067b8] text-white'}`}>
+                                            {isCompany ? <Building2 size={12} /> : <User size={12} />}
+                                        </div>
+                                        <span className="text-[13px] font-semibold text-[#0f172a] truncate">{loc.name}</span>
+                                    </div>
+                                    <button onClick={() => setActiveMarkerId(null)} className="w-[20px] h-[20px] flex items-center justify-center rounded-full hover:bg-black/10 text-[#64748b] shrink-0 ml-1">
+                                        <X size={12} />
+                                    </button>
+                                </div>
+                                {/* Body */}
+                                <div className="px-[14px] py-[10px] space-y-[6px]">
+                                    {!isCompany && loc.companyName && (
+                                        <div className="text-[11px] text-[#64748b]">{loc.companyName}</div>
+                                    )}
+                                    {loc.address && (
+                                        <div className="text-[11px] text-[#475569] leading-[1.5]">{loc.address}</div>
+                                    )}
+                                    <div className="flex flex-wrap gap-[5px] pt-[2px]">
+                                        {isCompany && loc.workerCount != null && loc.workerCount > 0 && (
+                                            <span className="text-[10px] px-[8px] py-[3px] rounded-[8px] font-semibold bg-[#dcfce7] text-[#16a34a]">
+                                                {loc.workerCount}名在籍
+                                            </span>
+                                        )}
+                                        {isUrgent && days != null && (
+                                            <span className="text-[10px] px-[8px] py-[3px] rounded-[8px] font-semibold bg-[#fee2e2] text-[#dc2626]">
+                                                ⚠ {days}日後期限
+                                            </span>
+                                        )}
+                                        {isWarn && days != null && (
+                                            <span className="text-[10px] px-[8px] py-[3px] rounded-[8px] font-semibold bg-[#fef3c7] text-[#d97706]">
+                                                ⚠ {days}日後期限
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+                                {/* Footer */}
+                                <div className="px-[14px] pb-[10px]">
+                                    <Link href={detailHref}
+                                        className="flex items-center justify-center gap-1.5 w-full h-[30px] rounded-[7px] bg-[#0067b8] text-white text-[11px] font-medium hover:bg-[#004a8c] transition-colors">
+                                        <ExternalLink size={11} />
+                                        詳細を見る
+                                    </Link>
+                                </div>
+                            </div>
+                        )
+                    })()}
 
                     {/* Geocoding progress overlay (top-left on map) */}
                     {isGeocoding && geocodeProgress && (

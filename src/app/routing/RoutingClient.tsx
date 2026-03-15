@@ -1,7 +1,7 @@
 'use client'
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { APIProvider, Map, AdvancedMarker, useMap } from '@vis.gl/react-google-maps'
-import { MapPin as MapPinIcon, Building2, User, Search, X, AlertTriangle, ExternalLink, LocateFixed, ChevronUp, List } from 'lucide-react'
+import { MapPin as MapPinIcon, Building2, User, Search, X, AlertTriangle, ExternalLink, LocateFixed, ChevronUp, List, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { companyInitials } from '@/lib/utils/companyName'
 
@@ -207,6 +207,7 @@ export default function RoutingClient({ initialLocations, filterCompanies, googl
     const [panTarget, setPanTarget] = useState<{ lat: number; lng: number } | null>(null)
 
     const [sheetState, setSheetState] = useState<'peek' | 'half' | 'full'>('peek')
+    const [mobileSearchActive, setMobileSearchActive] = useState(false)
 
     // Geocode modal state
     const [showGeocodeModal, setShowGeocodeModal] = useState(false)
@@ -568,7 +569,7 @@ export default function RoutingClient({ initialLocations, filterCompanies, googl
                         const isCompany = loc.type === 'company'
                         const detailHref = isCompany ? `/companies/${loc.id}` : `/workers/${loc.id}`
                         return (
-                            <div className="absolute top-3 left-1/2 -translate-x-1/2 z-[200] w-[280px] bg-white rounded-[10px] shadow-[0_4px_20px_rgba(0,0,0,.2)] border border-[#e2e8f0] overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+                            <div className="absolute bottom-0 left-0 right-0 rounded-t-2xl md:bottom-auto md:top-3 md:left-1/2 md:-translate-x-1/2 md:w-[280px] md:rounded-[10px] z-[200] bg-white shadow-[0_-4px_20px_rgba(0,0,0,.2)] md:shadow-[0_4px_20px_rgba(0,0,0,.2)] border border-[#e2e8f0] overflow-hidden animate-in fade-in slide-in-from-bottom duration-200 md:zoom-in-95">
                                 {/* Header */}
                                 <div className={`px-[14px] py-[10px] flex items-center justify-between border-b border-[#f1f5f9] ${isCompany ? 'bg-[#fef3c7]' : isUrgent ? 'bg-[#fee2e2]' : 'bg-[#e6f1fb]'}`}>
                                     <div className="flex items-center gap-2 min-w-0">
@@ -654,9 +655,147 @@ export default function RoutingClient({ initialLocations, filterCompanies, googl
                         地図データ ©2026 Google
                     </div>
 
+                    {/* ══ MOBILE: Google Maps-style floating search bar ══ */}
+                    <div className="md:hidden absolute top-3 left-3 right-[56px] z-[200]">
+                        {/* Search input pill */}
+                        <div className={`bg-white flex items-center gap-2 px-3 h-12 shadow-[0_2px_12px_rgba(0,0,0,.18)] border border-[#e2e8f0] transition-all ${mobileSearchActive ? 'rounded-t-2xl border-b-0' : 'rounded-2xl'}`}>
+                            {mobileSearchActive ? (
+                                <button
+                                    onClick={() => { setMobileSearchActive(false); setSearchQuery('') }}
+                                    className="shrink-0 text-[#475569] p-1 -ml-1"
+                                >
+                                    <ArrowLeft size={18} />
+                                </button>
+                            ) : (
+                                <Search size={16} className="text-[#94a3b8] shrink-0" />
+                            )}
+                            <input
+                                type="text"
+                                placeholder="企業名・労働者名を検索..."
+                                value={searchQuery}
+                                onChange={e => setSearchQuery(e.target.value)}
+                                onFocus={() => setMobileSearchActive(true)}
+                                className="flex-1 text-[14px] bg-transparent outline-none text-[#0f172a] placeholder-[#94a3b8]"
+                            />
+                            {searchQuery && (
+                                <button onClick={() => setSearchQuery('')} className="shrink-0 text-[#94a3b8]">
+                                    <X size={16} />
+                                </button>
+                            )}
+                        </div>
+
+                        {/* Search results dropdown */}
+                        {mobileSearchActive && (
+                            <div className="bg-white border border-[#e2e8f0] border-t-0 rounded-b-2xl shadow-[0_8px_20px_rgba(0,0,0,.15)] overflow-y-auto" style={{ maxHeight: '65vh' }}>
+                                {searchQuery ? (() => {
+                                    const allCompanies = [
+                                        ...filteredMappable.filter(l => l.type === 'company'),
+                                        ...filteredUnmapped.filter(l => l.type === 'company'),
+                                    ]
+                                    const allWorkers = [
+                                        ...filteredMappable.filter(l => l.type === 'worker'),
+                                        ...filteredUnmapped.filter(l => l.type === 'worker'),
+                                    ]
+                                    if (allCompanies.length === 0 && allWorkers.length === 0) {
+                                        return (
+                                            <div className="py-10 text-center text-[#94a3b8]">
+                                                <Search size={24} className="mx-auto mb-2 opacity-40" />
+                                                <p className="text-[12px]">「{searchQuery}」に一致する結果がありません</p>
+                                            </div>
+                                        )
+                                    }
+                                    return (
+                                        <>
+                                            {allCompanies.length > 0 && (
+                                                <div>
+                                                    <div className="px-4 py-2 flex items-center gap-1.5 text-[10px] font-bold text-[#94a3b8] uppercase tracking-widest bg-[#f8fafc] border-b border-[#f1f5f9]">
+                                                        <Building2 size={10} className="text-[#d97706]" /> 受入企業
+                                                        <span className="ml-auto font-normal">{allCompanies.length}件</span>
+                                                    </div>
+                                                    {allCompanies.map(loc => {
+                                                        const isMapped = loc.latitude != null && loc.longitude != null
+                                                        return (
+                                                            <button key={loc.id}
+                                                                onClick={() => {
+                                                                    if (isMapped) flyTo(loc as MappableLocation)
+                                                                    setMobileSearchActive(false)
+                                                                }}
+                                                                className="w-full flex items-center gap-3 px-4 py-3 border-b border-[#f8fafc] active:bg-[#f1f5f9] text-left">
+                                                                <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-[11px] font-bold shrink-0 ${isMapped ? 'bg-[#fef3c7] text-[#d97706]' : 'bg-[#f1f5f9] text-[#94a3b8]'}`}>
+                                                                    {initials(loc.name)}
+                                                                </div>
+                                                                <div className="flex-1 min-w-0">
+                                                                    <div className="text-[13px] font-medium text-[#0f172a] truncate">{loc.name}</div>
+                                                                    <div className="text-[11px] text-[#94a3b8] truncate mt-[1px]">{loc.address || '住所なし'}</div>
+                                                                </div>
+                                                                <div className="flex flex-col items-end gap-1 shrink-0">
+                                                                    {loc.workerCount != null && loc.workerCount > 0 && (
+                                                                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#dcfce7] text-[#16a34a] font-medium">{loc.workerCount}名</span>
+                                                                    )}
+                                                                    {!isMapped && (
+                                                                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#f1f5f9] text-[#94a3b8]">未登録</span>
+                                                                    )}
+                                                                </div>
+                                                            </button>
+                                                        )
+                                                    })}
+                                                </div>
+                                            )}
+                                            {allWorkers.length > 0 && (
+                                                <div>
+                                                    <div className="px-4 py-2 flex items-center gap-1.5 text-[10px] font-bold text-[#94a3b8] uppercase tracking-widest bg-[#f8fafc] border-b border-[#f1f5f9]">
+                                                        <User size={10} className="text-[#0067b8]" /> 労働者
+                                                        <span className="ml-auto font-normal">{allWorkers.length}件</span>
+                                                    </div>
+                                                    {allWorkers.map(loc => {
+                                                        const isMapped = loc.latitude != null && loc.longitude != null
+                                                        const days = loc.daysUntilExpiry
+                                                        const isUrgent = days != null && days <= 30
+                                                        const isWarn = days != null && days > 30 && days <= 60
+                                                        return (
+                                                            <button key={loc.id}
+                                                                onClick={() => {
+                                                                    if (isMapped) flyTo(loc as MappableLocation)
+                                                                    setMobileSearchActive(false)
+                                                                }}
+                                                                className="w-full flex items-center gap-3 px-4 py-3 border-b border-[#f8fafc] active:bg-[#f1f5f9] text-left">
+                                                                <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-[11px] font-bold shrink-0 ${isUrgent ? 'bg-[#fee2e2] text-[#dc2626]' : isMapped ? 'bg-[#e6f1fb] text-[#0067b8]' : 'bg-[#f1f5f9] text-[#94a3b8]'}`}>
+                                                                    {initials(loc.name)}
+                                                                </div>
+                                                                <div className="flex-1 min-w-0">
+                                                                    <div className={`text-[13px] font-medium truncate ${isUrgent ? 'text-[#dc2626]' : 'text-[#0f172a]'}`}>{loc.name}</div>
+                                                                    <div className="text-[11px] text-[#94a3b8] truncate mt-[1px]">{loc.companyName || '---'}</div>
+                                                                </div>
+                                                                <div className="flex flex-col items-end gap-1 shrink-0">
+                                                                    {(isUrgent || isWarn) && days != null && (
+                                                                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${isUrgent ? 'bg-[#fee2e2] text-[#dc2626]' : 'bg-[#fef3c7] text-[#d97706]'}`}>{days}日後</span>
+                                                                    )}
+                                                                    {!isMapped && (
+                                                                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#f1f5f9] text-[#94a3b8]">未登録</span>
+                                                                    )}
+                                                                </div>
+                                                            </button>
+                                                        )
+                                                    })}
+                                                </div>
+                                            )}
+                                        </>
+                                    )
+                                })() : (
+                                    <div className="py-8 text-center text-[#94a3b8]">
+                                        <Search size={22} className="mx-auto mb-2 opacity-40" />
+                                        <p className="text-[12px]">企業名または労働者名を入力してください</p>
+                                        <p className="text-[10px] mt-1 text-[#cbd5e1]">{mappableCompanies.length}社・{mappableWorkers.length}名が登録済み</p>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+
                     {/* ══ MOBILE BOTTOM SHEET ══ */}
                     <div className={`md:hidden absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl shadow-[0_-4px_24px_rgba(0,0,0,.12)] z-[150] transition-transform duration-300 ${
-                        sheetState === 'peek' ? 'translate-y-[calc(100%-56px)]'
+                        activeMarkerId || mobileSearchActive ? 'translate-y-full'
+                        : sheetState === 'peek' ? 'translate-y-[calc(100%-56px)]'
                         : sheetState === 'half' ? 'translate-y-[50%]'
                         : 'translate-y-0'
                     }`} style={{ maxHeight: '80vh' }}>

@@ -9,7 +9,6 @@ import {
 } from "lucide-react";
 import OrganizationForm from "../organization/OrganizationForm";
 import TeamManagerClient from "../accounts/TeamManagerClient";
-import { createClient } from "@/lib/supabase/client";
 import { logout } from "../login/actions";
 
 // ── Types ─────────────────────────────────────────────────────────
@@ -27,7 +26,7 @@ interface SettingsProps {
 // ── Tab: 個人設定 ─────────────────────────────────────────────────
 function TabAccount({ userProfile }: { userProfile: { id: string; full_name: string; email: string; role: string } }) {
     return (
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <div className="bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-[var(--radius-card)] p-6">
             <div className="flex items-center gap-3 mb-6">
                 <div className="p-2 bg-emerald-50 text-emerald-700 rounded-md">
                     <User size={20} />
@@ -46,9 +45,9 @@ function TabAccount({ userProfile }: { userProfile: { id: string; full_name: str
                         className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-md text-sm text-gray-400 cursor-not-allowed font-normal" />
                 </div>
                 <div>
-                    <label className="block text-xs font-normal text-gray-500 uppercase tracking-wider mb-1.5">権限</label>
-                    <div className="inline-flex px-2 py-1 bg-emerald-50 text-emerald-700 text-xs font-bold rounded uppercase tracking-widest">
-                        {userProfile?.role || 'staff'}
+                    <label className="form-label">権限</label>
+                    <div className="mt-1.5">
+                        <span className="badge badge-success">{userProfile?.role || 'staff'}</span>
                     </div>
                 </div>
             </div>
@@ -60,7 +59,7 @@ function TabAccount({ userProfile }: { userProfile: { id: string; full_name: str
 function TabNotifications({ emailAlerts, setEmailAlerts, pushAlerts, setPushAlerts }:
     { emailAlerts: boolean; setEmailAlerts: (v: boolean) => void; pushAlerts: boolean; setPushAlerts: (v: boolean) => void }) {
     return (
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <div className="bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-[var(--radius-card)] p-6">
             <div className="flex items-center gap-3 mb-6">
                 <div className="p-2 bg-emerald-50 text-emerald-700 rounded-md">
                     <Bell size={20} />
@@ -78,7 +77,7 @@ function TabNotifications({ emailAlerts, setEmailAlerts, pushAlerts, setPushAler
                             <p className="text-xs text-gray-500 mt-0.5">{desc}</p>
                         </div>
                         <button onClick={() => s(!v)}
-                            className={`relative inline-flex h-5 w-10 items-center rounded-full transition-colors shrink-0 ${v ? "bg-emerald-600" : "bg-gray-200"}`}>
+                            className={`relative inline-flex h-5 w-10 items-center rounded-full transition-colors shrink-0 ${v ? "bg-[var(--brand-primary)]" : "bg-gray-200"}`}>
                             <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform ${v ? "translate-x-5.5" : "translate-x-1"}`} />
                         </button>
                     </div>
@@ -103,7 +102,7 @@ function TabAI() {
     }
 
     return (
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <div className="bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-[var(--radius-card)] p-6">
             <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-3">
                     <div className="p-2 bg-emerald-50 text-emerald-700 rounded-md">
@@ -125,7 +124,7 @@ function TabAI() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div>
                         <label className="block text-xs font-normal text-gray-500 uppercase tracking-wider mb-2">使用モデル</label>
-                        <select className="w-full px-3 py-2 bg-white border border-gray-200 rounded-md text-sm outline-none focus:border-emerald-500 transition-colors font-normal">
+                        <select className="w-full px-3 py-2 bg-white border border-gray-200 rounded-md text-sm outline-none focus:border-[#0067b8] transition-colors font-normal">
                             <option>Gemini 1.5 Pro (推奨)</option>
                             <option>Gemini 1.5 Flash (高速)</option>
                             <option>GPT-4o</option>
@@ -133,7 +132,7 @@ function TabAI() {
                     </div>
                     <div>
                         <label className="block text-xs font-normal text-gray-500 uppercase tracking-wider mb-2">出力言語</label>
-                        <select className="w-full px-3 py-2 bg-white border border-gray-200 rounded-md text-sm outline-none focus:border-emerald-500 transition-colors font-normal">
+                        <select className="w-full px-3 py-2 bg-white border border-gray-200 rounded-md text-sm outline-none focus:border-[#0067b8] transition-colors font-normal">
                             <option>日本語 (Default)</option>
                             <option>English</option>
                             <option>Tiếng Việt</option>
@@ -142,12 +141,8 @@ function TabAI() {
                 </div>
 
                 <div className="pt-6 border-t border-gray-100 flex justify-end">
-                    <button
-                        onClick={handleSave}
-                        disabled={isSaving}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-md text-sm font-normal transition-colors flex items-center gap-2 disabled:opacity-50 uppercase tracking-widest"
-                    >
-                        {isSaving ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Save size={16} />}
+                    <button onClick={handleSave} disabled={isSaving} className="btn btn-primary">
+                        {isSaving ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Save size={15} />}
                         保存
                     </button>
                 </div>
@@ -195,11 +190,11 @@ export default function SettingsPageClient({ currentUser, usersList, companiesLi
                         const isActive = activeTab === tab.id;
                         return (
                             <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                                className={`flex items-center gap-3 px-4 py-2.5 text-xs font-normal rounded-lg transition-all duration-150 whitespace-nowrap text-left uppercase tracking-widest
+                                className={`flex items-center gap-3 px-4 py-2.5 text-[13px] font-normal rounded-lg transition-all duration-150 whitespace-nowrap text-left
                                     ${isActive
-                                        ? "bg-emerald-50 text-emerald-700 shadow-sm border border-emerald-100"
-                                        : "text-gray-400 hover:bg-gray-50 hover:text-gray-600 border border-transparent"}`}>
-                                <Icon size={14} className={isActive ? "text-emerald-700" : "text-gray-400"} strokeWidth={1.5} />
+                                        ? "bg-[var(--brand-primary-light)] text-[var(--brand-primary)] font-medium border border-[var(--brand-primary-light)]"
+                                        : "text-[var(--color-text-secondary)] hover:bg-[#f8fafc] border border-transparent"}`}>
+                                <Icon size={14} className={isActive ? "text-[var(--brand-primary)]" : "text-[var(--color-text-muted)]"} strokeWidth={1.5} />
                                 {tab.label}
                             </button>
                        );
@@ -235,20 +230,19 @@ export default function SettingsPageClient({ currentUser, usersList, companiesLi
                     )}
 
                     {activeTab === "organization" && isAdmin && (
-                        <div className="flex flex-col h-full bg-white border border-gray-200 rounded-lg overflow-hidden">
+                        <div className="flex flex-col h-full bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-[var(--radius-card)] overflow-hidden">
                             {/* Sub-tab bar */}
                             <div className="flex items-center gap-0 border-b border-gray-100 px-6 bg-gray-50/50">
                                 {ORG_SUB_TABS.map(({ id, label, icon: Icon }) => (
                                     <button key={id} onClick={() => setOrgSubTab(id)}
-                                        className={`relative flex items-center gap-2 px-6 py-4 text-xs font-normal tracking-widest uppercase transition-all border-b-2 -mb-[1px]
+                                        className={`relative flex items-center gap-2 px-6 py-4 text-[12px] font-normal tracking-wider uppercase transition-all border-b-2 -mb-[1px]
                                             ${orgSubTab === id
-                                                ? "text-emerald-700 border-emerald-600"
-                                                : "text-gray-400 border-transparent hover:text-gray-700"}`}>
+                                                ? "text-[var(--brand-primary)] border-[var(--brand-primary)]"
+                                                : "text-[var(--color-text-muted)] border-transparent hover:text-[var(--color-text-secondary)]"}`}>
                                         <Icon size={14} />
                                         {label}
                                         {id === "accounts" && (
-                                            <span className={`text-xs font-bold px-1.5 py-0.5 rounded-full ml-1
-                                                ${orgSubTab === id ? "bg-emerald-50 text-emerald-600" : "bg-gray-100 text-gray-400"}`}>
+                                            <span className={orgSubTab === id ? "badge badge-primary ml-1" : "badge badge-muted ml-1"}>
                                                 {usersList.length}
                                             </span>
                                         )}

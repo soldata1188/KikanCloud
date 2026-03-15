@@ -34,7 +34,7 @@ export default function AuditStatusColumn({ counts, activeTab, onSelect }: Audit
                                 }`}
                         >
                             <div className="flex items-center gap-2.5 overflow-hidden">
-                                <div className={`w-7 h-7 rounded-[6px] flex items-center justify-center shrink-0 border transition-all ${isActive ? 'bg-white border-emerald-200' : `${tab.bg} ${tab.border} border-transparent group-hover:border-gray-300`
+                                <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 border transition-all ${isActive ? 'bg-white border-emerald-200' : `${tab.bg} ${tab.border} border-transparent group-hover:border-gray-300`
                                     }`}>
                                     <Icon size={14} className={isActive ? 'text-emerald-600' : tab.color} />
                                 </div>

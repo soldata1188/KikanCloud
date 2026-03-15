@@ -5,8 +5,8 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 // ── Shared styles ──────────────────────────────────────────────────
-const L = "block text-[11px] font-normal text-gray-500 uppercase tracking-widest mb-2 px-1"
-const I = "w-full h-10 pl-10 pr-4 bg-gray-50 border border-gray-200 rounded-lg text-sm outline-none focus:border-blue-600 focus:bg-white transition-all placeholder:text-gray-300 font-normal"
+const L = "form-label"
+const I = "w-full h-10 pl-10 pr-4 bg-[var(--color-bg-page)] border border-[var(--color-border)] rounded-[var(--radius-input)] text-[13px] outline-none focus:border-[var(--brand-primary)] focus:bg-white transition-all placeholder:text-[var(--color-text-muted)] font-normal"
 
 export default function OrganizationForm({ initialData }: { initialData: any }) {
     const router = useRouter()
@@ -144,17 +144,12 @@ export default function OrganizationForm({ initialData }: { initialData: any }) 
                 </div>
 
                 {/* ── Actions ── */}
-                <div className="pt-8 flex justify-center border-t border-gray-100">
-                    <button type="submit" disabled={isLoading}
-                        className="w-full md:w-[320px] bg-blue-700 hover:bg-blue-800 text-white rounded-lg h-12 font-normal transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-blue-50">
+                <div className="pt-8 flex justify-center border-t border-[var(--color-border)]">
+                    <button type="submit" disabled={isLoading} className="btn btn-primary w-full md:w-[320px]" style={{ height: '44px' }}>
                         {isLoading
-                            ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                            : (
-                                <>
-                                    <Save size={18} />
-                                    <span className="text-sm uppercase tracking-widest">設定を保存する</span>
-                                </>
-                            )}
+                            ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                            : <Save size={16} />}
+                        設定を保存する
                     </button>
                 </div>
            </form>

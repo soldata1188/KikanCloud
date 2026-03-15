@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react';
-import { Building2, Edit, MapPin, Users, Briefcase, AlignLeft, Save, X, Loader2 } from 'lucide-react';
+import { Building2, Edit, Briefcase, AlignLeft, Save, Loader2 } from 'lucide-react';
 import { updateCompany } from './actions';
 
 interface Company {
@@ -148,7 +148,7 @@ export default function CompanyDetailColumn({ companies }: CompanyDetailColumnPr
         <div className="h-full flex flex-col bg-white overflow-hidden relative">
 
             {/* ── Header ── */}
-            <div className="px-5 py-2.5 border-b border-gray-300 shrink-0 sticky top-0 z-20 bg-white">
+            <div className="px-5 py-2.5 border-b border-gray-200 shrink-0 sticky top-0 z-20 bg-white">
                 <div className="flex items-start justify-between max-w-2xl mx-auto w-full">
                     <div className="flex items-center gap-4 min-w-0">
                         <div className="w-12 h-12 rounded-xl border-2 border-gray-100 bg-gray-50 flex items-center justify-center shrink-0 text-emerald-600">
@@ -167,9 +167,7 @@ export default function CompanyDetailColumn({ companies }: CompanyDetailColumnPr
                                 ) : (
                                     <>
                                         <h2 className="text-[16px] font-normal text-gray-900 tracking-tight leading-none truncate uppercase">{c.name_jp || '---'}</h2>
-                                        <span className={`text-xs font-bold px-2 py-0.5 rounded-full
-                                                ${(c.active_worker_count || 0) > 0 ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-500'}
-                                            `}>
+                                        <span className={(c.active_worker_count || 0) > 0 ? 'badge badge-success' : 'badge badge-muted'}>
                                             {c.active_worker_count! > 0 ? '受入中' : '未受入'}
                                         </span>
                                     </>
@@ -192,27 +190,17 @@ export default function CompanyDetailColumn({ companies }: CompanyDetailColumnPr
 
                     <div className="shrink-0 ml-4 flex gap-2">
                         {!isEditing ? (
-                            <button
-                                onClick={() => { setIsEditing(true); setEditData(c); }}
-                                className="h-8 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md text-[11px] font-normal transition-all flex items-center gap-1.5 active:scale-95 uppercase tracking-widest shadow-sm"
-                            >
+                            <button onClick={() => { setIsEditing(true); setEditData(c); }} className="btn btn-sm btn-secondary">
                                 <Edit size={13} />
                                 編集する
                             </button>
                         ) : (
                             <div className="flex flex-col gap-1.5">
-                                <button
-                                    onClick={handleSave}
-                                    disabled={isSaving}
-                                    className="h-8 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md text-[11px] font-normal transition-all flex items-center justify-center gap-1.5 active:scale-95 disabled:opacity-50 uppercase tracking-widest shadow-sm"
-                                >
+                                <button onClick={handleSave} disabled={isSaving} className="btn btn-sm btn-success">
                                     {isSaving ? <Loader2 size={13} className="animate-spin" /> : <Save size={13} />}
                                     保存する
                                 </button>
-                                <button
-                                    onClick={() => { setIsEditing(false); setEditData(c); }}
-                                    className="h-7 px-3 bg-white border border-gray-200 hover:bg-gray-50 text-gray-500 rounded-md text-[11px] font-normal transition-all uppercase tracking-widest shadow-sm"
-                                >
+                                <button onClick={() => { setIsEditing(false); setEditData(c); }} className="btn btn-sm btn-secondary">
                                     キャンセル
                                 </button>
                             </div>

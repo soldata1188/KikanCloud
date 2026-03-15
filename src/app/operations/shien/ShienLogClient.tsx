@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import {
-    Calendar,
     User,
     Building2,
     MessageSquare,
@@ -11,7 +10,6 @@ import {
     Phone,
     Users,
     Monitor,
-    MoreHorizontal,
     Trash2,
     Search,
     Filter,
@@ -19,12 +17,12 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { addShienLog, deleteShienLog } from './actions';
-import { ShienLog, Company, Worker } from '@/types/schema';
+import { Company, Worker } from '@/types/schema';
 
 interface ShienLogClientProps {
     initialLogs: any[];
-    companies: Company[];
-    workers: Worker[];
+    companies: Pick<Company, 'id' | 'name_jp'>[];
+    workers: Pick<Worker, 'id' | 'full_name_romaji'>[];
 }
 
 const TYPE_ICONS: Record<string, any> = {
@@ -98,11 +96,8 @@ export default function ShienLogClient({ initialLogs, companies, workers }: Shie
                         </div>
                     </div>
                 </div>
-                <button
-                    onClick={() => setIsModalOpen(true)}
-                    className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white text-[13px] font-bold rounded-lg hover:bg-blue-700 transition-all shadow-sm active:scale-95"
-                >
-                    <Plus size={16} strokeWidth={2.5} />
+                <button onClick={() => setIsModalOpen(true)} className="btn btn-primary">
+                    <Plus size={15} strokeWidth={2.5} />
                     新規記録作成
                 </button>
             </div>
@@ -157,24 +152,22 @@ export default function ShienLogClient({ initialLogs, companies, workers }: Shie
                                                 <div className="text-[16px] font-bold text-gray-900 mb-1">
                                                     {log.support_date}
                                                 </div>
-                                                <div className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full uppercase tracking-wider">
-                                                    {TYPE_LABELS[log.support_type]}
-                                                </div>
+                                                <span className="badge badge-primary">{TYPE_LABELS[log.support_type]}</span>
                                             </div>
                                         </div>
 
                                         {/* Right Side: Content */}
                                         <div className="flex-1 p-5 relative">
                                             <div className="flex items-center gap-2 mb-3">
-                                                <div className="flex items-center gap-1.5 px-2 py-0.5 bg-blue-50 text-[#0067b8] rounded border border-blue-100 text-[10px] font-black uppercase">
+                                                <span className="badge badge-primary flex items-center gap-1">
                                                     <Building2 size={10} />
                                                     {log.companies?.name_jp}
-                                                </div>
+                                                </span>
                                                 {log.workers && (
-                                                    <div className="flex items-center gap-1.5 px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded border border-emerald-100 text-[10px] font-black uppercase">
+                                                    <span className="badge badge-success flex items-center gap-1">
                                                         <User size={10} />
                                                         {log.workers?.full_name_romaji}
-                                                    </div>
+                                                    </span>
                                                 )}
                                             </div>
 

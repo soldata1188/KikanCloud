@@ -1,9 +1,12 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 
-// Diagnostic endpoint: fetches all data that page.tsx & workers/page.tsx fetch
-// and returns any errors as JSON — letting us see the actual error on production
+// Diagnostic endpoint: only available in development
 export async function GET() {
+    if (process.env.NODE_ENV === 'production') {
+        return NextResponse.json({ error: 'Not Found' }, { status: 404 })
+    }
+
     const results: Record<string, any> = {
         timestamp: new Date().toISOString(),
         checks: {},

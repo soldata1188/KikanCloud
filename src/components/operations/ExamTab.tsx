@@ -25,7 +25,7 @@ export default function ExamTab({
 
     // Filter and Sort (Flat List)
     const processedWorkers = React.useMemo(() => {
-        let list = workers
+        const list = workers
             .filter(w => w.kenteiStatus && w.kenteiStatus.type && w.kenteiStatus.type !== '---')
             .filter(w => batchFilter === 'all' || w.entryBatch === batchFilter)
             .filter(w => typeFilter === 'all' || w.kenteiStatus.type === typeFilter)

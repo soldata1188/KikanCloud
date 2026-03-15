@@ -1,6 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import Link from 'next/link'
 import { Sidebar } from '@/components/Sidebar'
+import { TopNav } from '@/components/TopNav'
 
 import WorkersListClient from './WorkersListClient'
 
@@ -20,9 +22,10 @@ export default async function WorkersPage() {
         const next90DaysStr = next90Days.toISOString().split('T')[0];
 
         return (
-            <div className="flex h-screen font-sans text-[#1f1f1f] overflow-hidden selection:bg-[#24b47e]/20">
+            <div className="flex h-screen font-sans text-gray-900 overflow-hidden selection:bg-emerald-500/20">
                 <Sidebar active="workers" />
                 <div className="flex-1 flex flex-col relative min-w-0 overflow-hidden">
+                    <TopNav title="" role={userProfile?.role} />
                     <WorkersListClient initialWorkers={workers || []} role={userProfile?.role || 'staff'} next90DaysStr={next90DaysStr} />
                 </div>
             </div>
@@ -41,7 +44,7 @@ export default async function WorkersPage() {
                     <p className="text-xs text-red-400 font-mono bg-red-50 p-3 rounded-lg text-left break-all">
                         {String(error?.message || error || 'Unknown error')}
                     </p>
-                    <a href="/workers" className="inline-block px-4 py-2 bg-emerald-600 text-white rounded-md text-sm">再読み込み</a>
+                    <Link href="/workers" className="inline-block px-4 py-2 bg-emerald-600 text-white rounded-md text-sm">再読み込み</Link>
                 </div>
             </div>
         )

@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useMemo, useState, useTransition } from 'react';
-import { ClipboardList, Building2, Calendar, CheckCircle2, MapPin, UserCircle, X, Save, Clock, CalendarCheck } from 'lucide-react';
+import React, { useMemo, useState, useTransition, useEffect, useRef } from 'react';
+import { ClipboardList, Calendar, CheckCircle2, X, Save, Clock } from 'lucide-react';
 import { upsertAuditSchedule } from './actions';
 import { useRouter } from 'next/navigation';
+import AuditTypeBadge, { AUDIT_TYPE_CONFIG } from './AuditTypeBadge';
 
 interface AuditTimelineBoardProps {
     allCompletedAudits: any[];
@@ -13,16 +14,20 @@ interface AuditTimelineBoardProps {
     staffList?: { id: string; name: string }[];
 }
 
-const TYPE_CONFIG: Record<string, { label: string, color: string, bg: string }> = {
-    homon: { label: '訪問', color: 'text-blue-600', bg: 'bg-blue-50' },
-    kansa: { label: '監査', color: 'text-emerald-600', bg: 'bg-emerald-50' },
-    rinji: { label: '臨時', color: 'text-amber-600', bg: 'bg-amber-50' },
-};
-
 export default function AuditTimelineBoard({ allCompletedAudits, companies, filterMonth, onSelectCompany, staffList = [] }: AuditTimelineBoardProps) {
     const router = useRouter();
     const [editingAudit, setEditingAudit] = useState<any | null>(null);
     const [isSaving, startSave] = useTransition();
+    const currentMonthRef = useRef<HTMLDivElement>(null);
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (currentMonthRef.current && scrollContainerRef.current) {
+            const container = scrollContainerRef.current;
+            const el = currentMonthRef.current;
+            container.scrollLeft = el.offsetLeft - container.clientWidth / 2 + el.clientWidth / 2;
+        }
+    }, [filterMonth]);
 
     const handleQuickSave = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -43,15 +48,14 @@ export default function AuditTimelineBoard({ allCompletedAudits, companies, filt
             router.refresh();
         });
     };
-    // Generate 6 months list (Oldest to Newest)
+    // 6 columns: current month + 5 months before (oldest→newest)
     const months = useMemo(() => {
-        const result = [];
-        const base = new Date(filterMonth + '-01');
-        for (let i = 5; i >= 0; i--) {
-            const d = new Date(base.getFullYear(), base.getMonth() - i, 1);
-            result.push(d.toISOString().slice(0, 7));
-        }
-        return result;
+        const [y, m] = filterMonth.split('-').map(Number);
+        return Array.from({ length: 6 }, (_, i) => {
+            const offset = 5 - i;
+            const date = new Date(y, m - 1 - offset, 1);
+            return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+        });
     }, [filterMonth]);
 
     const companyMap = useMemo(() => {
@@ -88,51 +92,41 @@ export default function AuditTimelineBoard({ allCompletedAudits, companies, filt
 
     return (
         <div className="flex flex-col h-full bg-slate-50 overflow-hidden">
-            {/* Header: Integrated Title Block */}
-            <div className="h-[48px] bg-white border-b border-gray-200 px-4 flex items-center shrink-0">
-                <div className="flex items-center justify-between w-full">
-                    <div className="flex items-center gap-3">
-                        <div className="flex items-center gap-2 px-2 py-0.5 bg-slate-50 border border-slate-100 rounded-[4px]">
-                            <ClipboardList size={14} className="text-blue-700" />
-                            <h2 className="text-[14px] font-normal text-gray-900 tracking-tight">監査・訪問スケジュールボード</h2>
-                        </div>
-                        <div className="h-4 border-l border-gray-300" />
-                        <p className="text-[11px] font-normal text-gray-900 uppercase tracking-widest">6ヶ月モニタリング概要</p>
-                    </div>
+            {/* Header row — month labels aligned with other column headers */}
+            <div ref={scrollContainerRef} className="h-[44px] bg-white border-b border-gray-200 shrink-0 overflow-x-auto overflow-y-hidden thin-scrollbar flex">
+                <div className="flex h-full w-full min-w-[1000px]">
+                    {months.map((month) => {
+                        const isCurrent = month === filterMonth;
+                        const displayMonth = month.replace('-', '/');
+                        const count = grouped[month]?.length ?? 0;
+                        return (
+                            <div key={month} className={`flex-1 min-w-[160px] h-full flex items-center justify-between px-4 border-r border-gray-200 last:border-r-0 ${isCurrent ? 'bg-blue-600' : 'bg-white'}`}>
+                                <div className="flex items-center gap-2">
+                                    <Calendar size={13} className={isCurrent ? 'text-blue-100' : 'text-blue-600'} />
+                                    <span className={`text-[13px] font-medium tabular-nums ${isCurrent ? 'text-white' : 'text-gray-700'}`}>{displayMonth}</span>
+                                </div>
+                                <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-normal ${isCurrent ? 'bg-white/20 text-white' : 'bg-gray-100 border border-gray-200 text-gray-500'}`}>
+                                    {count}
+                                </span>
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
 
-            {/* Board Content: Seamless Grid */}
-            <div className="flex-1 overflow-x-auto overflow-y-hidden thin-scrollbar p-0 flex">
-                <div className="flex h-full w-full min-w-[1000px] border-t border-gray-200 overflow-hidden">
+            {/* Board body */}
+            <div className="flex-1 overflow-x-auto overflow-y-hidden thin-scrollbar flex">
+                <div className="flex h-full w-full min-w-[1000px] overflow-hidden">
                     {months.map((month) => {
                         const audits = grouped[month];
-                        const displayMonth = month.replace('-', '/');
                         const isCurrent = month === filterMonth;
 
                         return (
-                            <div key={month} className={`flex-1 flex flex-col h-full min-w-[160px] border-r border-gray-200 last:border-r-0 ${isCurrent ? 'bg-blue-50/5' : ''}`}>
-                                {/* Month Header */}
-                                <div className={`flex items-center justify-between px-4 py-3 transition-all ${isCurrent
-                                    ? 'bg-blue-600 text-white'
-                                    : 'bg-slate-50 text-slate-600 border-b border-gray-200'
-                                    }`}>
-                                    <div className="flex items-center gap-2">
-                                        <Calendar size={14} className={isCurrent ? 'text-blue-100' : 'text-blue-700'} />
-                                        <span className="text-[16px] font-normal tabular-nums">{displayMonth}</span>
-                                    </div>
-                                    <div className={`px-2 py-0.5 rounded-full text-[11px] font-normal ${isCurrent ? 'bg-white/20 text-white' : 'bg-white border border-slate-300 text-gray-900'
-                                        }`}>
-                                        {audits.length}
-                                    </div>
-                                </div>
-
+                            <div key={month} ref={isCurrent ? currentMonthRef : null} className={`flex-1 flex flex-col h-full min-w-[160px] border-r border-gray-200 last:border-r-0 ${isCurrent ? 'bg-blue-50/10' : 'bg-white'}`}>
                                 {/* Column Body */}
-                                <div className={`flex-1 overflow-y-auto thin-scrollbar transition-colors divide-y divide-gray-200 ${isCurrent ? 'bg-blue-50/10' : 'bg-white'
-                                    }`}>
+                                <div className={`flex-1 overflow-y-auto thin-scrollbar divide-y divide-gray-100`}>
                                     {audits.length > 0 ? (
                                         audits.map((a) => {
-                                            const cfg = TYPE_CONFIG[a.audit_type] || TYPE_CONFIG.homon;
                                             const compName = companyMap[a.company_id] || '不明な企業';
                                             const day = (a.actual_date || a.scheduled_date)?.split('-')[2];
 
@@ -156,9 +150,7 @@ export default function AuditTimelineBoard({ allCompletedAudits, companies, filt
 
                                                     <div className="flex items-center justify-between gap-2">
                                                         <div className="flex items-center gap-1.5 min-w-0">
-                                                            <span className={`shrink-0 px-1 py-0 rounded-[2px] text-xs font-bold uppercase tracking-tighter border ${cfg.bg} ${cfg.color} border-current/10`}>
-                                                                {cfg.label}
-                                                            </span>
+                                                            <AuditTypeBadge type={a.audit_type} size="xs" />
                                                             <span className="text-[11px] font-normal text-gray-900 truncate">{a.pic_name || '—'}</span>
                                                         </div>
                                                         <div className="flex items-center gap-0.5 text-emerald-500 shrink-0">
@@ -186,10 +178,10 @@ export default function AuditTimelineBoard({ allCompletedAudits, companies, filt
             {/* Quick Edit Modal */}
             {editingAudit && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
-                    <div className="bg-white w-full max-w-md rounded-[6px] border border-gray-200 overflow-hidden animate-in fade-in zoom-in duration-200">
+                    <div className="bg-white w-full max-w-md rounded-xl border border-gray-200 overflow-hidden animate-in fade-in zoom-in duration-200">
                         <div className="flex items-center justify-between px-6 py-4 bg-gray-50 border-b border-gray-100">
                             <div className="flex items-center gap-3">
-                                <div className="p-2 bg-blue-600 rounded-[6px] text-white">
+                                <div className="p-2 bg-blue-600 rounded-lg text-white">
                                     <ClipboardList size={18} />
                                 </div>
                                 <div>
@@ -197,15 +189,15 @@ export default function AuditTimelineBoard({ allCompletedAudits, companies, filt
                                     <p className="text-[10px] font-normal text-gray-400 uppercase tracking-widest">{companyMap[editingAudit.company_id]}</p>
                                 </div>
                             </div>
-                            <button onClick={() => setEditingAudit(null)} className="p-2 hover:bg-gray-200 rounded-[6px] text-gray-400 transition-colors"><X size={20} /></button>
+                            <button onClick={() => setEditingAudit(null)} className="p-2 hover:bg-gray-200 rounded-lg text-gray-400 transition-colors"><X size={20} /></button>
                         </div>
 
                         <form onSubmit={handleQuickSave} className="p-6 space-y-5">
                             <div className="space-y-4">
                                 <div>
                                     <label className="text-[10px] font-normal text-gray-400 uppercase tracking-widest block mb-2 pl-1">種別</label>
-                                    <select name="audit_type" required defaultValue={editingAudit.audit_type} className="w-full bg-gray-50 border border-gray-200 rounded-[6px] px-4 py-2.5 outline-none text-[13px] font-normal focus:border-blue-600 appearance-none">
-                                        {Object.entries(TYPE_CONFIG).map(([key, cfg]) => (
+                                    <select name="audit_type" required defaultValue={editingAudit.audit_type} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 outline-none text-[13px] font-normal focus:border-[#0067b8] appearance-none">
+                                        {Object.entries(AUDIT_TYPE_CONFIG).map(([key, cfg]) => (
                                             <option key={key} value={key}>{cfg.label}</option>
                                         ))}
                                     </select>
@@ -213,7 +205,7 @@ export default function AuditTimelineBoard({ allCompletedAudits, companies, filt
 
                                 <div>
                                     <label className="text-[10px] font-normal text-gray-400 uppercase tracking-widest block mb-2 pl-1">担当者</label>
-                                    <select name="pic_name" defaultValue={editingAudit.pic_name} className="w-full bg-gray-50 border border-gray-200 rounded-[6px] px-4 py-2.5 outline-none text-[13px] font-normal focus:border-blue-600 appearance-none">
+                                    <select name="pic_name" defaultValue={editingAudit.pic_name} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 outline-none text-[13px] font-normal focus:border-[#0067b8] appearance-none">
                                         <option value="">— 担当を選択 —</option>
                                         {staffList.map((s: any) => <option key={s.id} value={s.name}>{s.name}</option>)}
                                     </select>
@@ -221,13 +213,13 @@ export default function AuditTimelineBoard({ allCompletedAudits, companies, filt
 
                                 <div>
                                     <label className="text-[10px] font-normal text-gray-400 uppercase tracking-widest block mb-2 pl-1">実施日</label>
-                                    <input name="scheduled_date" type="date" required defaultValue={editingAudit.actual_date || editingAudit.scheduled_date} className="w-full bg-gray-50 border border-gray-200 rounded-[6px] px-4 py-2.5 outline-none text-[13px] font-normal focus:border-blue-600" />
+                                    <input name="scheduled_date" type="date" required defaultValue={editingAudit.actual_date || editingAudit.scheduled_date} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 outline-none text-[13px] font-normal focus:border-[#0067b8]" />
                                 </div>
                             </div>
 
                             <div className="pt-4 flex gap-3">
-                                <button type="button" onClick={() => setEditingAudit(null)} className="flex-1 py-3 text-[13px] font-normal text-gray-500 hover:bg-gray-50 rounded-[6px] transition-colors">キャンセル</button>
-                                <button type="submit" disabled={isSaving} className="flex-[2] py-3 bg-blue-600 text-white rounded-[6px] text-[13px] font-normal flex items-center justify-center gap-2 active:scale-95 disabled:opacity-40 uppercase tracking-widest">
+                                <button type="button" onClick={() => setEditingAudit(null)} className="flex-1 py-3 text-[13px] font-normal text-gray-500 hover:bg-gray-50 rounded-lg transition-colors">キャンセル</button>
+                                <button type="submit" disabled={isSaving} className="flex-[2] py-3 bg-blue-600 text-white rounded-lg text-[13px] font-normal flex items-center justify-center gap-2 active:scale-95 disabled:opacity-40 uppercase tracking-widest">
                                     {isSaving ? <Clock size={16} className="animate-spin" /> : <Save size={16} />}
                                     {isSaving ? '保存中...' : '変更を保存'}
                                 </button>

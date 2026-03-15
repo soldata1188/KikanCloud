@@ -1,8 +1,9 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { updateAudit, deleteAudit, deleteAuditHistory } from '@/app/audits/actions'
-import { ArrowLeft, CalendarCheck, Clock, CheckCircle2, History, Trash2, Pencil } from 'lucide-react'
+import { ArrowLeft, CalendarCheck, Clock, History, Pencil } from 'lucide-react'
 import { Sidebar } from '@/components/Sidebar'
+import { TopNav } from '@/components/TopNav'
 import { UpdateButton, AuditEditDeleteButton, AuditHistoryDeleteButton } from '@/components/SubmitButtons'
 import { redirect, notFound } from 'next/navigation'
 
@@ -44,7 +45,9 @@ export default async function EditAuditPage({ params }: { params: Promise<{ id: 
     return (
         <div className="flex h-screen bg-gray-50 overflow-hidden font-sans">
             <Sidebar active="audits" />
-            <main className="flex-1 flex flex-col relative overflow-hidden">
+            <div className="flex-1 flex flex-col relative overflow-hidden min-w-0">
+                <TopNav title="監査・訪問 編集" role={userProfile?.role} />
+                <main className="flex-1 flex flex-col relative overflow-hidden">
 
                 {/* ── Top Bar ── */}
                 <div className="flex items-center justify-between px-6 h-[57px] border-b border-gray-200 bg-white shrink-0 z-20">
@@ -258,5 +261,6 @@ export default async function EditAuditPage({ params }: { params: Promise<{ id: 
                 </div>
             </main>
         </div>
+    </div>
     )
 }

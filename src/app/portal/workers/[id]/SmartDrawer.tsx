@@ -36,18 +36,18 @@ export function SmartDrawer({ workerId, documents, title, docType, icon, allowUp
  <div className="flex items-center gap-3">
  <div className={`w-10 h-10 rounded-md flex items-center justify-center shrink-0 ${allowUpload ? 'bg-orange-50 text-orange-600' : 'bg-white text-primary-600'}`}>{icon}</div>
  <div className="text-left">
- <h3 className="font-bold text-[#1f1f1f]">{title}</h3>
- <p className="text-xs text-[#878787]">{filteredDocs.length}件のファイル</p>
+ <h3 className="font-bold text-gray-900">{title}</h3>
+ <p className="text-xs text-gray-500">{filteredDocs.length}件のファイル</p>
  </div>
  </div>
- <ChevronDown className={`text-[#878787] transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+ <ChevronDown className={`text-gray-500 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
  </button>
 
  {isOpen && (
  <div className="px-6 pb-6 pt-2 border-t border-gray-350 bg-white/50">
  {allowUpload && (
  <div className="mb-6 flex gap-4 items-end bg-white p-4 rounded-md"> <div className="w-1/3">
- <label className="block text-xs font-bold text-[#878787] mb-1">対象月</label>
+ <label className="block text-xs font-bold text-gray-500 mb-1">対象月</label>
  <input type="month"value={targetMonth} onChange={(e) => setTargetMonth(e.target.value)} disabled={isPending} className="w-full bg-white border border-gray-350 rounded-md px-3 py-2 text-sm outline-none focus:border-orange-400"/>
  </div>
  <div className="flex-1 relative">
@@ -60,12 +60,12 @@ export function SmartDrawer({ workerId, documents, title, docType, icon, allowUp
  )}
 
  <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2">
- {filteredDocs.length === 0 ? <p className="text-sm text-[#878787] text-center py-4">データがありません</p> : filteredDocs.map(doc => (
+ {filteredDocs.length === 0 ? <p className="text-sm text-gray-500 text-center py-4">データがありません</p> : filteredDocs.map(doc => (
  <div key={doc.id} className="flex items-center justify-between p-3 bg-white rounded-md"> <div className="flex items-center gap-3 overflow-hidden">
  <CheckCircle2 className="text-primary-500 shrink-0"size={18} />
  <div className="min-w-0">
- <p className="text-sm font-bold text-[#1f1f1f] truncate"title={doc.file_name}>{allowUpload ?`[${doc.target_month}]`: ''}{doc.file_name}</p>
- <p className="text-[10px] text-[#878787]">{new Date(doc.created_at).toLocaleDateString('ja-JP')} <span className="mx-1">|</span> {doc.uploaded_by}</p>
+ <p className="text-sm font-bold text-gray-900 truncate"title={doc.file_name}>{allowUpload ?`[${doc.target_month}]`: ''}{doc.file_name}</p>
+ <p className="text-[10px] text-gray-500">{new Date(doc.created_at).toLocaleDateString('ja-JP')} <span className="mx-1">|</span> {doc.uploaded_by}</p>
  </div>
  </div>
  {doc.signedUrl && <a href={doc.signedUrl} target="_blank"rel="noopener noreferrer"className="p-2 bg-white hover:bg-gray-50 text-gray-600 hover:text-primary-600 rounded-lg transition-colors shrink-0"><Download size={16} /></a>}

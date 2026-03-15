@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, UploadCloud, FileText, Loader2, Image as ImageIcon, X, User, Shield, MessageSquare } from 'lucide-react';
+import { Loader2, X, User, Shield, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
 
 interface WorkerData {
@@ -246,7 +246,7 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
             {/* ❌ Error Toast */}
             {toastError && (
                 <div className="fixed top-16 right-4 z-[99999] animate-in fade-in slide-in-from-top-5 duration-300">
-                    <div className="flex items-center gap-3 bg-red-50 border border-red-200 px-5 py-3.5 rounded-[6px] text-red-700 shadow-xl">
+                    <div className="flex items-center gap-3 bg-red-50 border border-red-200 px-5 py-3.5 rounded-lg text-red-700 shadow-xl">
                         <X className="w-4 h-4 text-red-500 shrink-0 cursor-pointer" onClick={() => setToastError(null)} />
                         <span className="text-sm font-bold">{toastError}</span>
                     </div>
@@ -255,7 +255,7 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
             {/* ✅ Success Toast */}
             {toastSuccess && (
                 <div className="fixed top-16 right-4 z-[99999] animate-in fade-in slide-in-from-top-5 duration-300">
-                    <div className="flex items-center gap-3 bg-emerald-50 border border-emerald-200 px-5 py-3.5 rounded-[6px] text-emerald-700 shadow-xl">
+                    <div className="flex items-center gap-3 bg-emerald-50 border border-emerald-200 px-5 py-3.5 rounded-lg text-emerald-700 shadow-xl">
                         <span className="text-lg">&#10003;</span>
                         <span className="text-sm font-bold">{toastSuccess}</span>
                     </div>
@@ -280,16 +280,11 @@ export default function NewWorkerClient({ companies }: { companies: any[] }) {
                         <div className="flex items-center gap-2">
                             <Link
                                 href="/workers"
-                                className="h-9 px-4 bg-white border border-gray-200 hover:bg-gray-50 text-gray-500 rounded-md text-[12px] font-semibold transition-all flex items-center justify-center"
+                                className="btn btn-sm btn-secondary"
                             >
                                 キャンセル
                             </Link>
-                            <button
-                                type="button"
-                                onClick={handleSubmit}
-                                disabled={isSubmitting}
-                                className="h-9 px-5 bg-[#0067b8] hover:bg-[#005a9e] text-white rounded-md text-[12px] font-bold transition-all flex items-center justify-center gap-2 disabled:opacity-50"
-                            >
+                            <button type="button" onClick={handleSubmit} disabled={isSubmitting} className="btn btn-sm btn-primary">
                                 {isSubmitting && <Loader2 size={13} className="animate-spin" />}
                                 {isSubmitting ? '登録中...' : '登録完了'}
                             </button>

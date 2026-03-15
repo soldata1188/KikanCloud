@@ -43,11 +43,9 @@ export default function OperationListItem({ worker, onEditMemo }: OperationListI
 
                 {/* Badges */}
                 <div className="absolute top-4 right-4 flex gap-1">
-                    <span className="px-1.5 py-0.5 bg-green-100 text-green-700 text-xs font-bold rounded-sm border border-green-200">就業中</span>
+                    <span className="badge badge-success">就業中</span>
                     {isWarnExp && (
-                        <span className="px-1.5 py-0.5 bg-red-100 text-red-700 text-xs font-bold rounded-sm border border-red-200">
-                            期限まで{daysUntilExp}日
-                        </span>
+                        <span className="badge badge-danger">期限まで{daysUntilExp}日</span>
                     )}
                 </div>
 
@@ -84,10 +82,7 @@ export default function OperationListItem({ worker, onEditMemo }: OperationListI
                 <div className="flex items-center gap-2 mb-3">
                     <i className={`fas ${worker.kikou_status?.progress === '完了' ? 'fa-check-circle text-green-600' : 'fa-clock text-blue-600'}`}></i>
                     <span className="text-xs font-normal text-gray-900">機構業務</span>
-                    <span className={`px-1.5 py-0.5 text-xs font-bold rounded border ${worker.kikou_status?.progress === '完了'
-                            ? 'bg-green-100 text-green-700 border-green-200'
-                            : 'bg-blue-100 text-blue-700 border-blue-200'
-                        }`}>
+                    <span className={worker.kikou_status?.progress === '完了' ? 'badge badge-success' : 'badge badge-primary'}>
                         {worker.kikou_status?.progress || '未着手'}
                     </span>
                 </div>

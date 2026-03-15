@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createBrowserClient } from '@supabase/ssr';
-import { FileText, Upload, Trash2, Eye, FilePlus, FolderOpen, X, UploadCloud, Check } from 'lucide-react';
+import { FileText, Trash2, Eye, FilePlus, FolderOpen, X, UploadCloud, Check } from 'lucide-react';
 import { saveDocumentRecord, deleteDocumentRecord } from './documents-actions';
 
 // ── Doc Type Config ───────────────────────────────────────
@@ -252,7 +252,7 @@ export default function DocumentsColumn({ workerId }: DocumentsColumnProps) {
                                     onChange={e => setUploadDocType(e.target.value)}
                                     disabled={uploading}
                                     placeholder="種類 (例: パスポート)"
-                                    className="w-full h-8 px-2 bg-white border border-emerald-200 rounded-md text-[11px] font-bold outline-none focus:border-emerald-500 transition-all text-emerald-800"
+                                    className="w-full h-8 px-2 bg-white border border-emerald-200 rounded-md text-[11px] font-bold outline-none focus:border-[#0067b8] transition-all text-emerald-800"
                                 />
                                 <datalist id="doc-types-list">
                                     {Object.entries(DOC_TYPES).map(([k, v]) => (

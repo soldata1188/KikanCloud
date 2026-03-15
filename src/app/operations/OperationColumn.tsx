@@ -2,12 +2,13 @@
 
 import React, { useState, useEffect } from 'react';
 import {
-    Calendar, MapPin, Building2, Building, User,
-    ClipboardList, FileText, ShieldCheck, GraduationCap,
-    CheckCircle2, Plane, Briefcase, Activity, MessageSquare,
+    MapPin, Building2, Building,
+    ClipboardList, FileText, ShieldCheck,
+    CheckCircle2, Briefcase,
     Loader2, ChevronDown, ClipboardCheck, PlaneLanding,
-    StickyNote, Plus, Trash2
+    StickyNote, Plus, Trash2, Clock, MessageSquare, Phone, Monitor, Users
 } from 'lucide-react';
+import { getWorkerTasksAndLogs } from './actions';
 
 interface OperationColumnProps {
     workers: any[];
@@ -23,11 +24,39 @@ const WINDOW_OPTIONS = ['---', '窓口', 'ONLINE'];
 const KENTEI_OPTIONS = ['---', '初級', '基礎級', '専門級', '随時３級'];
 const SYSTEM_OPTIONS = ['---', '就労認可', '変更届出'];
 
-const InlineField = ({ label, value, type = "text", options = [], onChange }: any) => (
-    <div className="flex items-center gap-3 px-4 py-2 border-b border-slate-200 last:border-0 hover:bg-slate-50/50 transition-all group">
-        <label className="text-xs font-bold text-slate-400 uppercase tracking-tighter w-[90px] shrink-0">{label}</label>
+const PRIORITY_COLOR: Record<string, string> = {
+    urgent: 'bg-red-50 text-red-600 border-red-200',
+    high: 'bg-amber-50 text-amber-600 border-amber-200',
+    medium: 'bg-blue-50 text-blue-600 border-blue-100',
+    low: 'bg-gray-50 text-gray-500 border-gray-100',
+};
+const TASK_STATUS_COLOR: Record<string, string> = {
+    done: 'text-emerald-500',
+    in_progress: 'text-blue-500',
+    todo: 'text-gray-300',
+};
+const LOG_ICON: Record<string, React.ElementType> = {
+    visit: Users, phone: Phone, online: Monitor, other: MessageSquare,
+};
+const LOG_LABEL: Record<string, string> = {
+    visit: '訪問', phone: '電話', online: 'オンライン', other: 'その他',
+};
+
+function getVisaBadge(visaExpiry: string) {
+    if (!visaExpiry || visaExpiry === '---') return null;
+    const days = Math.ceil((new Date(visaExpiry).getTime() - Date.now()) / 86400000);
+    if (days < 0) return { label: '期限切れ', cls: 'bg-red-600 text-white' };
+    if (days <= 30) return { label: `残${days}日`, cls: 'bg-red-500 text-white' };
+    if (days <= 90) return { label: `残${days}日`, cls: 'bg-orange-400 text-white' };
+    if (days <= 180) return { label: `残${days}日`, cls: 'bg-yellow-400 text-gray-800' };
+    return { label: `残${days}日`, cls: 'bg-gray-100 text-gray-600' };
+}
+
+const InlineField = ({ label, value, type = 'text', options = [], onChange }: any) => (
+    <div className="flex items-center gap-3 px-5 py-2.5 border-b border-slate-100 last:border-0 hover:bg-slate-50/50 transition-all group">
+        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter w-[100px] shrink-0">{label}</label>
         <div className="flex-1 min-w-0">
-            {type === "select" ? (
+            {type === 'select' ? (
                 <div className="relative">
                     <select
                         value={value || '---'}
@@ -36,14 +65,14 @@ const InlineField = ({ label, value, type = "text", options = [], onChange }: an
                     >
                         {options.map((opt: string) => <option key={opt} value={opt}>{opt}</option>)}
                     </select>
-                    <ChevronDown size={14} className="absolute right-0 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none group-hover:text-blue-500 transition-colors" />
+                    <ChevronDown size={13} className="absolute right-0 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none group-hover:text-blue-500 transition-colors" />
                 </div>
             ) : (
                 <input
                     type={type}
                     value={value || ''}
                     onChange={(e) => onChange(e.target.value)}
-                    className="w-full h-8 bg-transparent text-sm font-medium text-slate-700 outline-none border-b border-transparent focus:border-blue-500 placeholder:text-slate-200"
+                    className="w-full h-8 bg-transparent text-sm font-medium text-slate-700 outline-none border-b border-transparent focus:border-blue-400 placeholder:text-slate-200 transition-colors"
                     placeholder="---"
                 />
             )}
@@ -51,51 +80,80 @@ const InlineField = ({ label, value, type = "text", options = [], onChange }: an
     </div>
 );
 
-const StatusSelect = ({ value, onChange }: { value: string, onChange: (v: string) => void }) => {
-    const colorClass = value === '完了'
-        ? 'text-emerald-600 bg-emerald-50 border-emerald-100'
+const StatusBadge = ({ value, onChange }: { value: string; onChange: (v: string) => void }) => {
+    const cls = value === '完了'
+        ? 'text-emerald-600 bg-emerald-50 border-emerald-200'
         : value === '進行中'
-            ? 'text-blue-600 bg-blue-50 border-blue-100'
-            : 'text-gray-400 bg-gray-100 border-gray-200';
-
+            ? 'text-blue-600 bg-blue-50 border-blue-200'
+            : 'text-gray-400 bg-gray-50 border-gray-200';
     return (
-        <div className="relative group/status flex-shrink-0">
-            <div className={`flex items-center px-3 py-1.5 rounded-[6px] border transition-all ${colorClass}`}>
-                <select
-                    value={value}
-                    onChange={(e) => onChange(e.target.value)}
-                    className="appearance-none bg-transparent text-xs font-bold outline-none cursor-pointer pr-4 color-inherit"
-                >
-                    {PROGRESS_OPTIONS.map(opt => <option key={opt} value={opt} className="bg-white text-slate-700">{opt}</option>)}
-                </select>
-                <ChevronDown size={12} className="absolute right-2 top-1/2 -translate-y-1/2 opacity-50 pointer-events-none" />
-            </div>
+        <div className={`relative flex items-center px-2.5 py-1 rounded-lg border text-[11px] font-bold ${cls}`}>
+            <select
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+                className="appearance-none bg-transparent outline-none cursor-pointer pr-4"
+            >
+                {PROGRESS_OPTIONS.map(opt => <option key={opt} value={opt} className="bg-white text-slate-700">{opt}</option>)}
+            </select>
+            <ChevronDown size={11} className="absolute right-1.5 top-1/2 -translate-y-1/2 opacity-50 pointer-events-none" />
         </div>
     );
 };
 
+const SectionBlock = ({ icon: Icon, title, status, onStatusChange, children }: {
+    icon: React.ElementType;
+    title: string;
+    status: string;
+    onStatusChange: (v: string) => void;
+    children: React.ReactNode;
+}) => (
+    <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
+        <div className="px-5 py-3 flex items-center justify-between border-b border-slate-100 bg-slate-50/40">
+            <div className="flex items-center gap-2.5">
+                <Icon size={15} className="text-slate-400" />
+                <span className="text-[11px] font-bold text-slate-600 uppercase tracking-widest">{title}</span>
+            </div>
+            <StatusBadge value={status} onChange={onStatusChange} />
+        </div>
+        <div>{children}</div>
+    </div>
+);
+
 export default function OperationColumn({ workers, staff, onUpdate, onBulkUpdate }: OperationColumnProps) {
-    const [memoLines, setMemoLines] = useState<string[]>([]);
+    const [memoLines, setMemoLines] = useState<string[]>(['']);
     const [draftChanges, setDraftChanges] = useState<Record<string, string>>({});
     const [isSaving, setIsSaving] = useState(false);
+    const [tasks, setTasks] = useState<any[]>([]);
+    const [shienLogs, setShienLogs] = useState<any[]>([]);
+    const [isLoadingActivity, setIsLoadingActivity] = useState(false);
 
     const isBulkMode = workers.length > 1;
     const worker = workers[0];
 
+    // Load tasks/logs for single worker
+    useEffect(() => {
+        if (isBulkMode || !worker?.id) {
+            setTasks([]);
+            setShienLogs([]);
+            return;
+        }
+        setIsLoadingActivity(true);
+        getWorkerTasksAndLogs(worker.id)
+            .then(({ tasks: t, logs: l }) => { setTasks(t); setShienLogs(l); })
+            .catch(() => { })
+            .finally(() => setIsLoadingActivity(false));
+    }, [worker?.id, isBulkMode]);
+
     useEffect(() => {
         if (!isBulkMode && worker?.id) {
-            const lines = worker.remarks ? worker.remarks.split('\n') : [''];
-            setMemoLines(lines);
+            setMemoLines(worker.remarks ? worker.remarks.split('\n') : ['']);
         }
         setDraftChanges({});
     }, [workers.length, worker?.id, worker?.remarks, isBulkMode]);
 
     const handleFieldChange = (field: string, subField: string, value: string) => {
         if (isBulkMode) {
-            setDraftChanges(prev => ({
-                ...prev,
-                [`${field}.${subField}`]: value
-            }));
+            setDraftChanges(prev => ({ ...prev, [`${field}.${subField}`]: value }));
         } else {
             onUpdate(field, subField, value);
         }
@@ -123,17 +181,10 @@ export default function OperationColumn({ workers, staff, onUpdate, onBulkUpdate
         onUpdate('direct', 'remarks', newLines.join('\n'));
     };
 
-    const addMemoLine = () => {
-        const newLines = [...memoLines, ''];
-        setMemoLines(newLines);
-        onUpdate('direct', 'remarks', newLines.join('\n'));
-    };
+    const addMemoLine = () => setMemoLines(prev => [...prev, '']);
 
     const removeMemoLine = (index: number) => {
-        if (memoLines.length <= 1) {
-            handleUpdateMemo(0, '');
-            return;
-        }
+        if (memoLines.length <= 1) { handleUpdateMemo(0, ''); return; }
         const newLines = memoLines.filter((_, i) => i !== index);
         setMemoLines(newLines);
         onUpdate('direct', 'remarks', newLines.join('\n'));
@@ -152,58 +203,69 @@ export default function OperationColumn({ workers, staff, onUpdate, onBulkUpdate
         );
     }
 
-    const getCommonValue = (field: string, subField?: string) => {
+    const getV = (field: string, subField?: string) => {
         const key = subField ? `${field}.${subField}` : `direct.${field}`;
-        if (isBulkMode && draftChanges[key] !== undefined) {
-            return draftChanges[key];
-        }
+        if (isBulkMode && draftChanges[key] !== undefined) return draftChanges[key];
         const values = workers.map(w => {
             if (field === 'direct') return w[subField!];
             return subField ? w[field]?.[subField] : w[field];
         });
-        const uniqueValues = Array.from(new Set(values));
-        if (uniqueValues.length === 1) return uniqueValues[0];
-        return isBulkMode ? '--- (複数)' : uniqueValues[0];
+        const unique = Array.from(new Set(values));
+        if (unique.length === 1) return unique[0];
+        return isBulkMode ? '--- (複数)' : unique[0];
     };
 
     const STAFF_OPTIONS = ['---', ...staff.map(s => s.full_name)];
 
+    // Real progress from actual status values
+    const progressStatuses = [
+        getV('kikou_status', 'progress'),
+        getV('nyukan_status', 'progress'),
+        getV('kentei_status', 'progress'),
+        getV('system_status', 'progress'),
+        getV('airport_status', 'progress'),
+    ].map(s => s || '未着手');
+    const completedCount = progressStatuses.filter(s => s === '完了').length;
+    const progressPct = Math.round((completedCount / progressStatuses.length) * 100);
+
+    // Visa expiry badge (single mode only)
+    const visaBadge = !isBulkMode && worker?.visaExpiry ? getVisaBadge(worker.visaExpiry) : null;
+
     return (
         <div className="flex-1 bg-slate-50 h-full overflow-y-auto thin-scrollbar">
-            <div className="max-w-[1000px] mx-auto w-full px-6 py-6 flex flex-col gap-6">
+            <div className="max-w-[660px] mx-auto w-full px-5 py-5 flex flex-col gap-4">
 
-                {/* 1. Header Information Panel */}
-                <div className="bg-white border border-slate-300 rounded-lg p-6 flex items-start justify-between">
-                    <div className="flex gap-5">
-                        <div className={`w-14 h-14 rounded-xl flex items-center justify-center text-white text-xl font-normal shrink-0 ${isBulkMode ? 'bg-slate-800' : 'bg-slate-700'}`}>
+                {/* Header */}
+                <div className="bg-white border border-slate-200 rounded-lg p-5 flex items-start justify-between gap-4">
+                    <div className="flex gap-4 min-w-0">
+                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-white text-lg font-bold shrink-0 ${isBulkMode ? 'bg-slate-700' : 'bg-blue-600'}`}>
                             {isBulkMode ? workers.length : worker.avatar}
                         </div>
-                        <div className="flex flex-col gap-2">
-                            <div className="flex items-center gap-3">
-                                <h1 className="text-xl font-bold text-slate-800 tracking-tight">
-                                    {isBulkMode ? `${workers.length} 名の労働者を選択中` : worker.name}
+                        <div className="flex flex-col gap-1.5 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                                <h1 className="text-base font-bold text-slate-800 tracking-tight">
+                                    {isBulkMode ? `${workers.length}名を一括編集中` : worker.name}
                                 </h1>
                                 {!isBulkMode && (
-                                    <span className="px-2 py-0.5 rounded bg-blue-50 text-blue-600 text-xs font-bold uppercase tracking-widest border border-blue-100">
+                                    <span className="px-2 py-0.5 rounded bg-blue-50 text-blue-600 text-[10px] font-bold uppercase tracking-widest border border-blue-100 shrink-0">
                                         {worker.systemType === 'ginou_jisshu' ? '技能実習' : worker.systemType === 'ikusei_shuro' ? '育成就労' : '特定技能'}
                                     </span>
                                 )}
                             </div>
-
-                            <div className="flex items-center gap-5 text-sm font-medium text-slate-500">
-                                <div className="flex items-center gap-2">
-                                    <Building2 size={15} className="text-slate-300" />
-                                    <span>{isBulkMode ? '一괄編集モード' : worker.company}</span>
+                            <div className="flex items-center gap-4 text-[11px] font-medium text-slate-400 flex-wrap">
+                                <div className="flex items-center gap-1.5">
+                                    <Building2 size={11} className="text-slate-300" />
+                                    <span>{isBulkMode ? '複数企業' : worker.company}</span>
                                 </div>
                                 {!isBulkMode && (
                                     <>
-                                        <div className="flex items-center gap-2">
-                                            <Briefcase size={15} className="text-slate-300" />
+                                        <div className="flex items-center gap-1.5">
+                                            <Briefcase size={11} className="text-slate-300" />
                                             <span>{worker.occupation}</span>
                                         </div>
-                                        <div className="flex items-center gap-2">
-                                            <MapPin size={15} className="text-slate-300" />
-                                            <span className="max-w-[250px] truncate">{worker.address}</span>
+                                        <div className="flex items-center gap-1.5">
+                                            <MapPin size={11} className="text-slate-300" />
+                                            <span className="max-w-[200px] truncate">{worker.address}</span>
                                         </div>
                                     </>
                                 )}
@@ -211,224 +273,238 @@ export default function OperationColumn({ workers, staff, onUpdate, onBulkUpdate
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-4 border-l border-slate-100 pl-6 shrink-0">
-                        <div className="flex flex-col gap-1">
-                            <span className="text-[10px] font-bold text-slate-400 tracking-widest uppercase">有効期限 (在留)</span>
-                            <div className="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-[6px] border border-slate-100">
-                                <Calendar size={14} className="text-slate-400" />
-                                <span className={`text-sm font-bold ${worker.visaExpiry.includes('あと') ? 'text-rose-600' : 'text-slate-600'}`}>{worker.visaExpiry}</span>
+                    <div className="flex flex-col items-end gap-2 shrink-0">
+                        {!isBulkMode && worker?.visaExpiry && worker.visaExpiry !== '---' && (
+                            <div className="flex flex-col items-end gap-1">
+                                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">在留期限</span>
+                                <div className="flex items-center gap-1.5">
+                                    <span className="text-xs font-bold text-slate-600">{worker.visaExpiry}</span>
+                                    {visaBadge && (
+                                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${visaBadge.cls}`}>
+                                            {visaBadge.label}
+                                        </span>
+                                    )}
+                                </div>
                             </div>
-                        </div>
+                        )}
                         {isBulkMode && Object.keys(draftChanges).length > 0 && (
                             <button
                                 onClick={handleBulkSave}
                                 disabled={isSaving}
-                                className="h-full px-6 bg-slate-800 hover:bg-slate-900 text-white rounded-lg font-normal text-[13px] flex items-center gap-2 transition-all active:scale-95 disabled:opacity-50"
+                                className="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg font-bold text-xs flex items-center gap-2 transition-all active:scale-95 disabled:opacity-50"
                             >
-                                {isSaving ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle2 size={16} />}
-                                <span>一括保存</span>
+                                {isSaving ? <Loader2 size={13} className="animate-spin" /> : <CheckCircle2 size={13} />}
+                                一括保存
                             </button>
                         )}
                     </div>
                 </div>
 
-                {/* 2. Unified Seamless Block */}
-                <div className="bg-white border border-slate-300 rounded-lg overflow-hidden flex flex-col divide-y divide-slate-300">
-
-                    {/* Top Section: Basic Cert Dates */}
-                    <div className="flex divide-x divide-slate-300">
-                        <div className="flex-1 flex items-center gap-6 px-6 py-5 hover:bg-slate-50/30 transition-all">
-                            <div className="flex flex-col gap-1.5">
-                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">認定開始日</span>
-                                <input
-                                    type="date"
-                                    value={getCommonValue('direct', 'cert_start_date') || ''}
-                                    onChange={(e) => handleFieldChange('direct', 'cert_start_date', e.target.value)}
-                                    className="bg-transparent text-sm font-medium text-slate-700 outline-none"
-                                />
-                            </div>
-                            <div className="flex flex-col gap-1.5">
-                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">認定終了日</span>
-                                <input
-                                    type="date"
-                                    value={getCommonValue('direct', 'cert_end_date') || ''}
-                                    onChange={(e) => handleFieldChange('direct', 'cert_end_date', e.target.value)}
-                                    className="bg-transparent text-sm font-medium text-slate-700 outline-none"
-                                />
-                            </div>
+                {/* Cert dates + real progress */}
+                <div className="bg-white border border-slate-200 rounded-lg overflow-hidden flex divide-x divide-slate-100">
+                    <div className="flex-1 px-5 py-4 flex gap-8">
+                        <div className="flex flex-col gap-1">
+                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">認定開始日</span>
+                            <input
+                                type="date"
+                                value={getV('direct', 'cert_start_date') || ''}
+                                onChange={(e) => handleFieldChange('direct', 'cert_start_date', e.target.value)}
+                                className="bg-transparent text-sm font-medium text-slate-700 outline-none"
+                            />
                         </div>
-                        <div className="flex-1 bg-slate-50/20 px-6 py-5 flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                                <Activity size={18} className="text-slate-400" />
-                                <span className="text-xs font-bold text-slate-700 uppercase tracking-widest">進捗管理概要</span>
-                            </div>
-                            <div className="flex items-center gap-3">
-                                <div className="flex flex-col items-end">
-                                    <span className="text-[10px] font-bold text-slate-400 uppercase">総合進捗</span>
-                                    <span className="text-sm font-bold text-slate-800">75%</span>
-                                </div>
-                                <div className="w-20 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                                    <div className="h-full bg-blue-500 w-[75%]" />
-                                </div>
-                            </div>
+                        <div className="flex flex-col gap-1">
+                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">認定終了日</span>
+                            <input
+                                type="date"
+                                value={getV('direct', 'cert_end_date') || ''}
+                                onChange={(e) => handleFieldChange('direct', 'cert_end_date', e.target.value)}
+                                className="bg-transparent text-sm font-medium text-slate-700 outline-none"
+                            />
                         </div>
                     </div>
-
-                    {/* Procedures Grid */}
-                    <div className="grid grid-cols-2 divide-x divide-slate-300">
-
-                        {/* Cell: Kikou */}
-                        <div className="flex flex-col group">
-                            <div className="px-5 py-3 flex items-center justify-between border-b border-gray-300 bg-white transition-all">
-                                <div className="flex items-center gap-3 text-slate-900">
-                                    <ClipboardList size={18} className="text-slate-400" />
-                                    <span className="text-sm font-bold uppercase tracking-widest">機構業務</span>
-                                </div>
-                                <StatusSelect value={getCommonValue('kikou_status', 'progress')} onChange={(v) => handleFieldChange('kikou_status', 'progress', v)} />
-                            </div>
-                            <div className="p-2 grid grid-cols-2">
-                                <InlineField label="申請内容" value={getCommonValue('kikou_status', 'type')} type="select" options={KIKOU_OPTIONS} onChange={(v: any) => handleFieldChange('kikou_status', 'type', v)} />
-                                <InlineField label="申請日" value={getCommonValue('kikou_status', 'application_date')} type="date" onChange={(v: any) => handleFieldChange('kikou_status', 'application_date', v)} />
-                                <div className="col-span-2">
-                                    <InlineField label="業務担当者" value={getCommonValue('kikou_status', 'assignee')} type="select" options={STAFF_OPTIONS} onChange={(v: any) => handleFieldChange('kikou_status', 'assignee', v)} />
-                                </div>
-                            </div>
+                    <div className="px-5 py-4 flex items-center gap-3 shrink-0">
+                        <div className="flex flex-col items-end gap-0.5">
+                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">総合進捗</span>
+                            <span className="text-2xl font-bold text-slate-800 leading-none">{progressPct}%</span>
+                            <span className="text-[9px] text-slate-400">{completedCount}/{progressStatuses.length} 完了</span>
                         </div>
-
-                        {/* Cell: Nyukan */}
-                        <div className="flex flex-col group">
-                            <div className="px-5 py-3 flex items-center justify-between border-b border-gray-300 bg-white transition-all">
-                                <div className="flex items-center gap-3 text-slate-900">
-                                    <FileText size={18} className="text-slate-400" />
-                                    <span className="text-sm font-bold uppercase tracking-widest">入管業務</span>
-                                </div>
-                                <StatusSelect value={getCommonValue('nyukan_status', 'progress')} onChange={(v) => handleFieldChange('nyukan_status', 'progress', v)} />
-                            </div>
-                            <div className="p-2 grid grid-cols-2">
-                                <div className="col-span-2">
-                                    <InlineField label="申請内容" value={getCommonValue('nyukan_status', 'type')} type="select" options={NYUKAN_OPTIONS} onChange={(v: any) => handleFieldChange('nyukan_status', 'type', v)} />
-                                </div>
-                                <InlineField label="申請日" value={getCommonValue('nyukan_status', 'application_date')} type="date" onChange={(v: any) => handleFieldChange('nyukan_status', 'application_date', v)} />
-                                <InlineField label="受理番号" value={getCommonValue('nyukan_status', 'receipt_number')} onChange={(v: any) => handleFieldChange('nyukan_status', 'receipt_number', v)} />
-                                <InlineField label="申請窓口" value={getCommonValue('nyukan_status', 'application_window')} type="select" options={WINDOW_OPTIONS} onChange={(v: any) => handleFieldChange('nyukan_status', 'application_window', v)} />
-                                <InlineField label="取次者" value={getCommonValue('nyukan_status', 'agent')} type="select" options={STAFF_OPTIONS} onChange={(v: any) => handleFieldChange('nyukan_status', 'agent', v)} />
-                                <div className="col-span-2">
-                                    <InlineField label="業務担当者" value={getCommonValue('nyukan_status', 'assignee')} type="select" options={STAFF_OPTIONS} onChange={(v: any) => handleFieldChange('nyukan_status', 'assignee', v)} />
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Cell: Kentei */}
-                        <div className="flex flex-col group">
-                            <div className="px-5 py-3 flex items-center justify-between border-b border-gray-300 bg-white transition-all">
-                                <div className="flex items-center gap-3 text-slate-900">
-                                    <ShieldCheck size={18} className="text-slate-400" />
-                                    <span className="text-sm font-bold uppercase tracking-widest">検定業務</span>
-                                </div>
-                                <StatusSelect value={getCommonValue('kentei_status', 'progress')} onChange={(v) => handleFieldChange('kentei_status', 'progress', v)} />
-                            </div>
-                            <div className="p-2 grid grid-cols-2">
-                                <div className="col-span-2">
-                                    <InlineField label="検定機関" value={getCommonValue('kentei_status', 'institution')} onChange={(v: any) => handleFieldChange('kentei_status', 'institution', v)} />
-                                </div>
-                                <div className="col-span-2">
-                                    <InlineField label="検定場所" value={getCommonValue('kentei_status', 'location')} onChange={(v: any) => handleFieldChange('kentei_status', 'location', v)} />
-                                </div>
-                                <InlineField label="検定内容" value={getCommonValue('kentei_status', 'type')} type="select" options={KENTEI_OPTIONS} onChange={(v: any) => handleFieldChange('kentei_status', 'type', v)} />
-                                <div />
-                                <InlineField label="学科日程" value={getCommonValue('kentei_status', 'exam_date_written')} type="date" onChange={(v: any) => handleFieldChange('kentei_status', 'exam_date_written', v)} />
-                                <InlineField label="実技日程" value={getCommonValue('kentei_status', 'exam_date_practical')} type="date" onChange={(v: any) => handleFieldChange('kentei_status', 'exam_date_practical', v)} />
-                                <div className="col-span-2">
-                                    <InlineField label="業務担当者" value={getCommonValue('kentei_status', 'assignee')} type="select" options={STAFF_OPTIONS} onChange={(v: any) => handleFieldChange('kentei_status', 'assignee', v)} />
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Cell: System */}
-                        <div className="flex flex-col group">
-                            <div className="px-5 py-3 flex items-center justify-between border-b border-gray-300 bg-white transition-all">
-                                <div className="flex items-center gap-3 text-slate-900">
-                                    <Building size={18} className="text-slate-400" />
-                                    <span className="text-sm font-bold uppercase tracking-widest">既存システム</span>
-                                </div>
-                                <StatusSelect value={getCommonValue('system_status', 'progress') || '未着手'} onChange={(v) => handleFieldChange('system_status', 'progress', v)} />
-                            </div>
-                            <div className="p-2 grid grid-cols-2">
-                                <div className="col-span-2">
-                                    <InlineField label="内容" value={getCommonValue('direct', 'system_type_content')} type="select" options={SYSTEM_OPTIONS} onChange={(v: any) => handleFieldChange('direct', 'system_type_content', v)} />
-                                </div>
-                                <InlineField label="申請日" value={getCommonValue('system_status', 'application_date')} type="date" onChange={(v: any) => handleFieldChange('system_status', 'application_date', v)} />
-                                <InlineField label="担当者" value={getCommonValue('system_status', 'assignee')} type="select" options={STAFF_OPTIONS} onChange={(v: any) => handleFieldChange('system_status', 'assignee', v)} />
-                            </div>
+                        <div className="w-2 h-16 bg-slate-100 rounded-full overflow-hidden flex flex-col-reverse">
+                            <div
+                                className="w-full bg-blue-500 rounded-full transition-all duration-500"
+                                style={{ height: `${progressPct}%` }}
+                            />
                         </div>
                     </div>
+                </div>
 
-                    {/* Bottom Full Row: Airport Support */}
-                    <div className="flex group border-t border-slate-300">
-                        <div className="w-[200px] p-6 flex flex-col items-center justify-center border-r border-gray-300 bg-white shrink-0 transition-all">
-                            <PlaneLanding size={32} className="text-slate-400 mb-3" />
-                            <span className="text-sm font-bold text-slate-900 uppercase tracking-widest text-center">送迎・帰国支援</span>
-                            <div className="mt-5 w-full">
-                                <StatusSelect value={getCommonValue('airport_status', 'progress') || '未着手'} onChange={(v) => handleFieldChange('airport_status', 'progress', v)} />
-                            </div>
-                        </div>
-                        <div className="flex-1 grid grid-cols-2 p-4">
-                            <InlineField label="帰国日" value={getCommonValue('airport_status', 'return_date')} type="date" onChange={(v: any) => handleFieldChange('airport_status', 'return_date', v)} />
-                            <InlineField label="再入国日" value={getCommonValue('airport_status', 'reentry_date')} type="date" onChange={(v: any) => handleFieldChange('airport_status', 'reentry_date', v)} />
-                            <InlineField label="業務担当者" value={getCommonValue('airport_status', 'assignee')} type="select" options={STAFF_OPTIONS} onChange={(v: any) => handleFieldChange('airport_status', 'assignee', v)} />
-                        </div>
-                    </div>
+                {/* 1. 機構業務 */}
+                <SectionBlock
+                    icon={ClipboardList} title="機構業務"
+                    status={getV('kikou_status', 'progress') || '未着手'}
+                    onStatusChange={(v) => handleFieldChange('kikou_status', 'progress', v)}
+                >
+                    <InlineField label="申請内容" value={getV('kikou_status', 'type')} type="select" options={KIKOU_OPTIONS} onChange={(v: any) => handleFieldChange('kikou_status', 'type', v)} />
+                    <InlineField label="申請日" value={getV('kikou_status', 'application_date')} type="date" onChange={(v: any) => handleFieldChange('kikou_status', 'application_date', v)} />
+                    <InlineField label="業務担当者" value={getV('kikou_status', 'assignee')} type="select" options={STAFF_OPTIONS} onChange={(v: any) => handleFieldChange('kikou_status', 'assignee', v)} />
+                </SectionBlock>
 
-                    {/* Memo Section */}
-                    <div className="flex flex-col border-t border-slate-300">
-                        <div className="px-6 py-4 bg-slate-50/20 border-b border-slate-300 flex items-center justify-between">
-                            <div className="flex items-center gap-2.5">
-                                <StickyNote size={18} className="text-slate-400" />
-                                <span className="text-sm font-bold text-slate-800 uppercase tracking-widest">備考・特記事項</span>
-                            </div>
+                {/* 2. 入管業務 */}
+                <SectionBlock
+                    icon={FileText} title="入管業務"
+                    status={getV('nyukan_status', 'progress') || '未着手'}
+                    onStatusChange={(v) => handleFieldChange('nyukan_status', 'progress', v)}
+                >
+                    <InlineField label="申請内容" value={getV('nyukan_status', 'type')} type="select" options={NYUKAN_OPTIONS} onChange={(v: any) => handleFieldChange('nyukan_status', 'type', v)} />
+                    <InlineField label="申請日" value={getV('nyukan_status', 'application_date')} type="date" onChange={(v: any) => handleFieldChange('nyukan_status', 'application_date', v)} />
+                    <InlineField label="受理番号" value={getV('nyukan_status', 'receipt_number')} onChange={(v: any) => handleFieldChange('nyukan_status', 'receipt_number', v)} />
+                    <InlineField label="申請窓口" value={getV('nyukan_status', 'application_window')} type="select" options={WINDOW_OPTIONS} onChange={(v: any) => handleFieldChange('nyukan_status', 'application_window', v)} />
+                    <InlineField label="取次者" value={getV('nyukan_status', 'agent')} type="select" options={STAFF_OPTIONS} onChange={(v: any) => handleFieldChange('nyukan_status', 'agent', v)} />
+                    <InlineField label="業務担当者" value={getV('nyukan_status', 'assignee')} type="select" options={STAFF_OPTIONS} onChange={(v: any) => handleFieldChange('nyukan_status', 'assignee', v)} />
+                </SectionBlock>
+
+                {/* 3. 検定業務 */}
+                <SectionBlock
+                    icon={ShieldCheck} title="検定業務"
+                    status={getV('kentei_status', 'progress') || '未着手'}
+                    onStatusChange={(v) => handleFieldChange('kentei_status', 'progress', v)}
+                >
+                    <InlineField label="検定機関" value={getV('kentei_status', 'institution')} onChange={(v: any) => handleFieldChange('kentei_status', 'institution', v)} />
+                    <InlineField label="検定場所" value={getV('kentei_status', 'location')} onChange={(v: any) => handleFieldChange('kentei_status', 'location', v)} />
+                    <InlineField label="検定内容" value={getV('kentei_status', 'type')} type="select" options={KENTEI_OPTIONS} onChange={(v: any) => handleFieldChange('kentei_status', 'type', v)} />
+                    <InlineField label="学科日程" value={getV('kentei_status', 'exam_date_written')} type="date" onChange={(v: any) => handleFieldChange('kentei_status', 'exam_date_written', v)} />
+                    <InlineField label="実技日程" value={getV('kentei_status', 'exam_date_practical')} type="date" onChange={(v: any) => handleFieldChange('kentei_status', 'exam_date_practical', v)} />
+                    <InlineField label="業務担当者" value={getV('kentei_status', 'assignee')} type="select" options={STAFF_OPTIONS} onChange={(v: any) => handleFieldChange('kentei_status', 'assignee', v)} />
+                </SectionBlock>
+
+                {/* 4. 就労システム */}
+                <SectionBlock
+                    icon={Building} title="就労システム"
+                    status={getV('system_status', 'progress') || '未着手'}
+                    onStatusChange={(v) => handleFieldChange('system_status', 'progress', v)}
+                >
+                    <InlineField label="内容" value={getV('direct', 'system_type_content')} type="select" options={SYSTEM_OPTIONS} onChange={(v: any) => handleFieldChange('direct', 'system_type_content', v)} />
+                    <InlineField label="申請日" value={getV('system_status', 'application_date')} type="date" onChange={(v: any) => handleFieldChange('system_status', 'application_date', v)} />
+                    <InlineField label="担当者" value={getV('system_status', 'assignee')} type="select" options={STAFF_OPTIONS} onChange={(v: any) => handleFieldChange('system_status', 'assignee', v)} />
+                </SectionBlock>
+
+                {/* 5. 送迎・帰国支援 */}
+                <SectionBlock
+                    icon={PlaneLanding} title="送迎・帰国支援"
+                    status={getV('airport_status', 'progress') || '未着手'}
+                    onStatusChange={(v) => handleFieldChange('airport_status', 'progress', v)}
+                >
+                    <InlineField label="帰国日" value={getV('airport_status', 'return_date')} type="date" onChange={(v: any) => handleFieldChange('airport_status', 'return_date', v)} />
+                    <InlineField label="再入国日" value={getV('airport_status', 'reentry_date')} type="date" onChange={(v: any) => handleFieldChange('airport_status', 'reentry_date', v)} />
+                    <InlineField label="業務担当者" value={getV('airport_status', 'assignee')} type="select" options={STAFF_OPTIONS} onChange={(v: any) => handleFieldChange('airport_status', 'assignee', v)} />
+                </SectionBlock>
+
+                {/* 6. 備考・特記事項 */}
+                <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
+                    <div className="px-5 py-3 flex items-center justify-between border-b border-slate-100 bg-slate-50/40">
+                        <div className="flex items-center gap-2.5">
+                            <StickyNote size={15} className="text-slate-400" />
+                            <span className="text-[11px] font-bold text-slate-600 uppercase tracking-widest">備考・特記事項</span>
+                        </div>
+                        {!isBulkMode && (
                             <button
                                 onClick={addMemoLine}
-                                className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-400 hover:bg-slate-800 hover:text-white transition-all active:scale-90"
+                                className="w-7 h-7 flex items-center justify-center rounded-full bg-slate-100 text-slate-400 hover:bg-slate-700 hover:text-white transition-all active:scale-90"
                             >
-                                <Plus size={16} />
+                                <Plus size={13} />
                             </button>
-                        </div>
-                        <div className="p-6">
-                            {isBulkMode ? (
-                                <textarea
-                                    value={getCommonValue('direct', 'remarks') || ''}
-                                    onChange={(e) => handleFieldChange('direct', 'remarks', e.target.value)}
-                                    className="w-full bg-slate-50/50 p-5 rounded-lg border border-slate-100 text-sm font-medium text-slate-700 outline-none focus:border-slate-300 min-h-[120px]"
-                                    placeholder="一括上書きメモを入力..."
-                                />
-                            ) : (
-                                <div className="space-y-2">
-                                    {memoLines.map((line, index) => (
-                                        <div key={index} className="flex items-center gap-4 group/memo border-b border-slate-200 last:border-0 py-1">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-slate-300 shrink-0" />
-                                            <input
-                                                type="text"
-                                                value={line}
-                                                onChange={(e) => handleUpdateMemo(index, e.target.value)}
-                                                className="flex-1 bg-transparent text-sm font-medium text-slate-700 outline-none placeholder:text-slate-200"
-                                                placeholder="メモを入力..."
-                                            />
-                                            <button
-                                                onClick={() => removeMemoLine(index)}
-                                                className="opacity-0 group-hover/memo:opacity-100 p-1 text-slate-300 hover:text-rose-500 transition-all"
-                                            >
-                                                <Trash2 size={14} />
-                                            </button>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
+                        )}
                     </div>
-
+                    <div className="p-5">
+                        {isBulkMode ? (
+                            <textarea
+                                value={getV('direct', 'remarks') || ''}
+                                onChange={(e) => handleFieldChange('direct', 'remarks', e.target.value)}
+                                className="w-full bg-slate-50 p-4 rounded-lg border border-slate-100 text-sm font-medium text-slate-700 outline-none focus:border-slate-300 min-h-[100px] resize-none"
+                                placeholder="一括上書きメモを入力..."
+                            />
+                        ) : (
+                            <div className="space-y-1">
+                                {memoLines.map((line, i) => (
+                                    <div key={i} className="flex items-center gap-3 group/memo py-1.5 border-b border-slate-100 last:border-0">
+                                        <div className="w-1 h-1 rounded-full bg-slate-300 shrink-0" />
+                                        <input
+                                            type="text"
+                                            value={line}
+                                            onChange={(e) => handleUpdateMemo(i, e.target.value)}
+                                            className="flex-1 bg-transparent text-sm font-medium text-slate-700 outline-none placeholder:text-slate-200"
+                                            placeholder="メモを入力..."
+                                        />
+                                        <button
+                                            onClick={() => removeMemoLine(i)}
+                                            className="opacity-0 group-hover/memo:opacity-100 p-1 text-slate-300 hover:text-rose-500 transition-all"
+                                        >
+                                            <Trash2 size={12} />
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
                 </div>
+
+                {/* 7. タスク・支援記録 (single worker only) */}
+                {!isBulkMode && (
+                    <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
+                        <div className="px-5 py-3 border-b border-slate-100 bg-slate-50/40 flex items-center gap-2.5">
+                            <CheckCircle2 size={15} className="text-slate-400" />
+                            <span className="text-[11px] font-bold text-slate-600 uppercase tracking-widest">タスク・支援記録</span>
+                            {isLoadingActivity && <Loader2 size={11} className="animate-spin text-slate-300 ml-1" />}
+                        </div>
+
+                        {isLoadingActivity ? (
+                            <div className="flex items-center justify-center py-8">
+                                <Loader2 size={18} className="animate-spin text-slate-300" />
+                            </div>
+                        ) : (
+                            <div className="divide-y divide-slate-100">
+                                {/* Tasks */}
+                                {tasks.length > 0 ? tasks.map(task => (
+                                    <div key={task.id} className="flex items-start gap-3 px-5 py-3 hover:bg-slate-50/50 transition-colors">
+                                        <CheckCircle2 size={13} className={`mt-0.5 shrink-0 ${TASK_STATUS_COLOR[task.status] || 'text-gray-300'}`} />
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-xs font-bold text-slate-700 truncate">{task.title}</p>
+                                            {task.due_date && (
+                                                <p className="text-[10px] text-slate-400 flex items-center gap-1 mt-0.5">
+                                                    <Clock size={9} />期日: {task.due_date}
+                                                </p>
+                                            )}
+                                        </div>
+                                        <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded border shrink-0 ${PRIORITY_COLOR[task.priority] || 'bg-gray-50 text-gray-500 border-gray-100'}`}>
+                                            {task.priority?.toUpperCase()}
+                                        </span>
+                                    </div>
+                                )) : (
+                                    <p className="text-[11px] text-slate-300 text-center py-5 italic">タスクなし</p>
+                                )}
+
+                                {/* ShienLogs (latest 3) */}
+                                {shienLogs.length > 0 && shienLogs.slice(0, 3).map(log => {
+                                    const Icon = LOG_ICON[log.support_type] || MessageSquare;
+                                    return (
+                                        <div key={log.id} className="flex items-start gap-3 px-5 py-3 bg-slate-50/30 hover:bg-slate-50 transition-colors">
+                                            <Icon size={13} className="text-slate-400 shrink-0 mt-0.5" />
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <span className="text-[9px] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-100">{LOG_LABEL[log.support_type]}</span>
+                                                    <span className="text-[10px] text-slate-400">{log.support_date}</span>
+                                                </div>
+                                                <p className="text-[11px] text-slate-600 line-clamp-2 leading-relaxed">{log.content}</p>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                <div className="h-8 shrink-0" />
             </div>
-            <div className="h-20 shrink-0" />
         </div>
     );
 }

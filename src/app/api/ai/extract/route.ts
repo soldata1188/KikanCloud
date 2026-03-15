@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 
 const apiKey = process.env.GEMINI_API_KEY!;
-const genAI = new GoogleGenerativeAI(apiKey);
 
 export async function POST(req: NextRequest) {
     if (!apiKey) {
@@ -22,7 +21,7 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+        const ai = new GoogleGenAI({ apiKey });
 
         const prompt = `
 Extract the following information from the provided document image (Residence Card or Passport) and return ONLY a valid JSON object matching this structure exactly. 
@@ -44,17 +43,18 @@ Required JSON Structure:
 }
 `;
 
-        const result = await model.generateContent([
-            prompt,
-            {
-                inlineData: {
-                    data: base64str,
-                    mimeType: mimeType
-                }
-            }
-        ]);
+        const result = await ai.models.generateContent({
+            model: "gemini-2.5-flash",
+            contents: [{
+                role: 'user',
+                parts: [
+                    { text: prompt },
+                    { inlineData: { data: base64str, mimeType } }
+                ]
+            }]
+        });
 
-        let text = result.response.text();
+        let text = result.text ?? '';
 
         // Strip markdown backticks if Gemini included them
         if (text.startsWith("\`\`\`json")) {

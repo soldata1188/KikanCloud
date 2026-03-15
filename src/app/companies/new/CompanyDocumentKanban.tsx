@@ -108,12 +108,12 @@ export function CompanyDocumentKanban() {
     })
 
     return (
-        <div className="w-[300px] shrink-0 h-full flex flex-col bg-[#fafafa] border-l border-gray-200">
+        <div className="w-[300px] shrink-0 h-full flex flex-col bg-gray-50 border-l border-gray-200">
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white z-10">
                 <div className="flex items-center gap-1.5">
-                    <UploadCloud size={18} className="text-[#1f1f1f]" />
-                    <h3 className="text-[15px] font-bold text-[#1f1f1f]">書類関係</h3>
+                    <UploadCloud size={18} className="text-gray-900" />
+                    <h3 className="text-[15px] font-bold text-gray-900">書類関係</h3>
                 </div>
             </div>
 
@@ -124,7 +124,7 @@ export function CompanyDocumentKanban() {
                     <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2.5 pl-1">1. ステージングエリア</h4>
                     <div
                         className={`cursor-pointer w-full h-[120px] border-2 border-dashed rounded-[10px] flex flex-col items-center justify-center p-3 transition-all relative
-                            ${stagedFile ? 'border-[#24b47e] bg-[#24b47e]/5' : 'border-[#878787] bg-white hover:bg-gray-50 hover:border-[#1f1f1f]'}`}
+                            ${stagedFile ? 'border-emerald-500 bg-emerald-500/5' : 'border-gray-400 bg-white hover:bg-gray-50 hover:border-gray-900'}`}
                         onDragOver={(e) => e.preventDefault()}
                         onDrop={handleMainFileDrop}
                         onClick={() => mainFileInputRef.current?.click()}
@@ -132,14 +132,14 @@ export function CompanyDocumentKanban() {
                         <input type="file" className="hidden" ref={mainFileInputRef} onChange={handleMainFileSelect} />
                         {stagedFile ? (
                             <div className="flex flex-col items-center animate-in zoom-in-95 duration-200 w-full">
-                                <FileText size={32} className="text-[#24b47e] mb-1.5" />
-                                <div className="text-[13px] font-bold text-[#24b47e] text-center truncate w-full px-2" title={stagedFile.name}>{stagedFile.name}</div>
-                                <div className="text-[10px] text-[#24b47e]/80 mt-1 font-medium bg-[#24b47e]/10 px-2 py-0.5 rounded-none">ファイル受信済み</div>
+                                <FileText size={32} className="text-emerald-500 mb-1.5" />
+                                <div className="text-[13px] font-bold text-emerald-500 text-center truncate w-full px-2" title={stagedFile.name}>{stagedFile.name}</div>
+                                <div className="text-[10px] text-emerald-500/80 mt-1 font-medium bg-emerald-500/10 px-2 py-0.5 rounded-none">ファイル受信済み</div>
                             </div>
                         ) : (
                             <div className="flex flex-col items-center group">
                                 <UploadCloud size={28} className="text-gray-400 mb-2 group-hover:text-gray-600 transition-colors" />
-                                <div className="text-[13px] font-bold text-[#1f1f1f]">ここに書類をドロップ</div>
+                                <div className="text-[13px] font-bold text-gray-900">ここに書類をドロップ</div>
                                 <div className="text-[11px] text-gray-500 mt-0.5 font-medium">クリックまたはドラッグ＆ドロップ</div>
                             </div>
                         )}
@@ -147,12 +147,12 @@ export function CompanyDocumentKanban() {
 
                     {/* Action Card: Slides down when file is staged */}
                     {stagedFile && (
-                        <div className="mt-3 p-3 bg-white border border-[#24b47e]/30 rounded-[10px] animate-in slide-in-from-top-2 fade-in-50 duration-200 relative">
+                        <div className="mt-3 p-3 bg-white border border-emerald-500/30 rounded-[10px] animate-in slide-in-from-top-2 fade-in-50 duration-200 relative">
                             <label className="block text-[11px] font-bold text-gray-600 mb-1.5 uppercase">カテゴリー指定:</label>
                             <select
                                 value={stagedTargetDoc}
                                 onChange={e => setStagedTargetDoc(e.target.value)}
-                                className="w-full bg-gray-50 border border-gray-300 focus:border-[#24b47e] focus:bg-white focus:ring-1 focus:ring-[#24b47e] focus:outline-none rounded-none pl-2.5 pr-8 py-2 text-xs mb-3 font-medium transition-colors cursor-pointer appearance-none"
+                                className="w-full bg-gray-50 border border-gray-300 focus:border-[#0067b8] focus:bg-white focus:ring-1 focus:ring-[#0067b8]/10 focus:outline-none rounded-none pl-2.5 pr-8 py-2 text-xs mb-3 font-medium transition-colors cursor-pointer appearance-none"
                             >
                                 <option value="">-- 書類の種類を選択 --</option>
                                 {COMPANY_DOC_TYPES.map(doc => {
@@ -163,7 +163,7 @@ export function CompanyDocumentKanban() {
                                         </option>
                                     )
                                 })}
-                                <option value="new_custom" className="font-bold text-[#24b47e]">➕ 新規カテゴリーを追加</option>
+                                <option value="new_custom" className="font-bold text-emerald-500">➕ 新規カテゴリーを追加</option>
                             </select>
 
                             {stagedTargetDoc === 'new_custom' && (
@@ -172,7 +172,7 @@ export function CompanyDocumentKanban() {
                                     placeholder="カテゴリー名を入力..."
                                     value={newCustomCategory}
                                     onChange={e => setNewCustomCategory(e.target.value)}
-                                    className="w-full bg-white border border-gray-300 focus:border-[#24b47e] focus:ring-1 focus:ring-[#24b47e] focus:outline-none rounded-none pl-2.5 pr-2 py-2 text-xs mb-3 font-medium transition-colors"
+                                    className="w-full bg-white border border-gray-300 focus:border-[#0067b8] focus:ring-1 focus:ring-[#0067b8]/10 focus:outline-none rounded-none pl-2.5 pr-2 py-2 text-xs mb-3 font-medium transition-colors"
                                 />
                             )}
 
@@ -180,7 +180,7 @@ export function CompanyDocumentKanban() {
                                 type="button"
                                 onClick={stageToStorage}
                                 disabled={!stagedTargetDoc || (stagedTargetDoc === 'new_custom' && !newCustomCategory.trim())}
-                                className="w-full py-2 bg-[#1f1f1f] disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white text-xs font-bold rounded-none hover:bg-black transition-colors flex items-center justify-center gap-1.5"
+                                className="w-full py-2 bg-gray-900 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white text-xs font-bold rounded-none hover:bg-black transition-colors flex items-center justify-center gap-1.5"
                             >
                                 ストレージへ保存 <ArrowLeft size={14} className="rotate-180" />
                             </button>
@@ -193,7 +193,7 @@ export function CompanyDocumentKanban() {
                     <div className="flex items-center justify-between mb-2.5 pl-1">
                         <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">2. ストレージ（保管庫）</h4>
                         {Object.keys(files).length > 0 && (
-                            <span className="bg-gray-100 text-[#1f1f1f] px-1.5 py-0.5 rounded-none font-bold text-[10px]">
+                            <span className="bg-gray-100 text-gray-900 px-1.5 py-0.5 rounded-none font-bold text-[10px]">
                                 {Object.values(files).reduce((acc, arr) => acc + arr.length, 0)} ファイル
                             </span>
                         )}
@@ -215,13 +215,13 @@ export function CompanyDocumentKanban() {
                             return (
                                 <React.Fragment key={doc.id}>
                                     {fileArr.map((f, idx) => (
-                                        <div key={f.id} className="p-1.5 bg-white border border-[#e5e7eb] rounded-none flex items-center justify-between animate-in fade-in zoom-in-95 duration-200 group">
+                                        <div key={f.id} className="p-1.5 bg-white border border-gray-200 rounded-none flex items-center justify-between animate-in fade-in zoom-in-95 duration-200 group">
                                             <div className="flex items-center gap-2 overflow-hidden flex-1">
-                                                <div className="w-7 h-7 rounded-none flex items-center justify-center shrink-0 bg-[#24b47e]/10 text-[#24b47e]">
+                                                <div className="w-7 h-7 rounded-none flex items-center justify-center shrink-0 bg-emerald-500/10 text-emerald-500">
                                                     {doc.id === 'kigyo_shashin' ? <ImageIcon size={14} /> : <FileText size={14} />}
                                                 </div>
                                                 <div className="truncate flex-1">
-                                                    <div className="text-xs font-bold text-[#1f1f1f] flex items-center gap-1.5 leading-none">
+                                                    <div className="text-xs font-bold text-gray-900 flex items-center gap-1.5 leading-none">
                                                         <span className="truncate">{doc.label} {fileArr.length > 1 ? `#${idx + 1}` : ''}</span>
                                                     </div>
                                                     <div className="flex flex-col mt-0.5">

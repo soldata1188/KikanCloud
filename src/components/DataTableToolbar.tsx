@@ -26,7 +26,7 @@ export function DataTableToolbar<T>({ data, filename, searchPlaceholder, onSearc
             <div className="flex items-center gap-2 w-full xl:w-auto flex-wrap px-4 xl:px-8">
                 <div className="relative w-full sm:w-[280px] shrink-0">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={14} />
-                    <input type="text" value={searchTerm} onChange={handleSearch} placeholder={searchPlaceholder} className="w-full h-[36px] bg-white border border-gray-200 rounded-md pl-9 pr-4 text-[12px] outline-none focus:border-blue-600 transition-colors text-gray-800 placeholder:text-gray-400 shadow-sm" />
+                    <input type="text" value={searchTerm} onChange={handleSearch} placeholder={searchPlaceholder} className="w-full h-[36px] bg-white border border-gray-200 rounded-md pl-9 pr-4 text-[12px] outline-none focus:border-[#0067b8] transition-colors text-gray-800 placeholder:text-gray-400 shadow-sm" />
                 </div>
                 {filterNode}
             </div>

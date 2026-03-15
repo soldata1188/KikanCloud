@@ -3,11 +3,12 @@
 import React, { useState, useEffect, useTransition } from 'react';
 import {
     CalendarCheck, Clock, CheckCircle2, Save, Check, Pencil,
-    Plus, History, ClipboardList, Building2, UserCircle, Briefcase
+    Plus, History, ClipboardList, Building2, UserCircle
 } from 'lucide-react';
 import Link from 'next/link';
 import { MonthFilter } from './MonthFilter';
-import { createAuditInline, upsertAuditSchedule } from './actions';
+import AuditTypeBadge from './AuditTypeBadge';
+import { upsertAuditSchedule } from './actions';
 import { useRouter } from 'next/navigation';
 import { X } from 'lucide-react';
 
@@ -28,10 +29,10 @@ const AUDIT_TYPES = [
    INLINE EDITOR COMPONENT
 ───────────────────────────────────────────────────────────── */
 function InlineEditor({
-    auditType, typeLabel, typeBadge,
+    auditType,
     companyId, filterMonth, existingAudit, onSaved, staffList = [],
 }: {
-    auditType: string; typeLabel: string; typeBadge: string
+    auditType: string
     companyId: string; filterMonth: string
     existingAudit?: any; onSaved: () => void
     staffList?: { id: string; name: string }[]
@@ -58,31 +59,28 @@ function InlineEditor({
                 markCompleted: existingAudit?.status === 'completed',
                 existingId: existingAudit?.id,
             });
-            if (!result?.error) { setIsDirty(false); setSaved(true); onSaved(); }
+            if (!result?.error) { setIsDirty(false); setSaved(true); onSaved(); setTimeout(() => setSaved(false), 3000); }
         });
     };
 
     const isDone = existingAudit?.status === 'completed';
 
     return (
-        <div className="flex flex-col gap-1 p-3 bg-white rounded-[6px] border border-gray-200 shadow-sm hover:shadow-md hover:border-emerald-100 transition-all group">
+        <div className={`flex flex-col gap-1 p-3 bg-white rounded-lg border shadow-sm transition-all group ${isDirty ? 'border-blue-400 ring-2 ring-blue-100' : 'border-gray-200 hover:shadow-md hover:border-emerald-100'}`}>
             <div className="flex items-center justify-between mb-1">
                 <div className="flex items-center gap-2">
-                    <div className={`p-1 rounded-[6px] ${typeBadge} bg-white shadow-sm border border-transparent group-hover:border-emerald-200`}>
-                        <ClipboardList size={14} className="text-emerald-600" />
-                    </div>
-                    <span className="text-[14px] font-normal text-gray-900 tracking-tight">{typeLabel}</span>
+                    <AuditTypeBadge type={auditType} size="sm" />
                 </div>
                 {isDone ? (
-                    <div className="flex items-center gap-1.5 px-2 py-0.5 bg-emerald-50 text-emerald-600 rounded-full border border-emerald-100 italic">
-                        <CheckCircle2 size={12} />
-                        <span className="text-[11px] font-normal uppercase tracking-widest text-emerald-700">完了</span>
-                    </div>
+                    <span className="badge badge-success flex items-center gap-1">
+                        <CheckCircle2 size={11} />
+                        完了
+                    </span>
                 ) : (
-                    <div className="flex items-center gap-1.5 px-2 py-0.5 bg-blue-50 text-blue-600 rounded-full border border-blue-100 italic">
-                        <Clock size={12} />
-                        <span className="text-[11px] font-normal uppercase tracking-widest text-blue-700">実施予定</span>
-                    </div>
+                    <span className="badge badge-primary flex items-center gap-1">
+                        <Clock size={11} />
+                        実施予定
+                    </span>
                 )}
             </div>
 
@@ -97,13 +95,13 @@ function InlineEditor({
                         value={date}
                         onChange={e => { setDate(e.target.value); setIsDirty(true); setSaved(false); }}
                         readOnly={isDone}
-                        className={`h-8 px-3 text-[12px] font-normal rounded-[6px] border outline-none transition-all w-full
-                            ${isDone ? 'bg-gray-50 border-gray-200 text-gray-500 opacity-80 cursor-not-allowed' : 'bg-white border-gray-300 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/5 text-gray-900'}`}
+                        className={`h-8 px-3 text-[12px] font-normal rounded-lg border outline-none transition-all w-full
+                            ${isDone ? 'bg-gray-50 border-gray-200 text-gray-500 opacity-80 cursor-not-allowed' : 'bg-white border-gray-300 focus:border-[#0067b8] focus:ring-2 focus:ring-[#0067b8]/10 text-gray-900'}`}
                     />
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                    <label className="text-[10px] font-normal uppercase tracking-widest text-[#94A3B8] ml-1 flex items-center gap-1.5">
+                    <label className="text-[10px] font-normal uppercase tracking-widest text-slate-400 ml-1 flex items-center gap-1.5">
                         <UserCircle size={11} className="text-emerald-400" />
                         担当スタッフ
                     </label>
@@ -111,8 +109,8 @@ function InlineEditor({
                         value={person}
                         disabled={isDone}
                         onChange={e => { setPerson(e.target.value); setIsDirty(true); setSaved(false); }}
-                        className={`h-8 px-1 text-[12px] font-normal rounded-[6px] border outline-none transition-all w-full appearance-none cursor-pointer
-                            ${isDone ? 'bg-gray-50 border-gray-100 text-gray-400 opacity-80 cursor-not-allowed' : 'bg-white border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/5 text-gray-800'}`}
+                        className={`h-8 px-1 text-[12px] font-normal rounded-lg border outline-none transition-all w-full appearance-none cursor-pointer
+                            ${isDone ? 'bg-gray-50 border-gray-100 text-gray-400 opacity-80 cursor-not-allowed' : 'bg-white border-gray-200 focus:border-[#0067b8] focus:ring-2 focus:ring-[#0067b8]/10 text-gray-800'}`}
                     >
                         <option value="">— 担当 —</option>
                         {staffList.map(s => (
@@ -127,7 +125,7 @@ function InlineEditor({
                     {existingAudit?.id && (
                         <Link
                             href={`/audits/${existingAudit.id}/edit`}
-                            className="text-[11px] font-normal text-gray-400 hover:text-emerald-600 transition-colors flex items-center gap-1 bg-gray-50 hover:bg-emerald-50 px-3 py-1.5 rounded-[6px] border border-transparent hover:border-emerald-100 shadow-sm"
+                            className="text-[11px] font-normal text-gray-400 hover:text-emerald-600 transition-colors flex items-center gap-1 bg-gray-50 hover:bg-emerald-50 px-3 py-1.5 rounded-lg border border-transparent hover:border-emerald-100 shadow-sm"
                         >
                             <Pencil size={12} />
                             レポートを編集
@@ -140,7 +138,7 @@ function InlineEditor({
                         <button
                             onClick={handleSave}
                             disabled={isSaving}
-                            className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-1.5 rounded-[6px] text-[11px] font-normal flex items-center gap-2 shadow-lg shadow-emerald-200 active:scale-95 transition-all"
+                            className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-1.5 rounded-lg text-[11px] font-normal flex items-center gap-2 shadow-lg shadow-emerald-200 active:scale-95 transition-all"
                         >
                             {isSaving ? <Clock size={12} className="animate-spin" /> : <Save size={12} />}
                             変更を保存
@@ -165,7 +163,7 @@ function InlineEditor({
                                     onSaved();
                                 });
                             }}
-                            className="bg-gray-900 hover:bg-black text-white px-4 py-1.5 rounded-[6px] text-[11px] font-normal flex items-center gap-2 shadow-lg shadow-gray-200 active:scale-95 transition-all"
+                            className="bg-gray-900 hover:bg-black text-white px-4 py-1.5 rounded-lg text-[11px] font-normal flex items-center gap-2 shadow-lg shadow-gray-200 active:scale-95 transition-all"
                         >
                             <CheckCircle2 size={12} />
                             完了にする
@@ -224,14 +222,14 @@ export default function AuditScheduleColumn({ row, filterMonth, staffList, onSav
                 <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-md px-6 py-4 border-b border-gray-200 flex flex-col gap-3">
                     <div className="flex items-center justify-between gap-4">
                         <div className="flex items-center gap-3 overflow-hidden">
-                            <div className="w-12 h-12 rounded-[6px] bg-emerald-600 text-white flex items-center justify-center shrink-0">
+                            <div className="w-12 h-12 rounded-lg bg-emerald-600 text-white flex items-center justify-center shrink-0">
                                 <Building2 size={24} />
                             </div>
                             <div className="overflow-hidden">
                                 <h2 className="text-[17px] font-normal text-gray-900 truncate leading-snug" title={row.company.name_jp}>
                                     {row.company.name_jp}
                                 </h2>
-                                <p className="text-[11px] font-normal uppercase tracking-widest text-[#B4C0D1] flex items-center gap-1.5">
+                                <p className="text-[11px] font-normal uppercase tracking-widest text-slate-300 flex items-center gap-1.5">
                                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                                     モニタリングスケジュール
                                 </p>
@@ -240,14 +238,14 @@ export default function AuditScheduleColumn({ row, filterMonth, staffList, onSav
 
                         <button
                             onClick={() => onOpenAddModal(row.company.id, 'homon')}
-                            className="w-10 h-10 rounded-[6px] bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center hover:bg-emerald-600 hover:text-white transition-all active:scale-90"
+                            className="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center hover:bg-emerald-600 hover:text-white transition-all active:scale-90"
                         >
                             <Plus size={20} />
                         </button>
                     </div>
 
                     {/* Option 3c: Month Filter here */}
-                    <div className="bg-gray-50 p-1.5 rounded-[6px] border border-gray-200 transform transition-all">
+                    <div className="bg-gray-50 p-1.5 rounded-lg border border-gray-200 transform transition-all">
                         <MonthFilter defaultValue={filterMonth} />
                     </div>
                 </div>
@@ -263,12 +261,10 @@ export default function AuditScheduleColumn({ row, filterMonth, staffList, onSav
                         </div>
 
                         <div className="flex flex-col gap-4">
-                            {AUDIT_TYPES.map(({ key, label, badge }) => (
+                            {AUDIT_TYPES.map(({ key }) => (
                                 <InlineEditor
                                     key={key}
                                     auditType={key}
-                                    typeLabel={label}
-                                    typeBadge={badge}
                                     companyId={row.company.id}
                                     filterMonth={filterMonth}
                                     existingAudit={row.auditsByType?.[key]}
@@ -292,7 +288,7 @@ export default function AuditScheduleColumn({ row, filterMonth, staffList, onSav
                             {row.lastAudits?.length > 0 ? (
                                 row.lastAudits.map((audit: any, idx: number) => (
                                     <div key={audit.id} className="pb-3 last:pb-0">
-                                        <div className="bg-white rounded-[6px] p-3 border border-gray-200 hover:border-blue-100 transition-all group">
+                                        <div className="bg-white rounded-lg p-3 border border-gray-200 hover:border-blue-100 transition-all group">
                                             <div className="flex items-center justify-between mb-2">
                                                 <div className="flex items-center gap-2">
                                                     <div className="flex items-center gap-2">
@@ -332,7 +328,7 @@ export default function AuditScheduleColumn({ row, filterMonth, staffList, onSav
                                     </div>
                                 ))
                             ) : (
-                                <div className="py-12 bg-white rounded-[6px] border border-dashed border-gray-200 flex flex-col items-center justify-center text-center px-6 mx-2">
+                                <div className="py-12 bg-white rounded-lg border border-dashed border-gray-200 flex flex-col items-center justify-center text-center px-6 mx-2">
                                     <History size={24} className="text-gray-200 mb-2" />
                                     <p className="text-[11px] font-normal text-gray-300 uppercase tracking-widest leading-loose">
                                         過去の監査記録は<br />ありません
@@ -347,10 +343,10 @@ export default function AuditScheduleColumn({ row, filterMonth, staffList, onSav
             {/* Quick Edit Modal */}
             {editingAudit && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
-                    <div className="bg-white w-full max-w-md rounded-[6px] border border-gray-100 overflow-hidden animate-in fade-in zoom-in duration-200">
+                    <div className="bg-white w-full max-w-md rounded-xl border border-gray-100 overflow-hidden animate-in fade-in zoom-in duration-200">
                         <div className="flex items-center justify-between px-6 py-4 bg-gray-50 border-b border-gray-100">
                             <div className="flex items-center gap-3">
-                                <div className="p-2 bg-blue-600 rounded-[6px] text-white">
+                                <div className="p-2 bg-blue-600 rounded-lg text-white">
                                     <ClipboardList size={18} />
                                 </div>
                                 <div>
@@ -358,14 +354,14 @@ export default function AuditScheduleColumn({ row, filterMonth, staffList, onSav
                                     <p className="text-[11px] font-normal text-gray-700 uppercase tracking-widest">{row.company.name_jp}</p>
                                 </div>
                             </div>
-                            <button onClick={() => setEditingAudit(null)} className="p-2 hover:bg-gray-200 rounded-[6px] text-gray-400 transition-colors"><X size={20} /></button>
+                            <button onClick={() => setEditingAudit(null)} className="p-2 hover:bg-gray-200 rounded-lg text-gray-400 transition-colors"><X size={20} /></button>
                         </div>
 
                         <form onSubmit={handleQuickSave} className="p-6 space-y-5">
                             <div className="space-y-4">
                                 <div>
                                     <label className="text-[10px] font-normal text-gray-400 uppercase tracking-widest block mb-2 pl-1">Type</label>
-                                    <select name="audit_type" required defaultValue={editingAudit.audit_type} className="w-full bg-gray-50 border border-gray-200 rounded-[6px] px-4 py-2.5 outline-none text-[13px] font-normal focus:border-blue-600 appearance-none">
+                                    <select name="audit_type" required defaultValue={editingAudit.audit_type} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 outline-none text-[13px] font-normal focus:border-[#0067b8] appearance-none">
                                         <option value="homon">訪問</option>
                                         <option value="kansa">監査</option>
                                         <option value="rinji">臨時</option>
@@ -374,7 +370,7 @@ export default function AuditScheduleColumn({ row, filterMonth, staffList, onSav
 
                                 <div>
                                     <label className="text-[10px] font-normal text-gray-400 uppercase tracking-widest block mb-2 pl-1">In Charge</label>
-                                    <select name="pic_name" defaultValue={editingAudit.pic_name} className="w-full bg-gray-50 border border-gray-200 rounded-[6px] px-4 py-2.5 outline-none text-[13px] font-normal focus:border-blue-600 appearance-none">
+                                    <select name="pic_name" defaultValue={editingAudit.pic_name} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 outline-none text-[13px] font-normal focus:border-[#0067b8] appearance-none">
                                         <option value="">— 担当を選択 —</option>
                                         {staffList.map((s: any) => <option key={s.id} value={s.name}>{s.name}</option>)}
                                     </select>
@@ -382,13 +378,13 @@ export default function AuditScheduleColumn({ row, filterMonth, staffList, onSav
 
                                 <div>
                                     <label className="text-[10px] font-normal text-gray-400 uppercase tracking-widest block mb-2 pl-1">Actual Date</label>
-                                    <input name="scheduled_date" type="date" required defaultValue={editingAudit.actual_date || editingAudit.scheduled_date} className="w-full bg-gray-50 border border-gray-200 rounded-[6px] px-4 py-2.5 outline-none text-[13px] font-normal focus:border-blue-600" />
+                                    <input name="scheduled_date" type="date" required defaultValue={editingAudit.actual_date || editingAudit.scheduled_date} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 outline-none text-[13px] font-normal focus:border-[#0067b8]" />
                                 </div>
                             </div>
 
                             <div className="pt-4 flex gap-3">
-                                <button type="button" onClick={() => setEditingAudit(null)} className="flex-1 py-3 text-[13px] font-normal text-gray-500 hover:bg-gray-50 rounded-[6px] transition-colors">キャンセル</button>
-                                <button type="submit" disabled={isSavingHistory} className="flex-[2] py-3 bg-blue-600 text-white rounded-[6px] text-[13px] font-normal flex items-center justify-center gap-2 active:scale-95 disabled:opacity-40 uppercase tracking-widest">
+                                <button type="button" onClick={() => setEditingAudit(null)} className="flex-1 py-3 text-[13px] font-normal text-gray-500 hover:bg-gray-50 rounded-lg transition-colors">キャンセル</button>
+                                <button type="submit" disabled={isSavingHistory} className="flex-[2] py-3 bg-blue-600 text-white rounded-lg text-[13px] font-normal flex items-center justify-center gap-2 active:scale-95 disabled:opacity-40 uppercase tracking-widest">
                                     {isSavingHistory ? <Clock size={16} className="animate-spin" /> : <Save size={16} />}
                                     {isSavingHistory ? '保存中...' : '変更を保存'}
                                 </button>

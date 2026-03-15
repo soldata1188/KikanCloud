@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useMemo, useRef, useCallback } from 'react';
-import { RefreshCw, ArrowLeft, Search, Building2, Users2, Settings2, Filter, Calendar } from 'lucide-react';
+import { RefreshCw, ArrowLeft, Search, Building2, Users2, Settings2, Calendar } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import CompanyColumn from './CompanyColumn';
 import WorkerColumn from './WorkerColumn';
@@ -12,16 +12,15 @@ import OperationListItem from './OperationListItem';
 interface OperationsClientProps {
     initialWorkers: any[];
     companies: any[];
-    initialVisas: any[];
-    initialExams: any[];
-    initialTransfers: any[];
     staff: any[];
+    tenantId: string;
 }
 
 export default function OperationsClient({
     initialWorkers,
     companies,
-    staff
+    staff,
+    tenantId,
 }: OperationsClientProps) {
     const supabase = createClient();
 
@@ -41,6 +40,9 @@ export default function OperationsClient({
     const [batchFilter, setBatchFilter] = useState('all');
     const [certFilter, setCertFilter] = useState('all');
     const [workerStatusFilter, setWorkerStatusFilter] = useState('working');
+
+    // Debounce timer refs for DB writes
+    const dbWriteTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
 
     // Column widths (resizable)
     const [companyWidth, setCompanyWidth] = useState(280);
@@ -155,7 +157,7 @@ export default function OperationsClient({
 
         allMappedWorkers.forEach(w => {
             const batch = w.entryBatch || '未設定';
-            const date = w.cert_start_date || ''; // Using cert_start_date for reference if entry_date missing
+            const date = (w.entryDate && w.entryDate !== '0000-00-00') ? w.entryDate : '';
 
             let daysLeft: number | null = null;
             if (w.visaExpiry && w.visaExpiry !== '---') {
@@ -219,6 +221,7 @@ export default function OperationsClient({
 
             return {
                 ...c,
+                worker_count: workersInCompany.length,
                 minDays,
                 maxDays,
                 visaTypes: Array.from(visaTypes)
@@ -381,45 +384,38 @@ export default function OperationsClient({
         }
     };
 
-    const handleUpdateOperation = async (field: string, subField: string, value: string) => {
+    const handleUpdateOperation = (field: string, subField: string, value: string) => {
         if (selectedWorkerIds.length === 0) return;
 
-        // Optimistic update for all selected ones
-        const updatedWorkers = workers.map(w => {
-            if (selectedWorkerIds.includes(w.id)) {
-                if (field === 'direct') {
-                    return { ...w, [subField]: value };
-                } else {
-                    const current = w[field] || {};
-                    return { ...w, [field]: { ...current, [subField]: value } };
-                }
+        // Immediate optimistic update
+        setWorkers(prev => prev.map(w => {
+            if (!selectedWorkerIds.includes(w.id)) return w;
+            if (field === 'direct') return { ...w, [subField]: value };
+            const current = w[field] || {};
+            return { ...w, [field]: { ...current, [subField]: value } };
+        }));
+
+        // Debounced DB write (400ms — reduces calls during rapid typing)
+        const timerKey = `${field}.${subField}`;
+        clearTimeout(dbWriteTimers.current[timerKey]);
+        const idsSnapshot = [...selectedWorkerIds];
+        dbWriteTimers.current[timerKey] = setTimeout(async () => {
+            try {
+                await Promise.all(idsSnapshot.map(async (id) => {
+                    const updatePayload: any = {};
+                    if (field === 'direct') {
+                        updatePayload[subField] = value;
+                    } else {
+                        const currentWorker = workers.find(w => w.id === id);
+                        const currentField = currentWorker ? currentWorker[field] || {} : {};
+                        updatePayload[field] = { ...currentField, [subField]: value };
+                    }
+                    return supabase.from('workers').update(updatePayload).eq('id', id);
+                }));
+            } catch (err) {
+                console.error('Debounced update failed:', err);
             }
-            return w;
-        });
-        setWorkers(updatedWorkers);
-
-        // API update for each
-        try {
-            const promises = selectedWorkerIds.map(async (id) => {
-                const updatePayload: any = {};
-                if (field === 'direct') {
-                    updatePayload[subField] = value;
-                } else {
-                    const currentWorker = workers.find(w => w.id === id);
-                    const currentField = currentWorker ? currentWorker[field] || {} : {};
-                    updatePayload[field] = { ...currentField, [subField]: value };
-                }
-
-                return supabase
-                    .from('workers')
-                    .update(updatePayload)
-                    .eq('id', id);
-            });
-
-            await Promise.all(promises);
-        } catch (err) {
-            console.error('Bulk update failed:', err);
-        }
+        }, 400);
     };
 
     const handleRefresh = async () => {
@@ -427,7 +423,9 @@ export default function OperationsClient({
         const { data } = await supabase
             .from('workers')
             .select('*, companies(name_jp)')
-            .eq('is_deleted', false);
+            .eq('is_deleted', false)
+            .eq('tenant_id', tenantId)
+            .in('status', ['working', 'standby', 'waiting']);
         if (data) setWorkers(data);
         setTimeout(() => setIsRefreshing(false), 500);
     };
@@ -435,28 +433,28 @@ export default function OperationsClient({
     return (
         <div className="flex flex-col h-screen bg-white overflow-hidden text-gray-900 antialiased">
             {/* 1. Unified Global Header */}
-            <header className="h-[44px] bg-white border-b border-gray-300 flex items-center justify-between px-4 z-40 shrink-0">
+            <header className="h-[44px] bg-white border-b border-gray-200 flex items-center justify-between px-4 z-40 shrink-0">
                 <div className="flex items-center gap-4 flex-1">
                     <h2 className="text-base font-bold tracking-tight text-gray-950 border-r border-gray-300 pr-4 shrink-0">
                         業務<span className="text-blue-700 font-bold">管理</span>
                     </h2>
 
                     {/* Global Search */}
-                    <div className="relative flex-1 max-w-sm group">
-                        <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
+                    <div className="relative w-[180px] group">
+                        <Search size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
                         <input
                             type="text"
-                            placeholder="企業名、労働者名で検索..."
+                            placeholder="名前・企業で検索..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             suppressHydrationWarning
-                            className="w-full h-8 pl-9 pr-3 bg-gray-50 border border-gray-200 rounded-[6px] text-sm font-normal text-gray-900 placeholder:text-gray-500 outline-none focus:border-blue-500 focus:bg-white transition-all shadow-sm"
+                            className="w-full h-7 pl-7 pr-2 bg-gray-50 border border-gray-200 rounded-md text-xs text-gray-900 placeholder:text-gray-400 outline-none focus:border-blue-500 focus:bg-white transition-all"
                         />
                     </div>
 
                     {/* Desktop Filters */}
                     <div className="hidden xl:flex items-center gap-3">
-                        <div className="flex items-center gap-2 bg-gray-50 px-2 py-1 rounded-[6px] border border-gray-200">
+                        <div className="flex items-center gap-2 bg-gray-50 px-2 py-1 rounded-lg border border-gray-200">
                             <select
                                 value={visaFilter}
                                 onChange={(e) => setVisaFilter(e.target.value)}
@@ -495,49 +493,31 @@ export default function OperationsClient({
                 <div className="flex items-center gap-3">
                     <button
                         onClick={handleRefresh}
-                        className={`p-1.5 rounded-[6px] bg-gray-50 text-gray-400 border border-gray-200 transition-all active:scale-95 ${isRefreshing ? 'animate-spin text-blue-600' : 'hover:bg-white hover:text-blue-600'}`}
+                        className={`p-1.5 rounded-lg bg-gray-50 text-gray-400 border border-gray-200 transition-all active:scale-95 ${isRefreshing ? 'animate-spin text-blue-600' : 'hover:bg-white hover:text-blue-600'}`}
                     >
                         <RefreshCw size={14} />
                     </button>
-                    <div className="w-8 h-8 rounded-full bg-blue-700 text-white flex items-center justify-center font-bold text-xs shadow-sm">
-                        {staff?.[0]?.full_name?.charAt(0) || 'A'}
-                    </div>
                 </div>
             </header>
 
             {/* Desktop: Seamless Unified Block Layout */}
-            <div className="hidden lg:flex flex-1 overflow-x-auto thin-scrollbar bg-white">
-                <div className="flex w-full min-w-max h-full border-t border-gray-200 overflow-hidden bg-white">
+            <div className="hidden lg:flex flex-1 items-stretch overflow-x-auto thin-scrollbar border-t border-gray-200 bg-white">
 
                     {/* Column -1: Entry Batches (Fixed 180px) */}
-                    <div className="w-[180px] flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-300">
-                        <div className="h-[44px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
-                            <div className="flex items-center gap-2 text-slate-900">
-                                <Calendar size={18} className="text-slate-400" />
-                                <span className="text-sm font-bold uppercase tracking-widest text-slate-950">入国期生</span>
+                    <div className="w-[180px] flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-200">
+                        <div className="h-[44px] px-3 border-b border-gray-200 bg-white flex items-center gap-2 shrink-0">
+                            <div className="flex items-center gap-2 shrink-0">
+                                <Calendar size={18} className="text-gray-400" />
+                                <span className="text-sm font-bold uppercase tracking-widest text-gray-900">期生</span>
                             </div>
-                            <span className="text-xs font-bold bg-white text-slate-500 px-1.5 py-0.5 rounded-[6px] border border-gray-200 shadow-sm">{batchItems.length}</span>
-                        </div>
-                        
-                        {/* Filter Bar Aligned */}
-                        <div className="px-2 py-1.5 border-b border-gray-200 bg-gray-50 flex items-center gap-1 shrink-0">
                             <button
                                 onClick={() => handleSelectBatch(null)}
-                                className={`flex-1 px-3 py-1.5 rounded-[6px] text-[11px] font-bold uppercase tracking-tight transition-all flex items-center justify-between
-                                    ${selectedBatch === null
-                                        ? 'bg-emerald-600 text-white shadow-sm'
-                                        : 'bg-white text-emerald-600 border border-emerald-100 hover:bg-emerald-50'}`}
+                                className={`px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-tight transition-all
+                                    ${selectedBatch === null ? 'bg-emerald-600 text-white shadow-sm' : 'text-gray-400 hover:text-gray-700'}`}
                             >
-                                <div className="flex items-center gap-2">
-                                    <Calendar size={13} strokeWidth={2.5} />
-                                    <span>すべて</span>
-                                </div>
-                                <span className={`text-[10px] font-mono font-bold px-1 py-0.5 rounded leading-none ${selectedBatch === null ? 'bg-white/20 text-white' : 'bg-emerald-50 text-emerald-600'}`}>
-                                    {totalBatchCount}
-                                </span>
+                                すべて
                             </button>
                         </div>
-
                         <div className="flex-1 overflow-hidden">
                             <EntryBatchColumn
                                 batches={batchItems}
@@ -548,39 +528,35 @@ export default function OperationsClient({
                         </div>
                     </div>
 
-                    {/* Resize handle */}
+                    {/* Resize Handle: Batch | Company */}
                     <div
-                        className="w-1 bg-transparent hover:bg-blue-400/30 cursor-col-resize shrink-0 transition-colors z-10"
+                        className="relative self-stretch flex-shrink-0 w-[1px] bg-gray-200 group/resize hover:bg-blue-300 transition-colors cursor-col-resize z-10"
                         onMouseDown={(e) => startResize('company', e.clientX)}
-                    />
+                    >
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover/resize:opacity-100 transition-opacity pointer-events-none">
+                            <div className="flex flex-col gap-[3px] py-2 px-1">
+                                {[...Array(5)].map((_, i) => (
+                                    <div key={i} className="w-[3px] h-[3px] rounded-full bg-blue-400" />
+                                ))}
+                            </div>
+                        </div>
+                    </div>
 
                     {/* Column 0: Companies */}
-                    <div className="flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-300" style={{ width: companyWidth }}>
-                        <div className="h-[44px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
-                            <div className="flex items-center gap-2 text-slate-900">
-                                <Building2 size={18} className="text-slate-400" />
-                                <span className="text-sm font-bold uppercase tracking-widest text-slate-950">企業リスト</span>
+                    <div className="flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-200" style={{ width: companyWidth }}>
+                        <div className="h-[44px] px-3 border-b border-gray-200 bg-white flex items-center gap-2 shrink-0">
+                            <div className="flex items-center gap-2 shrink-0">
+                                <Building2 size={18} className="text-blue-400" />
+                                <span className="text-sm font-bold uppercase tracking-widest text-blue-700">企業リスト</span>
                             </div>
-                            <span className="text-xs font-bold bg-white text-slate-500 px-1.5 py-0.5 rounded-[6px] border border-gray-200 shadow-sm">{filteredCompanies.length}</span>
-                        </div>
-
-                        {/* Filter Bar Aligned */}
-                        <div className="px-2 py-1.5 border-b border-gray-200 bg-gray-50 flex items-center gap-1 shrink-0">
                             <button
                                 onClick={() => handleSelectCompany(null)}
-                                className={`flex-1 px-3 py-1.5 rounded-[6px] text-[11px] font-bold uppercase tracking-tight transition-all flex items-center justify-between
-                                    ${selectedCompanyId === null
-                                        ? 'bg-emerald-600 text-white shadow-sm'
-                                        : 'bg-white text-emerald-600 border border-emerald-100 hover:bg-emerald-50'}`}
+                                className={`px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-tight transition-all
+                                    ${selectedCompanyId === null ? 'bg-emerald-600 text-white shadow-sm' : 'text-gray-400 hover:text-gray-700'}`}
                             >
-                                <div className="flex items-center gap-2">
-                                    <Building2 size={13} strokeWidth={2.5} />
-                                    <span>すべて表示</span>
-                                </div>
-                                <span className={`text-[10px] font-mono font-bold px-1 py-0.5 rounded leading-none ${selectedCompanyId === null ? 'bg-white/20 text-white' : 'bg-emerald-50 text-emerald-600'}`}>
-                                    {filteredCompanies.length}
-                                </span>
+                                すべて
                             </button>
+                            <span className="ml-auto text-xs font-bold bg-white text-blue-700 px-1.5 py-0.5 rounded-lg border border-blue-200 shadow-sm shrink-0">{filteredCompanies.length}</span>
                         </div>
 
                         <div className="flex-1 overflow-hidden">
@@ -608,34 +584,32 @@ export default function OperationsClient({
                     </div>
 
                     {/* Column 1: Workers */}
-                    <div className="flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-300" style={{ width: workerWidth }}>
-                        <div className="h-[44px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
-                            <div className="flex items-center gap-2 text-slate-900">
+                    <div className="flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-200" style={{ width: workerWidth }}>
+                        <div className="h-[44px] px-3 border-b border-gray-200 bg-white flex items-center gap-3 shrink-0">
+                            <div className="flex items-center gap-2 text-slate-900 shrink-0">
                                 <Users2 size={18} className="text-slate-400" />
                                 <span className="text-sm font-bold uppercase tracking-widest text-slate-950">労働者リスト</span>
                             </div>
-                            <span className="text-xs font-bold bg-white text-slate-500 px-1.5 py-0.5 rounded-[6px] border border-gray-200 shadow-sm">{filteredWorkers.length}</span>
-                        </div>
-
-                        {/* Status Tabs Filter */}
-                        <div className="px-2 py-1.5 border-b border-gray-200 bg-gray-50 flex items-center gap-1 shrink-0">
-                            {[
-                                { id: 'all', label: 'すべて' },
-                                { id: 'working', label: '就業中' },
-                                { id: 'standby', label: '対応中' },
-                                { id: 'waiting', label: '未入国' },
-                            ].map((tab) => (
-                                <button
-                                    key={tab.id}
-                                    onClick={() => setWorkerStatusFilter(tab.id)}
-                                    className={`flex-1 px-1.5 py-1.5 rounded-[6px] text-[11px] font-bold uppercase tracking-tight transition-all
-                                        ${workerStatusFilter === tab.id
-                                            ? 'bg-blue-600 text-white shadow-sm'
-                                            : 'bg-white text-gray-500 border border-gray-200 hover:bg-gray-100 hover:text-gray-700'}`}
-                                >
-                                    {tab.label}
-                                </button>
-                            ))}
+                            <div className="flex items-center gap-1 flex-1">
+                                {[
+                                    { id: 'all', label: 'すべて' },
+                                    { id: 'working', label: '就業中' },
+                                    { id: 'standby', label: '対応中' },
+                                    { id: 'waiting', label: '未入国' },
+                                ].map((tab) => (
+                                    <button
+                                        key={tab.id}
+                                        onClick={() => setWorkerStatusFilter(tab.id)}
+                                        className={`px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-tight transition-all
+                                            ${workerStatusFilter === tab.id
+                                                ? 'bg-blue-600 text-white shadow-sm'
+                                                : 'text-gray-400 hover:text-gray-700'}`}
+                                    >
+                                        {tab.label}
+                                    </button>
+                                ))}
+                            </div>
+                            <span className="text-xs font-bold bg-white text-slate-500 px-1.5 py-0.5 rounded-lg border border-gray-200 shadow-sm shrink-0">{filteredWorkers.length}</span>
                         </div>
 
                         <div className="flex-1 overflow-hidden">
@@ -662,13 +636,13 @@ export default function OperationsClient({
                     </div>
 
                     <div className="flex-1 flex flex-col overflow-hidden min-w-[400px]">
-                        <div className="h-[44px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
+                        <div className="h-[44px] px-4 border-b border-gray-200 bg-white flex items-center justify-between shrink-0">
                             <div className="flex items-center gap-2 text-slate-900">
                                 <Settings2 size={18} className="text-slate-400" />
                                 <span className="text-sm font-bold uppercase tracking-widest text-slate-950">業務オペレーション</span>
                             </div>
                             {selectedWorkers.length > 0 && (
-                                <span className="text-xs font-bold bg-slate-900 text-white px-2.5 py-1 rounded-[6px] shadow-sm">{selectedWorkers.length}名選択</span>
+                                <span className="text-xs font-bold bg-slate-900 text-white px-2.5 py-1 rounded-lg shadow-sm">{selectedWorkers.length}名選択</span>
                             )}
                         </div>
                         <div className="flex-1 overflow-hidden">
@@ -681,7 +655,6 @@ export default function OperationsClient({
                         </div>
                     </div>
 
-                </div>
             </div>
 
             {/* Mobile: Drill-down */}

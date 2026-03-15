@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { Building2, ChevronRight, AlertCircle, Circle, CalendarCheck, CheckCircle2 } from 'lucide-react';
-import Link from 'next/link';
 
 interface AuditCompanyListColumnProps {
     companies: any[];
@@ -59,14 +58,18 @@ export default function AuditCompanyListColumn({ companies, selectedId, onSelect
                                         <span className={`text-[10px] font-normal uppercase tracking-tight ${config.color}`}>
                                             {config.label}
                                         </span>
-                                        {row.nextKansaDue && (
-                                            <>
-                                                <span className={`text-[9px] opacity-30 ${isSelected ? 'text-emerald-300' : 'text-slate-300'}`}>|</span>
-                                                <span className={`text-[10px] font-normal font-mono ${isSelected ? 'text-emerald-600' : 'text-slate-500'}`}>
-                                                    {row.nextKansaDue.replace(/-/g, '/').substring(5)}
-                                                </span>
-                                            </>
-                                        )}
+                                        {row.nextKansaDue && (() => {
+                                            const days = Math.ceil((new Date(row.nextKansaDue).getTime() - Date.now()) / 86400000);
+                                            const dateColor = days < 0 ? 'text-red-500 font-semibold' : days <= 14 ? 'text-amber-500 font-semibold' : isSelected ? 'text-emerald-600' : 'text-slate-500';
+                                            return (
+                                                <>
+                                                    <span className={`text-[9px] opacity-30 ${isSelected ? 'text-emerald-300' : 'text-slate-300'}`}>|</span>
+                                                    <span className={`text-[10px] font-normal font-mono ${dateColor}`}>
+                                                        {row.nextKansaDue.replace(/-/g, '/').substring(5)}
+                                                    </span>
+                                                </>
+                                            );
+                                        })()}
                                     </div>
                                 </div>
 

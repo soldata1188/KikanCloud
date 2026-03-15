@@ -1,7 +1,7 @@
 'use client'
 import { useState, useTransition } from 'react'
 import {
-    Users, Plus, Loader2, Key, Lock, User, ShieldAlert, CheckCircle2,
+    Users, Plus, Key,
     Building2, RefreshCw, Trash2, Copy, Check, Shield, UserCheck, X
 } from 'lucide-react'
 import { createProvisionedAccount, resetUserPassword, deleteProvisionedAccount } from '../actions/team'
@@ -231,16 +231,16 @@ export default function TeamManagerClient({
                             </div>
                             <div>
                                 <label className="block text-[10px] font-normal text-gray-400 uppercase mb-1 tracking-wider">氏名</label>
-                                <input name="fullName" required className="w-full h-10 px-3 bg-gray-50 border border-gray-200 rounded-md text-sm outline-none focus:border-emerald-500 font-normal" />
+                                <input name="fullName" required className="w-full h-10 px-3 bg-gray-50 border border-gray-200 rounded-md text-sm outline-none focus:border-[#0067b8] font-normal" />
                             </div>
                             <div>
                                 <label className="block text-[10px] font-normal text-gray-400 uppercase mb-1 tracking-wider">ログインID</label>
-                                <input name="loginId" required className="w-full h-10 px-3 bg-gray-50 border border-gray-200 rounded-md text-sm font-mono outline-none focus:border-emerald-500 font-normal" />
+                                <input name="loginId" required className="w-full h-10 px-3 bg-gray-50 border border-gray-200 rounded-md text-sm font-mono outline-none focus:border-[#0067b8] font-normal" />
                             </div>
                             <div>
                                 <label className="block text-[10px] font-normal text-gray-400 uppercase mb-1 tracking-wider">初期パスワード</label>
                                 <div className="flex gap-2">
-                                    <input value={createPw} onChange={e => setCreatePw(e.target.value)} required className="flex-1 h-10 px-3 bg-gray-50 border border-gray-200 rounded-md text-sm font-mono outline-none focus:border-emerald-500 font-normal" />
+                                    <input value={createPw} onChange={e => setCreatePw(e.target.value)} required className="flex-1 h-10 px-3 bg-gray-50 border border-gray-200 rounded-md text-sm font-mono outline-none focus:border-[#0067b8] font-normal" />
                                     <button type="button" onClick={() => setCreatePw(genPassword())} className="px-3 bg-gray-100 border border-gray-200 rounded-md text-xs font-normal"><RefreshCw size={14} /></button>
                                 </div>
                             </div>
@@ -270,7 +270,7 @@ export default function TeamManagerClient({
                             <div>
                                 <label className="block text-[10px] font-normal text-gray-400 uppercase mb-1 tracking-wider">新しいパスワード</label>
                                 <div className="flex gap-2">
-                                    <input value={newPassword} onChange={e => setNewPassword(e.target.value)} required minLength={6} className="flex-1 h-10 px-3 bg-gray-50 border border-gray-200 rounded-md text-sm font-mono outline-none focus:border-emerald-500 font-normal" />
+                                    <input value={newPassword} onChange={e => setNewPassword(e.target.value)} required minLength={6} className="flex-1 h-10 px-3 bg-gray-50 border border-gray-200 rounded-md text-sm font-mono outline-none focus:border-[#0067b8] font-normal" />
                                     <button type="button" onClick={() => setNewPassword(genPassword())} className="px-3 bg-gray-100 border border-gray-200 rounded-md text-xs font-normal"><RefreshCw size={14} /></button>
                                 </div>
                             </div>

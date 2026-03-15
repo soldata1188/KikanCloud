@@ -4,9 +4,8 @@
 import React, { useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import {
-    User, Shield, CreditCard, Calendar, MapPin, Briefcase, FileText,
-    CheckCircle2, BookOpen, Heart, Droplets, Globe, Home, ClipboardList,
-    GraduationCap, MessageSquare, Flag, Building2, Camera, Loader2
+    User, CreditCard, Briefcase,
+    CheckCircle2, Globe, MessageSquare, Camera, Loader2
 } from 'lucide-react';
 
 interface Worker {
@@ -66,12 +65,12 @@ interface ProfileDetailColumnProps {
 
 // ── Helpers ──────────────────────────────────────────────
 const STATUS_MAP: Record<string, { label: string; cls: string }> = {
-    working: { label: '就業中', cls: 'bg-emerald-100 text-emerald-700' },
-    standby: { label: '対応中', cls: 'bg-blue-100 text-blue-700' },
-    waiting: { label: '未入国', cls: 'bg-gray-100 text-gray-600' },
-    missing: { label: '失踪', cls: 'bg-rose-100 text-rose-700' },
-    returned: { label: '帰国', cls: 'bg-amber-100 text-amber-700' },
-    transferred: { label: '転籍済', cls: 'bg-purple-100 text-purple-700' },
+    working: { label: '就業中', cls: 'badge badge-success' },
+    standby: { label: '対応中', cls: 'badge badge-primary' },
+    waiting: { label: '未入国', cls: 'badge badge-muted' },
+    missing: { label: '失踪', cls: 'badge badge-danger' },
+    returned: { label: '帰国', cls: 'badge badge-warning' },
+    transferred: { label: '転籍済', cls: 'badge badge-muted' },
 };
 const SYSTEM_MAP: Record<string, string> = {
     ginou_jisshu: '技能実習',
@@ -123,7 +122,7 @@ function Row({ label, value, valueClass }: { label: string; value: React.ReactNo
 function ExpiryRow({ label, value }: { label: string; value?: string | null }) {
     const n = daysLeft(value);
     const badge = n !== null && n <= 90 ? (
-        <span className={`ml-2 text-xs font-bold px-1 py-0.5 rounded ${n <= 30 ? 'bg-rose-500 text-white' : 'bg-amber-100 text-amber-700'}`}>
+        <span className={`ml-2 badge ${n <= 30 ? 'badge-danger' : 'badge-warning'}`}>
             {n <= 0 ? '期限切れ' : `${n}日`}
         </span>
     ) : null;
@@ -328,9 +327,8 @@ export default function ProfileDetailColumn({ workers, onUpdate, onBulkUpdate, b
                     </div>
                 </div>
                 <div className="p-5 bg-white border-t border-gray-200 shrink-0">
-                    <button onClick={onBulkUpdate}
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white h-12 rounded-md font-black text-[14px] flex items-center justify-center gap-2 transition-all active:scale-95">
-                        <CheckCircle2 size={18} />
+                    <button onClick={onBulkUpdate} className="btn btn-primary w-full" style={{ height: '48px', fontSize: '14px', fontWeight: 700 }}>
+                        <CheckCircle2 size={17} />
                         {workers.length} 名分を一括保存
                     </button>
                 </div>
@@ -416,7 +414,7 @@ export default function ProfileDetailColumn({ workers, onUpdate, onBulkUpdate, b
                                         ))}
                                     </select>
                                 ) : (
-                                    <span className={`text-xs font-bold px-2.5 py-1 rounded-full shadow-sm ${statusInfo.cls}`}>{statusInfo.label}</span>
+                                    <span className={statusInfo.cls}>{statusInfo.label}</span>
                                 )}
                             </div>
 
@@ -437,27 +435,17 @@ export default function ProfileDetailColumn({ workers, onUpdate, onBulkUpdate, b
                     {/* Quick Edit Actions */}
                     <div className="flex flex-col gap-2 shrink-0 ml-4">
                         {!isEditing ? (
-                            <button
-                                onClick={() => setIsEditing(true)}
-                                className="h-9 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md text-xs font-normal transition-all flex items-center gap-1.5 shadow-sm active:scale-95"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" /><path d="m15 5 4 4" /></svg>
+                            <button onClick={() => setIsEditing(true)} className="btn btn-sm btn-secondary">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" /><path d="m15 5 4 4" /></svg>
                                 編集する
                             </button>
                         ) : (
                             <div className="flex items-center gap-2 flex-col">
-                                <button
-                                    onClick={handleSave}
-                                    disabled={uploading}
-                                    className="w-full h-9 px-4 bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-400 text-white rounded-md text-xs font-normal transition-all flex items-center justify-center gap-2 shadow-sm active:scale-95"
-                                >
-                                    {uploading && <Loader2 size={14} className="animate-spin" />}
+                                <button onClick={handleSave} disabled={uploading} className="btn btn-sm btn-success w-full">
+                                    {uploading && <Loader2 size={13} className="animate-spin" />}
                                     保存する
                                 </button>
-                                <button
-                                    onClick={handleCancel}
-                                    className="w-full h-8 px-4 bg-white border border-gray-200 hover:bg-gray-50 text-gray-500 rounded-md text-[11px] font-normal transition-all active:scale-95 shadow-sm"
-                                >
+                                <button onClick={handleCancel} className="btn btn-sm btn-secondary w-full">
                                     キャンセル
                                 </button>
                             </div>

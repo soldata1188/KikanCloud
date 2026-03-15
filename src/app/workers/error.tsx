@@ -1,5 +1,7 @@
 'use client'
 
+import Link from 'next/link'
+
 export default function WorkersError({
     error,
     reset,
@@ -55,7 +57,7 @@ export default function WorkersError({
                 >
                     再試行
                 </button>
-                <a
+                <Link
                     href="/"
                     style={{
                         padding: '10px 24px',
@@ -68,7 +70,7 @@ export default function WorkersError({
                     }}
                 >
                     ホームに戻る
-                </a>
+                </Link>
             </div>
         </div>
     )

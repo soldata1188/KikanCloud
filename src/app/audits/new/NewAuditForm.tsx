@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, CalendarCheck, CheckCircle2, Clock, Building2, User, FileText } from 'lucide-react'
+import { ArrowLeft, CheckCircle2, Clock, Building2 } from 'lucide-react'
 import { createAudit } from '../actions'
 import { useFormStatus } from 'react-dom'
 

@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { Sidebar } from '@/components/Sidebar'
+import { TopNav } from '@/components/TopNav'
 import EditWorkerClient from './EditWorkerClient'
 
 export default async function EditWorkerPage(props: { params: Promise<{ id: string }> }) {
@@ -30,9 +31,10 @@ export default async function EditWorkerPage(props: { params: Promise<{ id: stri
         .order('name_jp')
 
     return (
-        <div className="flex h-screen font-sans text-gray-900 overflow-hidden selection:bg-[#24b47e]/20">
+        <div className="flex h-screen font-sans text-gray-900 overflow-hidden selection:bg-emerald-500/20">
             <Sidebar active="workers" />
             <div className="flex-1 flex flex-col relative min-w-0">
+                <TopNav title="実習生 編集" role={userProfile?.role} />
                 <main className="flex-1 overflow-y-auto relative">
                     <EditWorkerClient companies={companies || []} worker={worker} />
                 </main>

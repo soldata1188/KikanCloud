@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find:*)",
+      "Bash(wc:*)",
+      "Bash(find src:*)",
+      "Bash(for f:*)",
+      "Bash(cd:*)",
+      "mcp__ide__getDiagnostics",
+      "Bash(taskkill:*)",
+      "Bash(cmd /c \"taskkill /PID 29928 /F\" 2>&1)",
+      "Bash(cmd /c \"taskkill /IM node.exe /F\" 2>&1 && sleep 2)",
+      "Bash(npx tsc:*)",
+      "Bash(npx eslint:*)",
+      "Bash(npm run:*)",
+      "Bash(grep:*)",
+      "Bash(ls:*)",
+      "Bash(git:*)",
+      "Bash(npx next:*)",
+      "Bash(Remove-Item -Recurse -Force \"C:\\\\ARATABIZ\\\\kikan-saas\\\\.next\" 2>/dev/null; echo \"cleared\")"
+    ]
+  }
+}

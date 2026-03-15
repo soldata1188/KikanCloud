@@ -1,6 +1,8 @@
-﻿import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import Link from 'next/link'
 import { Sidebar } from '@/components/Sidebar'
+import { TopNav } from '@/components/TopNav'
 
 import { CompaniesClient } from './CompaniesClient'
 
@@ -18,9 +20,10 @@ export default async function CompaniesPage() {
         const { data: companies } = await supabase.from('companies').select('*, workers(id, status, is_deleted, visa_status, full_name_romaji, full_name_kana, avatar_url, entry_date, zairyu_exp)').eq('is_deleted', false).order('created_at', { ascending: false })
 
         return (
-            <div className="flex h-screen font-sans text-[#1f1f1f] overflow-hidden selection:bg-[#24b47e]/20">
+            <div className="flex h-screen font-sans text-gray-900 overflow-hidden selection:bg-emerald-500/20">
                 <Sidebar active="companies" />
                 <div className="flex-1 flex flex-col relative min-w-0 overflow-hidden">
+                    <TopNav title="" role={userProfile?.role} />
                     <CompaniesClient companies={companies || []} userRole={userProfile?.role || 'staff'} />
                 </div>
             </div>
@@ -38,7 +41,7 @@ export default async function CompaniesPage() {
                     <p className="text-xs text-red-400 font-mono bg-red-50 p-3 rounded-lg text-left break-all">
                         {String(error?.message || error || 'Unknown error')}
                     </p>
-                    <a href="/companies" className="inline-block px-4 py-2 bg-emerald-600 text-white rounded-md text-sm">再読み込み</a>
+                    <Link href="/companies" className="inline-block px-4 py-2 bg-emerald-600 text-white rounded-md text-sm">再読み込み</Link>
                 </div>
             </div>
         )

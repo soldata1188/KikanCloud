@@ -103,9 +103,9 @@ function WorkerListColumn({ workers, selectedIds, onSelect }: WorkerListColumnPr
                 {grouped.map(({ label, workers: groupWorkers }) => (
                     <div key={label}>
                         {/* ── Group Header ── */}
-                        <div className="flex items-center gap-3 px-4 py-1.5 bg-slate-50 border-b border-t border-slate-200 sticky top-0 z-10">
-                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#0067b8]">{label}</span>
-                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#0067b8] text-white">
+                        <div className="flex items-center gap-2 px-4 py-1.5 bg-gray-50 border-b border-t border-gray-100 sticky top-0 z-10">
+                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">{label}</span>
+                            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-gray-200 text-gray-600">
                                 {groupWorkers.length}
                             </span>
                         </div>
@@ -119,10 +119,10 @@ function WorkerListColumn({ workers, selectedIds, onSelect }: WorkerListColumnPr
                                     {/* Desktop List Layout */}
                                     <button
                                         onClick={(e) => onSelect(worker.id, e)}
-                                        className={`hidden lg:flex w-full text-left pl-1.5 pr-1.5 py-1.5 border-b border-b-slate-200 border-l-[3px] transition-all duration-150 items-center gap-3
+                                        className={`hidden lg:flex w-full text-left pl-1.5 pr-1.5 py-1.5 border-b border-gray-100 border-l-[3px] transition-all duration-150 items-center gap-3
                                             ${isSelected
-                                                ? 'bg-[#0067b8]/5 border-l-[#0067b8]'
-                                                : 'hover:bg-slate-50 border-l-transparent'}`}
+                                                ? 'bg-blue-50 border-l-blue-500'
+                                                : 'hover:bg-gray-50 border-l-transparent'}`}
                                     >
                                         {/* Row Number */}
                                         <span className="text-[10px] font-mono text-gray-300 shrink-0 w-[20px] text-center select-none">{rowNum}</span>
@@ -130,18 +130,17 @@ function WorkerListColumn({ workers, selectedIds, onSelect }: WorkerListColumnPr
                                         {/* Section 1: Avatar & Name */}
                                         <div className="flex-[2] min-w-[180px] flex items-center gap-3.5 overflow-hidden">
                                             <div className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 text-xs font-normal
-                                                ${isSelected ? 'bg-[#0067b8] text-white' : 'bg-slate-100 text-slate-500 border border-slate-200'}`}>
+                                                ${isSelected ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-500'}`}>
                                                 {worker.avatar_url
                                                     ? <img src={worker.avatar_url} alt="" className="w-full h-full object-cover rounded-full" />
                                                     : (worker.full_name_romaji || 'U').charAt(0).toUpperCase()}
                                             </div>
                                             <div className="flex flex-col min-w-0 justify-center">
-                                                <span className={`text-sm font-medium truncate uppercase tracking-tight leading-none
-                                                    ${isSelected ? 'text-[#0067b8]' : 'text-slate-900'}`}>
+                                                <span className={`text-sm font-semibold truncate uppercase tracking-tight leading-none
+                                                    ${isSelected ? 'text-blue-700' : 'text-gray-900'}`}>
                                                     {worker.full_name_romaji || '---'}
                                                 </span>
-                                                <span className={`text-xs font-normal truncate tracking-tight leading-none mt-1
-                                                    ${isSelected ? 'text-[#0067b8]/60' : 'text-slate-400'}`}>
+                                                <span className="text-[11px] font-normal truncate leading-none mt-1 text-gray-400">
                                                     {worker.full_name_kana || '---'}
                                                 </span>
                                             </div>
@@ -149,29 +148,25 @@ function WorkerListColumn({ workers, selectedIds, onSelect }: WorkerListColumnPr
 
                                         {/* Section 2: 受入企業 & 社宅住所 */}
                                         <div className="flex-[1.8] min-w-[160px] flex flex-col justify-center overflow-hidden pr-2">
-                                            <span className={`text-sm font-normal truncate block leading-none
-                                                ${isSelected ? 'text-[#0067b8]/80' : 'text-slate-600'}`}>
+                                            <span className="text-[13px] font-normal truncate block leading-none text-gray-700">
                                                 {worker.companies?.name_jp
                                                     ? worker.companies.name_jp.replace(/株式会社|有限会社|（株）|\(株\)/g, '').trim()
                                                     : '---'}
                                             </span>
                                             {worker.japan_residence && (
-                                                <span className={`text-[10px] font-normal truncate block leading-none mt-1.5
-                                                    ${isSelected ? 'text-[#0067b8]/50' : 'text-slate-400'}`}>
+                                                <span className="text-[10px] font-normal truncate block leading-none mt-1.5 text-gray-400">
                                                     {worker.japan_residence}
                                                 </span>
                                             )}
                                         </div>
 
-                                        {/* Section 2.5: 職種区分 & 入国期生 (New Column) */}
+                                        {/* Section 2.5: 職種区分 & 入国期生 */}
                                         <div className="flex-[1.2] min-w-[100px] flex flex-col justify-center overflow-hidden pr-2">
-                                            <span className={`text-[11px] font-bold truncate block leading-none
-                                                ${isSelected ? 'text-[#0067b8]/80' : 'text-slate-600'}`}>
+                                            <span className="text-[11px] font-semibold truncate block leading-none text-gray-700">
                                                 {worker.industry_field || '---'}
                                             </span>
                                             {worker.entry_batch && (
-                                                <span className={`text-[10px] font-black truncate block leading-none mt-1.5 uppercase tracking-wider
-                                                    ${isSelected ? 'text-[#0067b8]/50' : 'text-slate-400'}`}>
+                                                <span className="text-[10px] font-bold truncate block leading-none mt-1.5 uppercase tracking-wider text-gray-400">
                                                     {worker.entry_batch}
                                                 </span>
                                             )}
@@ -179,12 +174,10 @@ function WorkerListColumn({ workers, selectedIds, onSelect }: WorkerListColumnPr
 
                                         {/* Section 3: 入国日 & 在日期間 */}
                                         <div className="flex-[1.2] min-w-[130px] flex flex-col justify-center gap-0.5 items-end pr-2 ml-auto">
-                                            <span className={`text-sm font-mono tracking-tighter leading-none text-right
-                                                ${isSelected ? 'text-[#0067b8]' : 'text-slate-500'}`}>
+                                            <span className="text-sm font-mono tracking-tighter leading-none text-right text-gray-600">
                                                 {fmtDate(worker.entry_date)}
                                             </span>
-                                            <span className={`text-xs font-normal leading-none tracking-tight text-right
-                                                ${isSelected ? 'text-[#0067b8]/70' : 'text-slate-400'}`}>
+                                            <span className="text-xs font-normal leading-none tracking-tight text-right text-gray-400">
                                                 {fmtInJapanDuration(worker.entry_date)}
                                             </span>
                                         </div>

@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import WorkerDetailClient from './WorkerDetailClient'
 import { Sidebar } from '@/components/Sidebar'
+import { TopNav } from '@/components/TopNav'
 
 export default async function WorkerDetailPage(props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
@@ -34,9 +35,10 @@ export default async function WorkerDetailPage(props: { params: Promise<{ id: st
     }) || [];
 
     return (
-        <div className="flex h-screen font-sans text-gray-900 overflow-hidden selection:bg-[#24b47e]/20">
+        <div className="flex h-screen font-sans text-gray-900 overflow-hidden selection:bg-emerald-500/20">
             <Sidebar active="workers" />
             <div className="flex-1 flex flex-col relative min-w-0">
+                <TopNav title="" role={userProfile?.role} />
                 <main className="flex-1 overflow-y-auto relative">
                     <WorkerDetailClient worker={worker} documents={documents} />
                 </main>

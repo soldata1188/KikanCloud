@@ -1,8 +1,14 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { DM_Sans } from "next/font/google";
 import "./globals.css";
 import { FilledInputBackground } from "@/components/FilledInputBackground";
-const inter = Inter({ subsets: ["latin"] });
+
+const dmSans = DM_Sans({
+    subsets: ["latin"],
+    weight: ["400", "500", "600", "700"],
+    variable: "--font-dm-sans",
+    display: "swap",
+});
 
 export const metadata: Metadata = {
     title: "KikanCloud | 外国人材・受入企業管理クラウド",
@@ -11,12 +17,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
     return (
-        <html lang="ja">
-            <head>
-                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
-            </head>
-            <body className={inter.className} suppressHydrationWarning>
-
+        <html lang="ja" className={dmSans.variable}>
+            <body suppressHydrationWarning>
                 {children}
                 <FilledInputBackground />
             </body>

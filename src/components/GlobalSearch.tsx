@@ -5,13 +5,14 @@ import { globalSearch } from '@/app/actions/search'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
-export function GlobalSearch() {
+export function GlobalSearch({ variant = 'dark' }: { variant?: 'light' | 'dark' }) {
     const pathname = usePathname()
     const [isOpen, setIsOpen] = useState(false)
     const [query, setQuery] = useState('')
     const [results, setResults] = useState<{ workers: any[], companies: any[] }>({ workers: [], companies: [] })
     const [isPending, startTransition] = useTransition()
     const inputRef = useRef<HTMLInputElement>(null)
+    const isLight = variant === 'light'
 
     useEffect(() => {
         const down = (e: KeyboardEvent) => {
@@ -40,11 +41,19 @@ export function GlobalSearch() {
 
     return (
         <>
-            <div onClick={() => setIsOpen(true)} className="relative hidden md:block group cursor-pointer">
-                <Search className="absolute left-2 top-1/2 -translate-y-1/2 text-white/60 group-hover:text-white transition-colors" size={13} />
-                <div className="h-8 w-44 bg-white/10 border border-white/25 rounded px-7 pr-10 text-xs flex items-center text-white/50 group-hover:bg-white/20 transition-all">検索...</div>
-                <div className="absolute right-1.5 top-1/2 -translate-y-1/2 flex items-center gap-0.5 text-xs font-mono text-white/40">
-                    <span className="border border-white/25 rounded px-1">⌘</span><span className="border border-white/25 rounded px-1">K</span>
+            <div onClick={() => setIsOpen(true)} className="relative hidden md:block group cursor-pointer w-full max-w-[280px]">
+                <div
+                    className={`relative w-full h-9 rounded-[32px] flex items-center border transition-all ${isLight
+                        ? 'bg-gray-100 border-gray-200 group-hover:bg-gray-200'
+                        : 'bg-white/20 border-white/20 group-hover:bg-white/30 group-hover:border-white/30'
+                    }`}
+                >
+                    <Search className={`absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none ${isLight ? 'text-gray-400 group-hover:text-gray-600' : 'text-white/80'}`} size={14} />
+                    <span className={`pl-8 pr-14 text-[12px] truncate ${isLight ? 'text-gray-500' : 'text-white/80'}`}>労働者名、企業名で検索...</span>
+                    <span className={`absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-0.5 text-[9px] font-mono ${isLight ? 'text-gray-400' : 'text-white/60'}`}>
+                        <kbd className="rounded border border-white/30 bg-white/15 px-1 py-0.5">⌘</kbd>
+                        <kbd className="rounded border border-white/30 bg-white/15 px-1 py-0.5">K</kbd>
+                    </span>
                 </div>
             </div>
 

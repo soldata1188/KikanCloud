@@ -27,20 +27,14 @@ function EntryBatchColumn({ batches, selectedBatch, onSelect, hideAll = false }:
                     <button
                         onClick={() => onSelect(null)}
                         className={`w-full text-left px-3 py-2.5 border-b border-gray-100 transition-colors duration-150 flex items-center justify-between
-                            ${selectedBatch === null
-                                ? 'bg-emerald-50 border-l-[3px] border-emerald-500'
-                                : 'hover:bg-emerald-50/40 border-l-[3px] border-transparent'}`}
+                            ${selectedBatch === null ? 'bg-white' : 'hover:bg-gray-50'}`}
                     >
-                        <div className="flex items-center gap-2.5">
-                            <div className={`w-7 h-7 rounded-md flex items-center justify-center shrink-0
-                                ${selectedBatch === null ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-400'}`}>
-                                <CalendarDays size={14} />
-                            </div>
-                            <span className={`text-[13px] font-normal uppercase tracking-wide
-                                ${selectedBatch === null ? 'text-emerald-900' : 'text-slate-900'}`}>すべて</span>
-                        </div>
-                        <span className={`text-[9px] font-mono font-normal px-1 py-0.5 rounded leading-none
-                            ${selectedBatch === null ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-500'}`}>
+                        <span className={`text-[13px] font-bold rounded-full px-2.5 py-1 transition-all
+                            ${selectedBatch === null ? 'bg-emerald-600 text-white' : 'text-gray-500'}`}>
+                            すべて
+                        </span>
+                        <span className={`text-[9px] font-mono font-normal px-1.5 py-0.5 rounded-full leading-none
+                            ${selectedBatch === null ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>
                             {total}
                         </span>
                     </button>

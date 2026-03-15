@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useRef } from 'react';
-import { ArrowLeft, UploadCloud, FileText, Loader2, Image as ImageIcon, X, User, IdCard, Briefcase, Save, FileBadge2 } from 'lucide-react';
+import { ArrowLeft, UploadCloud, FileText, Loader2, X, User, IdCard, Briefcase, Save, FileBadge2 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 

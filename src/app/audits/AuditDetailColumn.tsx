@@ -1,10 +1,9 @@
 'use client';
 
 import React from 'react';
-import {
-    Building2, MapPin, Users, PieChart,
-    ExternalLink, FileDown, Printer, ShieldCheck,
-    Activity, Clock, Briefcase, UserCircle
+import { MapPin, Users,
+    ExternalLink, FileDown, ShieldCheck,
+    Activity, Clock
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -51,47 +50,47 @@ export default function AuditDetailColumn({ row, onOpenPdfModal }: AuditDetailCo
                 <div className="grid grid-cols-2 gap-3">
                     <button
                         onClick={onOpenPdfModal}
-                        className="bg-gray-900 border border-gray-900 text-white rounded-xl px-4 py-3 flex flex-col items-center gap-2 hover:bg-black transition-all shadow-lg shadow-gray-200 active:scale-95 group"
+                        className="bg-[var(--color-text-primary)] border border-[var(--color-text-primary)] text-white rounded-[var(--radius-button)] px-4 py-3 flex flex-col items-center gap-2 hover:opacity-90 transition-all shadow-sm active:scale-95 group"
                     >
                         <FileDown size={18} className="group-hover:animate-bounce" />
-                        <span className="text-[12px] font-black uppercase tracking-widest">Generate PDF</span>
+                        <span className="text-[12px] font-semibold">Generate PDF</span>
                     </button>
 
                     <Link
                         href={`/companies/${company.id}`}
                         target="_blank"
-                        className="bg-white border border-gray-300 text-gray-900 rounded-xl px-4 py-3 flex flex-col items-center gap-2 hover:border-blue-500 hover:text-blue-700 transition-all shadow-sm active:scale-95 group"
+                        className="bg-white border border-[var(--color-border)] text-[var(--color-text-primary)] rounded-[var(--radius-button)] px-4 py-3 flex flex-col items-center gap-2 hover:border-[var(--brand-primary)] hover:text-[var(--brand-primary)] transition-all shadow-sm active:scale-95 group"
                     >
                         <ExternalLink size={18} className="group-hover:rotate-12 transition-transform" />
-                        <span className="text-[12px] font-black uppercase tracking-widest">Detail View</span>
+                        <span className="text-[12px] font-semibold">Detail View</span>
                     </Link>
                 </div>
             </div>
 
             <div className="p-6 flex flex-col gap-6">
                 {/* Basic Info */}
-                <section className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-4">
+                <section className="bg-[var(--color-bg-card)] rounded-[var(--radius-card)] border border-[var(--color-border)] shadow-[var(--shadow-card)] p-5 space-y-4">
                     <div className="flex items-start gap-4">
-                        <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center shrink-0">
-                            <MapPin size={20} className="text-slate-400" />
+                        <div className="w-9 h-9 rounded-lg bg-[var(--color-bg-page)] flex items-center justify-center shrink-0">
+                            <MapPin size={18} className="text-[var(--color-text-muted)]" />
                         </div>
                         <div className="space-y-1">
-                            <h4 className="text-[11px] font-black text-gray-900 uppercase tracking-widest">Address Information</h4>
-                            <p className="text-[13px] font-black text-gray-900 leading-relaxed">
+                            <h4 className="text-[11px] font-semibold text-[var(--color-text-muted)] uppercase tracking-widest">所在地</h4>
+                            <p className="text-[13px] font-medium text-[var(--color-text-primary)] leading-relaxed">
                                 {company.address || '住所情報が未設定です'}
                             </p>
                         </div>
                     </div>
 
                     <div className="flex items-start gap-4">
-                        <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center shrink-0">
-                            <ShieldCheck size={20} className="text-slate-400" />
+                        <div className="w-9 h-9 rounded-lg bg-[var(--color-bg-page)] flex items-center justify-center shrink-0">
+                            <ShieldCheck size={18} className="text-[var(--color-text-muted)]" />
                         </div>
                         <div className="space-y-1">
-                            <h4 className="text-[11px] font-black text-gray-900 uppercase tracking-widest">Compliance Status</h4>
+                            <h4 className="text-[11px] font-semibold text-[var(--color-text-muted)] uppercase tracking-widest">コンプライアンス状況</h4>
                             <div className="flex items-center gap-2 mt-1">
-                                <span className={`px-2 py-0.5 rounded-full text-[11px] font-black uppercase ${row.kansaStatus === 'overdue' ? 'bg-rose-100 text-rose-700' : 'bg-emerald-100 text-emerald-700'}`}>
-                                    {row.kansaStatus === 'overdue' ? 'Risk Detected' : 'Clearance Ok'}
+                                <span className={row.kansaStatus === 'overdue' ? 'badge badge-danger' : 'badge badge-success'}>
+                                    {row.kansaStatus === 'overdue' ? 'リスクあり' : '問題なし'}
                                 </span>
                             </div>
                         </div>
@@ -99,52 +98,50 @@ export default function AuditDetailColumn({ row, onOpenPdfModal }: AuditDetailCo
                 </section>
 
                 {/* Worker Stats */}
-                <section className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                    <div className="px-5 py-4 border-b border-gray-50 flex items-center justify-between">
+                <section className="bg-[var(--color-bg-card)] rounded-[var(--radius-card)] border border-[var(--color-border)] shadow-[var(--shadow-card)] overflow-hidden">
+                    <div className="px-5 py-3 border-b border-[var(--color-border)] flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                            <Users size={15} className="text-blue-700" />
-                            <h3 className="text-[12px] font-black uppercase tracking-widest text-gray-900">外国人材 在籍状況</h3>
+                            <Users size={14} className="text-[var(--brand-primary)]" />
+                            <h3 className="text-[12px] font-semibold text-[var(--color-text-primary)]">外国人材 在籍状況</h3>
                         </div>
-                        <div className="text-[15px] font-black text-blue-700 bg-blue-50 px-3 py-0.5 rounded-full shadow-sm border border-blue-200">
-                            {workerCounts?.total || 0} <span className="text-[11px] font-bold ml-1">名</span>
+                        <div className="badge badge-primary">
+                            {workerCounts?.total || 0} 名
                         </div>
                     </div>
 
-                    <div className="p-4 space-y-2">
+                    <div className="p-4 space-y-1.5">
                         {visaEntries.length > 0 ? (
                             visaEntries.map(([visa, count]) => (
-                                <div key={visa} className="flex items-center justify-between p-3 rounded-xl bg-gray-50/50 hover:bg-gray-50 transition-colors group">
+                                <div key={visa} className="flex items-center justify-between px-3 py-2 rounded-lg bg-[var(--color-bg-page)] hover:bg-[#f1f5f9] transition-colors">
                                     <div className="flex items-center gap-2.5 overflow-hidden">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-blue-600 shadow-sm" />
-                                        <span className="text-[13px] font-black text-gray-900 truncate">{visa}</span>
+                                        <div className="w-1.5 h-1.5 rounded-full bg-[var(--brand-primary)]" />
+                                        <span className="text-[13px] font-medium text-[var(--color-text-primary)] truncate">{visa}</span>
                                     </div>
-                                    <span className="text-[15px] font-black text-gray-900 tabular-nums">{count}</span>
+                                    <span className="text-[14px] font-semibold text-[var(--color-text-primary)] tabular-nums">{count}</span>
                                 </div>
                             ))
                         ) : (
-                            <div className="py-8 text-center text-slate-300 italic text-[11px] font-bold">
+                            <div className="py-8 text-center text-[var(--color-text-muted)] text-[12px]">
                                 就業中の人材はいません。
                             </div>
                         )}
                     </div>
                 </section>
 
-                {/* System Info */}
-                <section className="bg-gradient-to-br from-[#1e293b] to-[#0f172a] rounded-2xl shadow-xl p-5 text-white/90">
-                    <div className="flex items-center gap-3 mb-4">
-                        <div className="p-2 bg-white/10 rounded-lg">
-                            <Clock size={16} />
+                {/* Audit Info */}
+                <section className="bg-[var(--brand-primary)] rounded-[var(--radius-card)] p-5 text-white">
+                    <div className="flex items-center gap-3 mb-3">
+                        <div className="p-1.5 bg-white/15 rounded-lg">
+                            <Clock size={15} />
                         </div>
-                        <h3 className="text-[11px] font-black tracking-[.2em] uppercase text-white/40">Audit Logic</h3>
+                        <h3 className="text-[11px] font-semibold tracking-wider uppercase text-white/70">監査ルール</h3>
                     </div>
-                    <p className="text-[12px] font-medium leading-relaxed mb-4">
-                        監査訪問は<span className="font-black text-blue-400 mx-1">3ヶ月に1回</span>以上の実施が義務付けられています。次回の期限を遵守してください。
+                    <p className="text-[12px] leading-relaxed text-white/90">
+                        監査訪問は<span className="font-bold text-white mx-1">3ヶ月に1回</span>以上の実施が義務付けられています。次回の期限を遵守してください。
                     </p>
-                    <div className="flex items-center justify-between pt-4 border-t border-white/5">
-                        <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]" />
-                            <span className="text-[10px] font-black uppercase tracking-widest text-white/40">Monitoring Active</span>
-                        </div>
+                    <div className="flex items-center gap-2 mt-4 pt-3 border-t border-white/15">
+                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-300" />
+                        <span className="text-[10px] font-medium uppercase tracking-widest text-white/50">Monitoring Active</span>
                     </div>
                 </section>
             </div>

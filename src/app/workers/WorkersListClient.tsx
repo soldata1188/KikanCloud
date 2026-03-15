@@ -4,9 +4,9 @@ import React, { useState, useTransition, useEffect, useRef, useCallback } from '
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import {
-    Search, Clock, Briefcase, AlertTriangle, ChevronLeft, ChevronRight,
-    Building2, Landmark, Calendar, ExternalLink, User, Users,
-    CheckCircle2, Circle, Plus, X, LayoutGrid, List, Trash2, RefreshCw, ArrowLeft
+    Search, Clock, AlertTriangle, ChevronLeft, ChevronRight,
+    Building2, Calendar, User, Users,
+    CheckCircle2, Plus, Trash2, RefreshCw, ArrowLeft
 } from 'lucide-react'
 import { bulkDeleteWorkers } from '@/app/actions/operations'
 import { updateWorkerStatus } from '@/app/operations/actions'
@@ -135,7 +135,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
 
     // Column widths (resizable) - Balanced for Option B
     const [batchWidth, setBatchWidth] = useState(165);
-    const [companyWidth, setCompanyWidth] = useState(240);
+    const [companyWidth, setCompanyWidth] = useState(360);
     const [workerWidth, setWorkerWidth] = useState(650);
     const [profileWidth, setProfileWidth] = useState(480);
     const isResizing = useRef(false);
@@ -145,7 +145,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
         const startWidth = col === 'batch' ? batchWidth : col === 'company' ? companyWidth : col === 'worker' ? workerWidth : profileWidth;
         const setter = col === 'batch' ? setBatchWidth : col === 'company' ? setCompanyWidth : col === 'worker' ? setWorkerWidth : setProfileWidth;
         const min = col === 'batch' ? 100 : col === 'company' ? 150 : col === 'worker' ? 300 : 300;
-        const max = col === 'batch' ? 300 : col === 'company' ? 500 : col === 'worker' ? 1000 : 800;
+        const max = col === 'batch' ? 300 : col === 'company' ? 700 : col === 'worker' ? 1000 : 800;
 
         const onMouseMove = (e: MouseEvent) => {
             if (!isResizing.current) return;
@@ -184,15 +184,20 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
 
     // Derived filter lists
     const uniqueCompanies = React.useMemo(() => {
-        const map = new Map<string, string>();
+        const map = new Map<string, { name: string; count: number }>();
         workers.forEach(w => {
             if (w.company_id && w.companies?.name_jp) {
-                map.set(w.company_id, w.companies.name_jp);
+                const existing = map.get(w.company_id);
+                if (!existing) {
+                    map.set(w.company_id, { name: w.companies.name_jp, count: 1 });
+                } else {
+                    existing.count++;
+                }
             }
         });
 
         return Array.from(map.entries())
-            .map(([id, name]) => ({ id, name_jp: name }))
+            .map(([id, { name, count }]) => ({ id, name_jp: name, worker_count: count }))
             .sort((a, b) => {
                 const nameA = cleanName(a.name_jp);
                 const nameB = cleanName(b.name_jp);
@@ -468,28 +473,28 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
     return (
         <div className="flex flex-col h-full bg-white overflow-hidden text-gray-900 antialiased">
             {/* 1. Header */}
-            <header className="h-[44px] bg-white border-b border-gray-300 flex items-center justify-between px-4 z-40 shrink-0">
+            <header className="h-[44px] bg-white border-b border-gray-200 flex items-center justify-between px-4 z-40 shrink-0">
                 <div className="flex items-center gap-4 flex-1">
                     <h2 className="text-base font-bold tracking-tight text-gray-950 border-r border-gray-300 pr-4 shrink-0">
                         人材<span className="text-blue-700">管理</span>
                     </h2>
 
                     {/* Global Search */}
-                    <div className="relative flex-1 max-w-sm group">
-                        <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
+                    <div className="relative w-[180px] group">
+                        <Search size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
                         <input
                             type="text"
-                            placeholder="名前、企業名で検索..."
+                            placeholder="名前・企業で検索..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             suppressHydrationWarning
-                            className="w-full h-8 pl-9 pr-3 bg-gray-50 border border-gray-200 rounded-[6px] text-sm font-normal text-gray-900 placeholder:text-gray-500 outline-none focus:border-blue-500 focus:bg-white transition-all shadow-sm"
+                            className="w-full h-7 pl-7 pr-2 bg-gray-50 border border-gray-200 rounded-md text-xs text-gray-900 placeholder:text-gray-400 outline-none focus:border-blue-500 focus:bg-white transition-all"
                         />
                     </div>
 
                     {/* Filters */}
                     <div className="hidden xl:flex items-center gap-3">
-                        <div className="flex items-center gap-2 bg-gray-50 px-2.5 py-1 rounded-[6px] border border-gray-200">
+                        <div className="flex items-center gap-2 bg-gray-50 px-2.5 py-1 rounded-lg border border-gray-200">
                             {/* Entry Date Filter */}
                             <select value={filterEntryDate} onChange={e => setFilterEntryDate(e.target.value)}
                                 suppressHydrationWarning
@@ -537,7 +542,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                         <>
                             <button
                                 onClick={() => setIsDeleteDialogOpen(true)}
-                                className="h-8 px-4 bg-white border border-rose-200 text-rose-600 hover:bg-rose-50 rounded-[6px] flex items-center gap-2 text-sm font-medium transition-all active:scale-95 shadow-sm"
+                                className="h-8 px-4 bg-white border border-rose-200 text-rose-600 hover:bg-rose-50 rounded-lg flex items-center gap-2 text-sm font-medium transition-all active:scale-95 shadow-sm"
                             >
                                 <Trash2 size={14} />
                                 削除
@@ -554,46 +559,50 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                             setSelectedCompanyId(null);
                             setTimeout(() => setIsRefreshing(false), 800);
                         }}
-                        className={`p-1.5 rounded-[6px] bg-gray-50 text-gray-400 border border-gray-200 transition-all active:scale-95 ${isRefreshing ? 'animate-spin text-blue-600' : 'hover:bg-white hover:text-blue-600'}`}
+                        className={`p-1.5 rounded-lg bg-gray-50 text-gray-400 border border-gray-200 transition-all active:scale-95 ${isRefreshing ? 'animate-spin text-blue-600' : 'hover:bg-white hover:text-blue-600'}`}
                     >
                         <RefreshCw size={14} />
                     </button>
                     {(role === 'admin' || role === 'staff') && (
-                        <Link 
-                            href="/workers/new" 
-                            className="h-8 px-3.5 bg-blue-700 hover:bg-blue-800 text-white rounded-[6px] text-sm font-bold flex items-center gap-2 active:scale-95 transition-all shadow-md shadow-blue-100 shrink-0"
-                        >
-                            <Plus size={16} />
-                            <span>新規登録</span>
+                        <Link href="/workers/new" className="btn btn-sm btn-primary shrink-0">
+                            <Plus size={15} />
+                            新規登録
                         </Link>
                     )}
                 </div>
             </header>
 
             {/* 2. Desktop: 4-Column Layout */}
-            <div className="hidden lg:flex flex-1 overflow-x-auto thin-scrollbar bg-white">
-                <div className="flex w-full min-w-max h-full border-t border-gray-300 overflow-hidden bg-white">
+            <div className="hidden lg:flex flex-1 items-stretch overflow-x-auto thin-scrollbar border-t border-gray-200 bg-white">
 
                     {/* Column 0: Entry Batch */}
-                    <div className="flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-300" style={{ width: batchWidth }}>
-                        <div className="h-[44px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
-                            <div className="flex items-center gap-2">
+                    <div className="flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-200" style={{ width: batchWidth }}>
+                        <div className="h-[44px] px-3 border-b border-gray-200 bg-white flex items-center gap-2 shrink-0">
+                            <div className="flex items-center gap-2 shrink-0">
                                 <Calendar size={18} className="text-gray-400" />
-                                <span className="text-sm font-bold uppercase tracking-widest text-gray-900">入国期生</span>
+                                <span className="text-sm font-bold uppercase tracking-widest text-gray-900">期生</span>
                             </div>
+                            <button
+                                onClick={() => handleSelectBatch(null)}
+                                className={`px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-tight transition-all
+                                    ${selectedBatch === null ? 'bg-emerald-600 text-white shadow-sm' : 'text-gray-400 hover:text-gray-700'}`}
+                            >
+                                すべて
+                            </button>
                         </div>
                         <div className="flex-1 overflow-hidden">
                             <EntryBatchColumn
                                 batches={batchItems}
                                 selectedBatch={selectedBatch}
                                 onSelect={handleSelectBatch}
+                                hideAll={true}
                             />
                         </div>
                     </div>
 
                     {/* Resize Handle: Batch | Company */}
                     <div
-                        className="relative flex-shrink-0 w-[1px] bg-gray-200 group/resize hover:bg-blue-300 transition-colors cursor-col-resize z-10"
+                        className="relative self-stretch flex-shrink-0 w-[1px] bg-gray-200 group/resize hover:bg-blue-300 transition-colors cursor-col-resize z-10"
                         onMouseDown={(e) => startResize('batch', e.clientX)}
                     >
                         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover/resize:opacity-100 transition-opacity pointer-events-none">
@@ -606,28 +615,34 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                     </div>
 
                     {/* Column 1: Companies */}
-                    <div className="flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-300" style={{ width: companyWidth }}>
-                        <div className="h-[44px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
-                            <div className="flex items-center gap-2">
+                    <div className="flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-200" style={{ width: companyWidth }}>
+                        <div className="h-[44px] px-3 border-b border-gray-200 bg-white flex items-center gap-2 shrink-0">
+                            <div className="flex items-center gap-2 shrink-0">
                                 <Building2 size={18} className="text-blue-400" />
                                 <span className="text-sm font-bold uppercase tracking-widest text-blue-700">企業リスト</span>
                             </div>
-                            {selectedBatch && (
-                                <span className="text-xs font-bold bg-white text-blue-700 px-1.5 py-0.5 rounded-[6px] border border-blue-200 shadow-sm">{filteredCompanies.length}</span>
-                            )}
+                            <button
+                                onClick={() => handleSelectCompany(null)}
+                                className={`px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-tight transition-all
+                                    ${selectedCompanyId === null ? 'bg-emerald-600 text-white shadow-sm' : 'text-gray-400 hover:text-gray-700'}`}
+                            >
+                                すべて
+                            </button>
+                            <span className="ml-auto text-xs font-bold bg-white text-blue-700 px-1.5 py-0.5 rounded-lg border border-blue-200 shadow-sm shrink-0">{filteredCompanies.length}</span>
                         </div>
                         <div className="flex-1 overflow-hidden">
                             <CompanyColumn
                                 companies={filteredCompanies}
                                 selectedId={selectedCompanyId}
                                 onSelect={handleSelectCompany}
+                                hideAll={true}
                             />
                         </div>
                     </div>
 
                     {/* Resize Handle: Company | Worker */}
                     <div
-                        className="relative flex-shrink-0 w-[1px] bg-gray-200 group/resize hover:bg-blue-300 transition-colors cursor-col-resize z-10"
+                        className="relative self-stretch flex-shrink-0 w-[1px] bg-gray-200 group/resize hover:bg-blue-300 transition-colors cursor-col-resize z-10"
                         onMouseDown={(e) => startResize('company', e.clientX)}
                     >
                         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover/resize:opacity-100 transition-opacity pointer-events-none">
@@ -640,28 +655,32 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                     </div>
 
                     {/* Column 2: Workers */}
-                    <div className="flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-300" style={{ width: workerWidth }}>
+                    <div className="flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-200" style={{ width: workerWidth }}>
 
-                        <div className="h-[44px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
-                            <div className="flex items-center gap-2">
+                        <div className="h-[44px] px-3 border-b border-gray-200 bg-white flex items-center gap-2 shrink-0">
+                            <div className="flex items-center gap-2 shrink-0">
                                 <Users size={18} className="text-gray-400" />
                                 <span className="text-sm font-bold uppercase tracking-widest text-gray-900">人材リスト</span>
                             </div>
-                            <span className="text-xs font-bold bg-gray-50 text-gray-900 px-1.5 py-0.5 rounded-[6px] border border-gray-200 shadow-sm">{filtered.length}</span>
-                        </div>
-                        {/* Tabs */}
-                        <div className="flex border-b border-gray-300 bg-white shrink-0">
-                            {TAB_KEYS.map((key) => {
-                                const isActive = activeTab === key
-                                const cfg = TAB_CONFIG[key]
-                                return (
-                                    <button key={key} onClick={() => setActiveTab(key)}
-                                        className={`flex-1 h-[44px] flex items-center justify-center text-xs font-bold uppercase tracking-widest transition-all border-b-2
-                                        ${isActive ? cfg.activeBg : cfg.inactiveText + ' border-transparent'}`}>
-                                        {cfg.label}
-                                    </button>
-                                )
-                            })}
+                            <div className="flex items-center gap-1 flex-1">
+                                {TAB_KEYS.map((key) => {
+                                    const isActive = activeTab === key
+                                    const cfg = TAB_CONFIG[key]
+                                    const count = key === 'all' ? workers.length : countByTab(key)
+                                    return (
+                                        <button key={key} onClick={() => setActiveTab(key)}
+                                            className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-tight transition-all
+                                            ${isActive ? 'bg-[#0067b8] text-white shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>
+                                            {cfg.label}
+                                            <span className={`text-[9px] rounded-full px-1 py-0.5 leading-none font-normal
+                                                ${isActive ? 'bg-white/25 text-white' : 'bg-gray-100 text-gray-500'}`}>
+                                                {count}
+                                            </span>
+                                        </button>
+                                    )
+                                })}
+                            </div>
+                            <span className="text-xs font-bold bg-gray-50 text-gray-900 px-1.5 py-0.5 rounded-lg border border-gray-200 shadow-sm shrink-0">{filtered.length}</span>
                         </div>
                         <div className="flex-1 overflow-hidden">
                             <WorkerListColumn
@@ -674,7 +693,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
 
                     {/* Resize Handle: Worker | Profile Detail */}
                     <div
-                        className="relative flex-shrink-0 w-[1px] bg-gray-200 group/resize hover:bg-blue-300 transition-colors cursor-col-resize z-10"
+                        className="relative self-stretch flex-shrink-0 w-[1px] bg-gray-200 group/resize hover:bg-blue-300 transition-colors cursor-col-resize z-10"
                         onMouseDown={(e) => startResize('worker', e.clientX)}
                     >
                         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover/resize:opacity-100 transition-opacity pointer-events-none">
@@ -687,14 +706,14 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                     </div>
 
                     {/* Column 3: Profile Detail */}
-                    <div className="flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-300" style={{ width: profileWidth }}>
-                        <div className="h-[44px] px-4 border-b border-gray-300 bg-white flex items-center justify-between shrink-0">
+                    <div className="flex-shrink-0 flex flex-col overflow-hidden border-r border-gray-200" style={{ width: profileWidth }}>
+                        <div className="h-[44px] px-4 border-b border-gray-200 bg-white flex items-center justify-between shrink-0">
                             <div className="flex items-center gap-2">
                                 <User size={18} className="text-gray-400" />
                                 <span className="text-sm font-bold uppercase tracking-widest text-gray-900">人材詳細</span>
                             </div>
                             {selectedIds.length > 1 && (
-                                <span className="text-xs font-bold bg-blue-50 text-blue-700 px-2.5 py-1 rounded-[6px] border border-blue-200 shadow-sm">{selectedIds.length}名一括選択中</span>
+                                <span className="text-xs font-bold bg-blue-50 text-blue-700 px-2.5 py-1 rounded-lg border border-blue-200 shadow-sm">{selectedIds.length}名一括選択中</span>
                             )}
                         </div>
                         <div className="flex-1 overflow-hidden">
@@ -711,7 +730,7 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
 
                     {/* Resize Handle: Profile | Documents */}
                     <div
-                        className="relative flex-shrink-0 w-[1px] bg-gray-200 group/resize hover:bg-blue-300 transition-colors cursor-col-resize z-10"
+                        className="relative self-stretch flex-shrink-0 w-[1px] bg-gray-200 group/resize hover:bg-blue-300 transition-colors cursor-col-resize z-10"
                         onMouseDown={(e) => startResize('profile', e.clientX)}
                     >
                         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover/resize:opacity-100 transition-opacity pointer-events-none">
@@ -726,13 +745,13 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                     {/* Column 4: Documents */}
                     <div className="flex-1 min-w-[320px] flex flex-col overflow-hidden">
 
-                        <div className="h-[44px] px-4 border-b border-gray-300 bg-white flex items-center justify-center gap-3 shrink-0 relative">
+                        <div className="h-[44px] px-4 border-b border-gray-200 bg-white flex items-center justify-center gap-3 shrink-0 relative">
                             <div className="flex items-center gap-2 text-slate-800">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" /><path d="M14 2v4a2 2 0 0 0 2 2h4" /></svg>
                                 <span className="text-sm font-bold uppercase tracking-widest text-gray-900">関連書類</span>
                             </div>
                             {selectedIds.length === 1 && (
-                                <span className="absolute right-4 text-xs font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-[6px] border border-blue-100 shadow-sm">1名選択</span>
+                                <span className="absolute right-4 text-xs font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-lg border border-blue-100 shadow-sm">1名選択</span>
                             )}
                         </div>
                         <div className="flex-1 overflow-hidden">
@@ -741,11 +760,10 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                             />
                         </div>
                     </div>
-                </div>
             </div>
 
             {/* 3. Mobile: Drill-down (4 steps) */}
-            <div className="flex lg:hidden flex-1 flex-col overflow-hidden bg-[#F5F5F7]">
+            <div className="flex lg:hidden flex-1 flex-col overflow-hidden bg-gray-100">
                 <div className="bg-white border-b border-gray-100 px-4 py-3 flex items-center gap-3 sticky top-0 z-20">
                     {viewState !== 'batches' && (
                         <button
@@ -788,15 +806,20 @@ export default function WorkersListClient({ initialWorkers, role, next90DaysStr 
                     )}
                     {viewState === 'workers' && (
                         <div className="absolute inset-0 flex flex-col bg-white">
-                            <div className="flex border-b border-gray-100 shrink-0">
+                            <div className="flex items-center gap-1 px-2 border-b border-gray-100 shrink-0 h-[52px]">
                                 {TAB_KEYS.map((key) => {
                                     const cfg = TAB_CONFIG[key]
                                     const isActive = activeTab === key
+                                    const count = key === 'all' ? workers.length : countByTab(key)
                                     return (
                                         <button key={key} onClick={() => setActiveTab(key)}
-                                            className={`flex-1 h-[52px] flex items-center justify-center text-xs font-bold uppercase tracking-widest border-b-2 transition-all
-                                            ${isActive ? cfg.activeBg : cfg.inactiveText + ' border-transparent'}`}>
+                                            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-bold transition-all
+                                            ${isActive ? 'bg-[#0067b8] text-white' : 'text-gray-400 hover:text-gray-600'}`}>
                                             {cfg.label}
+                                            <span className={`text-[10px] rounded-full px-1 py-0.5 leading-none font-normal
+                                                ${isActive ? 'bg-white/25 text-white' : 'bg-gray-100 text-gray-500'}`}>
+                                                {count}
+                                            </span>
                                         </button>
                                     )
                                 })}

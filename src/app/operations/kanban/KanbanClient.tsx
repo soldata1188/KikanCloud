@@ -2,28 +2,24 @@
 
 import React, { useState } from 'react';
 import {
-    ClipboardList,
     Plus,
     X,
-    Clock,
     AlertCircle,
     CheckCircle2,
     User,
     Building2,
     Calendar,
     ArrowLeft,
-    Tag,
-    GripVertical,
     Trash2
 } from 'lucide-react';
 import Link from 'next/link';
 import { addTask, updateTaskStatus, deleteTask } from './actions';
-import { Task, Company, Worker, User as UserType } from '@/types/schema';
+import { Company, Worker } from '@/types/schema';
 
 interface KanbanClientProps {
     initialTasks: any[];
-    companies: Company[];
-    workers: Worker[];
+    companies: Pick<Company, 'id' | 'name_jp'>[];
+    workers: Pick<Worker, 'id' | 'full_name_romaji'>[];
     staff: any[];
 }
 

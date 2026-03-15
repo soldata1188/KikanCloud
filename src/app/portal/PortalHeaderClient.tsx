@@ -14,12 +14,12 @@ export default function PortalHeaderClient({ userProfile }: { userProfile: any }
     return (
         <div className="flex items-center gap-4">
             <div className="relative cursor-pointer hover:bg-gray-50 p-1.5 rounded-full transition-colors">
-                <Bell size={16} className="text-[#878787]" />
+                <Bell size={16} className="text-gray-500" />
             </div>
-            <div className="w-px h-5 bg-[#ededed]"></div>
+            <div className="w-px h-5 bg-gray-200"></div>
             <div className="flex items-center gap-2">
-                <div className="text-[11px] font-bold text-[#878787] hidden md:block">{userProfile?.full_name} 様</div>
-                <button onClick={handleLogout} className="w-8 h-8 rounded-full bg-[#fbfcfd] border border-[#ededed] text-[#878787] hover:text-[#d93025] hover:border-[#fce8e6] hover:bg-[#fff9f9] flex items-center justify-center transition-colors" title="Sign Out">
+                <div className="text-[11px] font-bold text-gray-500 hidden md:block">{userProfile?.full_name} 様</div>
+                <button onClick={handleLogout} className="w-8 h-8 rounded-full bg-gray-50 border border-gray-200 text-gray-500 hover:text-red-600 hover:border-red-100 hover:bg-red-50 flex items-center justify-center transition-colors" title="Sign Out">
                     <LogOut size={14} />
                 </button>
             </div>

@@ -1,0 +1,794 @@
+================================================================================
+  KIKANCLOUD — BÁO CÁO TOÀN DIỆN ỨNG DỤNG
+  Ngày tạo: 2026-03-15
+  Phiên bản: 0.1.0
+================================================================================
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. THÔNG TIN TỔNG QUAN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Tên ứng dụng  : KikanCloud (基幹管理システム)
+Phiên bản     : 0.1.0
+Bản quyền     : Private & Confidential — ARATABIZ © 2025
+
+Mô tả:
+  Hệ thống SaaS doanh nghiệp phục vụ quản lý lao động nước ngoài tại Nhật Bản,
+  bao gồm thực tập sinh kỹ năng (技能実習生), lao động kỹ năng đặc định
+  (特定技能), và lao động trong chương trình ikusei shuro (育成就労).
+
+  Phục vụ hai nhóm người dùng chính:
+    - Giám sát đoàn (監理団体 / 登録支援機関): Quản lý toàn bộ chương trình
+    - Doanh nghiệp tiếp nhận (受入企業): Tiếp nhận và sử dụng lao động
+
+  Các chức năng cốt lõi: quản lý hồ sơ lao động, theo dõi visa/thẻ cư trú,
+  lập lịch kiểm tra định kỳ, quản lý chuyển việc, giao tiếp B2B, và
+  tích hợp AI để xử lý tài liệu.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+2. CÔNG NGHỆ SỬ DỤNG (từ package.json)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+── DEPENDENCIES (Runtime) ──────────────────────────────────────────────────────
+
+  Framework chính:
+    next                          v16.1.6   — Next.js (App Router + Turbopack)
+    react                         v19.2.3   — React UI library
+    react-dom                     v19.2.3   — React DOM renderer
+
+  Backend / Database:
+    @supabase/supabase-js         v2.97.0   — Supabase client (DB, Auth, Storage)
+    @supabase/ssr                 v0.8.0    — Supabase SSR helpers cho Next.js
+
+  AI / Machine Learning:
+    @google/genai                 v1.42.0   — Google Generative AI SDK (mới)
+    @google/generative-ai         v0.24.1   — Google Generative AI SDK (cũ)
+    → Sử dụng: Gemini 2.5 Flash cho OCR, chat, daily briefing
+
+  Bản đồ:
+    @vis.gl/react-google-maps     v1.7.1    — Google Maps React wrapper
+
+  UI & Icons:
+    lucide-react                  v0.575.0  — Icon library
+    nextjs-toploader              v3.9.17   — Progress bar khi navigate
+
+  Workflow / Flow Editor:
+    @xyflow/react                 v12.10.1  — React Flow (editor dạng node-graph)
+
+  CSV:
+    papaparse                     v5.5.3    — Parse/export CSV
+
+── DEVDEPENDENCIES (Development) ────────────────────────────────────────────────
+
+  @playwright/test                v1.58.2   — End-to-end testing
+  @tailwindcss/postcss            v4        — Tailwind CSS v4 PostCSS plugin
+  tailwindcss                     v4        — Tailwind CSS
+  typescript                      v5        — TypeScript
+  eslint                          v9        — Linting
+  eslint-config-next              v16.1.6   — Next.js ESLint config
+  eslint-plugin-unused-imports    v4.4.1    — Phát hiện import thừa
+  cross-env                       v10.1.0   — Cross-platform env vars
+
+── STACK TÓM TẮT ────────────────────────────────────────────────────────────────
+
+  Layer           | Công nghệ
+  ────────────────|─────────────────────────────────────────
+  Frontend        | Next.js 16 App Router + React 19 + TypeScript 5
+  Styling         | Tailwind CSS v4 + Custom Design System
+  Backend         | Supabase (PostgreSQL 15+)
+  Authentication  | Supabase Auth (email/password)
+  File Storage    | Supabase Storage (avatars, documents)
+  Database        | PostgreSQL với Row-Level Security (RLS)
+  AI              | Google Gemini 2.5 Flash
+  Maps            | Google Maps API
+  Testing         | Playwright (E2E)
+  Deployment      | Vercel (được cấu hình)
+  CI/CD           | GitHub Actions (deploy-db.yml)
+  Dev DB          | Supabase local (Docker)
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+3. CẤU TRÚC THƯ MỤC TOÀN BỘ
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+kikan-saas/
+├── .agents/                        # Quy tắc thiết kế cho AI agent
+│   └── workflows/
+│       ├── operations_design_standard.md
+│       └── standard_list_design.md
+├── _agent/                         # Thêm quy tắc design cho agent
+│   └── workflows/
+│       ├── design_standard.md
+│       ├── grid_dimensions_standard.md
+│       └── premium_flat_design.md
+├── .github/
+│   └── workflows/
+│       └── deploy-db.yml           # CI/CD: tự động deploy database migrations
+├── .vercel/                        # Vercel deployment config
+├── e2e/                            # Playwright E2E test files
+│   ├── login.spec.ts
+│   └── worker-document.spec.ts
+├── public/
+│   └── templates/
+│       ├── company_import_template.csv   # Template nhập công ty hàng loạt
+│       └── worker_import_template.csv    # Template nhập lao động hàng loạt
+├── supabase/
+│   ├── config.toml                 # Supabase local dev config
+│   ├── schema.sql                  # Schema đầy đủ
+│   ├── seed.sql                    # Dữ liệu demo
+│   ├── snippets/                   # SQL snippets tiện ích
+│   └── migrations/ (56 files)      # Lịch sử migration từ 2026-02 đến nay
+├── src/
+│   ├── actions/
+│   │   └── auth-actions.ts         # Server actions: login/logout/session
+│   ├── app/
+│   │   ├── globals.css             # Design system: tokens, utilities, animations
+│   │   ├── layout.tsx              # Root layout (font, metadata)
+│   │   ├── page.tsx                # Dashboard server component
+│   │   ├── DashboardClient.tsx     # Dashboard UI client component
+│   │   ├── loading.tsx             # Root loading state
+│   │   ├── error.tsx               # Root error boundary
+│   │   ├── global-error.tsx        # Global error boundary
+│   │   │
+│   │   ├── actions/                # Server Actions dùng chung
+│   │   │   ├── ai.ts              — AI actions (extract, chat)
+│   │   │   ├── operations.ts      — Bulk update operations
+│   │   │   ├── rpa.ts             — Automation/RPA actions
+│   │   │   ├── search.ts          — Global search
+│   │   │   └── team.ts            — Team management
+│   │   │
+│   │   ├── api/                    # API Routes (REST endpoints)
+│   │   │   ├── ai/
+│   │   │   │   ├── briefing/      — GET: Daily briefing + weather
+│   │   │   │   ├── chat/          — POST: AI chat (Gemini)
+│   │   │   │   └── extract/       — POST: OCR từ ảnh tài liệu
+│   │   │   ├── chat/              — POST: B2B messaging
+│   │   │   ├── companies/bulk/    — POST: Import công ty từ CSV
+│   │   │   ├── company_workers/
+│   │   │   │   ├── create_with_files/   — POST: Tạo lao động + upload file
+│   │   │   │   └── update_with_files/   — POST: Cập nhật lao động + file
+│   │   │   ├── debug/             — GET: Debug endpoint (dev only)
+│   │   │   └── organization/
+│   │   │       ├── route.ts       — POST: Cập nhật thông tin tổ chức
+│   │   │       └── staff/create/  — POST: Tạo tài khoản nhân viên
+│   │   │
+│   │   ├── login/                  # Đăng nhập
+│   │   │   ├── page.tsx
+│   │   │   └── actions.ts
+│   │   ├── update-password/        # Đổi mật khẩu
+│   │   │   └── page.tsx
+│   │   │
+│   │   ├── workers/                # Quản lý lao động
+│   │   │   ├── page.tsx            — Server component
+│   │   │   ├── WorkersListClient.tsx  — Danh sách chính (tabs, filter)
+│   │   │   ├── WorkerListColumn.tsx   — Cột danh sách lao động
+│   │   │   ├── ProfileDetailColumn.tsx — Panel chi tiết hồ sơ
+│   │   │   ├── DocumentsColumn.tsx    — Panel tài liệu
+│   │   │   ├── EntryBatchColumn.tsx   — Cột phân nhóm nhập cảnh
+│   │   │   ├── BulkImportModal.tsx    — Modal import CSV
+│   │   │   ├── BulkEditModal.tsx      — Modal chỉnh sửa hàng loạt
+│   │   │   ├── actions.ts
+│   │   │   ├── documents-actions.ts
+│   │   │   ├── error.tsx
+│   │   │   ├── new/               — Tạo lao động mới
+│   │   │   └── [id]/              — Chi tiết / sửa lao động
+│   │   │
+│   │   ├── companies/              # Quản lý doanh nghiệp
+│   │   │   ├── page.tsx
+│   │   │   ├── CompaniesClient.tsx    — Layout đa cột
+│   │   │   ├── CompanyListColumn.tsx  — Danh sách công ty
+│   │   │   ├── CompanyDetailColumn.tsx — Chi tiết công ty
+│   │   │   ├── CompanyDocumentsColumn.tsx — Tài liệu công ty
+│   │   │   ├── IndustryColumn.tsx     — Lọc theo ngành
+│   │   │   ├── BulkImportModal.tsx    — Import CSV
+│   │   │   ├── actions.ts
+│   │   │   ├── company-documents-actions.ts
+│   │   │   ├── new/               — Tạo công ty mới
+│   │   │   └── [id]/              — Chi tiết / sửa công ty
+│   │   │
+│   │   ├── operations/             # Quản lý nghiệp vụ
+│   │   │   ├── page.tsx
+│   │   │   ├── OperationsClient.tsx   — Layout chính 3 tab
+│   │   │   ├── CompanyColumn.tsx      — Cột công ty
+│   │   │   ├── WorkerColumn.tsx       — Cột lao động
+│   │   │   ├── OperationColumn.tsx    — Cột nghiệp vụ
+│   │   │   ├── OperationListItem.tsx  — Item trong danh sách
+│   │   │   ├── actions.ts
+│   │   │   ├── kanban/            — Kanban board (phụ)
+│   │   │   └── shien/             — Nhật ký hỗ trợ (支援記録)
+│   │   │
+│   │   ├── audits/                 # Kiểm tra / Giám sát
+│   │   │   ├── page.tsx
+│   │   │   ├── AuditsClient.tsx       — Client chính
+│   │   │   ├── AuditCompanyListColumn.tsx
+│   │   │   ├── AuditDetailColumn.tsx
+│   │   │   ├── AuditScheduleColumn.tsx
+│   │   │   ├── AuditStatusColumn.tsx
+│   │   │   ├── AuditTimelineBoard.tsx — Timeline board
+│   │   │   ├── AuditWorkerListColumn.tsx
+│   │   │   ├── MonthFilter.tsx
+│   │   │   ├── actions.ts
+│   │   │   ├── new/               — Tạo kiểm tra mới
+│   │   │   ├── [id]/edit/         — Sửa kiểm tra
+│   │   │   └── print/             — In báo cáo kiểm tra
+│   │   │
+│   │   ├── routing/                # Bản đồ định tuyến
+│   │   │   ├── page.tsx
+│   │   │   └── RoutingClient.tsx
+│   │   │
+│   │   ├── chat/                   # Chat / AI Assistant
+│   │   │   ├── page.tsx
+│   │   │   └── ChatClient.tsx
+│   │   │
+│   │   ├── portal/                 # Portal dành cho doanh nghiệp tiếp nhận
+│   │   │   ├── layout.tsx          — Layout riêng (không có Sidebar chính)
+│   │   │   ├── page.tsx            — Tổng quan portal
+│   │   │   ├── loading.tsx
+│   │   │   ├── PortalHeaderClient.tsx
+│   │   │   ├── actions.ts
+│   │   │   ├── chat/              — Chat trong portal
+│   │   │   └── workers/           — Xem danh sách lao động (portal)
+│   │   │       └── [id]/          — Chi tiết lao động (portal)
+│   │   │
+│   │   ├── settings/               # Cài đặt hệ thống
+│   │   │   ├── page.tsx
+│   │   │   ├── SettingsPageClient.tsx
+│   │   │   └── actions.ts
+│   │   │
+│   │   ├── accounts/               # Redirect → /settings
+│   │   │   ├── page.tsx
+│   │   │   └── TeamManagerClient.tsx
+│   │   │
+│   │   └── organization/           # Redirect → /settings
+│   │       ├── page.tsx
+│   │       ├── OrganizationForm.tsx
+│   │       ├── StaffList.tsx
+│   │       └── actions.ts
+│   │
+│   ├── components/                 # Shared UI components
+│   │   ├── Sidebar.tsx             — Sidebar (Server wrapper)
+│   │   ├── SidebarClient.tsx       — Sidebar (Client, navigation)
+│   │   ├── ClientSidebar.tsx       — Sidebar (Client variant)
+│   │   ├── SidebarAvatar.tsx       — Avatar trong sidebar
+│   │   ├── TopNav.tsx              — Top navigation bar (bg #0067b8)
+│   │   ├── ChatBox.tsx             — Chat box component
+│   │   ├── GlobalSearch.tsx        — Tìm kiếm toàn cục (Cmd+K)
+│   │   ├── DataTableToolbar.tsx    — Toolbar cho data tables
+│   │   ├── FilledInputBackground.tsx
+│   │   ├── InviteStaffForm.tsx     — Form mời nhân viên
+│   │   ├── SubmitButtons.tsx       — Submit button variants
+│   │   ├── ai/
+│   │   │   └── AIChatSidebar.tsx   — AI Chat sidebar
+│   │   ├── chat/
+│   │   │   └── QuickChatBot.tsx    — Quick chatbot widget
+│   │   ├── operations/
+│   │   │   └── ExamTab.tsx         — Tab quản lý thi cử
+│   │   └── ui/
+│   │       └── Button.tsx          — [MỚI] Button component chuẩn hóa
+│   │
+│   ├── hooks/
+│   │   ├── useSupabaseChat.ts      — Hook real-time chat
+│   │   └── useSupabaseUpload.ts    — Hook upload file
+│   │
+│   ├── lib/
+│   │   ├── supabase/
+│   │   │   ├── client.ts           — Supabase client-side client
+│   │   │   ├── server.ts           — Supabase server-side client
+│   │   │   └── types.ts            — Supabase generated types
+│   │   └── utils/
+│   │       └── timelineEngine.ts   — Logic tính toán timeline audit
+│   │
+│   ├── types/
+│   │   ├── schema.ts               — TypeScript interfaces cho tất cả models
+│   │   └── supabase.ts             — Supabase database type definitions
+│   │
+│   └── proxy.ts                    — Middleware: auth session + token refresh
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+4. DANH SÁCH TẤT CẢ CÁC TRANG (PAGES / ROUTES)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+── TRANG CÔNG KHAI (không cần đăng nhập) ────────────────────────────────────────
+
+  /login                  Trang đăng nhập (email/password)
+  /update-password        Trang đổi mật khẩu (từ link email reset)
+
+── TRANG CHÍNH (yêu cầu đăng nhập - union/admin roles) ─────────────────────────
+
+  /                       Dashboard — Tổng quan thống kê, cảnh báo hết hạn
+  /workers                Danh sách lao động — Filter, sort, xem chi tiết
+  /workers/new            Thêm lao động mới (form đầy đủ + upload tài liệu)
+  /workers/[id]           Chi tiết lao động (hồ sơ, tài liệu, lịch sử)
+  /workers/[id]/edit      Chỉnh sửa thông tin lao động
+
+  /companies              Danh sách doanh nghiệp — Layout 5 cột co dãn
+  /companies/new          Thêm doanh nghiệp mới (form + Kanban tài liệu)
+  /companies/[id]         Chi tiết doanh nghiệp
+  /companies/[id]/edit    Chỉnh sửa thông tin doanh nghiệp
+
+  /operations             Quản lý nghiệp vụ — 3 tab: Visa / Thi cử / Chuyển việc
+  /operations/kanban      Kanban board nghiệp vụ (phụ)
+  /operations/shien       Nhật ký hỗ trợ lao động (支援記録)
+
+  /audits                 Kiểm tra/Giám sát — Ma trận ưu tiên + Timeline
+  /audits/new             Tạo lịch kiểm tra mới
+  /audits/[id]/edit       Sửa thông tin kiểm tra
+  /audits/print           Trang in báo cáo kiểm tra
+
+  /routing                Bản đồ — Google Maps với vị trí lao động/công ty
+  /chat                   Chat AI + B2B messaging
+
+  /settings               Cài đặt hệ thống (tổ chức, nhân viên, AI)
+  /accounts               → Redirect đến /settings
+  /organization           → Redirect đến /settings
+
+── PORTAL DOANH NGHIỆP (yêu cầu role company_admin / company_user) ─────────────
+
+  /portal                 Tổng quan portal — Thống kê, lịch kiểm tra tới
+  /portal/chat            Nhắn tin với giám sát đoàn
+  /portal/workers         Danh sách lao động của công ty
+  /portal/workers/[id]    Chi tiết lao động (xem, không sửa)
+
+── API ROUTES ───────────────────────────────────────────────────────────────────
+
+  POST /api/ai/extract                    OCR: trích xuất từ ảnh tài liệu
+  POST /api/ai/chat                       AI Chat (Gemini)
+  GET  /api/ai/briefing                   Daily briefing + thời tiết Osaka
+  POST /api/chat                          Gửi tin nhắn B2B
+  POST /api/companies/bulk                Import công ty từ CSV
+  POST /api/company_workers/create_with_files   Tạo lao động + upload file
+  POST /api/company_workers/update_with_files   Cập nhật lao động + file
+  POST /api/organization                  Cập nhật thông tin tổ chức
+  POST /api/organization/staff/create     Tạo tài khoản nhân viên mới
+  GET  /api/debug                         Debug (chỉ dùng khi dev)
+
+TỔNG SỐ: 21 trang UI + 9 API routes
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+5. CÁC COMPONENT CHÍNH
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+── SHARED COMPONENTS (src/components/) ──────────────────────────────────────────
+
+  SidebarClient.tsx
+    - Navigation chính của app
+    - Active state: bg-blue-50 text-blue-700
+    - Org badge: bg-[#0067b8]
+    - Mobile: Bottom navigation bar cố định
+
+  TopNav.tsx
+    - Header bar màu xanh (#0067b8) chạy trên cùng
+    - Global Search (Cmd/Ctrl+K) trigger
+    - User info + logout dropdown
+    - AI Briefing button
+
+  GlobalSearch.tsx
+    - Modal tìm kiếm toàn cục
+    - Tìm kiếm lao động, công ty, kiểm tra
+    - Keyboard shortcut: Cmd/Ctrl+K
+
+  ChatBox.tsx
+    - Component chat B2B tái sử dụng
+    - Real-time via Supabase Realtime
+
+  DataTableToolbar.tsx
+    - Thanh công cụ filter/search cho tables
+    - Dùng trong nhiều trang
+
+  Button.tsx  [MỚI - được tạo trong lần chuẩn hóa UI]
+    - Component button chuẩn hóa toàn app
+    - 5 variants: primary, secondary, ghost, danger, success
+    - 3 sizes: sm (h-8), md (h-9), lg (h-10)
+    - Loading state, icon support
+
+  AIChatSidebar.tsx
+    - Sidebar AI chat có thể mở/đóng
+    - Dùng Gemini 2.5 Flash
+
+  QuickChatBot.tsx
+    - Widget chatbot nhanh
+
+── PAGE-LEVEL COMPONENTS (trong từng module) ────────────────────────────────────
+
+  Workers:
+    WorkersListClient     — Danh sách chính với tabs (All/Working/Waiting/...)
+    WorkerListColumn      — Cột hiển thị từng lao động trong list
+    ProfileDetailColumn   — Panel chi tiết hồ sơ (xem/sửa inline)
+    DocumentsColumn       — Panel quản lý tài liệu lao động
+    EntryBatchColumn      — Cột nhóm theo kỳ nhập cảnh
+    BulkImportModal       — Modal import CSV hàng loạt
+    BulkEditModal         — Modal chỉnh sửa nhiều lao động cùng lúc
+    NewWorkerClient       — Form tạo lao động mới
+    EditWorkerClient      — Form sửa lao động
+    WorkerDetailClient    — Trang chi tiết lao động
+
+  Companies:
+    CompaniesClient           — Layout 5 cột co dãn (resizable)
+    CompanyListColumn         — Danh sách công ty
+    IndustryColumn            — Lọc theo ngành nghề
+    CompanyDetailColumn       — Chi tiết công ty
+    CompanyDocumentsColumn    — Tài liệu công ty
+    CompanyDocumentKanban     — Kanban upload tài liệu (khi tạo mới)
+    BulkImportModal           — Import CSV
+    CompanyDetailClient       — Trang chi tiết công ty
+    EditCompanyClient         — Form sửa công ty
+
+  Operations:
+    OperationsClient      — Layout 3-cột: Công ty / Lao động / Nghiệp vụ
+    CompanyColumn         — Cột công ty
+    WorkerColumn          — Cột lao động
+    OperationColumn       — Cột nghiệp vụ (visa, thi, chuyển việc)
+    OperationListItem     — Từng item nghiệp vụ
+    ExamTab               — Tab quản lý thi cử (shared component)
+    KanbanClient          — Kanban board
+    ShienLogClient        — Nhật ký hỗ trợ
+
+  Audits:
+    AuditsClient              — Layout chính
+    AuditCompanyListColumn    — Danh sách công ty cần kiểm tra
+    AuditDetailColumn         — Chi tiết kiểm tra
+    AuditScheduleColumn       — Lịch kiểm tra theo tháng
+    AuditStatusColumn         — Ma trận trạng thái
+    AuditTimelineBoard        — Timeline board
+    AuditWorkerListColumn     — Danh sách lao động trong kiểm tra
+    MonthFilter               — Bộ lọc tháng
+    NewAuditForm              — Form tạo kiểm tra
+    PrintButton               — Nút in báo cáo
+
+  Routing:
+    RoutingClient         — Google Maps + filter lao động/công ty
+
+  Chat:
+    ChatClient            — UI chat đầy đủ (session list + messages)
+
+  Portal:
+    PortalHeaderClient    — Header của portal
+    SmartDrawer           — Drawer chi tiết lao động (portal)
+
+  Settings:
+    SettingsPageClient    — Trang cài đặt tích hợp (3 tab)
+    TeamManagerClient     — Quản lý nhân viên
+    OrganizationForm      — Form thông tin tổ chức
+    StaffList             — Danh sách nhân viên
+
+── HOOKS ────────────────────────────────────────────────────────────────────────
+
+  useSupabaseChat.ts      Real-time chat subscription
+  useSupabaseUpload.ts    File upload với progress tracking
+
+── SERVER ACTIONS ───────────────────────────────────────────────────────────────
+
+  auth-actions.ts         Login, logout, session management
+  workers/actions.ts      CRUD lao động
+  companies/actions.ts    CRUD công ty
+  audits/actions.ts       CRUD kiểm tra
+  operations/actions.ts   Bulk update operations
+  organization/actions.ts Cập nhật tổ chức
+  settings/actions.ts     Cài đặt hệ thống
+  actions/ai.ts           AI extract, chat
+  actions/search.ts       Global search
+  actions/team.ts         Team management
+  actions/rpa.ts          Automation actions
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+6. TÌNH TRẠNG UI SAU KHI ĐỒNG NHẤT (2026-03-15)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Đã thực hiện 6 giai đoạn chuẩn hóa UI:
+
+── GIAI ĐOẠN 1: Design Tokens (globals.css) ─────────────────────────────────────
+  ✅ Màu chủ đạo thống nhất: --brand-primary: #0067b8
+  ✅ Semantic tokens: text, border, status colors
+  ✅ Component tokens: button heights, input height (36px), modal radius (12px)
+  ✅ Header height token: --header-height: 44px
+  ✅ Utility classes mới: .ui-input, .ui-select, .ui-modal-overlay, .ui-modal,
+     .ui-modal-header, .ui-modal-body, .ui-modal-footer, .page-content,
+     .page-header, .page-body
+
+── GIAI ĐOẠN 2: Button Component ────────────────────────────────────────────────
+  ✅ Tạo src/components/ui/Button.tsx
+  ✅ 5 variants: primary (#0067b8), secondary, ghost, danger (red-600), success (emerald)
+  ✅ 3 sizes: sm (h-8/32px), md (h-9/36px), lg (h-10/40px)
+  ✅ Loading state với spinner, icon left/right, disabled state
+
+── GIAI ĐOẠN 3: Input/Form standardization ──────────────────────────────────────
+  ✅ Thay toàn bộ focus:border-emerald-500 → focus:border-[#0067b8]
+  ✅ Thay toàn bộ focus:border-blue-600 → focus:border-[#0067b8]
+  ✅ Focus ring thống nhất: focus:ring-[#0067b8]/10
+  ✅ Áp dụng trên 10 files
+
+── GIAI ĐOẠN 4: Modal/Dialog standardization ────────────────────────────────────
+  ✅ Modal container radius: rounded-xl (12px) — thống nhất
+  ✅ BulkEditModal: header bg-slate-800 → bg-gray-50, button → brand primary
+  ✅ BulkImportModal (2 files): header bg-emerald-700 → bg-gray-50
+  ✅ Overlay: bg-black/40 backdrop-blur-sm — thống nhất
+  ✅ Audit modals: rounded-[6px] → rounded-xl
+
+── GIAI ĐOẠN 5: Page Layout standardization ─────────────────────────────────────
+  ✅ Header height: h-[48px] → h-[44px] (thống nhất với --header-height)
+  ✅ Header border: border-gray-300 → border-gray-200 (thống nhất với --color-border)
+  ✅ seamless-header cập nhật dùng var(--header-height)
+
+── GIAI ĐOẠN 6: Xóa hardcoded hex colors ────────────────────────────────────────
+  ✅ Thay thế 87+ hardcoded hex values trên 20+ files:
+     text-[#1f1f1f]  → text-gray-900
+     text-[#878787]  → text-gray-500
+     border-[#ededed]→ border-gray-200
+     text-[#1a73e8]  → text-[#0067b8]
+     bg-[#F0F2F5]    → bg-gray-100
+     bg-[#1e3a5f]    → bg-[#0067b8]  (login button)
+     text-[#d93025]  → text-red-600
+     bg-[#f8fafc]    → bg-slate-50
+     text-[#94A3B8]  → text-slate-400
+     text-[#666666]  → text-gray-500
+     text-[#444746]  → text-gray-600
+     bg-[#1e8e3e]    → bg-emerald-700
+     bg-[#24b47e]    → bg-emerald-500
+     Và nhiều màu khác...
+
+── TRẠNG THÁI HIỆN TẠI SAU ĐỒNG NHẤT ───────────────────────────────────────────
+
+  Đã đồng nhất:
+    ✅ Màu primary: #0067b8 trên toàn app
+    ✅ Focus state inputs: border #0067b8 + ring 10%
+    ✅ Modal container: rounded-xl + bg-gray-50 header
+    ✅ Modal overlay: bg-black/40 backdrop-blur-sm
+    ✅ Header height: 44px
+    ✅ Header border: border-gray-200
+    ✅ Text colors: Tailwind classes (không còn hardcoded hex)
+    ✅ Build thành công (✓ Compiled successfully in 3.7s)
+
+  Còn tồn tại (minor, chấp nhận được):
+    ⚠ rounded-[6px] vẫn còn trong một số badge/chip/small element
+      (không phải modal — đây là kích thước hợp lý cho phần tử nhỏ)
+    ⚠ Button component mới (src/components/ui/Button.tsx) chưa được
+      áp dụng thay thế các button inline hiện có — cần áp dụng dần
+    ⚠ .ui-input, .ui-select chưa được áp dụng trong các form — cần áp dụng dần
+    ⚠ Portal page còn một số màu tùy chỉnh riêng (thiết kế khác biệt chủ ý)
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+7. TÍNH NĂNG ĐÃ CÓ VÀ CHƯA CÓ
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+── TÍNH NĂNG ĐÃ CÓ (hoạt động đầy đủ) ──────────────────────────────────────────
+
+  Dashboard:
+    ✅ Thống kê tổng quan: tổng lao động, phân loại theo trạng thái
+    ✅ Biểu đồ phân bố quốc tịch, ngành nghề
+    ✅ Cảnh báo visa/hộ chiếu/thẻ bảo hiểm sắp hết hạn (90 ngày)
+    ✅ AI Daily Briefing (thời tiết Osaka + tóm tắt ngày)
+    ✅ Quick access shortcuts
+
+  Quản lý lao động:
+    ✅ CRUD đầy đủ (tạo, xem, sửa, xóa mềm)
+    ✅ Hồ sơ đầy đủ: tên romaji/kana, ngày sinh, quốc tịch, địa chỉ
+    ✅ Thông tin visa: số thẻ cư trú, ngày hết hạn, loại visa
+    ✅ Thông tin hộ chiếu: số, ngày hết hạn
+    ✅ Avatar upload
+    ✅ Upload tài liệu (hợp đồng, bảo hiểm, v.v.)
+    ✅ OCR tự động trích xuất từ ảnh thẻ cư trú/hộ chiếu (Gemini)
+    ✅ Trạng thái: working / standby / waiting / missing / returned / transferred
+    ✅ Filter theo công ty, trạng thái, quốc tịch, ngành
+    ✅ Tab phân loại: Tất cả / Đang làm / Chờ / Đóng
+    ✅ Import CSV hàng loạt
+    ✅ Chỉnh sửa hàng loạt (Bulk Edit)
+    ✅ Sắp xếp theo ngày hết hạn visa, tên công ty
+    ✅ Nhóm theo kỳ nhập cảnh (期生)
+    ✅ Tìm kiếm toàn cục (Global Search)
+
+  Quản lý doanh nghiệp:
+    ✅ CRUD đầy đủ
+    ✅ Thông tin đầy đủ: tên JP/romaji/kana, địa chỉ, đại diện, liên hệ
+    ✅ Số pháp nhân doanh nghiệp (法人番号)
+    ✅ Phân loại theo ngành (IndustryColumn)
+    ✅ Thông tin giám sát: pic_name, guidance_manager, life_advisor, tech_advisor
+    ✅ Tọa độ địa lý (latitude/longitude) cho Maps
+    ✅ Tài liệu công ty (upload/download)
+    ✅ Import CSV hàng loạt
+    ✅ Resize columns (layout co dãn)
+    ✅ Xem lao động theo công ty
+
+  Quản lý nghiệp vụ (Operations):
+    ✅ Tab Visa: theo dõi tiến trình gia hạn (gathering→submitted→approved)
+    ✅ Tab Thi cử: quản lý lịch thi tiếng Nhật và kỹ năng, deadline, kết quả
+    ✅ Tab Chuyển việc: xử lý quy trình chuyển công ty, lý do, trạng thái
+    ✅ Filter theo công ty, trạng thái
+    ✅ Kanban board (trang phụ)
+    ✅ Nhật ký hỗ trợ / 支援記録 (trang phụ)
+
+  Kiểm tra / Giám sát (Audits):
+    ✅ 3 loại kiểm tra: 監査 (định kỳ), 訪問 (thăm), 臨時 (đột xuất)
+    ✅ Lập lịch và theo dõi
+    ✅ Ma trận ưu tiên: overdue / no_data / today_due / future
+    ✅ Timeline board hiển thị lịch sử
+    ✅ Cảnh báo chu kỳ 3 tháng
+    ✅ In báo cáo kiểm tra (print page)
+    ✅ Gán nhân viên phụ trách (pic_name)
+    ✅ Ghi chú kiểm tra
+
+  Bản đồ (Routing):
+    ✅ Google Maps hiển thị vị trí lao động và công ty
+    ✅ Filter theo công ty
+    ✅ Geocoding địa chỉ → tọa độ
+    ✅ Badge trạng thái: working/standby/未入国
+
+  Chat:
+    ✅ AI Chat với Gemini 2.5 Flash
+    ✅ Multi-turn conversation
+    ✅ Session management
+    ✅ B2B messaging (union ↔ company)
+
+  Portal doanh nghiệp:
+    ✅ Đăng nhập riêng (role: company_admin/company_user)
+    ✅ Xem danh sách lao động của công ty
+    ✅ Thông tin lịch kiểm tra tới
+    ✅ Chat với giám sát đoàn
+    ✅ Xem chi tiết lao động
+    ✅ Cách ly dữ liệu hoàn toàn (RLS)
+
+  Cài đặt:
+    ✅ Quản lý thông tin tổ chức (tên, địa chỉ, số giấy phép)
+    ✅ Tạo tài khoản nhân viên mới
+    ✅ Phân quyền theo role
+    ✅ Cài đặt AI (model, tone)
+
+  Bảo mật:
+    ✅ Row-Level Security (RLS) trên tất cả bảng
+    ✅ Multi-tenant isolation
+    ✅ RBAC: admin / staff / company_admin / company_user / worker
+    ✅ Soft delete (is_deleted flag)
+    ✅ Refresh token management
+    ✅ Service role key cho admin operations
+
+── TÍNH NĂNG CHƯA CÓ / CHƯA HOÀN THIỆN ────────────────────────────────────────
+
+  Portal doanh nghiệp:
+    ❌ Document Center (đã có UI placeholder nhưng chưa implement)
+    ❌ Upload tài liệu từ phía doanh nghiệp (chỉ xem)
+    ❌ Thông báo real-time cho doanh nghiệp khi có update mới
+    ❌ Multi-language UI (placeholder đã chuẩn bị nhưng chưa có i18n)
+
+  Worker role:
+    ❌ Portal tự phục vụ cho lao động (worker role) chưa implement
+    ❌ Lao động không thể đăng nhập và xem hồ sơ cá nhân
+
+  Workflows:
+    ❌ Workflow editor (React Flow / @xyflow/react đã cài nhưng chưa có trang)
+    ❌ Automation rules / RPA chưa hoàn thiện (actions/rpa.ts là skeleton)
+
+  Notifications:
+    ❌ System notification center chưa có UI (bảng notifications đã có trong DB)
+    ❌ Email notifications chưa implement
+    ❌ Push notifications chưa implement
+
+  Procedures (Thủ tục hành chính):
+    ❌ Module quản lý thủ tục (nyukan/kikou/kentei) có trong DB schema
+       nhưng chưa có trang UI riêng
+
+  Reports / Analytics:
+    ❌ Export báo cáo Excel/PDF (ngoài trang print audit)
+    ❌ Báo cáo tổng hợp theo tháng/quý/năm
+    ❌ Biểu đồ xu hướng
+
+  Các tính năng nâng cao:
+    ❌ Bulk import lao động từ CSV (có template nhưng route /api/workers chưa hoàn thiện)
+    ❌ Reminder tự động (gửi email trước khi visa hết hạn)
+    ❌ API public cho third-party integration
+    ❌ Mobile app (chỉ có responsive web)
+    ❌ Offline support / PWA
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+8. CÁC LỖI VÀ VẤN ĐỀ CÒN TỒN TẠI
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+── LỖI TYPESCRIPT (pre-existing, không block build) ─────────────────────────────
+
+  File: src/app/operations/kanban/page.tsx (dòng 22-23)
+  File: src/app/operations/shien/page.tsx (dòng 21-22)
+  Lỗi: TS2322 — Type mismatch khi pass company/worker data vào components
+  Chi tiết: Query Supabase chỉ select một số fields (id, name_jp) nhưng
+            component props yêu cầu full Company/Worker type với tenant_id, dob...
+  Trạng thái: Không block build (next.config.ts: ignoreBuildErrors: true)
+  Mức độ: ⚠ Trung bình — cần fix để đảm bảo type safety
+
+── VẤN ĐỀ CẤU TRÚC ─────────────────────────────────────────────────────────────
+
+  1. Duplicate Sidebar components
+     Tồn tại: Sidebar.tsx, SidebarClient.tsx, ClientSidebar.tsx (3 file tương tự)
+     Nguy cơ: Dễ nhầm lẫn, khó maintain
+     Đề xuất: Consolidate thành 1 pattern rõ ràng
+
+  2. /accounts và /organization redirect về /settings
+     Nguyên nhân: Tái cấu trúc cũ, các route cũ chưa được dọn
+     Đề xuất: Xóa hoặc giữ nguyên nếu cần backward compatibility
+
+  3. Portal workers/[id] có thư mục lỗi
+     Phát hiện trong directory listing: ./src/app/portal/workers/[id (không có dấu ])
+     Đây là artifact của filesystem listing, cần kiểm tra lại
+
+  4. API /api/workers chưa hoàn thiện
+     Thư mục src/app/api/workers/ tồn tại nhưng không có route.ts
+     Bulk import lao động CSV sẽ không hoạt động qua API này
+
+── VẤN ĐỀ UI CÒN TỒN TẠI (sau khi chuẩn hóa) ──────────────────────────────────
+
+  1. Button component mới chưa được áp dụng
+     src/components/ui/Button.tsx đã tạo nhưng các trang vẫn dùng button inline
+     Cần migration dần để thay thế
+
+  2. rounded-[6px] còn nhiều trong code (~70 chỗ)
+     Phần lớn là badge/chip/small elements — chấp nhận được
+     Một số trong form inputs — nên đổi sang rounded-lg
+
+  3. Chat page (ChatClient.tsx) còn dùng rounded-[32px] cho chat bubbles
+     Đây là thiết kế chủ ý cho speech bubble — có thể giữ nguyên
+
+  4. Portal có thiết kế khác biệt hoàn toàn (layout riêng, không có sidebar chính)
+     Đây là chủ ý (portal dành cho đối tượng khác) — không phải lỗi
+
+  5. Login page dùng h-12 cho inputs (lớn hơn chuẩn h-9)
+     Login page có thiết kế riêng biệt — chấp nhận được
+
+── VẤN ĐỀ PERFORMANCE / ARCHITECTURE ───────────────────────────────────────────
+
+  1. Có 2 Gemini SDK song song
+     @google/genai v1.42.0 (SDK mới) và @google/generative-ai v0.24.1 (SDK cũ)
+     Cần migrate hoàn toàn sang @google/genai và xóa SDK cũ
+
+  2. TypeScript strict mode chưa triệt để
+     next.config.ts: ignoreBuildErrors: true
+     Nên fix các TS errors và bật strict check
+
+  3. Debug API endpoint còn tồn tại
+     /api/debug/route.ts — cần đảm bảo không active trên production
+
+  4. Không có error boundaries cho từng module lớn
+     Chỉ có root error.tsx và workers/error.tsx
+     Nên thêm cho companies, operations, audits
+
+── VẤN ĐỀ BẢO MẬT ──────────────────────────────────────────────────────────────
+
+  1. /api/debug endpoint cần được disable hoàn toàn trên production
+  2. SUPABASE_SERVICE_ROLE_KEY cần được kiểm tra không bị expose
+  3. Cần review CORS settings cho API routes
+
+── VẤN ĐỀ TEST ──────────────────────────────────────────────────────────────────
+
+  Hiện tại chỉ có 2 E2E test files:
+    - e2e/login.spec.ts
+    - e2e/worker-document.spec.ts
+
+  Thiếu:
+    - Unit tests cho server actions
+    - Integration tests cho API routes
+    - Tests cho các tính năng core (CRUD lao động, công ty...)
+    - CI test automation (GitHub Actions chỉ có deploy-db.yml, không có test)
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+KẾT LUẬN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+KikanCloud là một SaaS platform hoàn chỉnh ở mức MVP với đầy đủ tính năng
+core cho việc quản lý lao động nước ngoài tại Nhật Bản. UI đã được chuẩn hóa
+với design system nhất quán. Build thành công, không có lỗi runtime.
+
+Mức độ hoàn thiện ước tính:
+  - Core features (CRUD): ~90% ✅
+  - UI/UX: ~85% (sau chuẩn hóa) ✅
+  - Portal doanh nghiệp: ~70% ⚠
+  - AI features: ~80% ✅
+  - Testing: ~15% ❌
+  - Documentation: ~60% ⚠
+
+================================================================================
+  Báo cáo được tạo bởi: Claude Code (claude-sonnet-4-6)
+  Ngày: 2026-03-15
+================================================================================

@@ -1,4 +1,4 @@
-﻿import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/supabase/server'
 import { Sidebar } from '@/components/Sidebar'
 import { TopNav } from '@/components/TopNav'
 
@@ -9,7 +9,8 @@ export const dynamic = 'force-dynamic';
 
 export default async function AuditsPage({ searchParams }: { searchParams: Promise<{ [key: string]: string | undefined }> }) {
     const sp = await searchParams;
-    const filterMonth = sp.month || new Date().toISOString().slice(0, 7);
+    const now = new Date();
+    const filterMonth = sp.month || `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
     const startOfMonth = `${filterMonth}-01`;
     const endOfMonth = new Date(new Date(startOfMonth).getFullYear(), new Date(startOfMonth).getMonth() + 1, 0).toISOString().split('T')[0];
 
@@ -27,7 +28,7 @@ export default async function AuditsPage({ searchParams }: { searchParams: Promi
         .order('full_name')
     const { data: companies } = await supabase
         .from('companies')
-        .select('id, name_jp, address, workers(id, full_name, system_type, visa_status, is_deleted)')
+        .select('id, name_jp, address, workers(id, full_name, system_type, visa_status, zairyu_exp, is_deleted)')
         .eq('is_deleted', false)
         .order('name_jp')
 
@@ -149,6 +150,7 @@ export default async function AuditsPage({ searchParams }: { searchParams: Promi
         <div className="seamless-block">
             <Sidebar active="audits" />
             <div className="flex-1 flex flex-col relative min-w-0 overflow-hidden">
+                <TopNav title="" role={userProfile?.role} />
                 <AuditsClient
                     matrixData={matrixData}
                     filterMonth={filterMonth}

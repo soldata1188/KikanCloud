@@ -50,7 +50,7 @@ export default function WorkerColumn({ workers, selectedIds, onSelect }: WorkerC
     const abbreviateCompany = (name: string): string => {
         if (!name) return '---';
         // Remove common legal entity prefixes / suffixes
-        let s = name
+        const s = name
             .replace(/株式会社/g, '')
             .replace(/有限会社/g, '')
             .replace(/合同会社/g, '')
@@ -81,25 +81,22 @@ export default function WorkerColumn({ workers, selectedIds, onSelect }: WorkerC
                     const isSelected = selectedIds.includes(worker.id);
                     const status = worker.nyukan_status?.progress;
 
-                    let bgCls = 'bg-white hover:bg-emerald-50/40';
-                    let borderLCls = 'border-l-transparent';
+                    const bgCls = isSelected ? 'bg-blue-50' : 'bg-white hover:bg-gray-50';
 
-                    if (status === '完了') {
-                        bgCls = isSelected ? 'bg-emerald-100' : 'bg-emerald-50/50 hover:bg-emerald-100/50';
-                        borderLCls = isSelected ? 'border-l-emerald-500' : 'border-l-emerald-200';
+                    let borderLCls = 'border-l-transparent';
+                    if (isSelected) {
+                        borderLCls = 'border-l-blue-500';
+                    } else if (status === '完了') {
+                        borderLCls = 'border-l-emerald-400';
                     } else if (status === '進行中') {
-                        bgCls = isSelected ? 'bg-blue-100' : 'bg-blue-50/50 hover:bg-blue-100/50';
-                        borderLCls = isSelected ? 'border-l-blue-500' : 'border-l-blue-200';
-                    } else if (isSelected) {
-                        bgCls = 'bg-emerald-50';
-                        borderLCls = 'border-l-emerald-500';
+                        borderLCls = 'border-l-amber-400';
                     }
 
                     return (
                         <button
                             key={worker.id}
                             onClick={(e) => onSelect(worker.id, e)}
-                            className={`w-full text-left pl-1.5 pr-3 py-2.5 border-b border-b-gray-200 border-l-[3px] transition-all duration-200 group flex items-center gap-2
+                            className={`w-full text-left pl-1.5 pr-3 py-2.5 border-b border-gray-100 border-l-[3px] transition-all duration-200 group flex items-center gap-2
                                 ${bgCls} ${borderLCls}`}
                         >
                             {/* Row Number */}

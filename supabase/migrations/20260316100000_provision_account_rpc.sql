@@ -43,7 +43,10 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 
--- Step 2: Create the provision_account RPC
+-- Step 2: Enable pgcrypto (crypt/gen_salt live in extensions schema in Supabase)
+CREATE EXTENSION IF NOT EXISTS pgcrypto SCHEMA extensions;
+
+-- Step 3: Create the provision_account RPC
 CREATE OR REPLACE FUNCTION public.provision_account(
   p_login_id    TEXT,
   p_password    TEXT,
@@ -55,7 +58,7 @@ CREATE OR REPLACE FUNCTION public.provision_account(
 RETURNS JSON
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public, auth
+SET search_path = public, auth, extensions
 AS $$
 DECLARE
   v_user_id   UUID;
@@ -107,7 +110,7 @@ BEGIN
   ) VALUES (
     v_user_id,
     v_email,
-    crypt(p_password, gen_salt('bf', 10)),
+    extensions.crypt(p_password, extensions.gen_salt('bf')),
     now(),
     now(),
     now(),

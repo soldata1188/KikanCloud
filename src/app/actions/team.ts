@@ -43,8 +43,18 @@ export async function createProvisionedAccount(formData: FormData) {
 
         if (rpcError) return { error: 'アカウントの作成に失敗しました: ' + rpcError.message }
 
-        const result = rpcResult as { success?: boolean; error?: string; login_id?: string }
+        const result = rpcResult as { success?: boolean; error?: string; login_id?: string; user_id?: string }
         if (result?.error) return { error: result.error }
+
+        // Re-set password via GoTrue Admin API to ensure bcrypt format compatibility.
+        // updateUserById only does an UPDATE (no email check), so it won't fail like createUser did.
+        if (result?.user_id) {
+            const { error: pwError } = await adminDb.auth.admin.updateUserById(result.user_id, { password })
+            if (pwError) {
+                await adminDb.auth.admin.deleteUser(result.user_id)
+                return { error: 'パスワードの設定に失敗しました: ' + pwError.message }
+            }
+        }
 
         revalidatePath('/accounts')
         revalidatePath('/organization')

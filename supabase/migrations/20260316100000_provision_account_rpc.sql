@@ -97,6 +97,8 @@ BEGIN
   PERFORM set_config('app.provisioning', 'true', true);
 
   -- Insert into auth.users (bypasses GoTrue email check)
+  -- is_sso_user = false and is_super_admin = false are required explicitly:
+  -- GoTrue queries WHERE id = ? AND is_sso_user = false, so NULL breaks lookup.
   INSERT INTO auth.users (
     id,
     email,
@@ -106,7 +108,9 @@ BEGIN
     updated_at,
     raw_user_meta_data,
     aud,
-    role
+    role,
+    is_super_admin,
+    is_sso_user
   ) VALUES (
     v_user_id,
     v_email,
@@ -116,7 +120,9 @@ BEGIN
     now(),
     jsonb_build_object('full_name', p_full_name),
     'authenticated',
-    'authenticated'
+    'authenticated',
+    false,
+    false
   );
 
   -- Insert into auth.identities (required for email login)
